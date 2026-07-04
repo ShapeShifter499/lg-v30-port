@@ -1,0 +1,106 @@
+# LG V30 (joan, US998) mainline Linux port
+
+Multi-agent project home. Any agent (or human) picking up a work parcel starts
+here — this file is the single source of truth for state and conventions.
+Coordination happens on **Deck board 4 "Shared Tasks", epic card #43** plus one
+card per parcel. Artifacts that Lance should see go to
+`Talk/Shared_AI_agents_files/{handoffs,patches,status}/` with a pointer in the
+card.
+
+## Goal
+
+Boot modern mainline Linux (6.x) on Lance's LG V30 **US998**. First userspace
+target: postmarketOS. Stretch: AOSP-on-mainline. The phone's daily driver will
+be LineageOS 22.2 (Android 15 on downstream 4.4) — the port never touches that
+install: test kernels boot tethered (`fastboot boot`) or from the recovery
+partition.
+
+Full background: `docs/recon-2026-07-04.md` (also on NC:
+`Shared_AI_agents_files/status/2026-07-04_lg-v30-joan-mainline-recon.md`).
+
+## Repos and paths (all on nym-nest)
+
+| What | Where |
+|---|---|
+| This project (harness, docs) | `~/vibe-coding-projects/coding/lg-v30-port/` |
+| Mainline kernel work tree | `~/vibe-coding-projects/coding/linux-mainline-v30/`, branch **`lge-joan-bringup`** |
+| Board DTS | `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` (first commit `3d3868854`, see its body for design decisions) |
+| Downstream reference kernel | `~/vibe-coding-projects/coding/android_kernel_lge_msm8998/` (LineageOS 4.4, **read-only reference — never build or modify**) |
+| Downstream joan DTS | `arch/arm64/boot/dts/lge/msm8998-joan/` in the downstream tree |
+
+## Build + test image
+
+```bash
+cd ~/vibe-coding-projects/coding/linux-mainline-v30
+# config = arm64 defconfig + these forced built-in (gadget/pstore from initramfs):
+#   scripts/config --enable USB_CONFIGFS --enable PHY_QCOM_QUSB2 \
+#     --enable PSTORE_RAM --enable PSTORE_CONSOLE --enable PSTORE_PMSG && make ... olddefconfig
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j4 Image.gz dtbs
+
+cd ~/vibe-coding-projects/coding/lg-v30-port
+./make-testimage.sh          # → out/boot-joan-mainline.img
+```
+
+The initramfs (`initramfs/root/init`) brings up a USB ECM+ACM gadget at
+172.16.42.1 with telnetd and a ttyGS0 shell. Milestone 1 = phone enumerates on
+the host (`lsusb`), then `ip addr add 172.16.42.2/24 dev <usb-if>` and
+`telnet 172.16.42.1`.
+
+Boot format (from LineageOS BoardConfig): `Image.gz-dtb` appended DTB, base
+0x0, pagesize 4096. LG aboot may not support `fastboot boot` — untested;
+fallback is flashing the **recovery** partition (never boot) and key-combo
+booting it (Vol-Down + Power, release/re-hold Power at the LG logo).
+
+## Work parcels
+
+Each parcel has a Deck card. **Claim = assign yourself / comment on the card
+and move it to Active.** Don't work an unclaimed-by-you card that's already
+Active. Parcels marked *no-device* are fully doable without the phone.
+
+| # | Parcel | Card | Needs device? | Depends on |
+|---|---|---|---|---|
+| P0 | Verify kernel build + boot.img packaging | #43 (epic) | no | — (Ember, in progress) |
+| P1 | Cross-check RPM regulator voltages vs downstream `msm8998-joan-common-pm.dtsi`; fix `msm8998-lge-joan.dts` (currently copied from OnePlus 5) | see board | no | — |
+| P2 | Extract SW43402 panel data from downstream (`dsi-panel-sw43402*.dtsi`): DSI init sequence, timings, DSC PPS params → `docs/panel-sw43402.md` | see board | no | — |
+| P3 | DSC-on-MDP5 feasibility verdict: read mainline `drivers/gpu/drm/msm` (mdp5 vs dpu DSC), downstream DSC usage; deliverable = written verdict + recommended display path in `docs/display-path.md` | see board | no | — |
+| P4 | Draft touchscreen node: downstream `msm8998-joan-touch-stm-ftm4.dtsi` → mainline `stmfts` DT node (i2c bus, gpios, supplies), committed `status = "disabled"` | see board | no | P1 helps |
+| P5 | Device chunk: confirm stock Pie, `fastboot oem unlock`, LineageOS 22.2 install, test `fastboot boot`, read actual hw rev + board-id, first tethered mainline boot | see board | **yes + Lance** | P0 |
+| P6 | pmOS `device-lg-joan` package skeleton (pmaports layout, deviceinfo, kernel APKBUILD against our branch) | later | no | P5 proof of life |
+
+## Conventions (binding)
+
+- **Commits**: kernel-style subjects (`arm64: dts: qcom: ...`), detailed body
+  (what + why), author `Lance <Gero3977@gmail.com>`, trailers per kernel.org
+  coding-assistant policy:
+  `Signed-off-by: Lance <Gero3977@gmail.com>` +
+  `Assisted-by: <your-harness>:<model actually running>` (e.g.
+  `Claude-Code:claude-fable-5`, `OpenClaw:<model>`). Never `Co-Authored-By`.
+  See `~/vibe-coding-projects/README.md` for the full policy.
+- **Branches**: small topic branches `joan/<topic>` off `lge-joan-bringup`,
+  merged back into `lge-joan-bringup` when the parcel is done. Don't rebase or
+  amend another agent's commits.
+- **Attribution on docs/artifacts**: append `Written-by:` / `Agent-harness:` /
+  `Date:` lines with *your* identity and the model running at write time.
+  Never replace an earlier agent's attribution — append beneath it.
+- **Safety**: nothing in this project flashes, deletes, or modifies the phone
+  or any partition without Lance present and approving. Test images are built
+  to `lg-v30-port/out/` and go nowhere else. The downstream kernel tree is
+  reference-only.
+- **State**: when you finish or hand off, update your parcel card and, if the
+  facts here changed, this README (append, don't rewrite history).
+
+## Current status (2026-07-04)
+
+- Recon done (see docs/). Kernel scaffold committed (`3d3868854`); DTB
+  compiles. `Image.gz` rebuild with gadget configs built-in was backgrounded on
+  nym-nest — if `arch/arm64/boot/Image.gz` is missing, rerun the build line
+  above. Test-image pipeline untested until the kernel image exists (P0).
+- Phone not yet confirmed/connected; P5 blocked on Lance.
+- Toolchain installed on nym-nest: `aarch64-linux-gnu-gcc` 16.1,
+  `android-tools` (adb/fastboot/mkbootimg), `dtc`. `dtschema` NOT installed, so
+  `CHECK_DTBS=y` doesn't work yet — install it if you want binding checks.
+
+---
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-04

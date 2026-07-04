@@ -1,0 +1,46 @@
+#!/bin/busybox sh
+# Bring-up initramfs for LG V30 (joan) mainline boots.
+# Goal: enumerate as a USB ECM network + ACM serial gadget, then offer
+# a telnet root shell. No storage is touched.
+
+/bin/busybox --install -s /bin
+export PATH=/bin
+
+mount -t devtmpfs dev /dev
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t configfs configfs /sys/kernel/config
+
+# --- USB gadget: ECM ethernet + ACM serial ---
+G=/sys/kernel/config/usb_gadget/g1
+mkdir -p $G
+echo 0x18d1 > $G/idVendor     # Google
+echo 0x4e26 > $G/idProduct
+mkdir -p $G/strings/0x409
+echo joan-mainline-0001 > $G/strings/0x409/serialnumber
+echo LG > $G/strings/0x409/manufacturer
+echo "V30 mainline bring-up" > $G/strings/0x409/product
+
+mkdir -p $G/configs/c.1/strings/0x409
+echo "ECM+ACM" > $G/configs/c.1/strings/0x409/configuration
+echo 500 > $G/configs/c.1/MaxPower
+
+mkdir -p $G/functions/ecm.usb0
+mkdir -p $G/functions/acm.GS0
+ln -s $G/functions/ecm.usb0 $G/configs/c.1/
+ln -s $G/functions/acm.GS0 $G/configs/c.1/
+
+# Bind to the first available UDC (a800000.dwc3)
+UDC=$(ls /sys/class/udc | head -n1)
+[ -n "$UDC" ] && echo "$UDC" > $G/UDC
+
+# --- network + shells ---
+ip link set lo up
+ip link set usb0 up 2>/dev/null
+ip addr add 172.16.42.1/24 dev usb0 2>/dev/null
+
+telnetd -l /bin/sh
+# Serial console on the ACM function, respawn forever
+while true; do
+    getty -n -l /bin/sh 115200 /dev/ttyGS0 2>/dev/null || sleep 5
+done
