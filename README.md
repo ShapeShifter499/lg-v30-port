@@ -89,7 +89,20 @@ Active. Parcels marked *no-device* are fully doable without the phone.
 - **State**: when you finish or hand off, update your parcel card and, if the
   facts here changed, this README (append, don't rewrite history).
 
-## Current status (2026-07-04)
+## Current status (2026-07-05)
+
+- **P0 DONE — test image ready for tethered boot.** Kernel built clean
+  (`Image.gz` 14.7 MB, joan DTB rebuilt) and packaged:
+  `out/boot-joan-mainline.img` (15.5 MB,
+  sha256 `c900dd1583fc7d760361e615dd69810165f4306171264c90fb617d1c378b0df9`).
+  Image verified by unpack: bootimg header v0, base 0x0, pagesize 4096,
+  kernel @0x8000 / ramdisk @0x1000000 / tags @0x100, kernel section =
+  byte-exact `Image.gz` + appended DTB, ramdisk carries `init` +
+  static aarch64 busybox. First device test (P5, needs Lance):
+  `fastboot boot out/boot-joan-mainline.img`, then watch `lsusb` for
+  18d1:4e26 "V30 mainline bring-up".
+
+## Previous status (2026-07-04)
 
 - Recon done (see docs/). Kernel scaffold committed (`3d3868854`); DTB
   compiles. `Image.gz` rebuild with gadget configs built-in was backgrounded on
@@ -104,3 +117,7 @@ Active. Parcels marked *no-device* are fully doable without the phone.
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-04
+
+Updated-by: Ember Nymbrand (agent-ember) — P0 completion status
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-05
