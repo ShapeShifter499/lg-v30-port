@@ -23,7 +23,7 @@ Full background: `docs/recon-2026-07-04.md` (also on NC:
 | What | Where |
 |---|---|
 | This project (harness, docs) | `~/vibe-coding-projects/coding/lg-v30-port/` |
-| Mainline kernel work tree | `~/vibe-coding-projects/coding/linux-mainline-v30/`, active tethered-test branch **`joan/latest-kernel`**; older clean/debug refs `lge-joan-bringup` and `joan/bringup-debug` are preserved |
+| Mainline kernel work tree | `~/vibe-coding-projects/coding/linux-mainline-v30/`, active clean tethered-test branch **`joan/latest-clean-test`**; debug branch `joan/latest-kernel` and older refs `lge-joan-bringup` / `joan/bringup-debug` are preserved |
 | Board DTS | `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` (first commit `3d3868854`, see its body for design decisions) |
 | Downstream reference kernel | `~/vibe-coding-projects/coding/android_kernel_lge_msm8998/` (LineageOS 4.4, **read-only reference — never build or modify**) |
 | Downstream joan DTS | `arch/arm64/boot/dts/lge/msm8998-joan/` in the downstream tree |
@@ -101,13 +101,17 @@ Active. Parcels marked *no-device* are fully doable without the phone.
 
 - **P5/debug continued — latest upstream still reboots before debug output.**
   Aurel rebased the joan debug stack onto fetched upstream `origin/master`
-  `8cdeaa50e` (`Linux 7.2-rc2`) as branch `joan/latest-kernel`, preserving the
-  old branch tips with backup refs. Build succeeded and produced RAM-only image
-  `out/boot-joan-latest-kernel.img` (sha256
-  `2c8af0cc49b05ccd5d0c5452b5bd8f607aadbe89675fdcc6f7b92f023f32c325`). A
+  `8cdeaa50e` (`Linux 7.2-rc2`) as branch `joan/latest-kernel`, then made a
+  cleaner tethered-test branch `joan/latest-clean-test` with only the four DTS
+  commits (no `head.S`/`setup_arch` breadcrumb instrumentation). Clean build
+  succeeded and produced RAM-only image `out/boot-joan-latest-clean.img` (sha256
+  `47418aebd86c929b59cd09d243d93abe7ab03d85310d11015dfcd530474d47c1`). A
   one-client `fastboot boot` succeeded, but the phone returned to LineageOS at
-  `t+29.7s` after boot handoff with no mainline mass-storage/debug channel.
-  Latest upstream alone did **not** fix the reset.
+  `t+46.7s` after boot handoff with no mainline mass-storage/debug channel.
+  Latest upstream plus clean joan DTS work still does **not** fix the reset.
+  The earlier debug branch image `out/boot-joan-latest-kernel.img` returned at
+  `t+29.7s`; prefer the clean branch for future baseline testing because the
+  breadcrumb commit is known debug-only and may perturb timing.
 - **Reset source remains unresolved, but narrowed.** Aurel tested the obvious
   downstream `SEC_WDOG_DIS` translations plus discriminators. `panic=30` and
   disabling the APSS watchdog DT node did **not** shift the reset window; a PSCI

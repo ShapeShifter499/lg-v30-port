@@ -41,10 +41,12 @@ part of a ledger experiment.
 
 ## Current kernel branch map
 
-- Latest tethered-test branch: `linux-mainline-v30`, branch `joan/latest-kernel`,
-  currently rebased onto fetched `origin/master` `8cdeaa50e` (`Linux 7.2-rc2`)
-  plus the five joan/debug commits now rewritten as `e1b2094f3`, `0c64968b7`,
-  `b6e545a9e`, `6a9b09615`, and `88bf16047`.
+- Latest clean tethered-test branch: `linux-mainline-v30`, branch
+  `joan/latest-clean-test`, currently rebased onto fetched `origin/master`
+  `8cdeaa50e` (`Linux 7.2-rc2`) plus four DTS-only joan commits now rewritten
+  as `25a391c94`, `a19ca9204`, `7c906e841`, and `0d7df4134`.
+- Latest debug branch: `joan/latest-kernel`, same upstream base plus the
+  debug-only breadcrumb commit, currently ending at `88bf16047`.
 - Previous debug branch preserved: `joan/bringup-debug`, currently old
   v7.2-rc1-based commits `3d3868854`, `d75290b9e`, `5acce83a9`, `93fe462d7`,
   and `6c5f06bc8`.
@@ -265,6 +267,41 @@ part of a ledger experiment.
     the debug breadcrumb commit.
 - Public/PR disposition: branch contains mixed upstream-candidate and debug-only
   commits; `do not publish` as-is.
+
+### K010 — latest clean DTS-only branch fastboot baseline
+
+- Handles:
+  - branch `joan/latest-clean-test` at `0d7df4134` — `arm64: dts: qcom: msm8998-lge-joan: add APSS watchdog node`
+  - base `origin/master` `8cdeaa50e` — `Linux 7.2-rc2`
+  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-clean.img`
+  - image sha256 `47418aebd86c929b59cd09d243d93abe7ab03d85310d11015dfcd530474d47c1`
+- Class: `bringup-local` baseline / public-shaping evidence.
+- Files changed by carried commits:
+  - `arch/arm64/boot/dts/qcom/Makefile`
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Purpose:
+  - Verify the latest upstream branch with only clean DTS-side joan commits,
+    excluding the known debug-only `head.S` / `setup_arch` breadcrumb commit.
+  - Establish a better baseline for future public/PR-shaped work.
+- Verification/evidence:
+  - `git diff --check` succeeded.
+  - `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6 Image.gz dtbs`
+    succeeded on `joan/latest-clean-test`.
+  - `./make-testimage.sh` produced the RAM-only boot image above.
+  - One-client RAM-only `fastboot boot out/boot-joan-latest-clean.img` succeeded
+    at the fastboot protocol layer (`Sending` OKAY, `Booting` OKAY, total
+    `5.525s`).
+  - No mainline mass-storage/debug channel appeared; LineageOS adb returned at
+    `t+46.7s` after boot handoff.
+- Status:
+  - Latest upstream v7.2-rc2 plus clean joan DTS work still does not fix the
+    reset.
+  - Prefer this clean branch over `joan/latest-kernel` for future baseline tests;
+    the breadcrumb branch is useful only as historical debug context and returned
+    at a different `t+29.7s` timing.
+- Public/PR disposition: `blocked` for a bootable public claim; the branch shape
+  is closer to public-ready than `joan/latest-kernel`, but individual commits
+  still need cleanup/review per K001-K004.
 
 ## Current narrowed hypothesis
 

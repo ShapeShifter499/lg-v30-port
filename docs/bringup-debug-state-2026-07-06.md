@@ -253,3 +253,37 @@ hypothesis produces a testable timing oracle or a clean upstream-candidate patch
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+## Aurel follow-up — latest clean branch test (2026-07-06)
+
+Aurel then created a cleaner latest-kernel tethered-test branch without the
+known debug-only ramoops breadcrumb commit:
+
+- base: fetched upstream `origin/master` `8cdeaa50e` (`Linux 7.2-rc2`);
+- branch: `joan/latest-clean-test`, four DTS-only commits ahead of upstream;
+- head: `0d7df4134` — `arm64: dts: qcom: msm8998-lge-joan: add APSS watchdog node`;
+- carried commits: initial joan DTS, downstream-compatible ramoops layout,
+  LG firmware-owned reserved memory, and APSS watchdog node;
+- excluded: `JOAN DEBUG: ramoops breadcrumbs in head.S and setup_arch`.
+
+Build/test evidence:
+
+| Item | Result |
+|---|---|
+| Build | `git diff --check` and `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6 Image.gz dtbs` succeeded. |
+| RAM-only image | `out/boot-joan-latest-clean.img` |
+| Image sha256 | `47418aebd86c929b59cd09d243d93abe7ab03d85310d11015dfcd530474d47c1` |
+| Fastboot command | one client only: `sudo -n fastboot boot out/boot-joan-latest-clean.img` |
+| Fastboot protocol result | `Sending 'boot.img' ... OKAY`; `Booting ... OKAY`; total time `5.525s` |
+| Host classifier result | no mass-storage/debug channel; LineageOS adb returned at `t+46.7s` after boot handoff. |
+
+Interpretation: the clean DTS-only latest branch is the better baseline for
+future public/PR-shaped testing, but it still reboots before mainline can expose
+USB diagnostics. The earlier `joan/latest-kernel` debug-branch result returned at
+`t+29.7s`; because that branch includes dead ramoops breadcrumb instrumentation,
+prefer `joan/latest-clean-test` for baseline work and keep breadcrumb code out of
+public candidates.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
