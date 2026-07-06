@@ -39,7 +39,8 @@ Three things, in order of value:
 - not DLOAD arg-shape / QSEE logbuf / RPM reachability / BOB / L19 / L18+L19+BOB
   / TCSR DLOAD cookie / PON S3 / PON reset-seq / Kryo errata (all Aurel);
 - **not anything userspace does (K022);**
-- **not kernel USB/dwc3/PHY bring-up (K023b).**
+- **not kernel USB/dwc3/PHY bring-up (K023b);**
+- **not kernel UFS host/PHY bring-up (K023c).**
 
 It IS: a controlled secure-side PS_HOLD reset (`POFF=0x2:PS_HOLD,
 PON=0x21:HARD_RESET, FAULT1=0x40:UVLO` stale), ~27-49s window, and a
@@ -53,13 +54,16 @@ with one subsystem `status="disabled"`, classifier init, **panic=0**).
 Subtract ONE at a time; if the reset stops, that subsystem's bring-up is the
 trigger. Candidates, most promising first:
 
-1. **UFS** (`&ufshc`, `&ufsphy`) — brings up early, touches secure/regulators;
-   storage isn't needed to boot (initramfs in RAM), so it's boot-safe to drop.
+1. ~~UFS~~ — DONE (K023c), eliminated. USB (K023b) also eliminated.
 2. **RPM regulators / rpm_requests** — but carefully: it's referenced by
    default nodes, so `status="disabled"` may break boot (=> silent with
    panic=0, which at least won't fool you). Consider disabling just the
    consumers, or accept the silent = "RPM needed to boot" datum.
 3. **The whole `&soc` watchdog node** was already tried (no effect), so skip.
+   Two big peripheral subsystems (USB, UFS) are now eliminated; the reset
+   is looking less like ANY removable peripheral and more like a low-level
+   secure/firmware timer. RPM is the last big untested removable — but
+   likely breaks boot (=> silent with panic=0, still an honest datum).
 4. If subtraction bottoms out (every removable subsystem still resets),
    the conclusion is a low-level secure/firmware timer armed at boot that
    downstream services via something below individual peripheral drivers

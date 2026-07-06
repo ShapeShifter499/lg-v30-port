@@ -875,6 +875,24 @@ part of a ledger experiment.
 - Agent-harness: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
+### K023c — full-DTB-minus-UFS (boot-safe): UFS bring-up is NOT the trigger
+
+- Handle: DTS `out/ember-noufs-K023c-2026-07-06.dts`; image
+  `out/boot-joan-noufs-k023c.img`
+  (sha256 `45564b83948eead68207cceb259e2de3ef6538f49d775b808d43f05f372c5b52`).
+  Kernel tree reverted clean after.
+- Class: `debug-only`; CONCLUSIVE (same panic=0 boot-safe harness as K023b).
+- Method: full known-good joan DTS with only `&ufshc` + `&ufsphy`
+  `status="disabled"`, panic=0 classifier init.
+- Result: LOS returned at +30s — natural reset (panic=0 rules out boot-fail;
+  well before the 90s survivor reboot). Reset persists.
+- Conclusion: kernel UFS host-controller / UFS-PHY bring-up is NOT the ~27s
+  reset trigger. Eliminated.
+- Public/PR disposition: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
