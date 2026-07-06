@@ -1,7 +1,7 @@
 #!/bin/busybox sh
-# Bring-up initramfs for LG V30 (joan) mainline boots.
-# Goal: enumerate as a USB ECM network + ACM serial gadget, then offer
-# a telnet root shell. No storage is touched.
+# Bring-up initramfs for LG V30 (joan) boots (mainline or downstream).
+# Goal: enumerate as a USB network + ACM serial gadget, then offer a
+# telnet root shell. No storage is touched.
 
 /bin/busybox --install -s /bin
 export PATH=/bin
@@ -10,8 +10,14 @@ mount -t devtmpfs dev /dev
 mount -t proc proc /proc
 mount -t sysfs sys /sys
 mount -t configfs configfs /sys/kernel/config
+mkdir -p /tmp
 
-# --- USB gadget: ECM ethernet + ACM serial ---
+# Kill the APSS watchdog at the register level (busybox devmem proved
+# absent; wdkill is our own static tool). Logs initial EN/BARK/BITE
+# state, disables, then keeps petting in case something re-arms it.
+/bin/wdkill > /tmp/wdt.log 2>&1 &
+
+# --- USB gadget: network (ECM, else RNDIS/NCM) + ACM serial ---
 G=/sys/kernel/config/usb_gadget/g1
 mkdir -p $G
 echo 0x18d1 > $G/idVendor     # Google
@@ -22,25 +28,82 @@ echo LG > $G/strings/0x409/manufacturer
 echo "V30 mainline bring-up" > $G/strings/0x409/product
 
 mkdir -p $G/configs/c.1/strings/0x409
-echo "ECM+ACM" > $G/configs/c.1/strings/0x409/configuration
+echo "bringup" > $G/configs/c.1/strings/0x409/configuration
 echo 500 > $G/configs/c.1/MaxPower
 
-mkdir -p $G/functions/ecm.usb0
-mkdir -p $G/functions/acm.GS0
-ln -s $G/functions/ecm.usb0 $G/configs/c.1/
-ln -s $G/functions/acm.GS0 $G/configs/c.1/
+NET=""
+for f in ecm rndis ncm; do
+    if mkdir $G/functions/$f.usb0 2>/dev/null; then
+        ln -s $G/functions/$f.usb0 $G/configs/c.1/ && NET=$f && break
+    fi
+done
+mkdir $G/functions/acm.GS0 2>/dev/null && ln -s $G/functions/acm.GS0 $G/configs/c.1/ 2>/dev/null
 
-# Bind to the first available UDC (a800000.dwc3)
-UDC=$(ls /sys/class/udc | head -n1)
+# Wait up to 300s for a UDC to probe (deferred probes get unlimited
+# time once the watchdog is dead), then bind.
+n=0
+while [ $n -lt 300 ]; do
+    UDC=$(ls /sys/class/udc 2>/dev/null | head -n1)
+    [ -n "$UDC" ] && break
+    sleep 1; n=$((n+1))
+done
 [ -n "$UDC" ] && echo "$UDC" > $G/UDC
 
 # --- network + shells ---
 ip link set lo up
-ip link set usb0 up 2>/dev/null
-ip addr add 172.16.42.1/24 dev usb0 2>/dev/null
+# device-side netdev name differs per function (usb0/rndis0/ncm0):
+# bring up the first non-loopback interface.
+for IF in $(ls /sys/class/net | grep -v '^lo$'); do
+    ip link set "$IF" up 2>/dev/null
+    ip addr add 172.16.42.1/24 dev "$IF" 2>/dev/null && break
+done
 
 telnetd -l /bin/sh
-# Serial console on the ACM function, respawn forever
-while true; do
-    getty -n -l /bin/sh 115200 /dev/ttyGS0 2>/dev/null || sleep 5
+
+# Serial shell on the ACM function (setsid+exec: works where getty
+# can't grab a controlling tty), respawned forever.
+(while :; do
+    setsid sh -c 'exec sh -i </dev/ttyGS0 >/dev/ttyGS0 2>&1' 2>/dev/null
+    sleep 2
+done) &
+
+# --- diagnostic dump over a mass-storage LUN (survives broken
+# --- network/serial): write ground truth to a file, re-bind the
+# --- gadget with a mass_storage function backed by it.
+mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null
+sleep 15
+D=/dev/diag.bin
+{
+    echo "===WDT===";        cat /tmp/wdt.log
+    echo "===VERSION===";    cat /proc/version
+    echo "===CMDLINE===";    cat /proc/cmdline
+    echo "===UDC===";        ls /sys/class/udc
+    echo "===GADGETNET===";  echo "$NET"; ip addr
+    echo "===INTERRUPTS==="; cat /proc/interrupts
+    echo "===CLK===";        cat /sys/kernel/debug/clk/clk_summary
+    echo "===REGULATOR===";  cat /sys/kernel/debug/regulator/regulator_summary
+    echo "===DMESG===";      dmesg
+    echo "===END==="
+} > $D 2>&1
+# pad to a 512-byte multiple for the LUN
+sz=$(wc -c < $D); pad=$(( (512 - sz % 512) % 512 ))
+[ $pad -gt 0 ] && dd if=/dev/zero bs=1 count=$pad >> $D 2>/dev/null
+if mkdir $G/functions/mass_storage.0 2>/dev/null; then
+    echo $D > $G/functions/mass_storage.0/lun.0/file
+    echo 1 > $G/functions/mass_storage.0/lun.0/ro 2>/dev/null
+    ln -s $G/functions/mass_storage.0 $G/configs/c.1/
+    # re-bind so the new function enumerates
+    echo '' > $G/UDC
+    sleep 2
+    UDC=$(ls /sys/class/udc 2>/dev/null | head -n1)
+    [ -n "$UDC" ] && echo "$UDC" > $G/UDC
+fi
+
+# Self-recover: reboot after 15 min unless /keep is touched (via a
+# live shell), so a dead-end boot never needs the power button.
+n=0
+while :; do
+    sleep 60; n=$((n+1))
+    [ -e /keep ] && continue
+    [ $n -ge 15 ] && echo b > /proc/sysrq-trigger
 done
