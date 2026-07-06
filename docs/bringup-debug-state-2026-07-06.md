@@ -663,6 +663,87 @@ Cleanup:
 - Phone parked back in LineageOS; `adb root` was used only for the PON readback.
 - No fastboot client left running.
 
+
+## Aurel follow-up — DT-backed RPM L19 default-vote oracle (2026-07-06)
+
+Focus after the BOB-mode timing result: test one concrete downstream joan PM
+override through mainline's own RPM regulator framework rather than another raw
+`qcom_smd_rpm` debug write.
+
+Downstream/mainline comparison:
+
+- Downstream `msm8998-joan-common-sound.dtsi` forces `pm8998_l19` to 3.3 V with
+  `qcom,init-voltage = <3300000>`,
+  `qcom,vdd-voltage-level = <3300000 3300000>`, and `regulator-always-on`.
+- Mainline joan currently inherits the generic MSM8998 MTP-style `l19` default
+  in `msm8998-lge-joan.dts`: `3008000`/`3008000` uV with no
+  `regulator-boot-on` or `regulator-always-on`.
+- Mainline `qcom_smd-regulator.c` already supports `qcom,rpm-pm8998-regulators`,
+  and regulator core applies fixed min/max constraints plus boot/always-on
+  enable during regulator registration. This makes L19 a good minimal DT-backed
+  oracle for “does one missing downstream RPM default vote matter?”.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-rpm-l19-always-on-oracle-2026-07-06.patch`
+- Touched file:
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Change:
+  update `vreg_l19a_3p0: l19` from `3008000` uV to `3300000` uV and mark it
+  `regulator-boot-on` plus `regulator-always-on` so mainline emits the default
+  through the existing RPM regulator framework during boot.
+- Image:
+  `out/boot-joan-latest-rpm-l19-always-on.img`
+- Image sha256:
+  `84134c0d71c7f7eafae9e6a268c50302238a002b6c11c229baa6b52a6ee96e04`
+- Patch sha256:
+  `41bb06f48df489e454c4d44aab7284e6990ac97367b8b8925e68cc642c95df45`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-l19-always-on-fastboot-2026-07-06.txt`, sha256
+  `7f5de9a5c9f90f8e1603de7a832ebb7bc0c9b3a6e6bcfb961e421015f408f52a`
+- PON evidence:
+  `out/aurel-rpm-l19-always-on-pon-2026-07-06.txt`, sha256
+  `325bc47d2dd040f34be1795d29ba642e6e5bcb21618d768f5404e54389e43dac`
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.517s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+57.8s`.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- This minimal DT-backed default vote did not produce survival or a mainline
+  diagnostic channel.
+- Because it used the existing mainline RPM regulator framework instead of a raw
+  debug write, it strengthens the conclusion that one missing L19 default alone
+  is not the sole reset gate.
+- Broader downstream PM/RPM regulator parity still looks worthwhile, but do not
+  repeat single-L19-only testing as if it were a likely standalone fix.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-l19-oracle.img`, sha256
+  `69c820614b2e06cdc089717a7971779e35089791f1e058757c9d81cdb65221b3`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback.
+- No fastboot client left running.
+
 Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Agent-harness: Hermes:gpt-5.4
 Date: 2026-07-06

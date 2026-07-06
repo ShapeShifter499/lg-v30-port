@@ -183,6 +183,21 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `PS_HOLD`. This bare BOB-mode vote is not sufficient, but the longer failure
   timing keeps full downstream RPM regulator/default-vote parity worth comparing.
   The patch was saved, reverted, and the kernel rebuilt clean.
+- **DT-backed RPM L19 default-vote oracle also still ended in controlled PS_HOLD.**
+  Downstream joan's sound overlay forces `pm8998_l19` to 3.3 V with
+  `qcom,init-voltage`, `qcom,vdd-voltage-level`, and `regulator-always-on`;
+  mainline joan inherited the generic MSM8998 `l19` setting of 3.008 V with no
+  boot/always-on flags. Aurel tested a minimal DT-only oracle in
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` that changed `vreg_l19a_3p0`
+  to 3.3 V and marked it `regulator-boot-on`/`regulator-always-on`
+  (`out/aurel-latest-rpm-l19-always-on-oracle-2026-07-06.patch`; image
+  `out/boot-joan-latest-rpm-l19-always-on.img`, sha256
+  `84134c0d71c7f7eafae9e6a268c50302238a002b6c11c229baa6b52a6ee96e04`).
+  RAM-only `fastboot boot` succeeded, but no mainline USB/diag appeared;
+  LineageOS adb returned at `t+57.8s`, and PON evidence again showed SID0
+  `PS_HOLD`. This minimal DT-backed default vote is not sufficient by itself,
+  though it keeps broader downstream PM/RPM regulator parity worth testing.
+  The patch was saved, reverted, and the kernel rebuilt clean.
 
 ## Previous status (2026-07-05)
 

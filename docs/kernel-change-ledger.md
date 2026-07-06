@@ -541,6 +541,47 @@ part of a ledger experiment.
   - the unusually long reset/return timing keeps broader downstream RPM
     regulator/default-vote parity high-value, but it needs a separate oracle.
 
+### K016 — DT-backed PM8998 L19 downstream default-vote oracle
+
+- Handles:
+  - patch `out/aurel-latest-rpm-l19-always-on-oracle-2026-07-06.patch`
+    (sha256 `41bb06f48df489e454c4d44aab7284e6990ac97367b8b8925e68cc642c95df45`);
+  - image `out/boot-joan-latest-rpm-l19-always-on.img`
+    (sha256 `84134c0d71c7f7eafae9e6a268c50302238a002b6c11c229baa6b52a6ee96e04`,
+    size `15736832` bytes);
+  - fastboot transcript `out/aurel-rpm-l19-always-on-fastboot-2026-07-06.txt`
+    (sha256 `7f5de9a5c9f90f8e1603de7a832ebb7bc0c9b3a6e6bcfb961e421015f408f52a`);
+  - PON evidence `out/aurel-rpm-l19-always-on-pon-2026-07-06.txt`
+    (sha256 `325bc47d2dd040f34be1795d29ba642e6e5bcb21618d768f5404e54389e43dac`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-l19-oracle.img`
+    (sha256 `69c820614b2e06cdc089717a7971779e35089791f1e058757c9d81cdb65221b3`).
+- Class: `debug-only`, rejected as a standalone fix; useful evidence that a
+  single downstream PM8998 L19 default vote is not the lone missing gate.
+- Public/PR disposition: `do not publish`.
+- Touched file: `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`.
+- Downstream reference:
+  - `msm8998-joan-common-sound.dtsi` forces `pm8998_l19` to 3.3 V with
+    `qcom,init-voltage`, `qcom,vdd-voltage-level`, and `regulator-always-on`;
+  - mainline joan inherited the generic MSM8998 MTP-style `l19` 3.008 V default
+    and no boot/always-on flags.
+- Mainline delta tested:
+  - update `vreg_l19a_3p0: l19` from `3008000` uV to `3300000` uV;
+  - add `regulator-boot-on` and `regulator-always-on` so regulator core applies
+    the default through the existing `qcom,rpm-pm8998-regulators` path.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt with GCC cross toolchain and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.517s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+57.8s`;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - a single DT-backed downstream L19 default vote is not the missing liveness
+    action;
+  - broader downstream PM/RPM regulator/default-vote parity still merits testing,
+    but not as another single-L19-only oracle.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -548,8 +589,10 @@ not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
 watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
 downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
 argument shape, registering a downstream-style QSEE log buffer, merely reaching
-RPM `rpm_requests` rpmsg setup, or sending a bare downstream BOB `bobm=2` RPM
-vote. Next investigation should compare very early downstream boot setup against
+RPM `rpm_requests` rpmsg setup, sending a bare downstream BOB `bobm=2` RPM
+vote, or forcing downstream joan's PM8998 L19 3.3 V always-on default through
+the mainline regulator framework. Next investigation should compare very early
+downstream boot setup against
 mainline,
 especially:
 
