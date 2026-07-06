@@ -14,7 +14,8 @@ reachability as a standalone liveness oracle, a minimal downstream PMI8998
 BOB-mode RPM vote, a DT-backed PM8998 L19 3.3 V always-on default vote,
 a broader DT-backed PM/RPM L18+L19+BOB overlay vote bundle, and a TCSR
 DLOAD/restart-cookie phandle matching downstream's `tcsr-boot-misc-detect`
-address.
+address, PM8998 PON S3/reset-sequence parity, optional Kryo SCM errata, and the
+obvious downstream `watchdog_v2`/QSEECOM probe paths checked in K025.
 
 ## Evidence preserved from the PON / reset-cause pass
 
@@ -35,8 +36,10 @@ bringup, high-memory secure/shared pool allocation, DLOAD-off argument shape, a
 standalone QSEE log-buffer registration ping, RPM `rpm_requests` rpmsg
 reachability alone, a bare PMI8998 BOB-mode RPM vote, or a single DT-backed
 PM8998 L19 3.3 V always-on default vote, a broader standard DT-backed
-PM/RPM L18+L19+BOB overlay vote bundle, or the downstream-observed TCSR
-DLOAD/restart-cookie route.
+PM/RPM L18+L19+BOB overlay vote bundle, the downstream-observed TCSR
+DLOAD/restart-cookie route, PM8998 PON S3/reset-sequence parity, optional Kryo
+SCM errata, or the obvious downstream `watchdog_v2`/QSEECOM probe paths checked
+in K025.
 
 ## Concrete rejected paths so far
 
@@ -61,6 +64,8 @@ DLOAD/restart-cookie route.
   still ended as SID0 `PS_HOLD`.
 - TCSR DLOAD/restart-cookie oracle (`qcom,dload-mode = <&tcsr_regs_2 0x13000>`):
   no diagnostic channel; reset still ended as SID0 `PS_HOLD`.
+
+- K025 secure-interface archaeology: downstream `watchdog_v2`/QSEECOM obvious early paths produced no valid boot oracle; no image built.
 
 ## New Aurel test: DLOAD-off SCM argument-shape oracle
 
@@ -518,3 +523,77 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.
+
+
+## Aurel follow-up — secure-interface archaeology K025 cancelled before boot
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Aurel followed Ember's session-2 handoff by inspecting downstream early
+secure/TZ/SCM paths before spending another boot cycle. Goal: find exactly one
+active downstream-default, early, state-changing secure call that mainline lacks
+and that is safe enough to test as a debug oracle.
+
+Sources compared:
+
+- downstream `drivers/soc/qcom/watchdog_v2.c`
+- downstream `drivers/misc/qseecom.c`
+- downstream `drivers/soc/qcom/qsee_ipc_irq_bridge.c`
+- downstream `include/soc/qcom/qseecomi.h`
+- downstream MSM8998/joan DT and joan defconfigs
+- mainline `drivers/firmware/qcom/qcom_scm.c`
+- mainline `drivers/firmware/qcom/qcom_qseecom.c`
+- mainline `drivers/firmware/qcom/Kconfig`
+- mainline MSM8998/joan DT and active `.config`
+
+Findings:
+
+- `SEC_WDOG_DIS` is still the only obvious secure-watchdog disable path in
+  downstream `watchdog_v2.c`. It was already rejected, and downstream LineageOS's
+  own sysfs disable path fails on this device with `0x42000107 ret=-2`.
+- The other secure call visible in `watchdog_v2.c`, `SCM_SVC_UTIL` /
+  `SCM_SET_REGSAVE_CMD` (`cmd 0x2`), registers a CPU register-save page for
+  watchdog-bite dump collection. Failure only means registers will not be dumped
+  on a dog bite. It is crashdump setup, not a pet/ack/keepalive.
+- Current mainline already has `CONFIG_QCOM_SCM=y`, `CONFIG_QCOM_TZMEM=y`, and
+  `CONFIG_QCOM_QSEECOM=y`, and `qcom_scm_probe()` already calls
+  `qcom_scm_qseecom_init()`. That function performs the QSEECOM version query
+  before applying the machine allowlist, so repeating the version query is not a
+  new oracle.
+- Mainline skips creating the `qcom_qseecom` platform device on joan because
+  `lge,joan` is not in the QSEECOM allowlist. Enabling it would currently mainly
+  add a `qcom.tz.uefisecapp` app lookup, which is not downstream joan default
+  liveness parity and should not be the next reset oracle.
+- Downstream `qseecom_probe()` can send `QSEOS_APP_REGION_NOTIFICATION`, but the
+  downstream MSM8998 qseecom node sets `qcom,appsbl-qseecom-support`; with that
+  property true, downstream treats appsbl/boot firmware as already handling the
+  region/commonlib state and skips the region notification path. Joan variant
+  DTs only resize `qseecom_mem` to `0x1800000`; they do not remove the property.
+- `qsee_ipc_irq_bridge.c` is char-device/IRQ/SSR notification plumbing and does
+  not issue an SCM/QSEE liveness call at probe.
+- `CONFIG_QCOM_EARLY_RANDOM=y` appears in joan defconfigs, but source search in
+  this tree only found config references, not a concrete implementation to
+  transplant or compare.
+
+Decision:
+
+- No K025 boot image was built.
+- No K025 fastboot boot was run.
+- This path is recorded as comparison-only / no-test so future agents do not
+  waste a boot on inactive or already-covered calls.
+
+Artifact:
+
+- `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`
+- sha256 `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`
+
+Next better targets:
+
+- downstream LGE panic/restart-reason plus IMEM/SMEM boot-cookie setup, kept
+  distinct from the already-rejected TCSR DLOAD phandle oracle;
+- any early `SCM_SVC_BOOT` or TZ setup before/around downstream `msm_watchdog`
+  init that is not `SEC_WDOG_DIS` and not dump-only;
+- stock-RAM-boot/downstream dmesg diffs around the first second, especially
+  secure monitor, qseecom, msm_watchdog, and restart-reason lines.

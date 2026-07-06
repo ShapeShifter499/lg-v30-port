@@ -265,6 +265,18 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   parity, so no RAM-boot oracle was built. Status artifact:
   `out/aurel-kryo-scm-comparison-2026-07-06.txt`.
 
+- **K025 secure-interface archaeology produced no new boot oracle.**
+  Aurel followed Ember's session-2 handoff and compared downstream
+  `watchdog_v2.c`, QSEECOM probe/listener/region paths, `qsee_ipc_irq_bridge`,
+  joan defconfigs, and current mainline QSEECOM. Result: the obvious candidates
+  were either already tested (`SEC_WDOG_DIS`), already mirrored by mainline
+  (QSEECOM version query), inactive on downstream joan defaults
+  (`QSEOS_APP_REGION_NOTIFICATION`, skipped because MSM8998 sets
+  `qcom,appsbl-qseecom-support`), dump-only (`SCM_SET_REGSAVE_CMD` register-save
+  setup), or ordinary IRQ/device plumbing. No speculative RAM-boot oracle was
+  built. Status artifact: `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`,
+  sha256 `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`.
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -303,5 +315,9 @@ Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
 
 Updated-by: Aurel Nymvale (agent-aurel) — Kryo SCM errata comparison
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Updated-by: Aurel Nymvale (agent-aurel) — K025 secure-interface archaeology comparison
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

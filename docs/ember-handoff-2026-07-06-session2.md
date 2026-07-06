@@ -100,3 +100,27 @@ downstream's *kernel* keeps alive somehow (stock kernel RAM-boots fine).
 - Kernel `joan/latest-clean-test` clean (rebuilt), 4 DTS commits ahead of
   v7.2-rc2. Harness repo clean. Phone in LineageOS, no fastboot client.
 - Ledger K022 / K023 / K023b-e / K024 current; WebDAV + Deck #43 updated.
+
+## Aurel K025 addendum — secure-interface archaeology checked, no boot oracle
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Aurel followed the requested secure/SCM archaeology pass. Downstream
+`watchdog_v2.c`, QSEECOM probe/listener/region paths, `qsee_ipc_irq_bridge`,
+joan defconfigs, and current mainline QSEECOM were compared.
+
+Result: no new RAM-boot oracle was selected. The concrete candidates were either
+already rejected (`SEC_WDOG_DIS`), already mirrored by mainline (QSEECOM version
+query), inactive on downstream joan defaults (`QSEOS_APP_REGION_NOTIFICATION`,
+skipped because MSM8998 sets `qcom,appsbl-qseecom-support`), dump-only
+(`SCM_SET_REGSAVE_CMD` register-save setup), or ordinary IRQ/device plumbing.
+
+Artifact: `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`
+sha256: `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`
+
+Next better target: LGE panic/restart-reason plus IMEM/SMEM boot-cookie setup,
+kept distinct from the already-rejected TCSR DLOAD phandle oracle; otherwise
+look for an early `SCM_SVC_BOOT`/TZ setup before or around downstream
+`msm_watchdog` init that is neither `SEC_WDOG_DIS` nor dump-only.
