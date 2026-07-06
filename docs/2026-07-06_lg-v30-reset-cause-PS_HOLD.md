@@ -410,13 +410,62 @@ Result:
 Conclusion: downstream PM8998 PON S3 source/debounce parity is not the missing
 standalone liveness handshake.
 
+
+## PM8998 PON reset-sequence/S1/S2 oracle — rejected
+
+Aurel tested the fuller downstream PM8998 PON reset-sequence delta after the S3
+source/debounce-only oracle failed.
+
+Patch and image:
+
+- Patch:
+  `out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`
+- Patch sha256:
+  `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`
+- Config artifact:
+  `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`
+- Config artifact sha256:
+  `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+- Image:
+  `out/boot-joan-latest-pon-reset-seq-oracle.img`
+- Image sha256:
+  `a0c0e2b6448981798d5cc5b03a4804504caaedff7705a896a42883d86786ee12`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-pon-reset-seq-fastboot-2026-07-06.txt`
+- Fastboot transcript sha256:
+  `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
+- PON evidence:
+  `out/aurel-pon-reset-seq-pon-2026-07-06.txt`
+- PON evidence sha256:
+  `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
+- Clean post-revert image:
+  `out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`
+- Clean post-revert image sha256:
+  `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.522s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+57.6s` host-script time, about `46.3s` after the
+  fastboot boot command returned.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: fuller downstream PM8998 PON reset-sequence/S1/S2 parity is not the
+missing standalone liveness handshake.
+
 ## Next best single oracle
 
 Do not repeat DLOAD SCM argument-shape, TCSR DLOAD-cookie phandle, QSEE-log
 registration, RPM reachability, bare BOB-mode, single L19 default-vote,
-standard DT L18+L19+BOB voltage/enable bundle, or PM8998 PON S3
-source/debounce parity tests as the next standalone test. Mainline
-already performs the TZ feature/version
+standard DT L18+L19+BOB voltage/enable bundle, PM8998 PON S3
+source/debounce parity, or PM8998 PON reset-sequence/S1/S2 parity tests as the
+next standalone test. Mainline already performs the TZ feature/version
 query, the QSEE log-buffer ping did not prevent PS_HOLD, the RPM rpmsg
 reachability oracle only shifted timing without exposing diagnostics, and the
 BOB-mode vote extended timing but still returned to LineageOS with SID0
@@ -431,8 +480,6 @@ against mainline, especially one of:
   voltage/enable votes;
 - fuller IMEM/reboot-mode/normal restart-reason modeling, only if kept distinct
   from the rejected TCSR DLOAD-cookie phandle;
-- fuller PMIC/PON reset-sequence/S1/S2 setup deltas not covered by the rejected
-  S3 source/debounce oracle;
 - LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
 - another concrete QSEE/QSECOM state transition only if downstream evidence shows
   it runs before the reset window and differs from mainline.
@@ -449,7 +496,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated through the PM8998 PON S3 source/debounce oracle.
+- Harness docs updated through the PM8998 PON reset-sequence/S1/S2 oracle.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.

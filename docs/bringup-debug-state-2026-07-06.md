@@ -999,6 +999,87 @@ Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
 
+
+## Aurel follow-up — PM8998 PON reset-sequence/S1/S2 oracle rejected
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Hypothesis:
+
+- The prior PON S3-only oracle matched only `qcom,s3-debounce` and `qcom,s3-src`.
+  Downstream joan also configures a fuller PM8998 PON reset sequence: disable S2
+  reset for `pon_1`/`pon_2`, and enable `pon_3` (`KPDPWR_N AND RESIN_N`) with
+  S1 timer `6720`, S2 timer `2000`, and S2 reset type `0x08`
+  (`PON_POWER_OFF_DVDD_HARD_RESET`).
+
+Oracle:
+
+- Saved patch:
+  `out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`
+- Touched files:
+  `drivers/power/reset/qcom-pon.c` and
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Change:
+  add DEBUG-ONLY property-driven PON S3 plus reset-sequence/S1/S2 programming to
+  upstream `qcom-pon`, and add joan `&pm8998_pon` child nodes matching downstream
+  `qcom,pon_1`, `qcom,pon_2`, and `qcom,pon_3` values.
+- Config artifact:
+  `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+- Required config verified:
+  `CONFIG_POWER_RESET_QCOM_PON=y`
+- Image:
+  `out/boot-joan-latest-pon-reset-seq-oracle.img`
+- Image sha256:
+  `a0c0e2b6448981798d5cc5b03a4804504caaedff7705a896a42883d86786ee12`
+- Patch sha256:
+  `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-pon-reset-seq-fastboot-2026-07-06.txt`, sha256 `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
+- PON evidence:
+  `out/aurel-pon-reset-seq-pon-2026-07-06.txt`, sha256 `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
+
+Verification:
+
+- `git diff --check` passed.
+- Targeted `drivers/power/reset/qcom-pon.o` compiled successfully.
+- Joan DTB rebuilt successfully.
+- Full kernel rebuild completed with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.522s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+57.6s` host-script time, about `46.3s` after the
+  fastboot boot command returned.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The fuller downstream PM8998 PON reset-sequence/S1/S2 setup is not sufficient
+  as a standalone survival/liveness fix.
+- Do not repeat the exact PM8998 PON reset-sequence oracle as another standalone
+  test.
+- The longer host return time may be noted as a timing perturbation, but it did
+  not expose diagnostics or change the reset cause.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`, sha256 `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback
+  and `adb unroot` returned adbd to ordinary shell mode.
+- No fastboot client left running.
+
+
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

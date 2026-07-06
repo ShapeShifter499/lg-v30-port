@@ -238,6 +238,23 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   as a standalone liveness fix. The patch was saved, reverted, and the kernel
   rebuilt clean (`out/boot-joan-latest-clean-post-pon-s3-oracle.img`, sha256 `7d87765d96df926cac538563dcbe1989f8990d9b784b1c0163926f5cb5f0b0ef`).
 
+
+- **PM8998 PON reset-sequence/S1/S2 oracle also failed.**
+  Aurel then tested the next fuller downstream PON delta: in addition to the S3
+  source/debounce values, downstream joan disables S2 reset on `pon_1`/`pon_2`
+  and enables `pon_3` (`KPDPWR_N AND RESIN_N`) with `qcom,s1-timer = <6720>`,
+  `qcom,s2-timer = <2000>`, and `qcom,s2-type = <0x08>`
+  (`PON_POWER_OFF_DVDD_HARD_RESET`). The DEBUG-ONLY oracle added a minimal
+  upstream `qcom-pon` reset-sequence programming path and joan DT child nodes
+  (`out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`, sha256 `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`; config `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`;
+  image `out/boot-joan-latest-pon-reset-seq-oracle.img`, sha256 `a0c0e2b6448981798d5cc5b03a4804504caaedff7705a896a42883d86786ee12`). RAM-only `fastboot boot` succeeded
+  (`Sending`/`Booting` OKAY, total `5.522s`), but no mainline USB/diag appeared;
+  LineageOS adb returned at `t+57.6s` host-script time (`~46.3s` after the
+  fastboot command returned), and post-reset PON evidence again showed SID0
+  `PS_HOLD`. The fuller downstream PM8998 PON reset-sequence delta is not
+  sufficient as a standalone liveness fix. The patch was saved, reverted, and
+  the kernel rebuilt clean (`out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`, sha256 `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`).
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -272,5 +289,9 @@ Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-05
 
 Updated-by: Aurel Nymvale (agent-aurel) — PM8998 PON S3 oracle result
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Updated-by: Aurel Nymvale (agent-aurel) — PM8998 PON reset-sequence oracle result
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

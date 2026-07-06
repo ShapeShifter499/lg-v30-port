@@ -695,6 +695,45 @@ part of a ledger experiment.
   - downstream PM8998 PON S3 source/debounce parity is not enough by itself;
   - do not repeat this exact PON S3 oracle as another standalone boot test.
 
+
+### K020 — DEBUG-ONLY / rejected: PM8998 PON reset-sequence/S1/S2 oracle
+
+- Status: `rejected`
+- Public disposition: `do not publish` as-is; debug oracle only.
+- Touched files:
+  - `drivers/power/reset/qcom-pon.c`
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Artifact:
+  - `out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`
+  - sha256 `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`
+  - config artifact `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+  - image `out/boot-joan-latest-pon-reset-seq-oracle.img`, sha256 `a0c0e2b6448981798d5cc5b03a4804504caaedff7705a896a42883d86786ee12`
+  - fastboot transcript `out/aurel-pon-reset-seq-fastboot-2026-07-06.txt`, sha256 `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
+  - PON evidence `out/aurel-pon-reset-seq-pon-2026-07-06.txt`, sha256 `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
+  - clean rebuilt image `out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`, sha256 `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`
+- Downstream/reference basis:
+  - downstream joan PM8998 PON has S3 source/debounce values plus reset child
+    nodes: `qcom,pon_1`/`qcom,pon_2` with `qcom,support-reset = <0>`, and
+    `qcom,pon_3` with `qcom,support-reset = <1>`, `qcom,s1-timer = <6720>`,
+    `qcom,s2-timer = <2000>`, and `qcom,s2-type = <PON_POWER_OFF_DVDD_HARD_RESET>`;
+  - upstream `qcom-pon` has no support for these reset-sequence child nodes, so
+    the oracle added a minimal DEBUG-ONLY property-driven programming path;
+  - `CONFIG_POWER_RESET_QCOM_PON=y` was verified before building.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - targeted `qcom-pon.o` and joan DTB builds completed, then full `Image.gz dtbs`
+    rebuild and package completed;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.522s`);
+  - no mainline USB/mass-storage/diag channel appeared;
+  - LineageOS adb returned at `t+57.6s` host-script time (`~46.3s` after fastboot
+    boot returned);
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - fuller downstream PM8998 PON reset-sequence/S1/S2 parity is not sufficient as
+    a standalone survival/liveness fix;
+  - do not repeat this exact PON reset-sequence oracle as another standalone boot test.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -708,8 +747,9 @@ mainline regulator framework, forcing a broader standard DT-backed PM/RPM
 L18+L19+BOB voltage/enable bundle, routing SCM DLOAD-mode clearing through
 the downstream-observed TCSR boot-misc cookie (`qcom,dload-mode = <&tcsr_regs_2
 0x13000>`), or programming downstream joan's PM8998 PON S3 source/debounce
-(`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`). Next
-investigation should compare very early downstream boot setup against mainline,
+(`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`), or matching
+the fuller downstream PM8998 PON reset-sequence/S1/S2 setup. Next investigation
+should compare very early downstream boot setup against mainline,
 especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
