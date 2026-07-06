@@ -122,3 +122,96 @@ for all device work.
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-06
+
+## Aurel follow-up — SCM/discriminator tests (2026-07-06)
+
+Aurel + Lance retested from LineageOS via `adb reboot bootloader` with a
+single `fastboot boot` client. No packages were installed. All tests were
+RAM-only and returned to LineageOS; no phone storage was written.
+
+New evidence:
+
+| Test image / change | Result |
+|---|---|
+| `qcom_scm_probe()` wrapper for `SEC_WDOG_DIS` (svc 0x1 cmd 0x7 arg 1, mainline `qcom_scm_call`) | Still reset/rebooted to LineageOS at the normal host-side window (~46-50s). |
+| early raw SMC variants (`std64`, `fast64`, `std32`, `fast32`) | Did not fix; the broader convention spray shortened the reboot window (~30s host-side), so it is likely noisy/unsafe as a fix. |
+| exact raw downstream fnid `0x02000107` + arg 1 | Did not fix; returned to LineageOS at ~30s host-side. |
+| clean kernel with cmdline `panic=30` | Returned to LineageOS at ~46.5s, same as panic=5 baseline; this argues against a normal Linux panic + `panic=5` reboot. |
+| APSS watchdog DT node disabled (`status = "disabled"`) | Returned to LineageOS at ~46.6s; this argues against mainline `qcom_wdt` probing/reprogramming the non-secure APSS WDT as the reset source. |
+| timing oracle: PSCI reset at `qcom_scm_probe()` entry | Returned to LineageOS at ~29.7s host-side, proving `qcom_scm_probe()` is reached early enough to run before the normal reset window. |
+| direct `0x42000107` + QCOM A6 quirk at `qcom_scm_probe()` entry, followed by non-secure WDT `EN=0` | Still returned to LineageOS at ~44.5s; no evidence that the attempted secure watchdog disable made `EN=0` safe. |
+| `SEC_WDOG_TRIG` (svc 0x1 cmd 0x8) via `qcom_scm_call_atomic()` after `__get_convention()` | Did not produce an earlier reset than baseline, suggesting the current mainline SCM invocation path/command form is not doing what downstream's watchdog code does for these commands. |
+
+Interpretation update: `qcom_scm_probe()` timing is not the blocker, and
+panic/APSS-WDT-driver explanations are now weaker. The remaining hard problem
+is why the downstream `SEC_WDOG_DIS`/`SEC_WDOG_TRIG` command path is not taking
+effect from mainline despite apparently matching the obvious svc/cmd IDs. Next
+work should stop piling on boot attempts and inspect the downstream SCM calling
+convention/preconditions in more detail (version probing, A6 quirk, atomic bit,
+argument convention, return-value handling, and whether downstream's watchdog
+path depends on additional TZ/SCM setup before these commands are accepted).
+
+Temporary experimental patches were not left in the kernel tree. The attempted
+SCM patch was saved for reference only at
+`lg-v30-port/out/aurel-sec-wdog-scm-experiments-2026-07-06.patch`.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+## Aurel follow-up — post-SCM watchdog-path analysis (2026-07-06)
+
+Additional work after comparing downstream and mainline SCM paths:
+
+- Downstream LineageOS runtime check: writing `1` to
+  `/sys/devices/soc/17817000.qcom,wdt/disable` invokes downstream's own
+  `SCM_SVC_BOOT` / `SCM_SVC_SEC_WDOG_DIS` path and fails with
+  `scm_call failed: func id 0x42000107, ret: -2` followed by
+  `Failed to deactivate secure wdog`. This is important: the downstream
+  `SEC_WDOG_DIS` sysfs path is not a known-good runtime path on this phone.
+- Downstream's normal survival path is instead the `msm_watchdog` thread:
+  it programs APSS WDT bark/bite, enables the WDT, then logs
+  `pet_watchdog [enable : 1 ...]` every ~10s on LineageOS.
+- A clean mainline test emulated downstream's APSS WDT programming from an
+  early joan-gated kernel thread while disabling the generic `qcom-wdt` DT
+  node so it could not write `EN=0`. Two variants were tried:
+  - EN=1, bark=16s, bite=19s, pet every 2s: still rebooted to LineageOS.
+  - EN=3 (`EN|UNMASKED_INT_EN`, matching downstream `qcom,wakeup-enable`),
+    bark=16s, bite=19s, pet every 2s: still rebooted to LineageOS at the
+    normal host-side window (~45.5s after `fastboot boot` completed).
+- These APSS tests were rebuilt with `qcom_scm.c` clean and force-recompiled
+  after a leftover SCM timing-oracle patch was discovered and removed. The
+  contaminated earlier WDT result should be ignored; the clean EN=3 result is
+  the valid one.
+
+Interpretation update: the simple explanations are now weaker:
+
+1. `SEC_WDOG_DIS` is not obviously a supported runtime path even downstream.
+2. Direct APSS WDT pets/programming from early mainline do not keep the device
+   alive, even when matching downstream's bark/bite/enable values more closely.
+3. The reset source still looks like secure/boot-chain state that downstream
+   clears or services through some other early path, not the generic APSS WDT
+   register sequence alone.
+
+Suggested next investigation before more boots:
+
+- Compare the very early downstream boot sequence before/around
+  `msm_watchdog` init for other SCM/boot-service calls that mainline lacks,
+  especially CPU/Kryo errata, LGE panic/restart-reason init, IMEM/SMEM boot
+  cookies, and any TZ/app/secure monitor setup that happens before 0.4s in
+  the downstream dmesg.
+- Treat `SEC_WDOG_DIS` as an attempted-but-invalid lead unless a boot-mode
+  difference proves it works only under `fastboot boot`.
+- If another timing test is needed, make it a single clean oracle with the
+  kernel tree first reset to `git status` clean and `qcom_scm.o` explicitly
+  rebuilt, to avoid mixed-object false signals.
+
+Artifacts saved under `lg-v30-port/out/`:
+
+- `aurel-qcom-scm-oracle-leftover-2026-07-06.patch`
+- `aurel-downstream-style-wdt-clean-test-2026-07-06.patch`
+- `aurel-wdt-en3-test-2026-07-06.patch`
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06

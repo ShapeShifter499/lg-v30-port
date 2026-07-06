@@ -88,8 +88,27 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   reference-only.
 - **State**: when you finish or hand off, update your parcel card and, if the
   facts here changed, this README (append, don't rewrite history).
+- **Kernel change tracking**: every kernel-impacting change must also be entered
+  in `docs/kernel-change-ledger.md` before handoff, whether it is a final
+  upstreamable commit, bringup-only patch, debug oracle, or rejected experiment.
+  Entries need the commit hash or saved patch path, touched files, evidence, and
+  status (`upstream-candidate`, `bringup-local`, `debug-only`, `rejected`, or
+  `unknown`).
 
-## Current status (2026-07-05)
+## Current status (2026-07-06)
+
+- **P5/debug continued — reset source still unresolved, but narrowed.** Aurel
+  tested the obvious downstream `SEC_WDOG_DIS` translations plus
+  discriminators. `panic=30` and disabling the APSS watchdog DT node did **not**
+  shift the reset window; a PSCI timing oracle at `qcom_scm_probe()` proved SCM
+  probe is reached early enough. A downstream LineageOS runtime check showed the
+  downstream `SEC_WDOG_DIS` sysfs path itself fails with `0x42000107 ret=-2`, so
+  it is not a known-good survival path. Clean APSS WDT takeover tests matching
+  downstream bark/bite/pet behavior, including EN=3 for `qcom,wakeup-enable`,
+  still rebooted to LineageOS before mainline USB/diag appears. Full table and
+  next-analysis notes are in `docs/bringup-debug-state-2026-07-06.md`.
+
+## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
   (`Image.gz` 14.7 MB, joan DTB rebuilt) and packaged:
