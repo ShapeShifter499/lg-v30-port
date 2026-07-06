@@ -25,19 +25,24 @@ mainline's own dmesg (the mule is proven — see below).
 
 `/dev/watchdog` (qcom-wdt on our added DT node) is **flaky across
 identical boots** — present some rounds, absent others; unexplained.
-Untested-but-built countermeasure: `initramfs/root/bin/wdkill`
-(source `initramfs/src/wdkill.c`) maps 0x17817000 via /dev/mem,
-LOGS INITIAL EN/BARK/BITE (finally proves whether aboot arms it),
-disables, pets forever. Rounds 17/18 meant to test it were lost to a
-host-side watcher race (see pitfalls), so **wdkill has never run**.
+**wdkill rounds 18+19 RESULTS (the session's key finding):**
+- Round 18, pet + `EN=0` via /dev/mem: reset came EARLIER (~15s
+  post-handoff vs the 27s baseline) — writing EN=0 to the armed block
+  PROVOKES an immediate response.
+- Round 19, pet-only (`RST=1` every 2s, EN untouched): baseline ~27s
+  reset unchanged — pets of the non-secure counter don't help.
 
-If wdkill shows EN=0 initially → the resetter is NOT the APSS wdog:
-next suspects are the TZ secure watchdog (downstream disables via
-`scm_call2(SCM_SIP_FNID(SCM_SVC_BOOT=0x1, SCM_SVC_SEC_WDOG_DIS=0x7))`,
-see downstream `drivers/soc/qcom/watchdog_v2.c:265` — mainline has no
-API for it; a bringup-branch hack initcall is the obvious move), or a
-kernel panic (panic=30 A/B was attempted once, result confounded by
-the flaky wdt probe — redo it cleanly).
+Conclusion: the ~27s resetter is almost certainly the **TZ secure
+watchdog**. TZ reacts to non-secure EN meddling and ignores
+non-secure pets. NEXT MOVE: early kernel-side SCM call mirroring
+downstream `drivers/soc/qcom/watchdog_v2.c:265`:
+`scm_call2(SCM_SIP_FNID(SCM_SVC_BOOT=0x1, SCM_SVC_SEC_WDOG_DIS=0x7))`
+with arg[0]=1 (SMC convention on 8998; mainline qcom_scm has no
+wrapper — add a bringup-branch initcall using __qcom_scm_call or a
+raw arm_smccc_smc: fnid owner=SIP(2), svc 0x1, cmd 0x7 →
+smc id 0x82000107? — verify encoding against downstream scm.h before
+firing). Secondary suspect if that fails: a panic (redo the panic=30
+vs panic=5 A/B cleanly, now that instruments are trustworthy).
 
 ## Debug channels — what WORKS and what LIES
 

@@ -16,9 +16,8 @@ int main(void)
 	if (w == MAP_FAILED) { perror("mmap"); return 1; }
 	printf("WDT initial: EN=%u BARK=%u BITE=%u\n", w[2], w[4], w[5]);
 	fflush(stdout);
-	w[1] = 1;	/* pet */
-	w[2] = 0;	/* disable */
-	printf("WDT after disable: EN=%u\n", w[2]);
+	w[1] = 1;	/* pet only: writing EN=0 provoked an instant reset (round 18) */
+	printf("WDT pet-only mode, EN untouched=%u\n", w[2]);
 	fflush(stdout);
-	for (;;) { w[1] = 1; sleep(3); }	/* re-pet forever */
+	for (;;) { w[1] = 1; sleep(2); }	/* re-pet forever */
 }
