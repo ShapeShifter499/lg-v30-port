@@ -457,18 +457,62 @@ part of a ledger experiment.
   - next compare another first-second downstream delta, especially RPM/SMD/SMEM
     handshake or LGE/Qualcomm boot-state cookies, one oracle at a time.
 
+
+### K014 — RPM `rpm_requests` rpmsg reachability timing oracle
+
+- Handles:
+  - patch `out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
+    (sha256 `a92efaa88f7717d5762fa71bd2d22c84510bf13c4b43a3e22f893bd25bc895f1`);
+  - image `out/boot-joan-latest-rpm-rpmsg-oracle.img`
+    (sha256 `d7b039b381ad83c61a4e7bfdf3005fa143a8fc5701c90dbf9faf06edfe1bed6b`,
+    size `15740928` bytes);
+  - fastboot transcript `out/aurel-rpm-rpmsg-fastboot-2026-07-06.txt`
+    (sha256 `3261e8f38e5a3aa1128fbbd4c4a721e181c5ef435ee54cf6d65ea54540e71d79`);
+  - PON evidence `out/aurel-rpm-rpmsg-pon-2026-07-06.txt`
+    (sha256 `8f01740521da6b31f997ddea02e5352bedb9f3429e88bbe09d8117b04ed139e1`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-rpm-oracle.img`
+    (sha256 `c3db2b91473773af0546579e846dc41f85074d750e7407f95917e1d5a7ccb5b3`).
+- Class: `debug-only`, rejected as a fix; useful as reachability evidence.
+- Public/PR disposition: `do not publish`.
+- Touched file: `drivers/soc/qcom/smd-rpm.c`.
+- Downstream reference:
+  - `drivers/soc/qcom/rpm-smd.c` GLINK path for `qcom,rpm-glink`;
+  - downstream dmesg logs APSS-RPM over GLINK around `0.317s` and `rpm_requests`
+    link configuration around `0.332s`.
+- Mainline delta tested:
+  - mainline already has RPM/SMEM/SMP2P/GLINK support built in and a `rpm_requests`
+    child under `qcom,glink-rpm` in `msm8998.dtsi`;
+  - oracle added only a 4s-delayed PSCI reset if `qcom_smd_rpm_probe()` runs on
+    `lge,joan`, to test reachability without adding RPM resource votes.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.518s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+58.3s`;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - reachability alone is not survival;
+  - the delayed host return is consistent with the oracle being reached, so a total
+    absence of RPM `rpm_requests` rpmsg setup is weaker as the blocker;
+  - still compare actual downstream RPM resource votes and SMEM/boot-state cookie
+    writes separately.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
 not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
 watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
 downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
-argument shape, or registering a downstream-style QSEE log buffer. Next
-investigation should compare very early downstream boot setup against mainline,
+argument shape, registering a downstream-style QSEE log buffer, or merely
+reaching RPM `rpm_requests` rpmsg setup. Next investigation should compare very
+early downstream boot setup against mainline,
 especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;
+- actual RPM resource votes / clocks / power-domain requests;
 - SMEM/bootreason/restart cookies;
 - other early `SCM_SVC_BOOT` / TZ setup before or around downstream
   `msm_watchdog` init;

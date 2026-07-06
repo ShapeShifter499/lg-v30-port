@@ -152,6 +152,21 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   RAM-only `fastboot boot` succeeded, but no mainline USB/diag appeared;
   LineageOS adb returned at `t+52.2s`, and PON evidence still showed SID0
   `PS_HOLD`. The patch was saved, reverted, and the kernel rebuilt clean.
+- **RPM `rpm_requests` reachability oracle did not produce survival.** Downstream
+  brings APSS-RPM communication over GLINK up early (`msm_rpm_dev_probe`,
+  `rpm_requests` around `0.332s` in downstream dmesg). Mainline already has
+  `qcom,glink-rpm` / `qcom,glink-smd-rpm` nodes and built-in RPM/SMEM/SMP2P
+  support, so Aurel tested a debug-only timing oracle in
+  `drivers/soc/qcom/smd-rpm.c`: if the `rpm_requests` rpmsg driver probes on
+  `lge,joan`, wait 4 seconds then issue PSCI `SYSTEM_RESET`.
+  (`out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`; image
+  `out/boot-joan-latest-rpm-rpmsg-oracle.img`, sha256
+  `d7b039b381ad83c61a4e7bfdf3005fa143a8fc5701c90dbf9faf06edfe1bed6b`).
+  RAM-only `fastboot boot` succeeded, but no mainline USB/diag appeared;
+  LineageOS adb returned at `t+58.3s`, and PON evidence again showed SID0
+  `PS_HOLD`. The delayed timing suggests mainline likely reaches the RPM
+  `rpm_requests` rpmsg probe before reset, but the reachability/liveness ping is
+  not survival. The patch was saved, reverted, and the kernel rebuilt clean.
 
 ## Previous status (2026-07-05)
 

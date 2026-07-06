@@ -498,6 +498,89 @@ Cleanup:
   and then `adb unroot` returned adbd to normal mode.
 - No fastboot client left running.
 
+
+## Aurel follow-up — RPM `rpm_requests` reachability oracle (2026-07-06)
+
+Focus after DLOAD and QSEE-log rejection: check whether mainline ever reaches the
+same early APSS-RPM `rpm_requests` path that downstream brings up around 0.3s,
+without adding any RPM votes, watchdog changes, or boot-cookie writes.
+
+Downstream/mainline comparison:
+
+- Downstream `drivers/soc/qcom/rpm-smd.c` probes `qcom,rpm-glink`, opens GLINK
+  edge `rpm`, channel `rpm_requests`, then logs `APSS-RPM communication over
+  GLINK` and later `glink config params: transport=(null), edge=rpm,
+  name=rpm_requests`.
+- Downstream dmesg has those messages at roughly `0.317s` / `0.332s`.
+- Mainline `msm8998.dtsi` already describes `qcom,glink-rpm` with child
+  `rpm_requests` compatible `qcom,rpm-msm8998`, `qcom,glink-smd-rpm`.
+- Mainline config has `CONFIG_RPMSG_QCOM_GLINK_RPM=y`,
+  `CONFIG_QCOM_SMD_RPM=y`, `CONFIG_QCOM_SMEM=y`, and `CONFIG_QCOM_SMP2P=y`.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
+- Touched file:
+  `drivers/soc/qcom/smd-rpm.c`
+- Change:
+  add a debug-only `lge,joan` timing oracle in `qcom_smd_rpm_probe()`: if the
+  `rpm_requests` rpmsg driver probes, log a marker, wait 4 seconds, then call
+  PSCI `SYSTEM_RESET` (`0x84000009`).
+- Image:
+  `out/boot-joan-latest-rpm-rpmsg-oracle.img`
+- Image sha256:
+  `d7b039b381ad83c61a4e7bfdf3005fa143a8fc5701c90dbf9faf06edfe1bed6b`
+- Patch sha256:
+  `a92efaa88f7717d5762fa71bd2d22c84510bf13c4b43a3e22f893bd25bc895f1`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-rpmsg-fastboot-2026-07-06.txt`, sha256
+  `3261e8f38e5a3aa1128fbbd4c4a721e181c5ef435ee54cf6d65ea54540e71d79`
+- PON evidence:
+  `out/aurel-rpm-rpmsg-pon-2026-07-06.txt`, sha256
+  `8f01740521da6b31f997ddea02e5352bedb9f3429e88bbe09d8117b04ed139e1`
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.518s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+58.3s` after `adb reboot bootloader`.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The oracle did not produce survival or a mainline diagnostic channel.
+- The later `t+58.3s` host return is consistent with the RPM `rpm_requests` rpmsg
+  probe being reached and then deliberately reset after the 4s delay, although
+  no on-target logs are available before the reset.
+- This weakens “mainline never reaches RPM rpmsg setup” as the blocker, but does
+  not rule out missing/late downstream RPM resource votes or SMEM/boot-state
+  cookies.
+- Next test should avoid reachability-only pings and instead compare a concrete
+  downstream RPM vote, SMEM boot-state write, or boot/restart cookie that differs
+  from mainline and happens before the reset window.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-rpm-oracle.img`, sha256
+  `c3db2b91473773af0546579e846dc41f85074d750e7407f95917e1d5a7ccb5b3`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback.
+- No fastboot client left running.
+
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

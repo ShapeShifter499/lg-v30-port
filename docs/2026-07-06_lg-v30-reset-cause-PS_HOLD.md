@@ -8,8 +8,9 @@ Date: 2026-07-06
 
 The LG V30 (`joan`) mainline reset is still a controlled PS_HOLD reset. The
 secure/liveness hypothesis remains active, but Aurel has now rejected two more
-specific first-second deltas: downstream's DLOAD-off SCM argument shape and
-downstream-style QSEE log-buffer registration.
+specific first-second deltas: downstream's DLOAD-off SCM argument shape,
+downstream-style QSEE log-buffer registration, and RPM `rpm_requests` rpmsg
+reachability as a standalone liveness oracle.
 
 ## Evidence preserved from the PON / reset-cause pass
 
@@ -27,7 +28,8 @@ Interpretation: the reset is hardware-indistinguishable from a deliberate secure
 reset. It is not currently explained by PMIC watchdog, thermal bite, keypad/GP
 fault, ordinary Linux panic, APSS watchdog node/petting, CPU-idle, secondary CPU
 bringup, high-memory secure/shared pool allocation, DLOAD-off argument shape, or a
-standalone QSEE log-buffer registration ping.
+standalone QSEE log-buffer registration ping, or RPM `rpm_requests` rpmsg
+reachability alone.
 
 ## Concrete rejected paths so far
 
@@ -42,6 +44,7 @@ standalone QSEE log-buffer registration ping.
   restart-reason decode.
 - Downstream DLOAD-off SCM argument shape `(0, 0)`: rejected.
 - Downstream-style QSEE log-buffer registration `SCM_QSEEOS_FNID(1, 6)`: rejected.
+- RPM `rpm_requests` rpmsg reachability/timing oracle: no survival.
 
 ## New Aurel test: DLOAD-off SCM argument-shape oracle
 
@@ -122,16 +125,63 @@ Result:
 Conclusion: standalone QSEE log-buffer registration is not the missing liveness
 handshake.
 
+
+## New Aurel test: RPM `rpm_requests` reachability oracle
+
+Downstream reference:
+
+- `android_kernel_lge_msm8998/drivers/soc/qcom/rpm-smd.c`
+- Downstream dmesg shows `msm_rpm_dev_probe: APSS-RPM communication over GLINK`
+  around `0.317s` and `rpm_requests` link configuration around `0.332s`.
+- Mainline has `qcom,glink-rpm` / `qcom,glink-smd-rpm` in `msm8998.dtsi`, and
+  `CONFIG_RPMSG_QCOM_GLINK_RPM`, `CONFIG_QCOM_SMD_RPM`, `CONFIG_QCOM_SMEM`, and
+  `CONFIG_QCOM_SMP2P` are built in.
+
+Oracle:
+
+- Patch:
+  `out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
+- Patch sha256:
+  `a92efaa88f7717d5762fa71bd2d22c84510bf13c4b43a3e22f893bd25bc895f1`
+- Image:
+  `out/boot-joan-latest-rpm-rpmsg-oracle.img`
+- Image sha256:
+  `d7b039b381ad83c61a4e7bfdf3005fa143a8fc5701c90dbf9faf06edfe1bed6b`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-rpmsg-fastboot-2026-07-06.txt`
+- PON evidence:
+  `out/aurel-rpm-rpmsg-pon-2026-07-06.txt`
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.518s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+58.3s`.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: RPM `rpm_requests` rpmsg reachability alone is not enough to satisfy
+or prevent the secure-side liveness/reset policy. The delayed host return suggests
+mainline likely reaches the RPM rpmsg probe before reset, so a total absence of
+RPM-channel setup is weaker as a root cause; still compare actual downstream RPM
+resource votes and SMEM/boot-state cookies separately.
+
 ## Next best single oracle
 
-Do not repeat DLOAD or QSEE-log registration as the next standalone test. Mainline
-already performs the TZ feature/version query, and the QSEE log-buffer ping did
-not prevent PS_HOLD.
+Do not repeat DLOAD, QSEE-log registration, or RPM reachability as the next
+standalone test. Mainline already performs the TZ feature/version query, the
+QSEE log-buffer ping did not prevent PS_HOLD, and the RPM rpmsg reachability
+oracle only shifted timing without exposing diagnostics.
 
 Next compare another first-second downstream secure-liveness/platform-state delta
 against mainline, especially one of:
 
-- RPM/SMD/SMEM handshake and boot-state setup visible in downstream early dmesg;
+- actual RPM resource votes / clocks / power-domain requests, not mere `rpm_requests` reachability;
+- SMEM boot-state and restart cookies visible in downstream early dmesg;
 - LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
 - another concrete QSEE/QSECOM state transition only if downstream evidence shows
   it runs before the reset window and differs from mainline.
@@ -148,7 +198,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated.
+- Harness docs updated through the RPM reachability oracle.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.
