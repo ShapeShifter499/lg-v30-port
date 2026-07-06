@@ -340,3 +340,80 @@ oracle rather than bundling it with watchdog or CPU-idle changes.
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+
+## Aurel follow-up — secure-liveness DLOAD-off SCM argument oracle (2026-07-06)
+
+Focus from the PS_HOLD handoff: diff downstream first-second secure-liveness
+setup against mainline. The first concrete delta tested here was download-mode
+setup in the secure monitor path.
+
+Downstream evidence:
+
+- `drivers/power/reset/msm-poweroff.c` uses `pure_initcall(msm_restart_init)`.
+- On LGE builds (`CONFIG_LGE_HANDLE_PANIC`), `download_mode` defaults to `0`.
+- Probe still calls `set_dload_mode(download_mode)`, so early boot sends an
+  explicit DLOAD-off request.
+- Downstream's ARMv8 path calls `SCM_DLOAD_CMD` (`SCM_SVC_BOOT`, command `0x10`)
+  with args `(0, 0)` for that off request.
+- Mainline `drivers/firmware/qcom/qcom_scm.c` also uses command `0x10`, but its
+  off request encoded args as `(QCOM_SCM_BOOT_SET_DLOAD_MODE, 0)`, i.e.
+  `(0x10, 0)`.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-dload-off-argshape-test-2026-07-06.patch`
+- Touched file:
+  `drivers/firmware/qcom/qcom_scm.c`
+- Change:
+  make `__qcom_scm_set_dload_mode(enable=false)` send downstream's `(0, 0)`
+  shape while leaving the rest of `qcom_scm_probe()` unchanged.
+- Image:
+  `out/boot-joan-latest-dload-off-argshape.img`
+- Image sha256:
+  `423d0c7f306a0d1617ade6577c8cb012df71cda6d6f8a08ab731dc4e79a26457`
+- Patch sha256:
+  `eb285f2d73b2711fa505c0938183954b18ebb125735ae69176e7311fc8f1a5a0`
+- Size:
+  `15736832` bytes
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.516s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+44.3s` after boot handoff.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The downstream-vs-mainline DLOAD-off argument-shape difference is not enough to
+  satisfy the secure-side liveness/reset policy.
+- This weakens `qcom,scm` `SET_DLOAD_MODE` as the missing first-second handshake.
+- The reset remains a controlled PS_HOLD path, not a PMIC fault.
+- The next secure-liveness delta to test should be a QSEE/QSEEOS-side early ping,
+  especially downstream `drivers/firmware/qcom/tz_log.c` registering the QSEE log
+  buffer (`SCM_QSEEOS_FNID(1, 6)`) and/or querying TZ feature/version. Test as a
+  single explicit oracle; do not bundle with watchdog, CPU-idle, or DLOAD changes.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-dload-oracle.img`, sha256
+  `ee952809d17b791094717eec4585ce83d14d5b1ef0e7e1a53def3a55ab4e19a3`.
+- Phone parked back in LineageOS; no fastboot client left running.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06

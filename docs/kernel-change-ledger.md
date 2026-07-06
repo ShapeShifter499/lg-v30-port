@@ -375,13 +375,53 @@ part of a ledger experiment.
   - sentinel absent -> reset precedes early_initcall; move probe earlier.
 - Public/PR disposition: `do not publish`.
 
+
+### K012 — downstream DLOAD-off SCM argument-shape oracle
+
+- Handles:
+  - patch `out/aurel-latest-dload-off-argshape-test-2026-07-06.patch`
+    (sha256 `eb285f2d73b2711fa505c0938183954b18ebb125735ae69176e7311fc8f1a5a0`);
+  - image `out/boot-joan-latest-dload-off-argshape.img`
+    (sha256 `423d0c7f306a0d1617ade6577c8cb012df71cda6d6f8a08ab731dc4e79a26457`,
+    size `15736832` bytes);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-dload-oracle.img`
+    (sha256 `ee952809d17b791094717eec4585ce83d14d5b1ef0e7e1a53def3a55ab4e19a3`).
+- Class: `debug-only`, rejected as a fix.
+- Public/PR disposition: `do not publish`.
+- Touched file: `drivers/firmware/qcom/qcom_scm.c`.
+- Downstream reference:
+  - `drivers/power/reset/msm-poweroff.c` lines around `set_dload_mode()` and
+    `msm_restart_probe()`;
+  - LGE builds default `download_mode = 0`, then early probe calls
+    `set_dload_mode(0)`, which invokes `SCM_DLOAD_CMD` (`0x10`) as args `(0, 0)`;
+  - downstream dmesg shows `set_dload_mode(0)` around `1.031840s`.
+- Mainline delta tested:
+  - mainline command was already `QCOM_SCM_BOOT_SET_DLOAD_MODE` (`0x10`), but its
+    disabled/off argument shape was `(0x10, 0)`;
+  - oracle changed only `enable=false` argument shape to downstream's `(0, 0)`.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.516s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+44.3s`;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - the DLOAD-off SCM argument-shape mismatch is not the missing secure-liveness
+    handshake;
+  - `SET_DLOAD_MODE` is weaker as the lead hypothesis;
+  - move to a single QSEE/QSEEOS-side early ping oracle (e.g. `tz_log.c` QSEE log
+    buffer registration / TZ feature query) before trying more watchdog variants.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
 not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
-watchdog pets, CPU-idle changes, single-core boot, or simply reserving the
-observed downstream high-memory secure/shared pools. Next investigation should
-compare very early downstream boot setup against mainline, especially:
+watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
+downstream high-memory secure/shared pools, or matching downstream's DLOAD-off
+SCM argument shape. Next investigation should compare very early downstream boot
+setup against mainline, especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;

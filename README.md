@@ -131,6 +131,18 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`,
   return `t+29.4s`). None exposed mainline USB/diag. Full table and
   next-analysis notes are in `docs/bringup-debug-state-2026-07-06.md`.
+- **Secure-liveness diff follow-up: DLOAD-off argument shape is not the fix.**
+  Downstream `msm-poweroff.c` on LGE builds defaults `download_mode=0` and its
+  `pure_initcall` issues `set_dload_mode(0)`, which sends SCM boot command
+  `SCM_DLOAD_CMD` (`0x10`) with args `(0, 0)`. Mainline `qcom_scm` used the same
+  command but represented the off request as args `(0x10, 0)`. Aurel tested a
+  debug-only patch changing mainline's off request to downstream's `(0, 0)`
+  shape (`out/aurel-latest-dload-off-argshape-test-2026-07-06.patch`; image
+  `out/boot-joan-latest-dload-off-argshape.img`, sha256
+  `423d0c7f306a0d1617ade6577c8cb012df71cda6d6f8a08ab731dc4e79a26457`).
+  `fastboot boot` succeeded but no mainline USB/diag appeared; LineageOS adb
+  returned at `t+44.3s` and the post-reset PON log again showed SID0
+  `PS_HOLD`. The patch was saved, reverted, and the kernel was rebuilt clean.
 
 ## Previous status (2026-07-05)
 
