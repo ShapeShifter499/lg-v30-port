@@ -1,0 +1,59 @@
+#!/bin/busybox sh
+# NULL-INIT DISCRIMINATOR for LG V30 (joan) reset debugging.
+#
+# Purpose: answer whether the ~27s controlled PS_HOLD reset is triggered by
+# anything Linux USERSPACE does, or is a background secure/firmware timer
+# independent of userspace. Every prior oracle ran the full bring-up init
+# which (a) runs wdkill writing the APSS watchdog registers via /dev/mem
+# [proven in round 18 to PROVOKE an earlier reset] and (b) brings up dwc3/
+# the USB PHY. This init deliberately does NEITHER during the reset window.
+#
+# Behaviour:
+#   - mount only the basics; touch NO hardware, NO /dev/mem, NO gadget.
+#   - stay completely idle through the whole observed reset window (0-150s).
+#   - IF still alive at t=150s (i.e. we survived the window a normal boot
+#     would have reset in), THEN and only then bring up a minimal USB
+#     gadget as a POSITIVE "I SURVIVED" beacon (VID:PID 18d1:5e30).
+#   - self-reboot at ~8 min so no button is ever needed.
+#
+# Host-side classification:
+#   - LineageOS adb (18d1:4ee7) returns at ~30-60s  => reset STILL happened
+#       with a do-nothing init  => background/firmware timer, NOT userspace.
+#       => the whole "add a downstream handshake" line is futile; the fix
+#          (if any) is secure-world/signed-firmware, not mainline Linux.
+#   - Survivor beacon (18d1:5e30) appears at ~150s   => a do-nothing init
+#       SURVIVES the reset window  => something the normal init does
+#       (wdkill register writes, or dwc3/PHY bring-up) TRIGGERS the reset.
+#       => next: bisect (wdkill-only vs gadget-only).
+
+/bin/busybox --install -s /bin
+export PATH=/bin
+
+mount -t devtmpfs dev /dev 2>/dev/null
+mount -t proc proc /proc 2>/dev/null
+mount -t sysfs sys /sys 2>/dev/null
+
+# Idle through the entire reset window. No hardware access at all.
+sleep 150
+
+# --- survivor beacon: minimal ACM-less network gadget, distinct PID ---
+mount -t configfs configfs /sys/kernel/config 2>/dev/null
+G=/sys/kernel/config/usb_gadget/g1
+mkdir -p $G
+echo 0x18d1 > $G/idVendor
+echo 0x5e30 > $G/idProduct        # distinct: "survived null-init"
+mkdir -p $G/strings/0x409
+echo joan-survivor > $G/strings/0x409/serialnumber
+echo LG > $G/strings/0x409/manufacturer
+echo "V30 NULLINIT SURVIVOR" > $G/strings/0x409/product
+mkdir -p $G/configs/c.1/strings/0x409
+echo beacon > $G/configs/c.1/strings/0x409/configuration
+echo 500 > $G/configs/c.1/MaxPower
+mkdir -p $G/functions/ecm.usb0 2>/dev/null && ln -s $G/functions/ecm.usb0 $G/configs/c.1/ 2>/dev/null
+UDC=$(ls /sys/class/udc 2>/dev/null | head -n1)
+[ -n "$UDC" ] && echo "$UDC" > $G/UDC 2>/dev/null
+
+# hold the survivor state a while, then self-reboot (no button needed)
+sleep 300
+echo b > /proc/sysrq-trigger 2>/dev/null
+while :; do sleep 60; done

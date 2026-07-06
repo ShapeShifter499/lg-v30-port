@@ -764,6 +764,39 @@ part of a ledger experiment.
 - Agent-harness: Hermes:gpt-5.5
 - Date: 2026-07-06
 
+### K022 — null-init discriminator (STAGED, not device-tested)
+
+- Handle: image `out/boot-joan-nullinit-discriminator.img`
+  (sha256 `ed00e7842b583eb2b12e68ef0f3f39512639590523db415a0bbea0719d837158`);
+  initramfs `initramfs/root-null/`; run doc `docs/nullinit-discriminator-run.md`.
+- Class: `debug-only` (discriminator; no kernel change — clean
+  `joan/latest-clean-test` kernel + a do-nothing initramfs).
+- Touched files: none in the kernel tree; new `initramfs/root-null/init` only.
+- Premise / why it is different from K005-K021: EVERY prior oracle was booted
+  with the full bring-up init, which runs `wdkill` (writes APSS watchdog regs
+  at 0x17817000 via /dev/mem — round 18 showed EN=0 there PROVOKES an earlier
+  reset) and brings up dwc3/PHY. So no result to date observed the phone with
+  Linux userspace doing NOTHING. The large reset-timing variance across
+  Aurel's runs (~30s to ~108s host cycle) is itself more consistent with a
+  variable-timing userspace trigger than a fixed hw watchdog period.
+- What it tests: boot the clean kernel with an init that touches no hardware,
+  no /dev/mem, no gadget, and idles through the whole 0-150s window; only if
+  it survives to 150s does it raise a distinct survivor beacon (18d1:5e30).
+- Expected discrimination:
+  - LOS returns ~30-60s -> reset is a BACKGROUND secure/firmware timer,
+    independent of userspace -> the entire handshake-parity line (K006-K021)
+    cannot fix it; any fix is secure-world/signed-firmware. STOP that line.
+  - survivor beacon 18d1:5e30 at ~150s -> a do-nothing init SURVIVES ->
+    something the normal init does (wdkill regs, or dwc3/PHY) TRIGGERS the
+    reset -> next passes bisect wdkill-only vs gadget-only.
+- Verification so far: ramdisk contents verified (init + busybox), bootimg
+  header v0/pagesize 4096 verified, image packaged. NOT device-tested (needs
+  Lance).
+- Public/PR disposition: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
