@@ -215,3 +215,41 @@ Artifacts saved under `lg-v30-port/out/`:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+## Aurel follow-up — latest upstream branch test (2026-07-06)
+
+Aurel refreshed the active tethered-test kernel branch without losing tracked
+work:
+
+- fetched upstream Linux `origin/master` to `8cdeaa50e` (`Linux 7.2-rc2`);
+- preserved the old debug tip with backup refs, including
+  `backup/joan-bringup-debug-before-latest-20260706-052942`;
+- saved a dirty detached SCM-oracle worktree patch to
+  `lg-v30-port/out/aurel-test-worktree-scm-oracle-dirty-20260706-052942.patch`
+  and reset that worktree clean to avoid stale-object contamination;
+- created/refreshed branch `joan/latest-kernel` by replaying the five joan/debug
+  commits onto `v7.2-rc2`, producing new head `88bf16047`.
+
+Build/test evidence:
+
+| Item | Result |
+|---|---|
+| Build | `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6 Image.gz dtbs` succeeded. |
+| RAM-only image | `out/boot-joan-latest-kernel.img` |
+| Image sha256 | `2c8af0cc49b05ccd5d0c5452b5bd8f607aadbe89675fdcc6f7b92f023f32c325` |
+| Fastboot command | one client only: `sudo -n fastboot boot out/boot-joan-latest-kernel.img` |
+| Fastboot protocol result | `Sending 'boot.img' ... OKAY`; `Booting ... OKAY`; total time `5.525s` |
+| Host classifier result | no mass-storage/debug channel; LineageOS adb returned at `t+29.7s` after boot handoff. |
+
+Interpretation: current upstream `v7.2-rc2` alone does not fix the reset. The
+active branch for further tethered tests is now `joan/latest-kernel`, but it still
+contains debug-only breadcrumb instrumentation and is not publishable as-is.
+
+Suggested next work: continue root-cause comparison of very early downstream boot
+setup versus mainline, especially early SCM/boot-service, restart/IMEM/SMEM, CPU
+errata, and firmware-state paths. Avoid another blind boot until a single
+hypothesis produces a testable timing oracle or a clean upstream-candidate patch.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06

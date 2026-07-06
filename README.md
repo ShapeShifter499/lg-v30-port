@@ -23,7 +23,7 @@ Full background: `docs/recon-2026-07-04.md` (also on NC:
 | What | Where |
 |---|---|
 | This project (harness, docs) | `~/vibe-coding-projects/coding/lg-v30-port/` |
-| Mainline kernel work tree | `~/vibe-coding-projects/coding/linux-mainline-v30/`, branch **`lge-joan-bringup`** |
+| Mainline kernel work tree | `~/vibe-coding-projects/coding/linux-mainline-v30/`, active tethered-test branch **`joan/latest-kernel`**; older clean/debug refs `lge-joan-bringup` and `joan/bringup-debug` are preserved |
 | Board DTS | `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` (first commit `3d3868854`, see its body for design decisions) |
 | Downstream reference kernel | `~/vibe-coding-projects/coding/android_kernel_lge_msm8998/` (LineageOS 4.4, **read-only reference — never build or modify**) |
 | Downstream joan DTS | `arch/arm64/boot/dts/lge/msm8998-joan/` in the downstream tree |
@@ -99,16 +99,25 @@ Active. Parcels marked *no-device* are fully doable without the phone.
 
 ## Current status (2026-07-06)
 
-- **P5/debug continued — reset source still unresolved, but narrowed.** Aurel
-  tested the obvious downstream `SEC_WDOG_DIS` translations plus
-  discriminators. `panic=30` and disabling the APSS watchdog DT node did **not**
-  shift the reset window; a PSCI timing oracle at `qcom_scm_probe()` proved SCM
-  probe is reached early enough. A downstream LineageOS runtime check showed the
-  downstream `SEC_WDOG_DIS` sysfs path itself fails with `0x42000107 ret=-2`, so
-  it is not a known-good survival path. Clean APSS WDT takeover tests matching
-  downstream bark/bite/pet behavior, including EN=3 for `qcom,wakeup-enable`,
-  still rebooted to LineageOS before mainline USB/diag appears. Full table and
-  next-analysis notes are in `docs/bringup-debug-state-2026-07-06.md`.
+- **P5/debug continued — latest upstream still reboots before debug output.**
+  Aurel rebased the joan debug stack onto fetched upstream `origin/master`
+  `8cdeaa50e` (`Linux 7.2-rc2`) as branch `joan/latest-kernel`, preserving the
+  old branch tips with backup refs. Build succeeded and produced RAM-only image
+  `out/boot-joan-latest-kernel.img` (sha256
+  `2c8af0cc49b05ccd5d0c5452b5bd8f607aadbe89675fdcc6f7b92f023f32c325`). A
+  one-client `fastboot boot` succeeded, but the phone returned to LineageOS at
+  `t+29.7s` after boot handoff with no mainline mass-storage/debug channel.
+  Latest upstream alone did **not** fix the reset.
+- **Reset source remains unresolved, but narrowed.** Aurel tested the obvious
+  downstream `SEC_WDOG_DIS` translations plus discriminators. `panic=30` and
+  disabling the APSS watchdog DT node did **not** shift the reset window; a PSCI
+  timing oracle at `qcom_scm_probe()` proved SCM probe is reached early enough.
+  A downstream LineageOS runtime check showed the downstream `SEC_WDOG_DIS`
+  sysfs path itself fails with `0x42000107 ret=-2`, so it is not a known-good
+  survival path. Clean APSS WDT takeover tests matching downstream bark/bite/pet
+  behavior, including EN=3 for `qcom,wakeup-enable`, still rebooted to LineageOS
+  before mainline USB/diag appears. Full table and next-analysis notes are in
+  `docs/bringup-debug-state-2026-07-06.md`.
 
 ## Previous status (2026-07-05)
 

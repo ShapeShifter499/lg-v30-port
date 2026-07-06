@@ -41,10 +41,15 @@ part of a ledger experiment.
 
 ## Current kernel branch map
 
-- Clean bringup base: `linux-mainline-v30`, branch `lge-joan-bringup`, currently
-  ending at `5acce83a9`.
-- Debug branch in use during watchdog/reset work: `joan/bringup-debug`, currently
-  `lge-joan-bringup` + commits `93fe462d7` and `6c5f06bc8`.
+- Latest tethered-test branch: `linux-mainline-v30`, branch `joan/latest-kernel`,
+  currently rebased onto fetched `origin/master` `8cdeaa50e` (`Linux 7.2-rc2`)
+  plus the five joan/debug commits now rewritten as `e1b2094f3`, `0c64968b7`,
+  `b6e545a9e`, `6a9b09615`, and `88bf16047`.
+- Previous debug branch preserved: `joan/bringup-debug`, currently old
+  v7.2-rc1-based commits `3d3868854`, `d75290b9e`, `5acce83a9`, `93fe462d7`,
+  and `6c5f06bc8`.
+- Clean bringup base: `lge-joan-bringup`, currently ending at old commit
+  `5acce83a9`.
 - Downstream reference: `android_kernel_lge_msm8998` is read-only.
 
 ## Ledger entries
@@ -225,6 +230,41 @@ part of a ledger experiment.
   - APSS WDT register programming alone is not the missing survival mechanism.
   - Do not keep in kernel tree.
 - Public/PR disposition: `do not publish`; rejected experiment only.
+
+### K009 — latest upstream rebase and RAM-only regression test
+
+- Handles:
+  - branch `joan/latest-kernel` at `88bf16047` — `JOAN DEBUG: ramoops breadcrumbs in head.S and setup_arch`
+  - base `origin/master` `8cdeaa50e` — `Linux 7.2-rc2`
+  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-kernel.img`
+  - image sha256 `2c8af0cc49b05ccd5d0c5452b5bd8f607aadbe89675fdcc6f7b92f023f32c325`
+- Class: `bringup-local` branch refresh / regression evidence.
+- Files changed by carried commits:
+  - `arch/arm64/boot/dts/qcom/Makefile`
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+  - `arch/arm64/kernel/head.S`
+  - `arch/arm64/kernel/setup.c`
+- Purpose:
+  - Move the joan debug stack from the old v7.2-rc1 shallow base to current
+    fetched upstream `v7.2-rc2` without losing the tracked joan commits.
+- Verification/evidence:
+  - Before reset/replay, old tips were preserved as backup refs, including
+    `backup/joan-bringup-debug-before-latest-20260706-052942`.
+  - A detached dirty SCM-oracle worktree patch was preserved at
+    `lg-v30-port/out/aurel-test-worktree-scm-oracle-dirty-20260706-052942.patch`
+    and the test worktree was reset clean to avoid object contamination.
+  - `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6 Image.gz dtbs`
+    succeeded on `joan/latest-kernel`.
+  - `./make-testimage.sh` produced the RAM-only boot image above.
+  - One-client RAM-only `fastboot boot out/boot-joan-latest-kernel.img` succeeded
+    at the fastboot protocol layer, but the phone returned to LineageOS at
+    `t+29.7s` after boot handoff; no mainline mass-storage/debug channel appeared.
+- Status:
+  - Latest upstream v7.2-rc2 alone does not fix the reset.
+  - Keep `joan/latest-kernel` as the active tethered-test branch; do not publish
+    the debug breadcrumb commit.
+- Public/PR disposition: branch contains mixed upstream-candidate and debug-only
+  commits; `do not publish` as-is.
 
 ## Current narrowed hypothesis
 
