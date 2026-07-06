@@ -848,6 +848,33 @@ part of a ledger experiment.
 - Agent-harness: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
+### K023b — full-DTB-minus-USB (boot-safe): USB bring-up is NOT the trigger
+
+- Handle: DTS artifact `out/ember-nousb-K023b-2026-07-06.dts`; image
+  `out/boot-joan-nousb-k023b.img`
+  (sha256 `fd7bb3e3da65b7d0669da15caccc86acb7d5e1453454ffd71564f701240b63de`).
+  Kernel tree reverted clean after.
+- Class: `debug-only`; result CONCLUSIVE (boot-confound-free).
+- Method: the KNOWN-GOOD full joan DTS with only `&usb3` and `&qusb2phy`
+  set `status="disabled"` (kernel never probes dwc3 / QUSB2 PHY), + a
+  classifier init, booted with **panic=0** so a boot failure HANGS (silent)
+  instead of masquerading as a reset. Three separable outcomes: silent =
+  boot-fail; LOS ~43s = natural reset (USB not trigger); LOS ~106s (our
+  90s survivor reboot) = survived => USB is trigger.
+- Result: LOS returned at +49s. With panic=0 that cannot be a boot panic
+  (would hang silent), and it is well before the 90s survivor reboot, so it
+  is the natural PS_HOLD reset — confirmed by post-reset PON
+  (`POFF=0x2:PS_HOLD, PON=0x21:HARD_RESET, FAULT1=0x40:UVLO`, identical).
+- Conclusion: disabling USB does NOT stop the reset => kernel-side
+  USB/dwc3/QUSB2-PHY bring-up is NOT what trips the ~27s reset. Eliminated.
+- Note: this is the boot-safe subtraction method K023 recommended, and it
+  worked — panic=0 removed the boot-vs-reset confound cleanly. Reuse this
+  harness to subtract the next subsystem (candidates below).
+- Public/PR disposition: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
