@@ -165,6 +165,7 @@ part of a ledger experiment.
 - Handles:
   - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-sec-wdog-scm-experiments-2026-07-06.patch`
   - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-qcom-scm-oracle-leftover-2026-07-06.patch`
+  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-scm-retcode-oracle-leftover-2026-07-06.patch`
 - Class: `rejected` unless new evidence shows a boot-mode-specific difference.
 - Files experimented with:
   - `drivers/firmware/qcom/qcom_scm.c`
