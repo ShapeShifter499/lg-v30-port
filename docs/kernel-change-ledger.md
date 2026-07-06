@@ -809,6 +809,45 @@ part of a ledger experiment.
 - Agent-harness: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
+### K023 — minimal-DTB firmware-vs-driver discriminator (INCONCLUSIVE: DTB too aggressive)
+
+- Handle: DTS artifact `out/ember-mindtb-K023-2026-07-06.dts`; images
+  `out/boot-joan-mindtb-nullinit.img`
+  (sha256 `042197d1da8ad03621edb63840cf48776aa73920dff00153804041b97be98eb4`),
+  proof-of-life `out/boot-joan-mindtb-pol.img` and
+  `out/boot-joan-mindtb-pol2.img`. Kernel tree reverted clean after.
+- Class: `debug-only`, INCONCLUSIVE.
+- Goal: split K022's result further — is the userspace-independent reset a
+  firmware/secure background timer, or kernel-side driver-probe behaviour?
+  Method: clean kernel Image + a minimal DTB that enables NO board
+  peripherals (no usb/dwc3, phy, regulators/RPM, watchdog, ufs, wifi, keys;
+  only SoC skeleton + LG firmware reserves + dummy regs for 3 dangling
+  msm8998.dtsi phandles) + null init.
+- Result: min-DTB null-init returned LOS at +49s — but PROOF-OF-LIFE
+  disproved the naive reading. An immediate-reboot init (first userspace
+  act; full-DTB baseline round 12 = +26.5s) on the SAME min-DTB returned at
+  +47s, i.e. the ~panic=30 window, NOT ~27s. So **the minimal DTB never
+  reaches userspace — it panics early in kernel boot.** The +49s was a boot
+  failure, not a reset. INCONCLUSIVE for the firmware-vs-driver question.
+- Lesson (logged): a boot failure with panic=N is indistinguishable from a
+  real reset by host-return timing alone; always pair a DTB/-config strip
+  with an immediate-reboot proof-of-life before trusting a "still resets"
+  reading. (Caught a false "firmware timer" conclusion.)
+- Likely over-strip cause: removing the full &rpm_requests regulator block
+  (replaced 3 phandles with a dummy fixed-reg) probably broke rpmcc/clock
+  or a critical early consumer -> early panic. Do NOT repeat this strip.
+- Better next design (boot-safe): start from the KNOWN-GOOD full joan DTS
+  (boots to userspace) and remove ONE suspect subsystem at a time
+  (USB/dwc3+phy first, since that is what we are ultimately bringing up),
+  keeping regulators/RPM/clocks/UFS intact so it still boots. Each pass:
+  full-DTB-minus-X + null init; if the reset stops, X's bring-up is the
+  trigger. Pair each with an immediate-reboot proof-of-life if the result
+  is "still resets".
+- Public/PR disposition: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
