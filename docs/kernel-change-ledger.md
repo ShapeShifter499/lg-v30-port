@@ -48,9 +48,11 @@ part of a ledger experiment.
 - Latest debug branch: `joan/latest-kernel`, same upstream base plus the
   debug-only breadcrumb commit, currently ending at `88bf16047`.
 - IMEM reset-reason oracle branch: `joan/imem-oracle`, off
-  `joan/latest-clean-test`, one debug-only commit `f0d368d28`. STAGED, not yet
-  device-tested (needs Lance). Image `out/boot-joan-imem-oracle.img`
-  (sha256 `8d180d57b91aefae1d4fdbbb88cf138d76711866c7e5e3dcdceebc118fb768c7`).
+  `joan/latest-clean-test`, one debug-only commit `f0d368d28`. Original Ember
+  image `out/boot-joan-imem-oracle.img` remains preserved, but Aurel K026
+  repackaged/tested the same kernel commit with the K023 `panic=0` null-init
+  classifier as `out/boot-joan-imem-k026.img` (sha256
+  `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`).
 - Previous debug branch preserved: `joan/bringup-debug`, currently old
   v7.2-rc1-based commits `3d3868854`, `d75290b9e`, `5acce83a9`, `93fe462d7`,
   and `6c5f06bc8`.
@@ -339,7 +341,7 @@ part of a ledger experiment.
     unless specifically investigating their perturbation.
 - Public/PR disposition: `do not publish`; keep only as negative evidence.
 
-### IMEM reset-reason oracle (Ember 2026-07-06) — STAGED, not device-tested
+### IMEM reset-reason oracle (Ember 2026-07-06) — original staged artifact; repackaged/tested as K026
 
 - Handle: branch `joan/imem-oracle` commit `f0d368d28`; patch
   `out/ember-imem-oracle-2026-07-06.patch`; image
@@ -1023,6 +1025,60 @@ Next better targets:
 - stock-RAM-boot/downstream dmesg diffs around the first second, especially
   secure monitor, qseecom, msm_watchdog, and restart-reason lines.
 
+
+### K026 — LGE IMEM default restart-reason oracle: reset PERSISTS; returned bootreason is TZ-class 0x6D630309
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Downstream/mainline comparison:
+
+- Downstream joan enables `CONFIG_LGE_HANDLE_PANIC=y`.
+- Downstream MSM8998 defines `qcom,msm-imem@146bf000` with `restart_reason@65c`.
+- Downstream `drivers/soc/qcom/lge/lge_handle_panic.c` maps IMEM in an
+  `early_initcall` and writes `LGE_RB_MAGIC | LGE_ERR_TZ` (`0x6d630300`) to
+  restart_reason.
+- Mainline MSM8998 has no LGE panic handler and no msm-imem/restart_reason node.
+
+Oracle:
+
+- Reused existing debug-only branch `joan/imem-oracle`, commit `f0d368d28`, rather
+  than creating a duplicate patch.
+- Rebuilt/repackaged with the K023 `panic=0` null-init classifier so a boot fail
+  cannot fake a reset/survival result.
+- Patch artifact: `out/aurel-lge-imem-default-reason-k026-2026-07-06.patch`
+  sha256 `d68baabab6c1b82d0b976b826de49a5aed621747893bf5fe40fa98fba8a89f62`.
+- Boot image: `out/boot-joan-imem-k026.img`
+  sha256 `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`.
+- Result artifact: `out/aurel-lge-imem-k026-result-2026-07-06.txt`.
+
+Device result:
+
+- `fastboot boot` was RAM-only and completed normally: Sending OKAY `[0.410s]`,
+  Booting OKAY `[5.095s]`, total `5.513s`.
+- No mainline USB/survivor beacon appeared.
+- LineageOS adb returned at `t+49.1s` after fastboot returned.
+- Classification: `lineageos_returned_reset_not_fixed`.
+- Post-reset PON remained SID0 `PS_HOLD` (`PON=0x21:PON1:HARD_RESET`,
+  `POFF=0x2:PS_HOLD`).
+- Returned downstream kernel reported `androidboot.product.lge.bootreasoncode=0x6D630309`
+  and `LGE BOOT REASON: 0x6d630309`.
+
+Interpretation:
+
+- K026 is rejected as a survival/liveness fix: simply matching downstream's early
+  LGE IMEM default restart-reason write does not stop the reset.
+- K026 is useful forensic evidence: the returned boot chain/downstream kernel now
+  exposes an LGE/TZ-class bootreason (`0x6D630309`).
+- From `lge_handle_panic.h`, `0x6d630000` is `LGE_RB_MAGIC` and `0x0300` is
+  `LGE_ERR_TZ`; subreason `0x0009` is not defined in this downstream kernel
+  header. It is not the named TZ non-secure watchdog bark (`0x3a`) or thermal
+  secure bite (`0x3b`).
+- Future work should chase where LG/XBL/TZ defines or emits TZ subreason `0x09`,
+  or compare the early secure-world handshake that causes that private TZ reset.
+  Do not repeat K026 as another liveness test.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -1038,14 +1094,17 @@ the downstream-observed TCSR boot-misc cookie (`qcom,dload-mode = <&tcsr_regs_2
 0x13000>`), programming downstream joan's PM8998 PON S3 source/debounce
 (`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`), matching
 the fuller downstream PM8998 PON reset-sequence/S1/S2 setup, forcing the
-optional downstream Kryo SCM errata debugfs helper, or retesting the obvious
-downstream `watchdog_v2`/QSEECOM probe paths checked in K025. The Kryo helper is
+optional downstream Kryo SCM errata debugfs helper, retesting the obvious
+downstream `watchdog_v2`/QSEECOM probe paths checked in K025, or repeating the
+LGE IMEM default restart-reason write tested in K026. The Kryo helper is
 not active joan default boot-state parity, and K025 did not find an active
 downstream-default QSEECOM/watchdog secure call that mainline lacks, so no boot
-oracle was built for either. Next investigation should compare another very
-early downstream state-changing path against mainline, especially:
+oracle was built for either; K026 then showed the LGE IMEM default restart-reason
+write does not stop the reset but does expose TZ-class bootreason `0x6D630309`.
+Next investigation should compare another very early downstream state-changing
+path against mainline, especially:
 
-- fuller LGE panic/restart-reason and IMEM cookie setup, if kept separate from K018;
+- the source/meaning of LG/TZ subreason `0x09` in XBL/TZ/bootloader-visible logs;
 - broader downstream RPM regulator/default votes / clocks / power-domain requests;
 - SMEM/bootreason/restart cookies;
 - other early `SCM_SVC_BOOT` / TZ setup before or around downstream

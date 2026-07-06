@@ -124,3 +124,29 @@ Next better target: LGE panic/restart-reason plus IMEM/SMEM boot-cookie setup,
 kept distinct from the already-rejected TCSR DLOAD phandle oracle; otherwise
 look for an early `SCM_SVC_BOOT`/TZ setup before or around downstream
 `msm_watchdog` init that is neither `SEC_WDOG_DIS` nor dump-only.
+
+
+## Aurel K026 addendum — LGE IMEM default restart-reason write tested
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Aurel followed the K025 next target and compared downstream LGE panic/restart
+reason IMEM setup against mainline. Downstream joan enables `CONFIG_LGE_HANDLE_PANIC=y`
+and writes `0x6d630300` (`LGE_RB_MAGIC | LGE_ERR_TZ`) to IMEM restart_reason at
+`0x146bf000 + 0x65c` from an early initcall. Mainline lacks this. Ember's existing
+`joan/imem-oracle` commit `f0d368d28` already implemented exactly that debug-only
+write, so Aurel reused it and rebuilt it with the K023 `panic=0` classifier as
+`out/boot-joan-imem-k026.img`.
+
+Result: RAM-only `fastboot boot` succeeded, but no mainline survivor beacon/USB
+appeared; LineageOS returned at `t+49.1s`, PON remained SID0 `PS_HOLD`, and the
+returned downstream kernel reported `androidboot.product.lge.bootreasoncode=0x6D630309`
+/ `LGE BOOT REASON: 0x6d630309`.
+
+Verdict: K026 is not a fix, but `0x6D630309` is new useful evidence. It decodes as
+LGE magic + TZ class + undocumented subreason `0x09`; it is not the named TZ
+non-secure watchdog bark (`0x3a`) or thermal secure bite (`0x3b`). Next target:
+find where LG/XBL/TZ defines or emits subreason `0x09`, or identify the early
+secure-world handshake that prevents it on stock/downstream. Do not repeat K026.

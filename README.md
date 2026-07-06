@@ -277,6 +277,22 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   built. Status artifact: `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`,
   sha256 `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`.
 
+- **K026 LGE IMEM default restart-reason write did not fix survival, but exposed a TZ-class bootreason.**
+  Aurel reused Ember's debug-only `joan/imem-oracle` commit `f0d368d28`
+  because it exactly matches downstream `lge_handle_panic` early IMEM parity:
+  write `LGE_RB_MAGIC | LGE_ERR_TZ` (`0x6d630300`) to IMEM restart_reason at
+  `0x146bf000 + 0x65c`. It was rebuilt with the safer K023 `panic=0` null-init
+  classifier (`out/boot-joan-imem-k026.img`, sha256
+  `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`).
+  RAM-only `fastboot boot` succeeded (`Sending`/`Booting` OKAY, total `5.513s`),
+  but no mainline USB/survivor beacon appeared; LineageOS adb returned at
+  `t+49.1s`. Post-reset PON still showed SID0 `PS_HOLD`, while the returned
+  downstream kernel reported `androidboot.product.lge.bootreasoncode=0x6D630309`
+  / `LGE BOOT REASON: 0x6d630309`. That decodes as LGE magic + TZ class +
+  undocumented subreason `0x09`; it is **not** the named TZ non-secure watchdog
+  bark (`0x3a`) or thermal secure bite (`0x3b`). Artifact:
+  `out/aurel-lge-imem-k026-result-2026-07-06.txt`.
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -319,5 +335,9 @@ Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
 
 Updated-by: Aurel Nymvale (agent-aurel) — K025 secure-interface archaeology comparison
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Updated-by: Aurel Nymvale (agent-aurel) — K026 LGE IMEM default restart-reason oracle
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

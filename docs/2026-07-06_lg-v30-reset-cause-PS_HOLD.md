@@ -597,3 +597,50 @@ Next better targets:
   init that is not `SEC_WDOG_DIS` and not dump-only;
 - stock-RAM-boot/downstream dmesg diffs around the first second, especially
   secure monitor, qseecom, msm_watchdog, and restart-reason lines.
+
+
+## Aurel follow-up — K026 LGE IMEM default restart-reason oracle tested
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Downstream joan enables `CONFIG_LGE_HANDLE_PANIC=y`; downstream `lge_handle_panic`
+maps IMEM `0x146bf000` in an early initcall and writes `LGE_RB_MAGIC | LGE_ERR_TZ`
+(`0x6d630300`) to restart_reason offset `0x65c`. Mainline has no equivalent LGE
+panic/IMEM restart-reason setup. Aurel therefore reused Ember's debug-only
+`joan/imem-oracle` commit `f0d368d28` and repackaged it with the safer K023
+`panic=0` null-init classifier.
+
+Artifacts:
+
+- Patch: `out/aurel-lge-imem-default-reason-k026-2026-07-06.patch`
+  sha256 `d68baabab6c1b82d0b976b826de49a5aed621747893bf5fe40fa98fba8a89f62`
+- Image: `out/boot-joan-imem-k026.img`
+  sha256 `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`
+- Result artifact: `out/aurel-lge-imem-k026-result-2026-07-06.txt`
+- Logs: `out/aurel-imem-k026-fastboot-2026-07-06.txt`,
+  `out/aurel-imem-k026-monitor-2026-07-06.txt`,
+  `out/aurel-imem-k026-pon-2026-07-06.txt`
+
+Device result:
+
+- RAM-only `fastboot boot` completed normally (`Sending`/`Booting` OKAY, total
+  `5.513s`).
+- No mainline USB/survivor beacon appeared.
+- LineageOS adb returned at `t+49.1s`; classification
+  `lineageos_returned_reset_not_fixed`.
+- Post-reset PON still showed SID0 `PS_HOLD`.
+- Returned downstream kernel reported
+  `androidboot.product.lge.bootreasoncode=0x6D630309` and
+  `LGE BOOT REASON: 0x6d630309`.
+
+Interpretation:
+
+- K026 is rejected as a survival fix: the LGE IMEM default restart-reason write
+  does not keep mainline alive.
+- It is useful evidence: `0x6D630309` decodes as LGE magic + TZ class + an
+  undocumented subreason `0x09` in this downstream kernel header. It is not the
+  named TZ non-secure watchdog bark (`0x3a`) or thermal secure bite (`0x3b`).
+- Do not repeat K026. Next useful work is to identify LG/XBL/TZ subreason `0x09`
+  or the early secure-world handshake that produces it.
