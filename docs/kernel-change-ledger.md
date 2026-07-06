@@ -47,6 +47,10 @@ part of a ledger experiment.
   as `25a391c94`, `a19ca9204`, `7c906e841`, and `0d7df4134`.
 - Latest debug branch: `joan/latest-kernel`, same upstream base plus the
   debug-only breadcrumb commit, currently ending at `88bf16047`.
+- IMEM reset-reason oracle branch: `joan/imem-oracle`, off
+  `joan/latest-clean-test`, one debug-only commit `f0d368d28`. STAGED, not yet
+  device-tested (needs Lance). Image `out/boot-joan-imem-oracle.img`
+  (sha256 `8d180d57b91aefae1d4fdbbb88cf138d76711866c7e5e3dcdceebc118fb768c7`).
 - Previous debug branch preserved: `joan/bringup-debug`, currently old
   v7.2-rc1-based commits `3d3868854`, `d75290b9e`, `5acce83a9`, `93fe462d7`,
   and `6c5f06bc8`.
@@ -334,6 +338,42 @@ part of a ledger experiment.
   - The `~29s` variants perturb timing and should not be reused as baselines
     unless specifically investigating their perturbation.
 - Public/PR disposition: `do not publish`; keep only as negative evidence.
+
+### IMEM reset-reason oracle (Ember 2026-07-06) — STAGED, not device-tested
+
+- Handle: branch `joan/imem-oracle` commit `f0d368d28`; patch
+  `out/ember-imem-oracle-2026-07-06.patch`; image
+  `out/boot-joan-imem-oracle.img`
+  (sha256 `8d180d57b91aefae1d4fdbbb88cf138d76711866c7e5e3dcdceebc118fb768c7`).
+- Class: `debug-only`.
+- Touched files: new `drivers/soc/qcom/joan_imem_oracle.c`,
+  `drivers/soc/qcom/Makefile` (`obj-y` unconditional).
+- Downstream reference: `drivers/soc/qcom/lge/lge_handle_panic.c`
+  (early_initcall maps `qcom,msm-imem@146bf000`, checks crash magic at 0x4c,
+  writes restart-reason at 0x65c) and its header's magic table
+  (`LGE_RB_MAGIC 0x6d630000`, `LGE_ERR_TZ 0x0300`,
+  `LGE_ERR_TZ_WDT_BARK 0x003A`, `LGE_ERR_TZ_THERM_SEC_BITE 0x003B`).
+- Rationale / why this is different from every rejected experiment: those all
+  tried to PREVENT the reset. This does not try to fix anything — it READS the
+  reset cause the secure boot chain records. Mainline has no imem node so it
+  never touches this SRAM; IMEM survives a warm reset (its whole purpose) and,
+  unlike the DDR ramoops region that LG scrubs, is READABLE FROM LINEAGEOS
+  after the crash-reset. This is a debug channel that should work where ramoops
+  did not.
+- Verification so far: `git diff --check` clean; builds; `joan_imem_oracle_init`
+  present in vmlinux as an `early` initcall; image packaged. NOT device-tested
+  (Lance required).
+- Device procedure (see `docs/imem-oracle-run.md` + `scripts/read-imem-reset-reason.sh`):
+  RAM-only boot the oracle image, let it crash-reset to LineageOS, then read
+  `busybox devmem 0x146bf65c 32` (reset reason) and `0x146bf640` (0x4a4f414e
+  sentinel = our initcall ran). Decode reason against the LGE table.
+- Expected discriminations:
+  - reason low byte `0x3a`/`0x3b` -> TZ watchdog bark / thermal bite named at last;
+  - reason `0x...0201` -> RPM; `0x...0301` -> kernel;
+  - reason still our default `0x6d630300` AND sentinel present -> reset came
+    from a path that records no LGE reason (suspect raw PMIC/PON/PS_HOLD);
+  - sentinel absent -> reset precedes early_initcall; move probe earlier.
+- Public/PR disposition: `do not publish`.
 
 ## Current narrowed hypothesis
 
