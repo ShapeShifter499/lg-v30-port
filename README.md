@@ -143,6 +143,15 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `fastboot boot` succeeded but no mainline USB/diag appeared; LineageOS adb
   returned at `t+44.3s` and the post-reset PON log again showed SID0
   `PS_HOLD`. The patch was saved, reverted, and the kernel was rebuilt clean.
+- **QSEE/QSEEOS log-buffer ping also failed as a survival oracle.** Aurel then
+  matched downstream `tz_log.c`'s ARMv8 `SCM_QSEEOS_FNID(1, 6)` QSEE log-buffer
+  registration as a debug-only qcom_scm probe call using a 32 KiB TZ memory
+  buffer (`out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`; image
+  `out/boot-joan-latest-qsee-logbuf.img`, sha256
+  `6a99c6f2c653e21d2cbba2df7ad2d392dbbcc40f0db7fef63efd599d57b7eb93`).
+  RAM-only `fastboot boot` succeeded, but no mainline USB/diag appeared;
+  LineageOS adb returned at `t+52.2s`, and PON evidence still showed SID0
+  `PS_HOLD`. The patch was saved, reverted, and the kernel rebuilt clean.
 
 ## Previous status (2026-07-05)
 

@@ -414,14 +414,58 @@ part of a ledger experiment.
   - move to a single QSEE/QSEEOS-side early ping oracle (e.g. `tz_log.c` QSEE log
     buffer registration / TZ feature query) before trying more watchdog variants.
 
+
+### K013 — downstream QSEE/QSEEOS log-buffer registration oracle
+
+- Handles:
+  - patch `out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`
+    (sha256 `68b0883cae085712a446475c5ae3bd723defb056ddd28e6babfe18521ce797d3`);
+  - image `out/boot-joan-latest-qsee-logbuf.img`
+    (sha256 `6a99c6f2c653e21d2cbba2df7ad2d392dbbcc40f0db7fef63efd599d57b7eb93`,
+    size `15736832` bytes);
+  - fastboot transcript `out/aurel-qsee-logbuf-fastboot-2026-07-06.txt`
+    (sha256 `828c8af9af4f8a9aa457d68ea2ae534b44a816fc8b1d05cc9c93d7706d4bc0d4`);
+  - PON evidence `out/aurel-qsee-logbuf-pon-2026-07-06.txt`
+    (sha256 `004d16ae7d4076acce09fdb261860856f80d53fce1edb289539389f60c100115`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-qsee-oracle.img`
+    (sha256 `45015e1880a65e7019abfd15de656af8253378323493a41d5563da9637e84320`).
+- Class: `debug-only`, rejected as a fix.
+- Public/PR disposition: `do not publish`.
+- Touched file: `drivers/firmware/qcom/qcom_scm.c`.
+- Downstream reference:
+  - `drivers/firmware/qcom/tz_log.c` `tzdbg_register_qsee_log_buf()`;
+  - ARMv8 path calls `SCM_QSEEOS_FNID(1, 6)` with args `(pa, len)` and arginfo
+    `0x22` after allocating a 32 KiB QSEE log buffer;
+  - downstream then queries TZ feature/version, which mainline already does in
+    `qcom_scm_qseecom_init()`.
+- Mainline delta tested:
+  - add only the missing log-buffer registration ping during qcom_scm QSEECOM init;
+  - allocate the 32 KiB buffer from mainline `qcom_tzmem`, send owner QSEE_OS
+    (`50`), service `1`, command `6`, args `(phys, 0x8000)`.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.513s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+52.2s`;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - standalone QSEE log-buffer registration is not the missing secure-liveness
+    handshake;
+  - the later host return may be timing perturbation, but it is not survival;
+  - next compare another first-second downstream delta, especially RPM/SMD/SMEM
+    handshake or LGE/Qualcomm boot-state cookies, one oracle at a time.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
 not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
 watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
-downstream high-memory secure/shared pools, or matching downstream's DLOAD-off
-SCM argument shape. Next investigation should compare very early downstream boot
-setup against mainline, especially:
+downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
+argument shape, or registering a downstream-style QSEE log buffer. Next
+investigation should compare very early downstream boot setup against mainline,
+especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;

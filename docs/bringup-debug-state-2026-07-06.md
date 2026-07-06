@@ -417,3 +417,87 @@ Cleanup:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+## Aurel follow-up — QSEE/QSEEOS log-buffer oracle (2026-07-06)
+
+Focus from the PS_HOLD handoff after the DLOAD-off rejection: test one concrete
+QSEE/QSEEOS-side early ping from downstream `tz_log.c`, without bundling any
+watchdog, CPU-idle, DLOAD, or memory-reservation changes.
+
+Downstream evidence:
+
+- `drivers/firmware/qcom/tz_log.c` calls `tzdbg_register_qsee_log_buf()` from
+  `tz_log_probe()`.
+- The ARMv8 path allocates a 32 KiB QSEE log buffer and calls
+  `SCM_QSEEOS_FNID(1, 6)` with args `(pa, len)` and arginfo `0x22`.
+- Downstream then calls `tzdbg_get_tz_version()`; mainline already performs the
+  matching TZ feature/version query inside `qcom_scm_qseecom_init()`, so this
+  oracle intentionally tested only the missing log-buffer registration ping.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`
+- Touched file:
+  `drivers/firmware/qcom/qcom_scm.c`
+- Change:
+  add a debug-only `qcom_scm_probe()`/QSEECOM-init call that allocates a 32 KiB
+  `qcom_tzmem` buffer, sends owner `QSEE_OS` (`50`), service `1`, command `6`,
+  arginfo `QCOM_SCM_ARGS(2, QCOM_SCM_RW, QCOM_SCM_VAL)`, args `(phys, 0x8000)`,
+  then logs the QSEE response.
+- Image:
+  `out/boot-joan-latest-qsee-logbuf.img`
+- Image sha256:
+  `6a99c6f2c653e21d2cbba2df7ad2d392dbbcc40f0db7fef63efd599d57b7eb93`
+- Patch sha256:
+  `68b0883cae085712a446475c5ae3bd723defb056ddd28e6babfe18521ce797d3`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-qsee-logbuf-fastboot-2026-07-06.txt`
+- PON evidence:
+  `out/aurel-qsee-logbuf-pon-2026-07-06.txt`
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.513s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+52.2s` after boot handoff.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- A standalone downstream-style QSEE log-buffer registration ping is not enough
+  to satisfy the secure-side liveness/reset policy.
+- The `t+52.2s` host return is later than the latest clean baseline, so the
+  oracle may perturb timing, but it still did not expose mainline USB/diag and
+  still ended in controlled SID0 `PS_HOLD`.
+- Mainline already performs the downstream TZ feature/version query, so repeating
+  that query is not a useful next standalone oracle.
+- The next secure-liveness comparison should move away from DLOAD and QSEE-log
+  setup toward another first-second downstream delta, especially RPM/SMD/SMEM
+  handshake or LGE/Qualcomm boot-state cookies, again as one oracle at a time.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-qsee-oracle.img`, sha256
+  `45015e1880a65e7019abfd15de656af8253378323493a41d5563da9637e84320`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback
+  and then `adb unroot` returned adbd to normal mode.
+- No fastboot client left running.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06

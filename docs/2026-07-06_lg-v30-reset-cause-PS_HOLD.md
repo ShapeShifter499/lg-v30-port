@@ -7,8 +7,9 @@ Date: 2026-07-06
 ## Current headline
 
 The LG V30 (`joan`) mainline reset is still a controlled PS_HOLD reset. The
-secure/liveness hypothesis remains active, but Aurel has now rejected one more
-specific first-second delta: downstream's DLOAD-off SCM argument shape.
+secure/liveness hypothesis remains active, but Aurel has now rejected two more
+specific first-second deltas: downstream's DLOAD-off SCM argument shape and
+downstream-style QSEE log-buffer registration.
 
 ## Evidence preserved from the PON / reset-cause pass
 
@@ -25,7 +26,8 @@ lge.bootreason=NORMAL / bootreasoncode=0x20
 Interpretation: the reset is hardware-indistinguishable from a deliberate secure
 reset. It is not currently explained by PMIC watchdog, thermal bite, keypad/GP
 fault, ordinary Linux panic, APSS watchdog node/petting, CPU-idle, secondary CPU
-bringup, or high-memory secure/shared pool allocation.
+bringup, high-memory secure/shared pool allocation, DLOAD-off argument shape, or a
+standalone QSEE log-buffer registration ping.
 
 ## Concrete rejected paths so far
 
@@ -38,7 +40,8 @@ bringup, or high-memory secure/shared pool allocation.
 - Downstream high-memory secure/shared pool no-map reservation: rejected.
 - IMEM oracle showed the useful readback route was PON/PS_HOLD, not LGE
   restart-reason decode.
-- New in this update: downstream DLOAD-off SCM argument shape `(0, 0)`: rejected.
+- Downstream DLOAD-off SCM argument shape `(0, 0)`: rejected.
+- Downstream-style QSEE log-buffer registration `SCM_QSEEOS_FNID(1, 6)`: rejected.
 
 ## New Aurel test: DLOAD-off SCM argument-shape oracle
 
@@ -81,21 +84,60 @@ Result:
 
 Conclusion: `SET_DLOAD_MODE` argument shape is not the missing liveness handshake.
 
-## Next best single oracle
 
-Try a QSEE/QSEEOS-side early ping, not bundled with watchdog or DLOAD changes.
-The most concrete downstream target is:
+## New Aurel test: QSEE/QSEEOS log-buffer oracle
+
+Downstream reference:
 
 - `android_kernel_lge_msm8998/drivers/firmware/qcom/tz_log.c`
-- `tzdbg_register_qsee_log_buf()` allocates a QSEE log buffer from the qseecom
-  ION heap and calls `SCM_QSEEOS_FNID(1, 6)` with args `(pa, len)` / arginfo
-  `0x22`.
-- `tzdbg_get_tz_version()` then queries TZ feature/version.
+- `tzdbg_register_qsee_log_buf()` allocates a 32 KiB QSEE log buffer and calls
+  `SCM_QSEEOS_FNID(1, 6)` with args `(pa, len)` / arginfo `0x22`.
+- Mainline already performs the downstream TZ feature/version query in
+  `qcom_scm_qseecom_init()`, so the oracle tested only the missing log-buffer
+  registration ping.
 
-A mainline oracle could add a debug-only qcom_scm-probe call that performs only
-one safe QSEE/TZ ping and measures whether reset timing or PS_HOLD behavior
-changes. Preserve patch under `out/`, test by RAM-only `fastboot boot`, then
-revert/rebuild clean and update the ledger.
+Oracle:
+
+- Patch:
+  `out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`
+- Patch sha256:
+  `68b0883cae085712a446475c5ae3bd723defb056ddd28e6babfe18521ce797d3`
+- Image:
+  `out/boot-joan-latest-qsee-logbuf.img`
+- Image sha256:
+  `6a99c6f2c653e21d2cbba2df7ad2d392dbbcc40f0db7fef63efd599d57b7eb93`
+- Size:
+  `15736832` bytes
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.513s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+52.2s`.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: standalone QSEE log-buffer registration is not the missing liveness
+handshake.
+
+## Next best single oracle
+
+Do not repeat DLOAD or QSEE-log registration as the next standalone test. Mainline
+already performs the TZ feature/version query, and the QSEE log-buffer ping did
+not prevent PS_HOLD.
+
+Next compare another first-second downstream secure-liveness/platform-state delta
+against mainline, especially one of:
+
+- RPM/SMD/SMEM handshake and boot-state setup visible in downstream early dmesg;
+- LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
+- another concrete QSEE/QSECOM state transition only if downstream evidence shows
+  it runs before the reset window and differs from mainline.
+
+Keep the same rule: one oracle at a time, RAM-only `fastboot boot`, save patch
+under `out/`, then revert/rebuild clean and update the ledger.
 
 ## Caveat for expectations
 
@@ -107,6 +149,6 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
 - Harness docs updated.
-- Phone parked back in LineageOS.
+- Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.
