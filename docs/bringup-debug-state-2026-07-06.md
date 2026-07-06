@@ -744,6 +744,87 @@ Cleanup:
 - Phone parked back in LineageOS; `adb root` was used only for the PON readback.
 - No fastboot client left running.
 
+## Aurel follow-up — DT-backed PM/RPM overlay parity oracle (2026-07-06)
+
+Focus after single-L19 failure: test one broader downstream joan PM/RPM overlay
+bundle through mainline's existing RPM regulator framework, without adding new
+regulator driver code or repeating the raw BOB-mode write.
+
+Downstream/mainline comparison:
+
+- Downstream common PM overlay sets `pm8998_l18` to 2.704 V via
+  `qcom,init-voltage` / `qcom,vdd-voltage-level` and keeps it enabled for the
+  RPM resource definition.
+- Downstream common sound overlay sets `pm8998_l19` to 3.3 V and marks it
+  `regulator-always-on`.
+- Downstream common PM overlay sets the PMI8998 BOB path to `qcom,init-bob-mode =
+  <2>` plus pin-control children. Mainline does not support the downstream BOB
+  mode/pin-control KVPs in DT, but it can send a standard BOB enable/voltage vote.
+- Mainline joan had L18 at the same fixed 2.704 V but no boot vote, L19 at 3.008
+  V with no boot/always-on flags, and BOB at 3.312-3.6 V with no forced enable.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`
+- Touched file:
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Change:
+  add a DEBUG-ONLY PM overlay bundle: `l18` fixed 2.704 V + `regulator-boot-on`,
+  `l19` fixed 3.3 V + `regulator-boot-on`/`regulator-always-on`, and BOB fixed
+  3.312 V + `regulator-boot-on`/`regulator-always-on`.
+- Image:
+  `out/boot-joan-latest-rpm-pm-overlay.img`
+- Image sha256:
+  `de729e6eff09e997de15bdfb0fcf29890e86765228d691f5bb1ca1e185806365`
+- Patch sha256:
+  `8b6d4480fe54b7ae7300ecb80b8b4091b542adadb57d1dc986851ec72dfb3c3f`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-pm-overlay-fastboot-2026-07-06.txt`, sha256
+  `ba6cefd54ace1274932cbd5a02defa52e298bc5ed0003be20afb2ec0f6f72c37`
+- PON evidence:
+  `out/aurel-rpm-pm-overlay-pon-2026-07-06.txt`, sha256
+  `15054fdb0af310176c769e71dc31d939d7523a64b936d18e9ecf16fcc4072bdb`
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.518s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+30.6s` after fastboot completion.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- This broader DT-backed PM/RPM default-vote bundle did not produce survival or a
+  mainline diagnostic channel.
+- It also did not preserve the much longer timing from the raw BOB-mode oracle;
+  host return was back near the early failure class.
+- Simple PM8998/PMI8998 regulator default-vote parity is now weaker as the sole
+  reset gate. If continuing RPM work, compare unsupported downstream-specific KVP
+  semantics or real consumers, not another standard DT voltage/enable bundle.
+  Otherwise pivot to SMEM/restart/boot-state cookies or PMIC/PON setup.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-pm-overlay-oracle.img`, sha256
+  `eaddd46a1716f36a31fccfe5d9d94ba3c375b53c0ab70df28ac2fac7dca07554`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback.
+- No fastboot client left running.
+
 Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.4
+Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

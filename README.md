@@ -198,6 +198,16 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `PS_HOLD`. This minimal DT-backed default vote is not sufficient by itself,
   though it keeps broader downstream PM/RPM regulator parity worth testing.
   The patch was saved, reverted, and the kernel rebuilt clean.
+- **Broader DT-backed PM/RPM overlay oracle also failed.**
+  Aurel tested a one-bundle downstream PM overlay parity oracle through the
+  existing mainline RPM regulator framework: `l18` fixed at 2.704 V and
+  `regulator-boot-on`, `l19` fixed at 3.3 V with boot/always-on, and `bob` fixed
+  at 3.312 V with boot/always-on (`out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`; image `out/boot-joan-latest-rpm-pm-overlay.img`, sha256
+  `de729e6eff09e997de15bdfb0fcf29890e86765228d691f5bb1ca1e185806365`). RAM-only `fastboot boot` succeeded, but no mainline USB/diag
+  appeared; LineageOS adb returned at `t+30.6s` after fastboot and PON evidence
+  again showed SID0 `PS_HOLD`. This broader DT-backed PM/RPM default-vote bundle
+  is not sufficient and does not preserve the longer timing seen with the raw
+  BOB-mode oracle. The patch was saved, reverted, and the kernel rebuilt clean.
 
 ## Previous status (2026-07-05)
 

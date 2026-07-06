@@ -11,7 +11,8 @@ secure/liveness hypothesis remains active, but Aurel has now rejected several
 specific first-second deltas: downstream's DLOAD-off SCM argument shape,
 downstream-style QSEE log-buffer registration, RPM `rpm_requests` rpmsg
 reachability as a standalone liveness oracle, a minimal downstream PMI8998
-BOB-mode RPM vote, and a DT-backed PM8998 L19 3.3 V always-on default vote.
+BOB-mode RPM vote, a DT-backed PM8998 L19 3.3 V always-on default vote,
+and a broader DT-backed PM/RPM L18+L19+BOB overlay vote bundle.
 
 ## Evidence preserved from the PON / reset-cause pass
 
@@ -31,7 +32,8 @@ fault, ordinary Linux panic, APSS watchdog node/petting, CPU-idle, secondary CPU
 bringup, high-memory secure/shared pool allocation, DLOAD-off argument shape, a
 standalone QSEE log-buffer registration ping, RPM `rpm_requests` rpmsg
 reachability alone, a bare PMI8998 BOB-mode RPM vote, or a single DT-backed
-PM8998 L19 3.3 V always-on default vote.
+PM8998 L19 3.3 V always-on default vote, or a broader standard DT-backed
+PM/RPM L18+L19+BOB overlay vote bundle.
 
 ## Concrete rejected paths so far
 
@@ -51,6 +53,9 @@ PM8998 L19 3.3 V always-on default vote.
   diagnostic channel; reset still ended as SID0 `PS_HOLD`.
 - DT-backed PM8998 L19 default-vote oracle (3.3 V, boot-on, always-on): no
   diagnostic channel; reset still ended as SID0 `PS_HOLD`.
+- Broader DT-backed PM/RPM overlay oracle (L18 boot-on, L19 3.3 V
+  boot/always-on, BOB 3.312 V boot/always-on): no diagnostic channel; reset
+  still ended as SID0 `PS_HOLD`.
 
 ## New Aurel test: DLOAD-off SCM argument-shape oracle
 
@@ -263,10 +268,56 @@ prevent the controlled PS_HOLD reset or expose diagnostics. It strengthens the
 case for broader PM/RPM regulator parity, but not another L19-only retry.
 
 
+## New Aurel test: DT-backed PM/RPM overlay parity oracle
+
+Downstream reference:
+
+- `android_kernel_lge_msm8998/arch/arm64/boot/dts/lge/msm8998-joan/msm8998-joan-common/msm8998-joan-common-pm.dtsi`
+- `android_kernel_lge_msm8998/arch/arm64/boot/dts/lge/msm8998-joan/msm8998-joan-common/msm8998-joan-common-sound.dtsi`
+- Downstream common PM/sound overlays set L18 2.704 V defaults, L19 3.3 V
+  always-on, and PMI8998 BOB mode/pin-control defaults.
+- Mainline cannot express downstream BOB mode/pin-control KVPs through its simple
+  SMD regulator DT binding, so this oracle tested the standard mainline-capable
+  voltage/enable subset: L18 boot vote, L19 fixed 3.3 V boot/always-on, and BOB
+  fixed 3.312 V boot/always-on.
+
+Oracle:
+
+- Patch:
+  `out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`
+- Patch sha256:
+  `8b6d4480fe54b7ae7300ecb80b8b4091b542adadb57d1dc986851ec72dfb3c3f`
+- Image:
+  `out/boot-joan-latest-rpm-pm-overlay.img`
+- Image sha256:
+  `de729e6eff09e997de15bdfb0fcf29890e86765228d691f5bb1ca1e185806365`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-pm-overlay-fastboot-2026-07-06.txt`
+- PON evidence:
+  `out/aurel-rpm-pm-overlay-pon-2026-07-06.txt`
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.518s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+30.6s` after fastboot.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: broader standard DT-backed PM/RPM regulator voltage/enable parity is
+not sufficient to prevent the controlled PS_HOLD reset or expose diagnostics.
+The next test should not be another standard regulator voltage/enable bundle.
+
+
 ## Next best single oracle
 
 Do not repeat DLOAD, QSEE-log registration, RPM reachability, bare BOB-mode,
-or single L19 default-vote tests as the next standalone test. Mainline
+single L19 default-vote, or standard DT L18+L19+BOB voltage/enable bundle
+tests as the next standalone test. Mainline
 already performs the TZ feature/version
 query, the QSEE log-buffer ping did not prevent PS_HOLD, the RPM rpmsg
 reachability oracle only shifted timing without exposing diagnostics, and the
@@ -277,8 +328,9 @@ Next compare another first-second downstream secure-liveness/platform-state delt
 against mainline, especially one of:
 
 - full downstream RPM regulator/default-vote parity or another concrete RPM vote,
-  not mere `rpm_requests` reachability, not just BOB `bobm=2`, and not just
-  L19 `3300000` + always-on/boot-on;
+  not mere `rpm_requests` reachability, not just BOB `bobm=2`, not just
+  L19 `3300000` + always-on/boot-on, and not just standard DT L18+L19+BOB
+  voltage/enable votes;
 - SMEM boot-state and restart cookies visible in downstream early dmesg;
 - LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
 - another concrete QSEE/QSECOM state transition only if downstream evidence shows
@@ -296,7 +348,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated through the DT-backed RPM L19 oracle.
+- Harness docs updated through the DT-backed PM/RPM overlay oracle.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.

@@ -582,6 +582,46 @@ part of a ledger experiment.
   - broader downstream PM/RPM regulator/default-vote parity still merits testing,
     but not as another single-L19-only oracle.
 
+### K017 — DT-backed PM/RPM overlay parity oracle
+
+- Handles:
+  - patch `out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`
+    (sha256 `8b6d4480fe54b7ae7300ecb80b8b4091b542adadb57d1dc986851ec72dfb3c3f`);
+  - image `out/boot-joan-latest-rpm-pm-overlay.img`
+    (sha256 `de729e6eff09e997de15bdfb0fcf29890e86765228d691f5bb1ca1e185806365`, size `15736832` bytes);
+  - fastboot transcript `out/aurel-rpm-pm-overlay-fastboot-2026-07-06.txt`
+    (sha256 `ba6cefd54ace1274932cbd5a02defa52e298bc5ed0003be20afb2ec0f6f72c37`);
+  - PON evidence `out/aurel-rpm-pm-overlay-pon-2026-07-06.txt`
+    (sha256 `15054fdb0af310176c769e71dc31d939d7523a64b936d18e9ecf16fcc4072bdb`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-pm-overlay-oracle.img`
+    (sha256 `eaddd46a1716f36a31fccfe5d9d94ba3c375b53c0ab70df28ac2fac7dca07554`).
+- Class: `debug-only`, rejected as a standalone fix; useful evidence that a
+  standard DT voltage/enable PM/RPM default bundle is not the sole reset gate.
+- Public/PR disposition: `do not publish`.
+- Touched file: `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`.
+- Downstream reference:
+  - common PM overlay sets `pm8998_l18` 2.704 V defaults;
+  - common sound overlay sets `pm8998_l19` 3.3 V and always-on;
+  - common PM overlay sets PMI8998 BOB `qcom,init-bob-mode = <2>` and pin-control
+    children, but mainline lacks those downstream-specific DT/KVP semantics.
+- Mainline delta tested:
+  - add `regulator-boot-on` to L18;
+  - set L19 to 3.3 V and add boot/always-on;
+  - force BOB to fixed 3.312 V and add boot/always-on so the existing mainline
+    RPM regulator framework sends standard enable/voltage votes.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt with GCC cross toolchain and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.518s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+30.6s` after fastboot;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - simple PM/RPM regulator default-vote parity via standard mainline DT
+    constraints is not enough;
+  - the next useful delta should not be another standard voltage/enable bundle.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -590,11 +630,10 @@ watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
 downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
 argument shape, registering a downstream-style QSEE log buffer, merely reaching
 RPM `rpm_requests` rpmsg setup, sending a bare downstream BOB `bobm=2` RPM
-vote, or forcing downstream joan's PM8998 L19 3.3 V always-on default through
-the mainline regulator framework. Next investigation should compare very early
-downstream boot setup against
-mainline,
-especially:
+vote, forcing downstream joan's PM8998 L19 3.3 V always-on default through the
+mainline regulator framework, or forcing a broader standard DT-backed PM/RPM
+L18+L19+BOB voltage/enable bundle. Next investigation should compare very early
+downstream boot setup against mainline, especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;
