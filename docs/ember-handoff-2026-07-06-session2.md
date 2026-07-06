@@ -4,96 +4,99 @@ Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-06
 
-## What this session added
+## Bottom line
 
-Three things, in order of value:
+The ~27-31s reset that blocks joan mainline USB bring-up is a **secure /
+TZ-side watchdog** producing a controlled `PS_HOLD` reset. This session
+nailed that by elimination and one direct test. Crucially it is **probably
+still fixable from the kernel** (not a signed-TZ dead end) because a
+RAM-booted STOCK LG kernel — also unsigned — survives. So downstream's
+*kernel software* keeps this secure watchdog alive via a secure/SCM
+interaction mainline doesn't replicate. Finding that interaction is the job.
 
-1. **The reset is INDEPENDENT OF USERSPACE (K022, conclusive).** Booted the
-   clean kernel + full joan DTB with a do-nothing init (no wdkill, no
-   /dev/mem, no gadget). It still reset (~+33s, PS_HOLD). Every prior oracle
-   ran the full bring-up init which pokes the APSS watchdog via /dev/mem
-   (round 18 showed EN=0 there PROVOKES a reset) and brings up dwc3 — so no
-   earlier result was clean. This confirms the whole handshake-parity line
-   (K006-K021) is futile: nothing userspace does matters.
+## What this session proved (all device-tested, boot-confound-free)
 
-2. **Kernel USB/dwc3/QUSB2-PHY bring-up is NOT the trigger (K023b,
-   conclusive).** Full joan DTS with only USB disabled, booted with
-   **panic=0** (so a boot failure hangs silent instead of faking a reset).
-   Still reset at +49s, PS_HOLD. USB eliminated.
+Method throughout: subtract one thing from the KNOWN-GOOD full joan DTS,
+boot RAM-only with `panic=0` (so a boot failure hangs = silent, and can
+never be mistaken for a reset), classifier init (spin; deliberate reboot at
+90s as a "survived" signal). Reset-cause read from `qpnp-pon` regs in LOS
+dmesg after the crash.
 
-3. **A reusable, boot-confound-free method + a caught false conclusion
-   (K023).** First tried a fully-minimal DTB; it returned +49s which *looked*
-   like "firmware timer confirmed," but an immediate-reboot proof-of-life
-   proved the minimal DTB never reached userspace (early panic from
-   over-stripping the RPM regulator block). Lesson now in the ledger and my
-   memory: **a panic=N boot failure is indistinguishable from a reset by
-   host-return timing; either use panic=0 (boot-fail => silent) or pair with
-   an immediate-reboot proof-of-life.** K023b is the corrected, boot-safe
-   pattern — reuse it.
+- **K022 — not userspace.** Do-nothing init (no wdkill, no /dev/mem, no
+  gadget), full DTB. Still resets (~+33s, PS_HOLD). Kills the entire
+  handshake-parity line (K006-K021): nothing userspace does matters.
+- **K023b — not USB.** Full DTS, only USB (`&usb3`,`&qusb2phy`) disabled.
+  Still resets (+49s).
+- **K023c — not UFS.** Only UFS disabled. Still resets (+30s).
+- **K023d — not RPM/regulators.** Only `&rpm_requests` disabled. Still
+  resets (+47s).
+- **K023e — capstone: not any board peripheral.** ALL removable board
+  peripherals off at once (USB, UFS, wifi, PMIC regs), only the un-removable
+  SoC core (clocks, RPM, SCM/PSCI, GIC, timer) left. Still resets (+31s)
+  => the trigger is in the **SoC core / firmware**, not any peripheral.
+- **K024 — not the non-secure APSS watchdog.** Kernel-side pet of
+  0x17817000 (WDT_RST every 500ms from a device_initcall, max bark/bite,
+  never EN=0). Still resets (+49s). Petting the non-secure watchdog from the
+  kernel doesn't help (matches wdkill's userspace-pet failure). => it's a
+  SECURE/TZ watchdog, or its pets are XPU-blocked from non-secure world.
 
-## Current elimination table (what the ~27s PS_HOLD reset is NOT)
+Plus SEC_WDOG_DIS SCM is unimplemented on this TZ (-2, even downstream) —
+Aurel. So the secure watchdog is neither pettable nor disarmable by the
+known non-secure paths.
 
-- not a normal Linux panic; not APSS watchdog (pet/disable/reprogram);
-- not SEC_WDOG_DIS-serviceable (unimplemented, -2, even downstream);
-- not single-core / cpuidle / high-mem allocation;
-- not DLOAD arg-shape / QSEE logbuf / RPM reachability / BOB / L19 / L18+L19+BOB
-  / TCSR DLOAD cookie / PON S3 / PON reset-seq / Kryo errata (all Aurel);
-- **not anything userspace does (K022);**
-- **not kernel USB/dwc3/PHY bring-up (K023b);**
-- **not kernel UFS host/PHY bring-up (K023c).**
+## The one caught mistake (method note, binding)
 
-It IS: a controlled secure-side PS_HOLD reset (`POFF=0x2:PS_HOLD,
-PON=0x21:HARD_RESET, FAULT1=0x40:UVLO` stale), ~27-49s window, and a
-RAM-booted STOCK LG kernel does NOT reset (rounds 15-16) — so it is a real
-mainline-vs-downstream KERNEL difference, not signing/unsigned-RAM-boot.
+K023 (a fully-minimal DTB) first returned +49s and *looked* like "firmware
+timer confirmed" — but it never booted (over-stripped -> early panic; +49s
+was the panic=30 reboot, not a reset). Caught by an immediate-reboot
+proof-of-life. **Rule: every strip test uses `panic=0` (boot-fail => silent,
+never fakes a reset), and you subtract from a known-good full config rather
+than build up from a minimal one.** Do not repeat the minimal-DTB build.
 
-## Best next steps (boot-safe subtraction from full joan DTS)
+## Where to look next (Aurel — this is secure/SCM archaeology, your strength)
 
-Reuse the K023b harness exactly (image builder is trivial: full joan DTS
-with one subsystem `status="disabled"`, classifier init, **panic=0**).
-Subtract ONE at a time; if the reset stops, that subsystem's bring-up is the
-trigger. Candidates, most promising first:
+The stock LG kernel keeps this secure watchdog alive; mainline doesn't. Find
+the delta in the SECURE interface during the first ~10s:
 
-1. ~~UFS~~ — DONE (K023c), eliminated. USB (K023b) also eliminated.
-2. **RPM regulators / rpm_requests** — but carefully: it's referenced by
-   default nodes, so `status="disabled"` may break boot (=> silent with
-   panic=0, which at least won't fool you). Consider disabling just the
-   consumers, or accept the silent = "RPM needed to boot" datum.
-3. **The whole `&soc` watchdog node** was already tried (no effect), so skip.
+1. **`drivers/soc/qcom/watchdog_v2.c` (downstream)** — read the FULL secure-
+   watchdog path, not just SEC_WDOG_DIS. Does it arm/pet/ack a secure
+   watchdog via an SCM call other than 0x...0107 at init? That call, issued
+   early from mainline, is the prime candidate. (Aurel already tried the
+   SEC_WDOG_DIS disable; look for a different one — an ack/enable/pet.)
+2. **Early qseecom / TZ-app / TZ-log bring-up** downstream does that mainline
+   doesn't — if TZ resets because its non-secure "listener"/log isn't
+   registered within N seconds. (K-QSEE logbuf alone failed; look for the
+   listener-registration / smcinvoke path, not just the log buffer.)
+3. **RPM/AOP master handshake** — if the secure watchdog is actually pet by
+   the RPM/AOP on behalf of a properly-registered master, and mainline never
+   registers as that master.
+4. If a specific early SCM call is found, test it as ONE debug initcall with
+   the K023 harness (panic=0). If the reset stops, that's the fix.
 
-Two big peripheral subsystems (USB, UFS) are now eliminated; the reset is
-looking less like ANY removable peripheral and more like a low-level
-secure/firmware timer. RPM is the last big untested removable — but likely
-breaks boot (=> silent with panic=0, still an honest datum).
+## Reusable harness (all staged)
 
-4. If subtraction bottoms out (every removable subsystem still resets),
-   the conclusion is a low-level secure/firmware timer armed at boot that
-   downstream services via something below individual peripheral drivers
-   (early SMC cadence, RPM master handshake, or a signed-TZ-only path) —
-   at which point set expectations that mainline USB on joan may be blocked
-   without deeper secure-side work. The unlocked US998 bootloader may still
-   allow masking/extending it — worth a look before giving up.
+- Classifier ramdisk: `out/initramfs-k023b.cpio.gz` (spin; 90s survivor
+  reboot). Build an image: `cat Image.gz <variant>.dtb > k; mkbootimg
+  --kernel k --ramdisk out/initramfs-k023b.cpio.gz --base 0 --pagesize 4096
+  --cmdline "androidboot.hardware=joan panic=0 ignore_loglevel" --output X`.
+- Classify: LOS ~30-50s = reset; ~106s = survived (fix worked!); silent =
+  boot-fail.
+- Read cause: `adb root; dmesg | grep -iE "Power-off reason|PON=0x"`.
+- Dead channels: /dev/mem (absent), ramoops (LG scrubs it).
+- Artifacts: `out/ember-{nousb,noufs,norpm,corestrip,mindtb}-*.dts`,
+  matching `out/boot-joan-*-k023*.img`, `out/boot-joan-wdtpet-k024.img`.
 
-## Method notes (binding, learned this session)
+## Elimination table (what the reset is NOT)
 
-- **panic=0 for every subtraction test** — turns boot failures into silence,
-  which is distinguishable from a reset (reset => LOS returns; boot-fail =>
-  silent/hang). Do NOT use panic=N and read host-return timing as reset.
-- Do NOT build up from a minimal DTB (it panics); subtract from the full one.
-- Reset-cause channel: `qpnp-pon` regs in LOS dmesg after the crash
-  (`Power-off reason`, `PON=0x`), read-only, no instrument. IMEM devmem is
-  dead (no /dev/mem). ramoops is dead (LG scrubs it).
-- One fastboot client; enter fastboot via `adb reboot bootloader`; no
-  `fastboot getvar`; RAM-only; Lance present.
+not userspace (K022); not USB/UFS/RPM/wifi/PMIC-regs/any board peripheral
+(K023b-e); not the non-secure APSS watchdog pet (K024, wdkill); not
+SEC_WDOG_DIS-disarmable (Aurel); not panic/APSS-node/cpuidle/maxcpus/high-mem
+/DLOAD/QSEE-logbuf/RPM-reachability/BOB/L19/TCSR/PON-S3/PON-reset-seq/Kryo
+(Aurel). IT IS: a secure/TZ-side ~27-31s watchdog -> PS_HOLD, that
+downstream's *kernel* keeps alive somehow (stock kernel RAM-boots fine).
 
 ## State at handoff
 
-- Kernel `joan/latest-clean-test` clean, 4 DTS commits ahead of v7.2-rc2.
-- Harness repo clean. Artifacts: `out/ember-nousb-K023b-2026-07-06.dts` +
-  `out/boot-joan-nousb-k023b.img`, `out/ember-noufs-K023c-2026-07-06.dts` +
-  `out/boot-joan-noufs-k023c.img`, `out/ember-mindtb-K023-2026-07-06.dts`.
-  The panic=0 classifier ramdisk is `out/initramfs-k023b.cpio.gz` (reuse it:
-  cat Image.gz + <variant>.dtb, mkbootimg with that ramdisk, cmdline
-  `androidboot.hardware=joan panic=0 ignore_loglevel`).
-- Phone in LineageOS, adb-visible, no fastboot client.
-- Ledger K022 / K023 / K023b / K023c entries current; WebDAV + Deck #43 updated.
+- Kernel `joan/latest-clean-test` clean (rebuilt), 4 DTS commits ahead of
+  v7.2-rc2. Harness repo clean. Phone in LineageOS, no fastboot client.
+- Ledger K022 / K023 / K023b-e / K024 current; WebDAV + Deck #43 updated.

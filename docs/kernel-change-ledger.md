@@ -920,6 +920,35 @@ part of a ledger experiment.
 - Agent-harness: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
+### K024 — kernel-side APSS watchdog pet: reset PERSISTS => secure/TZ watchdog
+
+- Handle: patch driver `drivers/soc/qcom/joan_wdt_pet.c` (reverted; see
+  git history / this entry); image `out/boot-joan-wdtpet-k024.img`
+  (sha256 recorded in build). DEBUG-ONLY, reverted clean.
+- Class: `debug-only`; CONCLUSIVE.
+- Method: device_initcall (~1-2s) that maps the APSS watchdog at 0x17817000
+  and pets it (WDT_RST=0x4) every 500ms from KERNEL space, with max
+  bark/bite, never writing EN=0 (round 18 showed EN=0 provokes a reset).
+  Full joan DTB, null classifier init, panic=0.
+- Result: LOS at +49s — reset PERSISTS. Kernel-side petting of the
+  non-secure APSS watchdog does NOT stop the reset (matches wdkill's earlier
+  userspace-pet failure, but now from early boot with kernel privilege).
+- Conclusion: the ~27-31s PS_HOLD reset is NOT the pettable non-secure APSS
+  watchdog. It is a SECURE / TZ-side watchdog (or its pet writes are
+  XPU-blocked from non-secure world). Non-secure Linux cannot service it by
+  petting, and (Aurel) SEC_WDOG_DIS SCM is unimplemented (-2). 
+- IMPORTANT nuance (keeps this from being "needs signed TZ, give up"): a
+  RAM-booted STOCK LG KERNEL (also unsigned) SURVIVES (rounds 15-16). So
+  downstream's KERNEL software keeps this secure watchdog alive via some
+  secure/SCM interaction that mainline does not replicate — i.e. likely
+  fixable from the kernel once that interaction is found. Prime place to
+  look: downstream `drivers/soc/qcom/watchdog_v2.c` secure-watchdog handling
+  and any early SCM/qseecom/tz-app bring-up beyond SEC_WDOG_DIS.
+- Public/PR disposition: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
