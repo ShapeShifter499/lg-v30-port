@@ -1,0 +1,329 @@
+===== BASELINE (clean boot) =====
+[    0.001479] pid_max: default: 32768 minimum: 301
+[    0.371483] msm_watchdog 17817000.qcom,wdt: wdog absent resource not present
+[    0.530750] cpr3_regulator_init_ctrl: apc0: Default CPR mode = full HW closed-loop
+[    0.536264] cpr3_regulator_init_ctrl: apc1: Default CPR mode = full HW closed-loop
+[    0.538726] cpr3_regulator_init_ctrl: gfx: Default CPR mode = closed-loop
+[    0.593256] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pm8998@0:qcom,power-on@800: PMIC@SID0 Power-on reason: Triggered from Hard Reset and 'cold' boot
+[    0.593278] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pm8998@0:qcom,power-on@800: PMIC@SID0: Power-off reason: Triggered from PS_HOLD (PS_HOLD/MSM controlled shutdown)
+[    0.593891] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: No PON config. specified
+[    0.593930] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: PMIC@SID2 Power-on reason: Triggered from PON1 (secondary PMIC) and 'cold' boot
+[    0.593951] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: PMIC@SID2: Power-off reason: Triggered from GP1 (Keypad_Reset1)
+[    0.684407] NetLabel:  unlabeled traffic allowed by default
+[    0.829872] PCI: CLS 0 bytes, default 64
+[    0.971312] io scheduler cfq registered (default)
+[    1.009091] mdss_fb_probe: qcom,default-brightness = 511
+[    1.037172] B -    587338 - PM: 0: PON=0x21:PON1:HARD_RESET: ON=0x80:PON_SEQ: POFF=0x2:PS_HOLD: OFF=0x80:POFF_SEQ: FAULT1=0x40:UVLO\x0d
+[    1.037297] B -    587430 - PM: 1: PON=0x20:PON1: ON=0x80:PON_SEQ: POFF=0x8:GP1: OFF=0x80:POFF_SEQ: FAULT1=0x40:UVLO\x0d
+[    1.037423] B -    587521 - PM: 2: PON=0x20:PON1: ON=0x80:PON_SEQ: POFF=0x8:GP1: OFF=0x80:POFF_SEQ: FAULT2=0x8:FAULT_N\x0d
+[    1.042937] Boot reason: 0x20 not handled, defaulting to Normal Boot\x0d
+[    1.321324] DC_SUSPEND: effective vote is now 0 voted by DEFAULT_VOTER,0
+[    1.321359] DC_ICL: effective vote is now 900000 voted by DEFAULT_VOTER,0
+[    1.321523] CHG_DISABLE: effective vote is now 0 voted by DEFAULT_VOTER,0
+[    1.323101] PMI: smblib_handle_typec_cc_state_change: TypeC SOURCE_DEFAULT insertion
+[    1.323147] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    1.325590] PMI: smblib_handle_wdog_bark: IRQ: determine-initial-status
+[    1.338396] SHOWCASE: showcase_create_parsedt: soc-min : 45, soc-max : 50 of lge,soc-range-default
+[    1.339715] PMINFO: [VOT] IUSB:3000(HW_ICL_VOTER), IBAT:3300(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4395(BATT_PROFILE_VOTER), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_DELAY_VOTER)
+[    1.585597] Invalid index Defaulting curr to 0
+[    2.110184] init: Couldn't load property file '/vendor/default.prop': open() failed: No such file or directory: No such file or directory
+[    2.142015] FG: extension_fg_load_icoeff_dt: ICOEFF is set to 100 by default
+[    2.146969] audit: type=1107 audit(1488353749.859:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=persist.env.fastdorm.enabled pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.147213] audit: type=1107 audit(1488353749.859:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=ro.data.large_tcp_window_size pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.147467] audit: type=1107 audit(1488353749.859:7): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=crypto.driver.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.147521] audit: type=1107 audit(1488353749.859:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=drmdiag.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.147564] audit: type=1107 audit(1488353749.859:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=drmdiag.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.147754] audit: type=1107 audit(1488353749.859:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=persist.ims.regmanager.mode pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.155627] init: Parsing file /system/etc/init/bootstat-debug.rc...
+[    2.155831] init: Parsing file /system/etc/init/bootstat.rc...
+[    2.197544] init: starting service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)'...
+[    2.199957] init: SVC_EXEC service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' pid 588 (uid 0 gid 0+0 context default) started; waiting...
+[    2.216358] init: Service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' (pid 588) exited with status 0 waiting took 0.018000 seconds
+[    2.216371] init: Sending signal 9 to service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' (pid 588) process group...
+[    2.220817] init: starting service 'apexd-bootstrap'...
+[    2.229979] init: SVC_EXEC service 'apexd-bootstrap' pid 590 (uid 0 gid 1000+0 context default) started; waiting...
+[    2.272422] apexd: Bootstrap subcommand detected
+[    2.304950] init: Service 'apexd-bootstrap' (pid 590) exited with status 0 waiting took 0.083000 seconds
+[    2.304967] init: Sending signal 9 to service 'apexd-bootstrap' (pid 590) process group...
+[    2.366513] init: SVC_EXEC service 'boringssl_self_test32' pid 594 (uid 0 gid 0+0 context default) started; waiting...
+[    2.436256] init: SVC_EXEC service 'boringssl_self_test64' pid 596 (uid 0 gid 0+0 context default) started; waiting...
+[    2.682186] usbpd usbpd0: typec mode:TYPEC_SOURCE_DEFAULT(Rp56k) present:1 type:4 orientation:2
+[    2.682191] usbpd usbpd0: Type-C Source (default) connected
+[    3.182885] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    3.183559] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    3.661773] init: SVC_EXEC service 'boringssl_self_test32_vendor' pid 685 (uid 0 gid 0+0 context default) started; waiting...
+[    3.722900] init: SVC_EXEC service 'boringssl_self_test64_vendor' pid 687 (uid 0 gid 0+0 context default) started; waiting...
+[    4.261999] init: Command 'copy /system/etc/prop.default /dev/urandom' action=init (/system/etc/init/hw/init.rc:120) took 0ms and failed: Could not read input file '/system/etc/prop.default': open() failed: No such file or directory
+[    4.369129] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    4.370579] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    4.548305] init: SVC_EXEC service 'exec 4 (/system/bin/vdc checkpoint markBootAttempt)' pid 741 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.652447] init: SVC_EXEC service 'exec 5 (/vendor/bin/init.qti.qseecomd.sh)' pid 743 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.820193] using default for wan-rx-desc-size = 256
+[    4.859906] init: SVC_EXEC service 'exec 6 (/system/bin/fsverity_init --load-verified-keys)' pid 773 (uid 0 gid 0+0 context default) started; waiting...
+[    4.869733] init: SVC_EXEC service 'exec 7 (/system/bin/vdc checkpoint prepareCheckpoint)' pid 774 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.893664] init: Switched to default mount namespace
+[    4.898826] init: SVC_EXEC service 'exec 8 (/system/bin/vdc keymaster earlyBootEnded)' pid 778 (uid 1000 gid 1000+0 context default) started; waiting...
+[    5.081289] init: SVC_EXEC service 'exec 9 (/bin/rm -rf /data/misc/virtualizationservice)' pid 788 (uid 1081 gid 1000+0 context default) started; waiting...
+[    5.142188] init: SVC_EXEC service 'exec 10 (/system/bin/chattr +F /data/media)' pid 790 (uid 1023 gid 1023+0 context default) started; waiting...
+[    5.153976] init: SVC_EXEC service 'derive_sdk' pid 791 (uid 9999 gid 9999+0 context default) started; waiting...
+[    5.170973] init: SVC_EXEC service 'exec 11 (/system/bin/vdc --wait cryptfs init_user0)' pid 792 (uid 0 gid 0+0 context default) started; waiting...
+[    5.220090] init: SVC_EXEC service 'derive_classpath' pid 795 (uid 1000 gid 1000+1 context default) started; waiting...
+[    5.270676] init: SVC_EXEC service 'exec 12 (/system/bin/fsverity_init --lock)' pid 797 (uid 0 gid 0+0 context default) started; waiting...
+[    5.279096] init: SVC_EXEC service 'apexd-snapshotde' pid 798 (uid 0 gid 1000+0 context default) started; waiting...
+[    5.294075] init: SVC_EXEC service 'exec 13 (/system/bin/tzdatacheck /apex/com.android.tzdata/etc/tz /data/misc/zoneinfo)' pid 799 (uid 1000 gid 1000+0 context default) started; waiting...
+[    5.327030] init: Command 'rm /data/vendor/perfd/default_values' action=post-fs-data (/vendor/etc/init/hw/init.qcom.rc:378) took 1ms and failed: unlink() failed: No such file or directory
+[    5.335630] init: processing action (post-fs-data) from (/system/etc/init/bootstat.rc:9)
+[    5.379592] init: SVC_EXEC service 'bpfloader' pid 803 (uid 0 gid 0+0 context default) started; waiting...
+[    5.423286] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.423321] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.456365] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.456388] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.462451] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.462476] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.525144] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.525167] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.528332] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.528357] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.532837] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.532860] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.539162] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.539185] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.552729] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.552753] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.556125] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    5.556685] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    5.559402] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.559425] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    6.146459] init: SVC_EXEC service 'boringssl_self_test_apex32' pid 945 (uid 0 gid 0+0 context default) started; waiting...
+[    6.192568] init: SVC_EXEC service 'boringssl_self_test_apex64' pid 951 (uid 0 gid 0+0 context default) started; waiting...
+[    6.336608] init: processing action (ro.persistent_properties.ready=true) from (/system/etc/init/bootstat.rc:67)
+[    6.336867] init: processing action (ro.persistent_properties.ready=true) from (/system/etc/init/bootstat.rc:71)
+[    6.337233] init: starting service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)'...
+[    6.509716] init: Service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)' (pid 977) exited with status 0 oneshot service took 0.171000 seconds in background
+[    6.509746] init: Sending signal 9 to service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)' (pid 977) process group...
+[    6.580765] init: SVC_EXEC service 'exec 23 (/system/bin/flags_health_check BOOT_FAILURE)' pid 1148 (uid 1000 gid 1000+0 context default) started; waiting...
+[    6.742502] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[   10.080919] type=1400 audit(1783344393.469:45): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.288695] type=1400 audit(1783344393.669:46): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=8087 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.461109] type=1400 audit(1783344393.849:47): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.596782] type=1400 audit(1783344393.979:48): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.736783] type=1400 audit(1783344394.119:49): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=8087 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.771351] type=1400 audit(1783344394.159:50): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.876720] type=1400 audit(1783344394.259:51): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.917414] type=1400 audit(1783344394.299:52): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=8087 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.938271] type=1400 audit(1783344394.319:53): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.960167] type=1400 audit(1783344394.349:54): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   11.123342] type=1400 audit(1783344394.509:55): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=8087 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   11.315362] type=1400 audit(1783344394.699:56): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   11.446291] type=1400 audit(1783344394.829:57): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=8080 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   13.027468] init: SVC_EXEC service 'exec 24 (/system/bin/extra_free_kbytes.sh 48600)' pid 2182 (uid 0 gid 0+0 context default) started; waiting...
+[   21.952659] init: SVC_EXEC service 'exec 25 (/bin/rm -rf /data/per_boot)' pid 3050 (uid 1000 gid 1000+0 context default) started; waiting...
+[   21.983281] init: processing action (sys.boot_completed=1 && sys.bootstat.first_boot_completed=0) from (/system/etc/init/bootstat.rc:77)
+[   21.983840] init: starting service 'exec 26 (/system/bin/bootstat --record_boot_complete --record_boot_reason --record_time_since_factory_reset -l)'...
+[   22.076022] init: Service 'exec 26 (/system/bin/bootstat --record_boot_complete --record_boot_reason --record_time_since_factory_reset -l)' (pid 3063) exited with status 0 oneshot service took 0.090000 seconds in background
+[   22.076034] init: Sending signal 9 to service 'exec 26 (/system/bin/bootstat --record_boot_complete --record_boot_reason --record_time_since_factory_reset -l)' (pid 3063) process group...
+[   22.325571] sdcardfs: options -> fsuid=1023,fsgid=1023,multiuser,derive_gid,default_normal,unshared_obb,mask=6,userid=0,gid=1015
+[   32.274903] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[   63.232215] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[   94.186161] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  125.031676] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  156.191259] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  187.232478] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  218.193269] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  249.152574] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  280.192237] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  311.232456] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  342.131860] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  373.150397] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  404.192668] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  435.232661] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  466.192642] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  497.152345] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  528.192673] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  559.232580] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  590.190824] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  621.152575] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  652.193291] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  683.232375] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  714.188804] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  745.152259] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  776.192377] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  807.229626] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  838.189121] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  869.152518] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  900.068441] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  931.233368] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  962.192683] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[  993.148818] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1024.192210] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1055.232409] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1086.192389] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1117.092449] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1148.192548] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1179.229149] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1210.189147] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1241.152403] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1272.192318] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1303.232455] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1334.128862] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1365.149552] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1396.192535] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1427.232393] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1458.192667] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1489.152421] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1520.192379] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1551.172596] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1582.192448] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1613.152465] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1644.192412] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1675.229240] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1706.189620] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:1550(VENEER_VOTER_IBAT), IDC:900(DEFAULT_VOTER), FLOAT:4000(VENEER_VOTER_VFLOAT), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_INDIRECT_VOTER)
+[ 1737.152358] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1738.460862] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 1768.129079] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1799.230333] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1803.381191] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 1830.191375] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1861.151639] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1868.295258] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 1892.192543] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1923.352281] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1933.213659] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 1954.192426] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1985.152377] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 1998.129672] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 2016.192668] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 2047.229927] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 2063.049077] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 2078.189039] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 2109.149461] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+[ 2127.977174] PMI: smblib_handle_wdog_bark: IRQ: wdog-bark
+[ 2140.192478] PMINFO: [VOT] IUSB:500(USB_PSY_VOTER), IBAT:3000(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4400(BATT_PROFILE_VOTER), CHDIS:0(VENEER_VOTER_VFLOAT), PLDIS:1(PL_FCC_LOW_VOTER)
+===== fastboot boot latest-clean =====
+Booting                                            OKAY [  5.098s]
+Finished. Total time: 5.533s
+LOS returned at +34s after handoff
+===== POST-CRASH (after mainline reset) =====
+[    0.001482] pid_max: default: 32768 minimum: 301
+[    0.371202] msm_watchdog 17817000.qcom,wdt: wdog absent resource not present
+[    0.529515] cpr3_regulator_init_ctrl: apc0: Default CPR mode = full HW closed-loop
+[    0.535116] cpr3_regulator_init_ctrl: apc1: Default CPR mode = full HW closed-loop
+[    0.537582] cpr3_regulator_init_ctrl: gfx: Default CPR mode = closed-loop
+[    0.591727] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pm8998@0:qcom,power-on@800: PMIC@SID0 Power-on reason: Triggered from Hard Reset and 'cold' boot
+[    0.591750] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pm8998@0:qcom,power-on@800: PMIC@SID0: Power-off reason: Triggered from PS_HOLD (PS_HOLD/MSM controlled shutdown)
+[    0.592363] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: No PON config. specified
+[    0.592402] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: PMIC@SID2 Power-on reason: Triggered from PON1 (secondary PMIC) and 'cold' boot
+[    0.592423] qcom,qpnp-power-on 800f000.qcom,spmi:qcom,pmi8998@2:qcom,power-on@800: PMIC@SID2: Power-off reason: Triggered from GP1 (Keypad_Reset1)
+[    0.686002] NetLabel:  unlabeled traffic allowed by default
+[    0.838572] PCI: CLS 0 bytes, default 64
+[    0.983190] io scheduler cfq registered (default)
+[    1.010862] mdss_fb_probe: qcom,default-brightness = 511
+[    1.037925] B -    584715 - PM: 0: PON=0x21:PON1:HARD_RESET: ON=0x80:PON_SEQ: POFF=0x2:PS_HOLD: OFF=0x80:POFF_SEQ: FAULT1=0x40:UVLO\x0d
+[    1.038050] B -    584807 - PM: 1: PON=0x20:PON1: ON=0x80:PON_SEQ: POFF=0x8:GP1: OFF=0x80:POFF_SEQ: FAULT1=0x40:UVLO\x0d
+[    1.038176] B -    584898 - PM: 2: PON=0x20:PON1: ON=0x80:PON_SEQ: POFF=0x8:GP1: OFF=0x80:POFF_SEQ: FAULT2=0x8:FAULT_N\x0d
+[    1.043701] Boot reason: 0x20 not handled, defaulting to Normal Boot\x0d
+[    1.323928] DC_SUSPEND: effective vote is now 0 voted by DEFAULT_VOTER,0
+[    1.323964] DC_ICL: effective vote is now 900000 voted by DEFAULT_VOTER,0
+[    1.324139] CHG_DISABLE: effective vote is now 0 voted by DEFAULT_VOTER,0
+[    1.325753] PMI: smblib_handle_typec_cc_state_change: TypeC SOURCE_DEFAULT insertion
+[    1.325800] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    1.328139] PMI: smblib_handle_wdog_bark: IRQ: determine-initial-status
+[    1.341663] SHOWCASE: showcase_create_parsedt: soc-min : 45, soc-max : 50 of lge,soc-range-default
+[    1.343025] PMINFO: [VOT] IUSB:3000(HW_ICL_VOTER), IBAT:3300(BATT_PROFILE_VOTER), IDC:900(DEFAULT_VOTER), FLOAT:4395(BATT_PROFILE_VOTER), CHDIS:0(DEFAULT_VOTER), PLDIS:1(PL_DELAY_VOTER)
+[    1.585274] Invalid index Defaulting curr to 0
+[    2.119836] init: Couldn't load property file '/vendor/default.prop': open() failed: No such file or directory: No such file or directory
+[    2.156652] audit: type=1107 audit(1488355936.869:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=persist.env.fastdorm.enabled pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.156901] audit: type=1107 audit(1488355936.869:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=ro.data.large_tcp_window_size pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.157147] audit: type=1107 audit(1488355936.869:7): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=crypto.driver.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.157202] audit: type=1107 audit(1488355936.869:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=drmdiag.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.157246] audit: type=1107 audit(1488355936.869:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=drmdiag.load pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.157440] audit: type=1107 audit(1488355936.869:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=u:r:init:s0 msg='avc:  denied  { read } for property=persist.ims.regmanager.mode pid=0 uid=0 gid=0 scontext=u:r:vendor_init:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0'
+[    2.162260] FG: extension_fg_load_icoeff_dt: ICOEFF is set to 100 by default
+[    2.169302] init: Parsing file /system/etc/init/bootstat-debug.rc...
+[    2.169505] init: Parsing file /system/etc/init/bootstat.rc...
+[    2.210195] init: starting service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)'...
+[    2.212584] init: SVC_EXEC service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' pid 585 (uid 0 gid 0+0 context default) started; waiting...
+[    2.229506] init: Service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' (pid 585) exited with status 0 waiting took 0.018000 seconds
+[    2.229519] init: Sending signal 9 to service 'exec 1 (/system/bin/bootstrap/linkerconfig --target /linkerconfig/bootstrap)' (pid 585) process group...
+[    2.233961] init: starting service 'apexd-bootstrap'...
+[    2.243114] init: SVC_EXEC service 'apexd-bootstrap' pid 587 (uid 0 gid 1000+0 context default) started; waiting...
+[    2.284620] apexd: Bootstrap subcommand detected
+[    2.320002] init: Service 'apexd-bootstrap' (pid 587) exited with status 0 waiting took 0.085000 seconds
+[    2.320032] init: Sending signal 9 to service 'apexd-bootstrap' (pid 587) process group...
+[    2.379076] init: SVC_EXEC service 'boringssl_self_test32' pid 591 (uid 0 gid 0+0 context default) started; waiting...
+[    2.452846] init: SVC_EXEC service 'boringssl_self_test64' pid 593 (uid 0 gid 0+0 context default) started; waiting...
+[    2.669584] usbpd usbpd0: typec mode:TYPEC_SOURCE_DEFAULT(Rp56k) present:1 type:4 orientation:2
+[    2.669588] usbpd usbpd0: Type-C Source (default) connected
+[    3.170336] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    3.171904] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    3.691315] init: SVC_EXEC service 'boringssl_self_test32_vendor' pid 685 (uid 0 gid 0+0 context default) started; waiting...
+[    3.752759] init: SVC_EXEC service 'boringssl_self_test64_vendor' pid 686 (uid 0 gid 0+0 context default) started; waiting...
+[    4.270315] init: Command 'copy /system/etc/prop.default /dev/urandom' action=init (/system/etc/init/hw/init.rc:120) took 0ms and failed: Could not read input file '/system/etc/prop.default': open() failed: No such file or directory
+[    4.357470] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    4.359069] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    4.554414] init: SVC_EXEC service 'exec 4 (/system/bin/vdc checkpoint markBootAttempt)' pid 739 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.653093] init: SVC_EXEC service 'exec 5 (/vendor/bin/init.qti.qseecomd.sh)' pid 741 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.823242] using default for wan-rx-desc-size = 256
+[    4.862052] init: SVC_EXEC service 'exec 6 (/system/bin/fsverity_init --load-verified-keys)' pid 773 (uid 0 gid 0+0 context default) started; waiting...
+[    4.875716] init: SVC_EXEC service 'exec 7 (/system/bin/vdc checkpoint prepareCheckpoint)' pid 774 (uid 1000 gid 1000+0 context default) started; waiting...
+[    4.897074] init: Switched to default mount namespace
+[    4.902473] init: SVC_EXEC service 'exec 8 (/system/bin/vdc keymaster earlyBootEnded)' pid 778 (uid 1000 gid 1000+0 context default) started; waiting...
+[    5.087924] init: SVC_EXEC service 'exec 9 (/bin/rm -rf /data/misc/virtualizationservice)' pid 788 (uid 1081 gid 1000+0 context default) started; waiting...
+[    5.149173] init: SVC_EXEC service 'exec 10 (/system/bin/chattr +F /data/media)' pid 790 (uid 1023 gid 1023+0 context default) started; waiting...
+[    5.166013] init: SVC_EXEC service 'derive_sdk' pid 791 (uid 9999 gid 9999+0 context default) started; waiting...
+[    5.183162] init: SVC_EXEC service 'exec 11 (/system/bin/vdc --wait cryptfs init_user0)' pid 792 (uid 0 gid 0+0 context default) started; waiting...
+[    5.232707] init: SVC_EXEC service 'derive_classpath' pid 795 (uid 1000 gid 1000+1 context default) started; waiting...
+[    5.283820] init: SVC_EXEC service 'exec 12 (/system/bin/fsverity_init --lock)' pid 797 (uid 0 gid 0+0 context default) started; waiting...
+[    5.292382] init: SVC_EXEC service 'apexd-snapshotde' pid 798 (uid 0 gid 1000+0 context default) started; waiting...
+[    5.307362] init: SVC_EXEC service 'exec 13 (/system/bin/tzdatacheck /apex/com.android.tzdata/etc/tz /data/misc/zoneinfo)' pid 799 (uid 1000 gid 1000+0 context default) started; waiting...
+[    5.340397] init: Command 'rm /data/vendor/perfd/default_values' action=post-fs-data (/vendor/etc/init/hw/init.qcom.rc:378) took 1ms and failed: unlink() failed: No such file or directory
+[    5.348891] init: processing action (post-fs-data) from (/system/etc/init/bootstat.rc:9)
+[    5.394931] init: SVC_EXEC service 'bpfloader' pid 802 (uid 0 gid 0+0 context default) started; waiting...
+[    5.438375] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.438410] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.471438] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.471461] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.477431] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.477457] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.539304] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.539328] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.542562] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.542587] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.544644] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    5.546193] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[    5.546892] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.546915] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.553131] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.553154] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.566498] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.566522] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    5.573315] LibBpfLoader: Couldn't find section btf_min_bpfloader_ver (defaulting to 0 [0x0]).
+[    5.573341] LibBpfLoader: Couldn't find section btf_min_kernel_ver (defaulting to 0 [0x0]).
+[    6.141414] init: SVC_EXEC service 'boringssl_self_test_apex32' pid 946 (uid 0 gid 0+0 context default) started; waiting...
+[    6.194253] init: SVC_EXEC service 'boringssl_self_test_apex64' pid 954 (uid 0 gid 0+0 context default) started; waiting...
+[    6.315901] init: processing action (ro.persistent_properties.ready=true) from (/system/etc/init/bootstat.rc:67)
+[    6.316685] init: processing action (ro.persistent_properties.ready=true) from (/system/etc/init/bootstat.rc:71)
+[    6.317120] init: starting service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)'...
+[    6.495361] init: Service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)' (pid 972) exited with status 0 oneshot service took 0.174000 seconds in background
+[    6.495378] init: Sending signal 9 to service 'exec 22 (/system/bin/bootstat --set_system_boot_reason)' (pid 972) process group...
+[    6.567436] init: SVC_EXEC service 'exec 23 (/system/bin/flags_health_check BOOT_FAILURE)' pid 1159 (uid 1000 gid 1000+0 context default) started; waiting...
+[    6.732168] PMI: smblib_handle_typec_cc_state_change: IRQ: cc-state-change; Type-C SOURCE_DEFAULT detected
+[   10.150913] type=1400 audit(1783346580.569:45): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.323197] type=1400 audit(1783346580.739:46): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=19471 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.509672] type=1400 audit(1783346580.919:47): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.653387] type=1400 audit(1783346581.069:48): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.786840] type=1400 audit(1783346581.199:49): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=19471 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.810617] type=1400 audit(1783346581.229:50): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.917402] type=1400 audit(1783346581.329:51): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.957707] type=1400 audit(1783346581.369:52): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=19471 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   10.978301] type=1400 audit(1783346581.389:53): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   10.996939] type=1400 audit(1783346581.409:54): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   11.152902] type=1400 audit(1783346581.569:55): avc: denied { read } for comm="android.hardwar" name="u:object_r:build_bootimage_prop:s0" dev="tmpfs" ino=19471 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:build_bootimage_prop:s0 tclass=file permissive=0
+[   11.346914] type=1400 audit(1783346581.759:56): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   11.470297] type=1400 audit(1783346581.889:57): avc: denied { read } for comm="android.hardwar" name="u:object_r:bootanim_system_prop:s0" dev="tmpfs" ino=19464 scontext=u:r:hal_camera_default:s0 tcontext=u:object_r:bootanim_system_prop:s0 tclass=file permissive=0
+[   13.074606] init: SVC_EXEC service 'exec 24 (/system/bin/extra_free_kbytes.sh 48600)' pid 2193 (uid 0 gid 0+0 context default) started; waiting...
+===== lge bootreasoncode =====
+lge.bootreason=NORMAL
+androidboot.product.lge.bootreasoncode=0x20
+lge.crash_handler=off
+PASS COMPLETE
