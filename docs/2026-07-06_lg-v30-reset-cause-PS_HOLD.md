@@ -359,12 +359,63 @@ Result:
 Conclusion: routing DLOAD-mode clearing through the downstream-observed TCSR
 boot-misc cookie is not the missing standalone liveness handshake.
 
+
+## Aurel follow-up: PM8998 PON S3 source/debounce oracle rejected
+
+After the TCSR DLOAD/restart-cookie oracle, Aurel compared downstream joan
+PMIC/PON setup against mainline and isolated one unsupported downstream PON
+delta:
+
+- downstream PM8998 PON root properties:
+  - `qcom,s3-debounce = <32>`
+  - `qcom,s3-src = "kpdpwr-and-resin"`
+- mainline `qcom-pon` does not consume these properties, so a pure DTS change
+  would not test the delta.
+
+Oracle:
+
+- Patch:
+  `out/aurel-latest-pon-s3-oracle-2026-07-06.patch`
+- Patch sha256:
+  `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`
+- Config artifact:
+  `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`
+- Config artifact sha256:
+  `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+- Image:
+  `out/boot-joan-latest-pon-s3-oracle.img`
+- Image sha256:
+  `2c83d4782aa60564c840efe5122ebfeb9aa30f8e0aea8bab10fc7d70f6fb2c31`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-pon-s3-fastboot-2026-07-06.txt`
+- Fastboot transcript sha256:
+  `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
+- PON evidence:
+  `out/aurel-pon-s3-pon-2026-07-06.txt`
+- PON evidence sha256:
+  `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.510s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+30.5s`.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: downstream PM8998 PON S3 source/debounce parity is not the missing
+standalone liveness handshake.
+
 ## Next best single oracle
 
 Do not repeat DLOAD SCM argument-shape, TCSR DLOAD-cookie phandle, QSEE-log
-registration, RPM reachability, bare BOB-mode, single L19 default-vote, or
-standard DT L18+L19+BOB voltage/enable bundle tests as the next standalone
-test. Mainline
+registration, RPM reachability, bare BOB-mode, single L19 default-vote,
+standard DT L18+L19+BOB voltage/enable bundle, or PM8998 PON S3
+source/debounce parity tests as the next standalone test. Mainline
 already performs the TZ feature/version
 query, the QSEE log-buffer ping did not prevent PS_HOLD, the RPM rpmsg
 reachability oracle only shifted timing without exposing diagnostics, and the
@@ -380,7 +431,8 @@ against mainline, especially one of:
   voltage/enable votes;
 - fuller IMEM/reboot-mode/normal restart-reason modeling, only if kept distinct
   from the rejected TCSR DLOAD-cookie phandle;
-- PMIC/PON setup deltas not covered by the existing PON readback;
+- fuller PMIC/PON reset-sequence/S1/S2 setup deltas not covered by the rejected
+  S3 source/debounce oracle;
 - LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
 - another concrete QSEE/QSECOM state transition only if downstream evidence shows
   it runs before the reset window and differs from mainline.
@@ -397,7 +449,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated through the TCSR DLOAD/restart-cookie oracle.
+- Harness docs updated through the PM8998 PON S3 source/debounce oracle.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.

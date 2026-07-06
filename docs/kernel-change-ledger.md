@@ -661,6 +661,40 @@ part of a ledger experiment.
   - do not repeat this exact `qcom,dload-mode` phandle as another standalone
     oracle.
 
+
+### K019 — DEBUG-ONLY / rejected: PM8998 PON S3 source/debounce oracle
+
+- Status: `rejected` / `debug-only`; saved as patch artifact only.
+- Branch/test base: `joan/latest-clean-test`.
+- Touched files:
+  - `drivers/power/reset/qcom-pon.c`
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Artifact:
+  - `out/aurel-latest-pon-s3-oracle-2026-07-06.patch`
+  - sha256 `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`
+  - config artifact `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+  - image `out/boot-joan-latest-pon-s3-oracle.img`, sha256 `2c83d4782aa60564c840efe5122ebfeb9aa30f8e0aea8bab10fc7d70f6fb2c31`
+  - fastboot transcript `out/aurel-pon-s3-fastboot-2026-07-06.txt`, sha256 `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
+  - PON evidence `out/aurel-pon-s3-pon-2026-07-06.txt`, sha256 `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
+  - clean rebuilt image `out/boot-joan-latest-clean-post-pon-s3-oracle.img`, sha256 `7d87765d96df926cac538563dcbe1989f8990d9b784b1c0163926f5cb5f0b0ef`
+- Downstream/reference basis:
+  - downstream joan PM8998 PON sets `qcom,s3-debounce = <32>` and
+    `qcom,s3-src = "kpdpwr-and-resin"`;
+  - upstream `qcom-pon` does not consume those properties, so the oracle added a
+    minimal DEBUG-ONLY property-driven programming path and joan DT override;
+  - `CONFIG_POWER_RESET_QCOM_PON=y` was verified before building.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt with GCC cross toolchain and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.510s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+30.5s`;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - downstream PM8998 PON S3 source/debounce parity is not enough by itself;
+  - do not repeat this exact PON S3 oracle as another standalone boot test.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -671,10 +705,12 @@ argument shape, registering a downstream-style QSEE log buffer, merely reaching
 RPM `rpm_requests` rpmsg setup, sending a bare downstream BOB `bobm=2` RPM
 vote, forcing downstream joan's PM8998 L19 3.3 V always-on default through the
 mainline regulator framework, forcing a broader standard DT-backed PM/RPM
-L18+L19+BOB voltage/enable bundle, or routing SCM DLOAD-mode clearing through
+L18+L19+BOB voltage/enable bundle, routing SCM DLOAD-mode clearing through
 the downstream-observed TCSR boot-misc cookie (`qcom,dload-mode = <&tcsr_regs_2
-0x13000>`). Next investigation should compare very early
-downstream boot setup against mainline, especially:
+0x13000>`), or programming downstream joan's PM8998 PON S3 source/debounce
+(`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`). Next
+investigation should compare very early downstream boot setup against mainline,
+especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - fuller LGE panic/restart-reason and IMEM cookie setup, if kept separate from K018;

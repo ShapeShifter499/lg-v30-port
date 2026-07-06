@@ -906,6 +906,99 @@ Cleanup:
 - Phone parked back in LineageOS; `adb root` was used only for the PON readback.
 - No fastboot client left running.
 
+
+## Aurel follow-up — PM8998 PON S3 source/debounce oracle (2026-07-06)
+
+Focus after rejecting the TCSR DLOAD/restart-cookie phandle: compare downstream
+joan PMIC/PON setup against current mainline and test one concrete unsupported
+PON delta.
+
+Downstream/mainline comparison:
+
+- Downstream joan sets PM8998 PON root properties `qcom,s3-debounce = <32>` and
+  `qcom,s3-src = "kpdpwr-and-resin"`.
+- Downstream also configures `pon_1`/`pon_2` support-reset `0` and `pon_3`
+  support-reset `1` with `s1-timer = <6720>`, `s2-timer = <2000>`, and
+  `s2-type = <PON_POWER_OFF_DVDD_HARD_RESET>`.
+- Mainline `qcom-pon` for PM8998 only handles reboot-mode spare bits and child
+  population; the upstream binding does not model those downstream PON S3/reset
+  properties.
+- Therefore a pure DTS oracle would not exercise the downstream S3 delta. The
+  minimal test needed a DEBUG-ONLY driver extension plus a joan DT override.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-pon-s3-oracle-2026-07-06.patch`
+- Touched files:
+  `drivers/power/reset/qcom-pon.c` and
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Change:
+  add property-driven S3 source/debounce programming to `qcom-pon` at probe and
+  add joan `&pm8998_pon` values matching downstream (`32`, `kpdpwr-and-resin`).
+- Config artifact:
+  `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+- Required config verified:
+  `CONFIG_POWER_RESET_QCOM_PON=y`
+- Image:
+  `out/boot-joan-latest-pon-s3-oracle.img`
+- Image sha256:
+  `2c83d4782aa60564c840efe5122ebfeb9aa30f8e0aea8bab10fc7d70f6fb2c31`
+- Patch sha256:
+  `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`
+- Size:
+  `15740928` bytes
+- Fastboot transcript:
+  `out/aurel-pon-s3-fastboot-2026-07-06.txt`, sha256 `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
+- PON evidence:
+  `out/aurel-pon-s3-pon-2026-07-06.txt`, sha256 `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
+
+Verification:
+
+- `git diff --check` passed.
+- The active kernel `.config` was restored from `.config.old` and refreshed with
+  `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig` because the
+  live config had drifted enough that `CONFIG_POWER_RESET_QCOM_PON` did not stay
+  enabled. Verified `CONFIG_ARM64=y`, `CONFIG_MFD_SPMI_PMIC=y`, and
+  `CONFIG_POWER_RESET_QCOM_PON=y` before building the oracle.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.510s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+30.5s` after the fastboot boot monitor began.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The downstream PM8998 PON S3 source/debounce setup is not sufficient as a
+  standalone survival/liveness fix.
+- Do not repeat the exact `qcom,s3-debounce`/`qcom,s3-src` PON S3 oracle as
+  another standalone test.
+- Remaining PMIC/PON work, if any, must target a different unsupported state
+  change, such as the fuller downstream PON reset-sequence/S1/S2 setup, or pivot
+  away from PMIC/PON toward another first-second downstream state transition.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-pon-s3-oracle.img`, sha256
+  `7d87765d96df926cac538563dcbe1989f8990d9b784b1c0163926f5cb5f0b0ef`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback
+  and `adb unroot` returned adbd to ordinary shell mode.
+- No fastboot client left running.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

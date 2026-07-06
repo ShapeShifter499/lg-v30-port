@@ -222,6 +222,22 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   TCSR DLOAD/restart-cookie route is not sufficient as a standalone liveness
   fix. The patch was saved, reverted, and the kernel rebuilt clean.
 
+
+- **PM8998 PON S3 source/debounce oracle also failed.**
+  Aurel compared downstream joan PMIC/PON setup and found an unsupported
+  downstream delta: PM8998 PON programs `qcom,s3-debounce = <32>` and
+  `qcom,s3-src = "kpdpwr-and-resin"`, while upstream `qcom-pon` only handles
+  reboot-mode spare bits and child population. The DEBUG-ONLY oracle added a
+  minimal `qcom-pon` S3 source/debounce programming path plus a joan
+  `&pm8998_pon` override, and verified `CONFIG_POWER_RESET_QCOM_PON=y`
+  (`out/aurel-latest-pon-s3-oracle-2026-07-06.patch`, sha256 `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`; config `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`;
+  image `out/boot-joan-latest-pon-s3-oracle.img`, sha256 `2c83d4782aa60564c840efe5122ebfeb9aa30f8e0aea8bab10fc7d70f6fb2c31`). RAM-only `fastboot boot` succeeded
+  (`Sending`/`Booting` OKAY, total `5.510s`), but no mainline USB/diag appeared;
+  LineageOS adb returned at `t+30.5s`, and post-reset PON evidence again showed
+  SID0 `PS_HOLD`. The downstream PON S3 source/debounce delta is not sufficient
+  as a standalone liveness fix. The patch was saved, reverted, and the kernel
+  rebuilt clean (`out/boot-joan-latest-clean-post-pon-s3-oracle.img`, sha256 `7d87765d96df926cac538563dcbe1989f8990d9b784b1c0163926f5cb5f0b0ef`).
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -254,3 +270,7 @@ Date: 2026-07-04
 Updated-by: Ember Nymbrand (agent-ember) — P0 completion status
 Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-05
+
+Updated-by: Aurel Nymvale (agent-aurel) — PM8998 PON S3 oracle result
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
