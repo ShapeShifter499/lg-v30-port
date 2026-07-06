@@ -93,7 +93,9 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   upstreamable commit, bringup-only patch, debug oracle, or rejected experiment.
   Entries need the commit hash or saved patch path, touched files, evidence, and
   status (`upstream-candidate`, `bringup-local`, `debug-only`, `rejected`, or
-  `unknown`).
+  `unknown`). Public/PR-ready work must also satisfy
+  `docs/public-upstreaming-plan.md`: clean topic commits, detailed rationale,
+  verification evidence, no debug-only leftovers, and required trailers.
 
 ## Current status (2026-07-06)
 

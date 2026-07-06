@@ -30,6 +30,10 @@ For every kernel-impacting change, add or update a ledger entry before handoff:
    appending a correction with `Written-by`, `Agent-harness`, and date.
 6. Before a real commit intended for reuse/upstream, make sure the ledger points
    from the final commit back to the bringup evidence that justified it.
+7. If a change might be pushed publicly or used in a PR/patch series, add a
+   `Public/PR disposition` note: `ready`, `needs cleanup`, `blocked`, or
+   `do not publish`, and point to `docs/public-upstreaming-plan.md` for the
+   criteria.
 
 Safety invariant: all device tests stay RAM-only (`fastboot boot`) unless Lance
 explicitly approves a different action. Never flash or write phone partitions as
@@ -69,6 +73,8 @@ part of a ledger experiment.
     enabling more peripherals.
   - Trim `qcom,board-id` once exact target hardware revision handling is final.
 - Status: keep; expected to be the base of any future mainline/pmOS work.
+- Public/PR disposition: `needs cleanup` — likely part of the public base, but
+  commit/body/DTS should be rechecked after regulator and board-id follow-ups.
 
 ### K002 — match downstream ramoops layout
 
@@ -86,6 +92,8 @@ part of a ledger experiment.
 - Status:
   - Keep as documented history for now, but do not depend on ramoops for debug.
   - Re-evaluate before upstreaming; a dead ramoops node may not be worth carrying.
+- Public/PR disposition: `blocked` — do not publish as a useful debug channel
+  unless a new bootloader/ramoops persistence story is proven.
 
 ### K003 — reserve LG firmware-owned memory
 
@@ -108,6 +116,8 @@ part of a ledger experiment.
   - Relocate or reconcile mainline `gpu_mem` and `wlan_msa_mem`, which currently
     overlap LG's downstream SLPI-related range.
 - Status: keep; high-value for mainlining and non-Android OS boot.
+- Public/PR disposition: `needs cleanup` — likely public-worthy, but GPU/WLAN
+  reserved-memory overlaps need a final explanation or follow-up split.
 
 ### K004 — APSS watchdog DT node
 
@@ -127,6 +137,8 @@ part of a ledger experiment.
   - Verify bark/bite semantics and whether downstream properties like
     `qcom,wakeup-enable` have any mainline equivalent or should be omitted.
 - Status: keep on debug branch; not proven necessary for solving current reset.
+- Public/PR disposition: `blocked` — do not submit until APSS watchdog behavior
+  and placement (`msm8998.dtsi` vs joan DTS) are settled.
 
 ### K005 — ramoops breadcrumb instrumentation
 
@@ -145,6 +157,8 @@ part of a ledger experiment.
 - Status:
   - NEVER MERGE.
   - Keep only as historical breadcrumb on debug branch until no longer useful.
+- Public/PR disposition: `do not publish` except as investigation history in a
+  non-kernel evidence document.
 
 ### K006 — SEC_WDOG_DIS / SEC_WDOG_TRIG SCM experiments
 
@@ -169,6 +183,7 @@ part of a ledger experiment.
 - Status:
   - Do not keep in kernel tree.
   - Do not retry blindly; inspect earlier downstream TZ/boot setup first.
+- Public/PR disposition: `do not publish`; rejected experiment only.
 
 ### K007 — panic/APSS-WDT discriminators
 
@@ -186,6 +201,7 @@ part of a ledger experiment.
 - Status:
   - Panic and generic qcom-wdt-driver explanations are weaker; do not center the
     next debugging round there without new evidence.
+- Public/PR disposition: `do not publish`; evidence only.
 
 ### K008 — downstream-style APSS WDT takeover experiments
 
@@ -207,6 +223,7 @@ part of a ledger experiment.
 - Status:
   - APSS WDT register programming alone is not the missing survival mechanism.
   - Do not keep in kernel tree.
+- Public/PR disposition: `do not publish`; rejected experiment only.
 
 ## Current narrowed hypothesis
 
