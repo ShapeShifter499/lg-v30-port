@@ -459,13 +459,31 @@ Result:
 Conclusion: fuller downstream PM8998 PON reset-sequence/S1/S2 parity is not the
 missing standalone liveness handshake.
 
+
+## CPU/Kryo SCM errata comparison — no boot oracle
+
+Aurel compared downstream `drivers/soc/qcom/scm-errata.c` before creating another
+RAM-boot image.
+
+The downstream helper can issue SCM BOOT command `0x12` for Kryo errata toggles
+(E74/E75 enable arg `0x1`, E76 disable arg `0x100`), but it is optional debugfs
+infrastructure (`CONFIG_QCOM_SCM_ERRATA`, depending on `DEBUG_FS` and `QCOM_SCM`)
+and was not enabled in the joan defconfigs checked. Its init path creates debugfs
+files and registers a CPU hotplug notifier; it does not immediately apply the
+calls to already-online boot CPUs.
+
+Conclusion: CPU/Kryo SCM errata was rejected at comparison time as a standalone
+oracle. It is not active downstream joan default boot-state parity, so no kernel
+patch was built or booted for this path.
+
 ## Next best single oracle
 
 Do not repeat DLOAD SCM argument-shape, TCSR DLOAD-cookie phandle, QSEE-log
 registration, RPM reachability, bare BOB-mode, single L19 default-vote,
 standard DT L18+L19+BOB voltage/enable bundle, PM8998 PON S3
-source/debounce parity, or PM8998 PON reset-sequence/S1/S2 parity tests as the
-next standalone test. Mainline already performs the TZ feature/version
+source/debounce parity, PM8998 PON reset-sequence/S1/S2 parity tests, or the
+optional downstream CPU/Kryo SCM errata debugfs helper as the next standalone
+test. Mainline already performs the TZ feature/version
 query, the QSEE log-buffer ping did not prevent PS_HOLD, the RPM rpmsg
 reachability oracle only shifted timing without exposing diagnostics, and the
 BOB-mode vote extended timing but still returned to LineageOS with SID0
@@ -496,7 +514,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated through the PM8998 PON reset-sequence/S1/S2 oracle.
+- Harness docs updated through the PM8998 PON reset-sequence/S1/S2 oracle and the CPU/Kryo SCM errata comparison.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.

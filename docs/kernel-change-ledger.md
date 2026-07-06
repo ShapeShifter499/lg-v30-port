@@ -734,6 +734,36 @@ part of a ledger experiment.
     a standalone survival/liveness fix;
   - do not repeat this exact PON reset-sequence oracle as another standalone boot test.
 
+
+### K021 — comparison-only / no-test: downstream Kryo SCM errata helper
+
+- Status: `comparison-only`, no RAM-boot oracle built.
+- Class: rejected as a standalone downstream-parity oracle before testing.
+- Touched files: none in the kernel tree.
+- Downstream basis inspected:
+  - `drivers/soc/qcom/scm-errata.c`
+  - `drivers/soc/qcom/Kconfig`
+  - `drivers/soc/qcom/Makefile`
+  - `arch/arm64/configs/joan*defconfig`
+- Finding:
+  - downstream has an optional debugfs/hotcpu helper for SCM BOOT command `0x12`
+    (`SCM_KRYO_ERRATA_ID`);
+  - default booleans would make E74/E75 enable use arg `0x1`, and E76 disable use
+    arg `0x100`;
+  - `CONFIG_QCOM_SCM_ERRATA` depends on `DEBUG_FS` and `QCOM_SCM`, has no default
+    enable, and was not present in the joan downstream defconfigs checked;
+  - the helper init path creates debugfs files and registers a CPU_STARTING notifier
+    but does not immediately apply the setting to already-online boot CPUs.
+- Decision:
+  - no debug-only mainline SMC oracle was built because this is not active default
+    downstream joan boot-state parity;
+  - forcing command `0x12` from mainline would be speculative rather than a direct
+    downstream-parity test.
+- Artifact:
+  - `out/aurel-kryo-scm-comparison-2026-07-06.txt`
+- Agent-harness: Hermes:gpt-5.5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -746,13 +776,14 @@ vote, forcing downstream joan's PM8998 L19 3.3 V always-on default through the
 mainline regulator framework, forcing a broader standard DT-backed PM/RPM
 L18+L19+BOB voltage/enable bundle, routing SCM DLOAD-mode clearing through
 the downstream-observed TCSR boot-misc cookie (`qcom,dload-mode = <&tcsr_regs_2
-0x13000>`), or programming downstream joan's PM8998 PON S3 source/debounce
-(`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`), or matching
-the fuller downstream PM8998 PON reset-sequence/S1/S2 setup. Next investigation
-should compare very early downstream boot setup against mainline,
-especially:
+0x13000>`), programming downstream joan's PM8998 PON S3 source/debounce
+(`qcom,s3-debounce = <32>`, `qcom,s3-src = "kpdpwr-and-resin"`), matching
+the fuller downstream PM8998 PON reset-sequence/S1/S2 setup, or forcing the
+optional downstream Kryo SCM errata debugfs helper. The Kryo helper is not active
+joan default boot-state parity, so no boot oracle was built for it. Next
+investigation should compare another very early downstream state-changing path
+against mainline, especially:
 
-- CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - fuller LGE panic/restart-reason and IMEM cookie setup, if kept separate from K018;
 - broader downstream RPM regulator/default votes / clocks / power-domain requests;
 - SMEM/bootreason/restart cookies;

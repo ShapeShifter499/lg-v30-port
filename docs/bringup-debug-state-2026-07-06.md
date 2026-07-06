@@ -1083,3 +1083,44 @@ Cleanup:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+
+## Aurel follow-up — Kryo SCM errata comparison cancelled before boot
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Aurel compared the suggested CPU/Kryo errata SCM path before building another
+boot image.
+
+Downstream source checked:
+
+- `drivers/soc/qcom/scm-errata.c`
+- `drivers/soc/qcom/Kconfig`
+- `drivers/soc/qcom/Makefile`
+- `arch/arm64/configs/joan*defconfig`
+
+Finding:
+
+- Downstream contains a `scm-errata.c` helper for SCM BOOT command `0x12`.
+- Its default state would enable Kryo E74/E75 workaround (`arg 0x1`) and leave
+  E76 disabled (`arg 0x100` if explicitly written).
+- The helper is optional debugfs support: `CONFIG_QCOM_SCM_ERRATA` depends on
+  `DEBUG_FS` and `QCOM_SCM` and has no default enable.
+- The joan defconfigs checked enable `CONFIG_QCOM_SCM=y` but did not include
+  `CONFIG_QCOM_SCM_ERRATA`.
+- Its init path creates debugfs files and registers a `CPU_STARTING` notifier;
+  it does not immediately apply the calls to already-online boot CPUs.
+
+Decision:
+
+- No CPU/Kryo SCM errata oracle was built or booted.
+- This was rejected at comparison time because it is optional debug/runtime
+  infrastructure, not active downstream joan boot-state parity.
+- A forced command-`0x12` call in mainline would be speculative and less valuable
+  than the previous downstream-parity oracles.
+
+Artifact:
+
+- `out/aurel-kryo-scm-comparison-2026-07-06.txt`

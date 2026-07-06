@@ -255,6 +255,16 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   sufficient as a standalone liveness fix. The patch was saved, reverted, and
   the kernel rebuilt clean (`out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`, sha256 `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`).
 
+
+- **CPU/Kryo SCM errata comparison produced no boot oracle.**
+  Aurel compared downstream `drivers/soc/qcom/scm-errata.c` against mainline.
+  Downstream has an optional debugfs/hotcpu helper for Kryo errata command `0x12`
+  (`E74/E75` enable arg `0x1`, `E76` disable arg `0x100`), but joan defconfigs
+  do not enable `CONFIG_QCOM_SCM_ERRATA`, and the helper does not apply itself
+  to already-online boot CPUs at init. This is not active downstream default boot
+  parity, so no RAM-boot oracle was built. Status artifact:
+  `out/aurel-kryo-scm-comparison-2026-07-06.txt`.
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -292,6 +302,6 @@ Updated-by: Aurel Nymvale (agent-aurel) — PM8998 PON S3 oracle result
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
 
-Updated-by: Aurel Nymvale (agent-aurel) — PM8998 PON reset-sequence oracle result
+Updated-by: Aurel Nymvale (agent-aurel) — Kryo SCM errata comparison
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
