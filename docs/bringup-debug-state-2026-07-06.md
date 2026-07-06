@@ -99,7 +99,7 @@ vs panic=5 A/B cleanly, now that instruments are trustworthy).
 - harness `coding/lg-v30-port`: init v3 (wdkill + tolerant gadget +
   self-reboot), wdkill src+bin, this doc, downstream diag capture.
 - Test images in `lg-v30-port/out/` (gitignored):
-  `boot-joan-mainline.img` = round-18 (wdkill, UNTESTED),
+  `boot-joan-mainline.img` = round-19 (pet-only wdkill),
   `boot-joan-hybrid-stockkernel.img` = stock kernel + our initramfs
   (the diag-mule vehicle, proven).
 
@@ -107,9 +107,8 @@ vs panic=5 A/B cleanly, now that instruments are trustworthy).
 
 1. Park-state check: phone in LOS, adb authorized for nym-nest, adb
    root enabled (LOS "Rooted debugging").
-2. Run round 18 as designed (single watcher!): mainline + wdkill.
-   Read the outcome class: gadget / fallback-at-Ns / alive-silent.
-3. If still ~27s: TZ sec-wdog SCM disable hack in kernel; retest.
+2. TZ sec-wdog SCM disable hack in kernel (see key finding above for
+   the exact call); retest with a SINGLE watcher.
 4. If alive but no UDC: hybrid-mule a mainline diag by waiting — with
    the resetter dead, check UDC at 5min; if absent, the diag mule
    can't carry — fall back to timing-encoding WHY (probe
