@@ -893,6 +893,33 @@ part of a ledger experiment.
 - Agent-harness: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
+### K023d/e — RPM eliminated; capstone: trigger is in the SoC core/firmware
+
+- K023d (RPM): full joan DTS with `&rpm_requests` disabled, panic=0. LOS at
+  +47s (real reset) => RPM/regulator bring-up is NOT the trigger.
+  Artifact `out/ember-norpm-K023d-2026-07-06.dts`,
+  image `out/boot-joan-norpm-k023d.img`
+  (sha256 `0153fbb599e8d3979032c2d90d0966dd2ef3041da10be1056a8f67ede121daed`).
+- K023e (CAPSTONE): full joan DTS with ALL removable board peripherals
+  disabled at once (usb3, qusb2phy, ufshc, ufsphy, wifi, pm8005_regulators),
+  keeping only the un-removable SoC core (clocks, RPM, SCM/PSCI, GIC, timer),
+  panic=0. LOS at +31s (real reset). Artifact
+  `out/ember-corestrip-K023e-2026-07-06.dts`,
+  image `out/boot-joan-corestrip-k023e.img`
+  (sha256 `22a6a640c6c3f13f955a709ecc92a3097116fa11d59af4b94fb92d6b723248f3`).
+- CONCLUSION of the subtraction line (K022, K023b/c/d/e): the ~27-31s
+  PS_HOLD reset is triggered by the **SoC core / firmware**, NOT by any
+  removable board peripheral bring-up (USB, UFS, RPM/regulators, wifi, PMIC
+  regs all eliminated) and NOT by userspace. It fires regardless of what
+  Linux brings up. A RAM-booted STOCK LG kernel does NOT reset, so it is a
+  real mainline-vs-downstream kernel difference at the core/secure level.
+- Timing note: LOS-return times are bimodal (~31 vs ~48s) across otherwise-
+  identical runs — unexplained; may be reset-moment or LG-boot bimodality.
+- Class: `debug-only`, both CONCLUSIVE. Public/PR: `do not publish`.
+- Written-by: Ember Nymbrand (agent-ember)
+- Agent-harness: Claude-Code:claude-fable-5
+- Date: 2026-07-06
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
