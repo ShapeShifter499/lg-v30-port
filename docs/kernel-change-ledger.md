@@ -303,12 +303,45 @@ part of a ledger experiment.
   is closer to public-ready than `joan/latest-kernel`, but individual commits
   still need cleanup/review per K001-K004.
 
+### K011 — latest clean CPU/idle/high-memory discriminators
+
+- Handles:
+  - branch `joan/latest-clean-test` at `0d7df4134` plus command-line-only image variants;
+  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-maxcpus1.img`, sha256 `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8`;
+  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-cpuidleoff.img`, sha256 `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d`;
+  - saved patch `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-latest-highmem-reserve-test-2026-07-06.patch`;
+  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-highmem-reserve.img`, sha256 `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`.
+- Class: `rejected` / `debug-only` discriminators.
+- Purpose:
+  - Test whether the reset is caused by secondary CPU bringup/Kryo errata, CPU
+    idle/PSCI idle, or early allocator use of downstream high-memory secure/shared
+    ranges.
+- Verification/evidence:
+  - `maxcpus=1`: one-client RAM-only `fastboot boot` protocol OKAY, total
+    `5.522s`; no mainline mass-storage/debug channel; LineageOS adb returned at
+    `t+29.5s`.
+  - `cpuidle.off=1 nohlt`: one-client RAM-only `fastboot boot` protocol OKAY,
+    total `5.520s`; no mainline mass-storage/debug channel; LineageOS adb
+    returned at `t+45.8s`.
+  - high-memory reservation debug patch: `git diff --check` and build succeeded;
+    one-client RAM-only `fastboot boot` protocol OKAY, total `5.516s`; no
+    mainline mass-storage/debug channel; LineageOS adb returned at `t+29.4s`.
+  - Kernel tree was restored to clean `joan/latest-clean-test` and rebuilt after
+    saving the high-memory patch.
+- Status:
+  - Not fixes. These weaken the secondary-CPU, cpuidle, and simple high-memory
+    allocator/XPU hypotheses.
+  - The `~29s` variants perturb timing and should not be reused as baselines
+    unless specifically investigating their perturbation.
+- Public/PR disposition: `do not publish`; keep only as negative evidence.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
-not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path or by direct
-APSS watchdog pets. Next investigation should compare very early downstream boot
-setup against mainline, especially:
+not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
+watchdog pets, CPU-idle changes, single-core boot, or simply reserving the
+observed downstream high-memory secure/shared pools. Next investigation should
+compare very early downstream boot setup against mainline, especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;

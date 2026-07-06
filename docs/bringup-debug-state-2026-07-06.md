@@ -287,3 +287,56 @@ public candidates.
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+## Aurel follow-up — latest clean CPU/idle/high-memory discriminators (2026-07-06)
+
+Aurel kept the public-shaped branch as `joan/latest-clean-test` and tested three
+new hypotheses from the earlier handoff notes. All tests were RAM-only
+`fastboot boot`; no flashing, no phone-storage writes, and no package installs.
+The phone returned safely to LineageOS after each failed boot.
+
+Hypotheses tested:
+
+1. **Secondary CPU / Kryo errata discriminator.** Downstream enables the ARM64
+   845719 workaround for Kryo2xx Silver during early boot. Mainline has
+   `CONFIG_ARM64_ERRATUM_845719=y`, but Aurel tested whether avoiding secondary
+   CPU bringup changes the reset by using `maxcpus=1`.
+2. **CPU idle / PSCI idle discriminator.** Downstream passes
+   `lpm_levels.sleep_disabled=1` and uses Qualcomm idle plumbing. Aurel tested
+   whether disabling generic mainline CPU idle changes the reset with
+   `cpuidle.off=1 nohlt`.
+3. **High-memory firmware/XPU discriminator.** Downstream allocates high
+   `qseecom`, `secure_region`, `sp_region`, `adsp_region`, and default CMA pools
+   during early reserved-memory setup. Aurel tested a debug-only DTS patch that
+   reserves the observed downstream physical ranges as `no-map` to see whether
+   mainline was tripping a secure/XPU reset by allocating memory firmware expects
+   to own.
+
+| Test | Artifact | Result |
+|---|---|---|
+| `maxcpus=1` latest clean image | `out/boot-joan-latest-maxcpus1.img`, sha256 `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8` | Fastboot protocol OKAY (`5.522s`); no mainline USB/diag; LineageOS adb returned at `t+29.5s`. |
+| `cpuidle.off=1 nohlt` latest clean image | `out/boot-joan-latest-cpuidleoff.img`, sha256 `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d` | Fastboot protocol OKAY (`5.520s`); no mainline USB/diag; LineageOS adb returned at `t+45.8s`. |
+| downstream high-memory reservation debug patch | saved patch `out/aurel-latest-highmem-reserve-test-2026-07-06.patch`; image `out/boot-joan-latest-highmem-reserve.img`, sha256 `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6` | Build OK; fastboot protocol OKAY (`5.516s`); no mainline USB/diag; LineageOS adb returned at `t+29.4s`. |
+
+Interpretation:
+
+- Single-core boot did not survive, so the reset is not simply caused by
+  secondary CPU bringup or a missing secondary-CPU erratum step.
+- Disabling mainline CPU idle did not shift the clean baseline window, so idle
+  entry/PSCI cpuidle is unlikely to be the primary trigger.
+- Reserving the downstream high-memory secure/shared pools as `no-map` did not
+  help, so the reset is unlikely to be caused only by mainline allocating those
+  high physical ranges before the diag gadget appears.
+- The faster `~29s` host-side returns for `maxcpus=1` and high-memory reserve are
+  evidence that these debug variants perturb timing/boot flow; do not publish
+  them as fixes. The kernel tree was restored to clean `joan/latest-clean-test`
+  and rebuilt after saving the high-memory patch.
+
+Next likely path: inspect downstream early IMEM/restart/memory-dump setup,
+including `memory_dump_v2.c` (`MSM Memory Dump base table set up` at downstream
+`0.115s`) and LGE panic/restart-reason code, but test it as a single explicit
+oracle rather than bundling it with watchdog or CPU-idle changes.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06

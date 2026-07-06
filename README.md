@@ -120,8 +120,17 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   sysfs path itself fails with `0x42000107 ret=-2`, so it is not a known-good
   survival path. Clean APSS WDT takeover tests matching downstream bark/bite/pet
   behavior, including EN=3 for `qcom,wakeup-enable`, still rebooted to LineageOS
-  before mainline USB/diag appears. Full table and next-analysis notes are in
-  `docs/bringup-debug-state-2026-07-06.md`.
+  before mainline USB/diag appears.
+- **Latest new-path tests also failed.** Aurel tested single-core boot
+  (`maxcpus=1`, image sha256
+  `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8`,
+  LineageOS return `t+29.5s`), CPU idle disabled (`cpuidle.off=1 nohlt`, sha256
+  `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d`,
+  return `t+45.8s`), and a debug-only downstream high-memory reservation patch
+  (`out/aurel-latest-highmem-reserve-test-2026-07-06.patch`, image sha256
+  `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`,
+  return `t+29.4s`). None exposed mainline USB/diag. Full table and
+  next-analysis notes are in `docs/bringup-debug-state-2026-07-06.md`.
 
 ## Previous status (2026-07-05)
 
