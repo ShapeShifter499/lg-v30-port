@@ -60,10 +60,12 @@ trigger. Candidates, most promising first:
    panic=0, which at least won't fool you). Consider disabling just the
    consumers, or accept the silent = "RPM needed to boot" datum.
 3. **The whole `&soc` watchdog node** was already tried (no effect), so skip.
-   Two big peripheral subsystems (USB, UFS) are now eliminated; the reset
-   is looking less like ANY removable peripheral and more like a low-level
-   secure/firmware timer. RPM is the last big untested removable — but
-   likely breaks boot (=> silent with panic=0, still an honest datum).
+
+Two big peripheral subsystems (USB, UFS) are now eliminated; the reset is
+looking less like ANY removable peripheral and more like a low-level
+secure/firmware timer. RPM is the last big untested removable — but likely
+breaks boot (=> silent with panic=0, still an honest datum).
+
 4. If subtraction bottoms out (every removable subsystem still resets),
    the conclusion is a low-level secure/firmware timer armed at boot that
    downstream services via something below individual peripheral drivers
@@ -87,7 +89,11 @@ trigger. Candidates, most promising first:
 ## State at handoff
 
 - Kernel `joan/latest-clean-test` clean, 4 DTS commits ahead of v7.2-rc2.
-- Harness repo clean. Artifacts: `out/ember-nousb-K023b-2026-07-06.dts`,
-  `out/boot-joan-nousb-k023b.img`, `out/ember-mindtb-K023-2026-07-06.dts`.
+- Harness repo clean. Artifacts: `out/ember-nousb-K023b-2026-07-06.dts` +
+  `out/boot-joan-nousb-k023b.img`, `out/ember-noufs-K023c-2026-07-06.dts` +
+  `out/boot-joan-noufs-k023c.img`, `out/ember-mindtb-K023-2026-07-06.dts`.
+  The panic=0 classifier ramdisk is `out/initramfs-k023b.cpio.gz` (reuse it:
+  cat Image.gz + <variant>.dtb, mkbootimg with that ramdisk, cmdline
+  `androidboot.hardware=joan panic=0 ignore_loglevel`).
 - Phone in LineageOS, adb-visible, no fastboot client.
-- Ledger K022 / K023 / K023b entries current; WebDAV + Deck #43 updated.
+- Ledger K022 / K023 / K023b / K023c entries current; WebDAV + Deck #43 updated.
