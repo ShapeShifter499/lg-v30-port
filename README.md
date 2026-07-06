@@ -167,6 +167,22 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `PS_HOLD`. The delayed timing suggests mainline likely reaches the RPM
   `rpm_requests` rpmsg probe before reset, but the reachability/liveness ping is
   not survival. The patch was saved, reverted, and the kernel rebuilt clean.
+- **RPM BOB-mode state-changing oracle also did not expose diagnostics.**
+  Downstream joan enables the PMI8998/PM8998 BOB RPM regulator path and sets
+  `qcom,init-bob-mode = <2>` (`AUTO`) for `pmi8998_bob` and pin-control child
+  regulators; mainline joan currently has no `rpm-pmi8998-regulators` / BOB
+  regulator child nodes. Aurel tested a minimal debug-only RPM write in
+  `drivers/soc/qcom/smd-rpm.c` after `rpm_requests` probe: send KVP `bobm=2` to
+  resource `BOBB:1` in active and sleep sets
+  (`out/aurel-latest-rpm-bob-mode-oracle-2026-07-06.patch`; image
+  `out/boot-joan-latest-rpm-bob-mode.img`, sha256
+  `e7ccb54378f39b84a3497590844d26d504e5cc770040190bab86e5e845f7c1c9`).
+  RAM-only `fastboot boot` succeeded, but no mainline USB/diag appeared; the
+  monitor timed out at `t+108.4s` with no adb/no mainline channel, then a
+  follow-up host check found LineageOS adb and PON evidence again showed SID0
+  `PS_HOLD`. This bare BOB-mode vote is not sufficient, but the longer failure
+  timing keeps full downstream RPM regulator/default-vote parity worth comparing.
+  The patch was saved, reverted, and the kernel rebuilt clean.
 
 ## Previous status (2026-07-05)
 

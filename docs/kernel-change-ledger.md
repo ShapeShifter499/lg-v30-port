@@ -499,20 +499,63 @@ part of a ledger experiment.
   - still compare actual downstream RPM resource votes and SMEM/boot-state cookie
     writes separately.
 
+
+### K015 — RPM BOB-mode downstream default-vote oracle
+
+- Handles:
+  - patch `out/aurel-latest-rpm-bob-mode-oracle-2026-07-06.patch`
+    (sha256 `eca4d41b1532903e541118e951f9dda4e366fed3b89a2feedd08915386cbd7df`);
+  - image `out/boot-joan-latest-rpm-bob-mode.img`
+    (sha256 `e7ccb54378f39b84a3497590844d26d504e5cc770040190bab86e5e845f7c1c9`,
+    size `15736832` bytes);
+  - fastboot transcript `out/aurel-rpm-bob-mode-fastboot-2026-07-06.txt`
+    (sha256 `0f77a5769d905b209821f73f48d4c06926ece06b430003e6dbaede6100d1ff96`);
+  - PON evidence `out/aurel-rpm-bob-mode-pon-2026-07-06.txt`
+    (sha256 `8b06e8d271ce730f845a07ef79e2f3d6bf0148edd9363f1746c8d91f58cc3779`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-bob-oracle.img`
+    (sha256 `9f659917f5b7bfc687a8aef56a64e391ceb2b9958b043490edce298d7af657ab`).
+- Class: `debug-only`, rejected as a standalone fix; useful timing evidence for
+  real RPM regulator/default-vote parity.
+- Public/PR disposition: `do not publish`.
+- Touched file: `drivers/soc/qcom/smd-rpm.c`.
+- Downstream reference:
+  - `msm8998-regulator.dtsi` / joan PM overlay enable `rpm-regulator-bobb`;
+  - `pmi8998_bob` and its pin-control children carry `qcom,init-bob-mode = <2>`;
+  - downstream RPM regulator driver sends `bobm` KVP defaults when configured.
+- Mainline delta tested:
+  - mainline joan has RPM rpmsg support but lacks the RPM regulator child nodes,
+    so it never sends the downstream BOB mode default;
+  - oracle sent KVP `bobm=2` to RPM resource `BOBB:1` in active and sleep sets
+    directly from `qcom_smd_rpm_probe()` on `lge,joan`.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt with GCC cross toolchain and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.515s`);
+  - no mainline USB/diag channel appeared;
+  - host monitor timed out at `t+108.4s` with no adb/no mainline channel;
+  - follow-up host check found LineageOS adb and post-reset PON log again reported
+    SID0 `PS_HOLD`.
+- Interpretation:
+  - a bare BOB-mode vote is not the missing liveness action;
+  - the unusually long reset/return timing keeps broader downstream RPM
+    regulator/default-vote parity high-value, but it needs a separate oracle.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
 not one solved by the simple downstream sysfs `SEC_WDOG_DIS` path, direct APSS
 watchdog pets, CPU-idle changes, single-core boot, simply reserving the observed
 downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
-argument shape, registering a downstream-style QSEE log buffer, or merely
-reaching RPM `rpm_requests` rpmsg setup. Next investigation should compare very
-early downstream boot setup against mainline,
+argument shape, registering a downstream-style QSEE log buffer, merely reaching
+RPM `rpm_requests` rpmsg setup, or sending a bare downstream BOB `bobm=2` RPM
+vote. Next investigation should compare very early downstream boot setup against
+mainline,
 especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
 - LGE panic/restart-reason and IMEM cookie setup;
-- actual RPM resource votes / clocks / power-domain requests;
+- broader downstream RPM regulator/default votes / clocks / power-domain requests;
 - SMEM/bootreason/restart cookies;
 - other early `SCM_SVC_BOOT` / TZ setup before or around downstream
   `msm_watchdog` init;

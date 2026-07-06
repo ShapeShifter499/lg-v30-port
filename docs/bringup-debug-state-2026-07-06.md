@@ -581,6 +581,88 @@ Cleanup:
 - Phone parked back in LineageOS; `adb root` was used only for the PON readback.
 - No fastboot client left running.
 
+
+## Aurel follow-up — RPM BOB-mode state-changing oracle (2026-07-06)
+
+Focus after RPM reachability rejection: test one concrete downstream RPM default
+vote rather than another ping. Downstream joan enables the PMI8998/PM8998 BOB
+regulator path and sets `qcom,init-bob-mode = <2>` (`AUTO`) for the BOB resource;
+mainline joan has the RPM channel, but no `rpm-pmi8998-regulators` / BOB child
+nodes, so it never sends that default through the regulator framework.
+
+Downstream/mainline comparison:
+
+- Downstream `msm8998-regulator.dtsi` defines `rpm-regulator-bobb` with resource
+  `bobb`, id `1`, and `qcom,init-bob-mode = <2>`.
+- Downstream joan PM overlay keeps `pmi8998_bob` and the BOB pin-control children
+  enabled with the same init BOB mode.
+- Mainline `qcom_smd-regulator.c` supports `qcom,rpm-pmi8998-regulators` and BOB
+  resource `QCOM_SMD_RPM_BOBB`, but `msm8998-lge-joan.dts` currently has no BOB
+  RPM regulator children.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-rpm-bob-mode-oracle-2026-07-06.patch`
+- Touched file:
+  `drivers/soc/qcom/smd-rpm.c`
+- Change:
+  after `qcom_smd_rpm_probe()` binds on `lge,joan`, send KVP `bobm=2` to RPM
+  resource `BOBB:1` in both active and sleep sets, then continue normal child
+  population.
+- Image:
+  `out/boot-joan-latest-rpm-bob-mode.img`
+- Image sha256:
+  `e7ccb54378f39b84a3497590844d26d504e5cc770040190bab86e5e845f7c1c9`
+- Patch sha256:
+  `eca4d41b1532903e541118e951f9dda4e366fed3b89a2feedd08915386cbd7df`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-rpm-bob-mode-fastboot-2026-07-06.txt`, sha256
+  `0f77a5769d905b209821f73f48d4c06926ece06b430003e6dbaede6100d1ff96`
+- PON evidence:
+  `out/aurel-rpm-bob-mode-pon-2026-07-06.txt`, sha256
+  `8b06e8d271ce730f845a07ef79e2f3d6bf0148edd9363f1746c8d91f58cc3779`
+
+Verification:
+
+- `git diff --check` passed.
+- Initial accidental `LLVM=1` build attempt failed because `clang` is not
+  installed; no packages were installed. Rebuilt with the documented toolchain:
+  `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.515s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- Host monitor timed out at `t+108.4s` with no adb and no mainline channel; a
+  follow-up host check then found LineageOS adb visible.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The oracle did not produce survival or a mainline diagnostic channel.
+- It delayed failure far beyond prior ordinary returns, so actual RPM regulator
+  defaults remain interesting, but a single BOB `bobm=2` active/sleep vote is not
+  sufficient.
+- Next test should either add a minimal DT-backed RPM regulator/default-vote
+  parity set from an existing MSM8998 mainline device plus downstream joan BOB
+  overrides, or pick another concrete early state write with downstream evidence.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-bob-oracle.img`, sha256
+  `9f659917f5b7bfc687a8aef56a64e391ceb2b9958b043490edce298d7af657ab`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback.
+- No fastboot client left running.
+
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
