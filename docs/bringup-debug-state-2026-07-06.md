@@ -825,6 +825,87 @@ Cleanup:
 - Phone parked back in LineageOS; `adb root` was used only for the PON readback.
 - No fastboot client left running.
 
+## Aurel follow-up — TCSR DLOAD/restart-cookie oracle (2026-07-06)
+
+Focus after rejecting standard PM/RPM voltage/enable parity: compare downstream
+restart/boot-state cookie setup against current mainline MSM8998, then test one
+state-changing cookie delta.
+
+Downstream/mainline comparison:
+
+- Downstream MSM8998 defines `qcom,msm-imem@146bf000` with `restart_reason@65c`,
+  `boot_stats@6b0`, `diag_dload@c8`, and `dload_type@1c` children.
+- Downstream `qcom,pshold` also carries a `tcsr-boot-misc-detect` resource at
+  physical `0x1fd3000`, which is `tcsr_regs_2 + 0x13000`.
+- Mainline MSM8998 had SMEM and RPM/SMP2P nodes but no IMEM/restart-reason node,
+  no `qcom,pshold` node, and no SCM `qcom,dload-mode` phandle for the TCSR
+  DLOAD cookie path.
+- Mainline SCM therefore fell back to the secure `SET_DLOAD_MODE` call, whose
+  argument-shape variants were already rejected. This oracle tested only the
+  missing TCSR boot-misc DLOAD-cookie route.
+
+Oracle tested:
+
+- Saved patch:
+  `out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
+- Touched file:
+  `arch/arm64/boot/dts/qcom/msm8998.dtsi`
+- Change:
+  add DEBUG-ONLY `qcom,dload-mode = <&tcsr_regs_2 0x13000>` to the MSM8998 SCM
+  node so `qcom_scm_set_download_mode(0)` clears the downstream-observed TCSR
+  DLOAD bits at `0x1fd3000` instead of using the secure-call fallback.
+- Image:
+  `out/boot-joan-latest-tcsr-dload-cookie.img`
+- Image sha256:
+  `0ba46735f6f6fac182f3de3f67fe46f5c60c26948be7b1193f7c7147b48645dd`
+- Patch sha256:
+  `bd4c3fc21b3d10260fe2b7c2ee96291966fdd9b7f43424c97288e876d1e86b97`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-tcsr-dload-cookie-fastboot-2026-07-06.txt`, sha256
+  `f09b9ded76e826a195d2dc23e356f17953191b2b12b10b5b4f091e66a4d6cdff`
+- PON evidence:
+  `out/aurel-tcsr-dload-cookie-pon-2026-07-06.txt`, sha256
+  `279334aa223eb6ad8d1620544830bee37d535f3be07d376cb0a2620e4abfcbe2`
+
+Verification:
+
+- `git diff --check` passed.
+- Kernel rebuilt with `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+  Image.gz dtbs`.
+- Boot image packaged with `make-testimage.sh`.
+- One-client RAM-only `fastboot boot` was used; no flashing, no phone-storage
+  writes, no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.513s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+55.5s` from test start.
+- Post-reset LineageOS dmesg again showed:
+  `PMIC@SID0: Power-off reason: Triggered from PS_HOLD` and
+  `PON=0x21 ... POFF=0x2:PS_HOLD`.
+
+Interpretation:
+
+- The downstream-observed TCSR DLOAD/restart-cookie path is not sufficient as a
+  standalone survival/liveness fix.
+- Because the outcome remained a controlled SID0 `PS_HOLD` reset with no mainline
+  diagnostics, do not repeat this TCSR `qcom,dload-mode` phandle as another
+  standalone boot test.
+- The remaining restart-cookie area should be the fuller IMEM/reboot-mode/normal
+  restart-reason model only if tested as a clearly separate oracle; otherwise
+  pivot toward PMIC/PON setup or another first-second downstream state transition.
+
+Cleanup:
+
+- The debug patch was saved under `out/` and then reverted.
+- Kernel branch `joan/latest-clean-test` was rebuilt clean after the revert.
+- Clean post-oracle package:
+  `out/boot-joan-latest-clean-post-tcsr-dload-cookie-oracle.img`, sha256
+  `38351422d5862f87a42edd51765117fc1b6b60892f6e980c58cda6f725d283f8`.
+- Phone parked back in LineageOS; `adb root` was used only for the PON readback.
+- No fastboot client left running.
+
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

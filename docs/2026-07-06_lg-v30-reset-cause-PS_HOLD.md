@@ -12,7 +12,9 @@ specific first-second deltas: downstream's DLOAD-off SCM argument shape,
 downstream-style QSEE log-buffer registration, RPM `rpm_requests` rpmsg
 reachability as a standalone liveness oracle, a minimal downstream PMI8998
 BOB-mode RPM vote, a DT-backed PM8998 L19 3.3 V always-on default vote,
-and a broader DT-backed PM/RPM L18+L19+BOB overlay vote bundle.
+a broader DT-backed PM/RPM L18+L19+BOB overlay vote bundle, and a TCSR
+DLOAD/restart-cookie phandle matching downstream's `tcsr-boot-misc-detect`
+address.
 
 ## Evidence preserved from the PON / reset-cause pass
 
@@ -32,8 +34,9 @@ fault, ordinary Linux panic, APSS watchdog node/petting, CPU-idle, secondary CPU
 bringup, high-memory secure/shared pool allocation, DLOAD-off argument shape, a
 standalone QSEE log-buffer registration ping, RPM `rpm_requests` rpmsg
 reachability alone, a bare PMI8998 BOB-mode RPM vote, or a single DT-backed
-PM8998 L19 3.3 V always-on default vote, or a broader standard DT-backed
-PM/RPM L18+L19+BOB overlay vote bundle.
+PM8998 L19 3.3 V always-on default vote, a broader standard DT-backed
+PM/RPM L18+L19+BOB overlay vote bundle, or the downstream-observed TCSR
+DLOAD/restart-cookie route.
 
 ## Concrete rejected paths so far
 
@@ -56,6 +59,8 @@ PM/RPM L18+L19+BOB overlay vote bundle.
 - Broader DT-backed PM/RPM overlay oracle (L18 boot-on, L19 3.3 V
   boot/always-on, BOB 3.312 V boot/always-on): no diagnostic channel; reset
   still ended as SID0 `PS_HOLD`.
+- TCSR DLOAD/restart-cookie oracle (`qcom,dload-mode = <&tcsr_regs_2 0x13000>`):
+  no diagnostic channel; reset still ended as SID0 `PS_HOLD`.
 
 ## New Aurel test: DLOAD-off SCM argument-shape oracle
 
@@ -313,11 +318,53 @@ not sufficient to prevent the controlled PS_HOLD reset or expose diagnostics.
 The next test should not be another standard regulator voltage/enable bundle.
 
 
+## New Aurel test: TCSR DLOAD/restart-cookie oracle
+
+Downstream reference:
+
+- `android_kernel_lge_msm8998/arch/arm64/boot/dts/qcom/msm8998.dtsi`
+- Downstream defines `qcom,msm-imem@146bf000` with restart/dload/boot-stat
+  children, plus a `qcom,pshold` `tcsr-boot-misc-detect` resource at physical
+  `0x1fd3000`.
+- `0x1fd3000` is `tcsr_regs_2 + 0x13000`; mainline MSM8998 had `tcsr_regs_2` but
+  no SCM `qcom,dload-mode` phandle and no IMEM restart-reason node.
+
+Oracle:
+
+- Patch:
+  `out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
+- Patch sha256:
+  `bd4c3fc21b3d10260fe2b7c2ee96291966fdd9b7f43424c97288e876d1e86b97`
+- Image:
+  `out/boot-joan-latest-tcsr-dload-cookie.img`
+- Image sha256:
+  `0ba46735f6f6fac182f3de3f67fe46f5c60c26948be7b1193f7c7147b48645dd`
+- Size:
+  `15736832` bytes
+- Fastboot transcript:
+  `out/aurel-tcsr-dload-cookie-fastboot-2026-07-06.txt`
+- PON evidence:
+  `out/aurel-tcsr-dload-cookie-pon-2026-07-06.txt`
+
+Result:
+
+- RAM-only one-client `fastboot boot`.
+- No flashing; no phone-storage writes; no `fastboot getvar`.
+- Fastboot protocol succeeded:
+  `Sending 'boot.img' ... OKAY`, `Booting ... OKAY`, total `5.513s`.
+- No mainline USB/mass-storage/diag channel appeared.
+- LineageOS adb returned at `t+55.5s` from test start.
+- Post-reset dmesg again showed SID0 `PS_HOLD`.
+
+Conclusion: routing DLOAD-mode clearing through the downstream-observed TCSR
+boot-misc cookie is not the missing standalone liveness handshake.
+
 ## Next best single oracle
 
-Do not repeat DLOAD, QSEE-log registration, RPM reachability, bare BOB-mode,
-single L19 default-vote, or standard DT L18+L19+BOB voltage/enable bundle
-tests as the next standalone test. Mainline
+Do not repeat DLOAD SCM argument-shape, TCSR DLOAD-cookie phandle, QSEE-log
+registration, RPM reachability, bare BOB-mode, single L19 default-vote, or
+standard DT L18+L19+BOB voltage/enable bundle tests as the next standalone
+test. Mainline
 already performs the TZ feature/version
 query, the QSEE log-buffer ping did not prevent PS_HOLD, the RPM rpmsg
 reachability oracle only shifted timing without exposing diagnostics, and the
@@ -331,7 +378,9 @@ against mainline, especially one of:
   not mere `rpm_requests` reachability, not just BOB `bobm=2`, not just
   L19 `3300000` + always-on/boot-on, and not just standard DT L18+L19+BOB
   voltage/enable votes;
-- SMEM boot-state and restart cookies visible in downstream early dmesg;
+- fuller IMEM/reboot-mode/normal restart-reason modeling, only if kept distinct
+  from the rejected TCSR DLOAD-cookie phandle;
+- PMIC/PON setup deltas not covered by the existing PON readback;
 - LGE/Qualcomm restart/boot-state cookies not covered by the prior IMEM oracle;
 - another concrete QSEE/QSECOM state transition only if downstream evidence shows
   it runs before the reset window and differs from mainline.
@@ -348,7 +397,7 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 ## Current state after Aurel update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
-- Harness docs updated through the DT-backed PM/RPM overlay oracle.
+- Harness docs updated through the TCSR DLOAD/restart-cookie oracle.
 - Phone parked back in LineageOS; adbd returned to non-root after PON readback.
 - No fastboot client left running.
 - No packages installed.

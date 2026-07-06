@@ -622,6 +622,45 @@ part of a ledger experiment.
     constraints is not enough;
   - the next useful delta should not be another standard voltage/enable bundle.
 
+### K018 — TCSR DLOAD/restart-cookie oracle
+
+- Handles:
+  - patch `out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
+    (sha256 `bd4c3fc21b3d10260fe2b7c2ee96291966fdd9b7f43424c97288e876d1e86b97`);
+  - image `out/boot-joan-latest-tcsr-dload-cookie.img`
+    (sha256 `0ba46735f6f6fac182f3de3f67fe46f5c60c26948be7b1193f7c7147b48645dd`, size `15736832` bytes);
+  - fastboot transcript `out/aurel-tcsr-dload-cookie-fastboot-2026-07-06.txt`
+    (sha256 `f09b9ded76e826a195d2dc23e356f17953191b2b12b10b5b4f091e66a4d6cdff`);
+  - PON evidence `out/aurel-tcsr-dload-cookie-pon-2026-07-06.txt`
+    (sha256 `279334aa223eb6ad8d1620544830bee37d535f3be07d376cb0a2620e4abfcbe2`);
+  - clean post-oracle repack `out/boot-joan-latest-clean-post-tcsr-dload-cookie-oracle.img`
+    (sha256 `38351422d5862f87a42edd51765117fc1b6b60892f6e980c58cda6f725d283f8`).
+- Class: `debug-only`, rejected as a standalone fix; useful evidence that the
+  downstream TCSR boot-misc DLOAD cookie path is not the sole reset gate.
+- Public/PR disposition: `do not publish` as tested. A future clean IMEM/reboot
+  support patch may still be evaluated separately, but this oracle alone is not
+  evidence for publication.
+- Touched file: `arch/arm64/boot/dts/qcom/msm8998.dtsi`.
+- Downstream reference:
+  - `qcom,msm-imem@146bf000` contains restart/boot/dload children;
+  - `qcom,pshold` exposes `tcsr-boot-misc-detect` at `0x1fd3000`, equivalent to
+    `tcsr_regs_2 + 0x13000`.
+- Mainline delta tested:
+  - add `qcom,dload-mode = <&tcsr_regs_2 0x13000>` to the SCM node so mainline
+    clears DLOAD bits through the same TCSR boot-misc cookie address.
+- Verification/evidence:
+  - `git diff --check` passed;
+  - kernel rebuilt with GCC cross toolchain and image packaged;
+  - RAM-only one-client `fastboot boot` succeeded (`Sending`/`Booting` OKAY,
+    total `5.513s`);
+  - no mainline USB/diag channel appeared;
+  - LineageOS adb returned at `t+55.5s` from test start;
+  - post-reset PON log again reported SID0 `PS_HOLD`.
+- Interpretation:
+  - the TCSR DLOAD/restart-cookie route is not enough by itself;
+  - do not repeat this exact `qcom,dload-mode` phandle as another standalone
+    oracle.
+
 ## Current narrowed hypothesis
 
 The blocker still looks like a secure/boot-chain/platform-state resetter, but
@@ -631,12 +670,14 @@ downstream high-memory secure/shared pools, matching downstream's DLOAD-off SCM
 argument shape, registering a downstream-style QSEE log buffer, merely reaching
 RPM `rpm_requests` rpmsg setup, sending a bare downstream BOB `bobm=2` RPM
 vote, forcing downstream joan's PM8998 L19 3.3 V always-on default through the
-mainline regulator framework, or forcing a broader standard DT-backed PM/RPM
-L18+L19+BOB voltage/enable bundle. Next investigation should compare very early
+mainline regulator framework, forcing a broader standard DT-backed PM/RPM
+L18+L19+BOB voltage/enable bundle, or routing SCM DLOAD-mode clearing through
+the downstream-observed TCSR boot-misc cookie (`qcom,dload-mode = <&tcsr_regs_2
+0x13000>`). Next investigation should compare very early
 downstream boot setup against mainline, especially:
 
 - CPU/Kryo errata SCM calls (`drivers/soc/qcom/scm-errata.c` downstream);
-- LGE panic/restart-reason and IMEM cookie setup;
+- fuller LGE panic/restart-reason and IMEM cookie setup, if kept separate from K018;
 - broader downstream RPM regulator/default votes / clocks / power-domain requests;
 - SMEM/bootreason/restart cookies;
 - other early `SCM_SVC_BOOT` / TZ setup before or around downstream

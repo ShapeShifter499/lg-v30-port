@@ -209,6 +209,19 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   is not sufficient and does not preserve the longer timing seen with the raw
   BOB-mode oracle. The patch was saved, reverted, and the kernel rebuilt clean.
 
+- **TCSR DLOAD/restart-cookie oracle also failed.**
+  Aurel compared downstream's MSM8998 restart/IMEM setup and found that
+  downstream exposes `qcom,msm-imem@146bf000` plus a `qcom,pshold` fallback
+  `tcsr-boot-misc-detect` resource at `0x1fd3000` (`tcsr_regs_2 + 0x13000`),
+  while mainline MSM8998 had no equivalent DLOAD cookie phandle. The oracle added
+  `qcom,dload-mode = <&tcsr_regs_2 0x13000>` to mainline SCM so
+  `qcom_scm_set_download_mode(0)` clears the same TCSR boot-misc DLOAD bits
+  (`out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`; image `out/boot-joan-latest-tcsr-dload-cookie.img`, sha256 `0ba46735f6f6fac182f3de3f67fe46f5c60c26948be7b1193f7c7147b48645dd`). RAM-only `fastboot boot`
+  succeeded, but no mainline USB/diag appeared; LineageOS adb returned at
+  `t+55.5s` from test start, and PON evidence again showed SID0 `PS_HOLD`. This
+  TCSR DLOAD/restart-cookie route is not sufficient as a standalone liveness
+  fix. The patch was saved, reverted, and the kernel rebuilt clean.
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
