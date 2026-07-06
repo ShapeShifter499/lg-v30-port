@@ -789,9 +789,21 @@ part of a ledger experiment.
   - survivor beacon 18d1:5e30 at ~150s -> a do-nothing init SURVIVES ->
     something the normal init does (wdkill regs, or dwc3/PHY) TRIGGERS the
     reset -> next passes bisect wdkill-only vs gadget-only.
-- Verification so far: ramdisk contents verified (init + busybox), bootimg
-  header v0/pagesize 4096 verified, image packaged. NOT device-tested (needs
-  Lance).
+- RESULT (device-tested 2026-07-06, Lance present): **LOS RETURNED at +33s.**
+  The reset happened even with a do-nothing init. Post-reset PON identical:
+  `Power-off: PS_HOLD`, `PON=0x21:HARD_RESET, POFF=0x2:PS_HOLD, FAULT1=0x40:UVLO`.
+  Timing (~33s host cycle) is within the same family as busy-init runs, i.e.
+  removing ALL userspace activity (wdkill /dev/mem writes + gadget/UDC bring-up)
+  did NOT change the reset. => the resetter is INDEPENDENT OF USERSPACE.
+- Consequence: the handshake-parity line (K006-K021) is confirmed futile —
+  nothing userspace does can satisfy or provoke it. The reset is either a
+  secure/firmware background timer, or kernel-init-time driver behaviour that
+  runs regardless of init (null-init does NOT disable kernel driver probing).
+- Honest scope note: this does NOT prove "pure firmware" — it proves
+  "not userspace." Splitting firmware-timer vs kernel-probe is the next step
+  (K023): strip kernel driver probing (initcall_blacklist / minimal config /
+  minimal DT) and/or measure whether the reset period is FIXED across runs
+  (fixed => hardware/secure watchdog; variable => probe/thermal triggered).
 - Public/PR disposition: `do not publish`.
 - Written-by: Ember Nymbrand (agent-ember)
 - Agent-harness: Claude-Code:claude-fable-5
