@@ -1179,3 +1179,55 @@ Interpretation:
 - Do not spend more remote attempts while the phone is absent from USB. After
   recovery, either retry the exact K027 image once or move to a better-supported
   NoC/config-fabric oracle based on downstream MSM8998 bus/ICC parity.
+
+## K028 (prep) — CONF_NOC mechanism identified in source: late unused-clock/genpd sweeps (no device test)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Source-only session; phone absent from USB throughout (no device contact).
+Full analysis: `docs/k028-conf-noc-sweep-hypothesis-2026-07-07.md`.
+
+Mechanism (best fit for `LGE_ERR_TZ_CONF_NOC_ERR`):
+
+- `clk_disable_unused()` (late_initcall_sync) + genpd power-off-unused
+  (late_initcall) gate every XBL-left-on GCC branch clock/GDSC that our
+  driverless mainline boot never claims. A later register-path access into a
+  gated block — most plausibly TZ's periodic PRNG entropy reseed — fails on
+  the Config NoC; LG TZ policy logs `TZ|CONF_NOC_ERR` and pulls PS_HOLD.
+- Explains: all K022–K024 resets (every config ran the sweeps; each had
+  victims), K023d no-RPM reset (victims are GCC-side, built-in), the jittery
+  +27–31s timing (event-driven TZ access, not a watchdog period), and the
+  stock-kernel survival (downstream sweeps too — `clock_late_init()` — but
+  its full driver set claims nearly everything first: msm_rng, qseecom,
+  mdss cont-splash, msm_bus keepalives).
+
+Key source facts (verified this session, mainline v7.2-rc2 vs LOS 4.4):
+
+- gcc-msm8998.c: **zero** `CLK_IGNORE_UNUSED`; only 3 `CLK_IS_CRITICAL`
+  (gpu_cfg_ahb, mmss_noc_cfg_ahb, mss_q6_bimc_axi). All other boot-on
+  branches sweepable (prng_ahb, boot_rom_ahb, mmss_sys_noc_axi, mmss_qm_*,
+  aggre1_noc_xo, cfg_noc_usb3_axi, bimc_hmss_axi, …).
+- PRNG standout: downstream `qrng@793000` claims `gcc_prng_ahb_clk` + votes
+  `msm-rng-noc` + `qcom,no-qrng-config` (TZ owns config). Mainline
+  msm8998.dtsi has **no rng node**; no qcom-rng driver in .config → clock
+  swept every boot while TZ still uses the block.
+- RPM fabric clocks are NOT sweepable (msm8998_icc_clks never registered in
+  CCF; INT_MAX handoff votes persist; no 8998 ICC provider exists) —
+  consistent with K023d.
+- OnePlus 8998 precedent: their simplefb node holds 8 MDSS clocks +
+  MDSS_GDSC explicitly "due to unused clk cleanup". (MMCC=m ⇒ MDSS clocks
+  never registered in our RAM boots ⇒ not suspects for current resets.)
+- LGE error taxonomy separates MM/PERIPH/SYS/CONF NoC codes ⇒ 0x09 pins the
+  failure to the register path, not display/data traffic, not XPU.
+
+Consequence: K027 (`clk_ignore_unused pd_ignore_unused`) is exactly the
+class discriminator. Its single valid retry after physical phone recovery
+classifies the whole hypothesis: survive ⇒ bisect (K028a clk-only ⇒ K028b
+mark prng_ahb+boot_rom `CLK_IGNORE_UNUSED` ⇒ durable fix = msm8998.dtsi rng
+node + `CONFIG_CRYPTO_DEV_QCOM_RNG=y`); valid reset ⇒ entire sweep class
+eliminated in one boot ⇒ fall back to TZ-affirmative-keepalive line.
+
+No kernel or DTS changes committed; no images built. Predictions recorded in
+the analysis doc before any device test.
