@@ -2,7 +2,30 @@
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
-Date: 2026-07-07 (mid-session checkpoint; K029 in flight when first written)
+Date: 2026-07-07 (SESSION PAUSED — see banner below)
+
+## SESSION PAUSED — device stuck, needs Lance's physical attention
+
+After 9 consecutive RAM-boot-then-reset cycles (K027 retry through K035),
+the phone landed in an unfamiliar state: `lsusb` shows `1004:6340` (LG's
+own vendor ID, not the normal `18d1:4ee7` ADB identity every prior
+successful return showed), and neither `adb` nor `fastboot` reach it. A
+215-second passive, read-only observation window showed zero change — not
+a slow boot, genuinely stuck. **No further remote device commands were
+attempted.** Full detail in the ledger's K035 entry.
+
+Working theory (unconfirmed, offered for Lance's judgment): a boot-loop
+protection counter in LG's bootloader, falling back to a diagnostic mode
+after many consecutive abnormal resets — a normal, protective response,
+not damage. A plain forced restart (Power + Volume-Down) is the expected
+safe recovery, matching the H932's established recovery pattern. **Do
+not attempt KDZ/flash/exotic recovery tools — this almost certainly just
+needs a normal restart once Lance is available.**
+
+The confirmed win from this session (the `anoc1_smmu` skip-reset fix,
+K030) stands regardless of this pause — it eliminated a real, named
+TrustZone Config/MM-NoC fault. Everything below this banner is the
+in-progress narrative leading up to the pause.
 
 Supersedes `docs/ember-handoff-2026-07-07-k027-complete.md` for current
 state. That handoff's safety contract, reusable harness description, and
