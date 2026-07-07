@@ -1231,3 +1231,49 @@ eliminated in one boot ⇒ fall back to TZ-affirmative-keepalive line.
 
 No kernel or DTS changes committed; no images built. Predictions recorded in
 the analysis doc before any device test.
+
+## K027 (valid retry) — REJECTED, and the reset re-labeled itself: MM NoC error, not Config NoC
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Phone physically recovered by Lance (was in LineageOS, adb visible). Valid
+one-client pass, script `$CLAUDE_JOB_DIR/tmp/k027-run.sh`, full log
+`out/ember-k027-valid-retry-2026-07-07.log`:
+
+- Sending OKAY 0.409s, Booting OKAY 5.096s (sudo -n fastboot, adb-entered).
+- Handoff t+12s; LineageOS adb back at t+42s (+30s after handoff).
+- **RESET PERSISTS with `clk_ignore_unused pd_ignore_unused`.**
+- PON: PS_HOLD as always. But the boot chain self-labeled the crash:
+  `androidboot.product.lge.bootreasoncode=0x6D630306` =
+  `LGE_RB_MAGIC | LGE_ERR_TZ |` **`LGE_ERR_TZ_MM_NOC_ERR (0x0006)`**.
+
+Two consequences:
+
+1. **TZ/XBL labels every reset on its own** — K026's kernel-side IMEM write
+   was not needed for labeling. Every future pass gets a free reason code;
+   read it back every time (runner already does).
+2. **K027 changed the failure**: with the late clk/genpd sweeps disabled the
+   Config-NoC error (K026, 0x09) is GONE and a **Multimedia-NoC** error
+   surfaces instead. So the K028-prep sweep analysis was not wrong but
+   incomplete: the sweeps were implicated in the CNoC layer; beneath it
+   something else kills the MM NoC ~5-15s after handoff. Prediction 1/3 of
+   the prep doc falsified as written (survival), prediction 2 falsified in
+   the useful direction (code changed, not stayed).
+
+Method upgrade adopted: **onion-peel by bootreason** — one variable per
+pass; each reset's LGE subcode names the stratum that fired first.
+
+Suspect ranking for MM_NOC under retention: (a) RPM stratum — OnePlus-derived
+regulator votes applied at ~2s (never cross-checked vs LG downstream, per
+project memory), rpmcc INT_MAX handoff + enable_scaling; (b) XBL-left-live
+display/QM hardware interacting with retained-but-unmanaged state; (c) SMMU
+global resets (weakened: mmss_smmu defers forever on &mmcc clocks, MMCC=m —
+display translations never touched; anoc1/2/lpass/adreno smmus feed other
+NoCs).
+
+Next: **K028 = K027 cmdline + `&rpm_requests` disabled** (proven K023d DTS
+edit) — removes the whole RPM stratum under retention. Survive ⇒ split
+regulators vs clk-handoff next. Reset ⇒ RPM stratum innocent; read the new
+label and peel the next stratum (SMMU blacklist pass is staged as K029).
