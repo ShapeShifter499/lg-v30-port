@@ -1430,3 +1430,47 @@ an anoc1-only quirk. `out/ember-k031-allsmmu-skipreset-2026-07-07.dts` is
 staged (K027 baseline + `ember,debug-skip-reset` on all five nodes) to
 test whether extending the same patch removes the residual generic
 reset too.
+
+## K031 — all-5-SMMU skip-reset: identical to K030, anoc1 alone is sufficient
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Same kernel binary as K030 (patch is generic, keyed off a DT property —
+no rebuild needed). DTS: K027 baseline + `ember,debug-skip-reset` on all
+five msm8998 SMMU-v2 instances (`anoc1_smmu`, `anoc2_smmu`, `adreno_smmu`,
+`lpass_q6_smmu`, `mmss_smmu`), matching downstream's blanket policy.
+`out/ember-k031-allsmmu-skipreset-2026-07-07.dts`, image
+`out/boot-joan-allsmmuskipreset-k031.img`, sha256
+`a836f695460d93b9be92802bc69db1326b359c1706c3a446519b58b8c518ffdb`.
+Runner `out/ember-k031-valid-retry-2026-07-07.log`.
+
+Result: **reset persists**, LOS returned t+47s (35s after handoff, same
+ballpark as every test in this chain), PON PS_HOLD. Bootreasoncode:
+**identical to K030** — `0x20` (`UNDEFINED_CRITICAL_ERROR`),
+`hiddenreset=0`, `lge.bootreason=NORMAL`.
+
+Interpretation: tagging the other four SMMUs changed nothing observable.
+`anoc1_smmu` alone was sufficient to eliminate the NoC-fault signature;
+the other four aren't contributing a distinguishable effect on this
+classifier boot. Since skipping the reset on a real consumer's SMMU
+(anoc2/wifi, adreno/GPU, lpass_q6/audio) also skips setting up the
+default bypass/stream-mapping state those consumers would eventually
+need — a real correctness risk once their drivers actually attach and
+map, which our spin-only classifier ramdisk never exercises — **the
+broader K031 patch is not preferred**. Going forward, treat K030's
+anoc1-only patch as the accepted, safer baseline; do not carry the other
+four `ember,debug-skip-reset` tags forward without a specific reason to
+re-test them.
+
+Standing question after K030/K031: **what produces the residual
+`UNDEFINED_CRITICAL_ERROR` (0x20)?** This code is generic/undetailed
+(unlike the NoC-specific codes), so the bootreason-as-classifier method
+that drove K027-K031 has no further signal to peel by itself. Next probe
+should re-establish a sharper oracle for this new, still-unnamed failure
+— e.g. re-run the K023-style board-peripheral subtraction *on top of*
+the confirmed anoc1 skip-reset baseline (previous K023 eliminations were
+proven under the old NoC-fault regime and may not all transfer), or look
+for other PON/QSEE-log detail that distinguishes `UNDEFINED_CRITICAL_ERROR`
+from a plain unhandled watchdog.
