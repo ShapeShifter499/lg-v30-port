@@ -41,23 +41,73 @@ one layer at a time instead of chasing one root cause.
   subtractions (RPM, anoc1_smmu) have now both regressed to the same
   shallow fault; only the untouched K027 baseline has ever reached the
   deeper one. Conclusion: **stop subtracting nodes from K027's baseline.**
-- **K030 (built, kernel patch applied, not yet device-tested)**: found
-  *why* anoc1_smmu isn't a harmless orphan. Downstream
-  `msm-arm-smmu-8998.dtsi` defines this exact block
+- **K030 — CONFIRMED FIX for one real, named cause.** Downstream
+  `msm-arm-smmu-8998.dtsi` defines `anoc1_smmu`
   (`arm,smmu-anoc1@1680000`) with `qcom,skip-init` + `qcom,register-save`
   — real Qualcomm properties meaning TZ/XBL already owns/configured this
   SMMU instance and the downstream driver deliberately never runs a
   global reset on it. Mainline's `arm_smmu_device_reset()` has no such
   concept: it unconditionally clears sGFSR, forces every SMR invalid and
   every S2CR to bypass, and invalidates the TLB on every probed SMMU.
-  Added a debug-only kernel patch
-  (`out/ember-k030-skip-smmu-reset-debug.patch`, applied to
-  `drivers/iommu/arm/arm-smmu/arm-smmu.c`) that skips the entire reset
-  sequence when a new `ember,debug-skip-reset` DT boolean is present, and
-  added that property to `&anoc1_smmu` on top of K027's **untouched**
-  baseline (node stays enabled, RPM stays enabled — nothing removed this
-  time). Kernel rebuild was in progress when this checkpoint was written;
-  check the ledger's K030 entry for the device result.
+  Debug patch `out/ember-k030-skip-smmu-reset-debug.patch` (applied to
+  `drivers/iommu/arm/arm-smmu/arm-smmu.c`) skips the reset when a new
+  `ember,debug-skip-reset` DT boolean is present, tagged onto
+  `&anoc1_smmu` alone. Device result: the reset still happens at the
+  same ~30-40s mark, **but the specific TZ NoC-fault classification is
+  gone** — bootreasoncode changed from the `LGE_RB_MAGIC|LGE_ERR_TZ`
+  crash family (`0x09` Config NoC / `0x06` MM NoC, `hiddenreset=1`) to a
+  bare `0x20` (`UNDEFINED_CRITICAL_ERROR`, the older/separate
+  `pon_restart_reason` enum) with `hiddenreset=0`. A real, named fault
+  class is eliminated. Not yet a full fix — see K031-K035 below.
+- **K031**: broadened the same patch to all five msm8998 SMMU-v2
+  instances (downstream tags all of them `qcom,skip-init` identically).
+  **Identical result to K030** — no additional benefit, and it carries a
+  real correctness risk for wifi/GPU/audio's own SMMUs once their real
+  consumers actually attach domains (untested by our spin-only
+  classifier). **Preferred fix is K030's anoc1-only patch, not this.**
+- **K032**: tested whether the `clk_ignore_unused pd_ignore_unused`
+  cmdline retention (in place since K027) still matters now that the
+  SMMU fix exists. **It doesn't** — plain default cmdline gives the
+  identical `0x20` result. This retroactively corrects the whole
+  K027/K028/K029 narrative and `docs/k028-conf-noc-sweep-hypothesis-
+  2026-07-07.md`: the clock-sweep story was a coincidental correlation,
+  not a real cause. **Confirmed clean baseline: full untouched joan DTS
+  + `&anoc1_smmu { ember,debug-skip-reset; };` + plain default cmdline.
+  No cmdline workaround needed.**
+- **K033**: re-ran the K023e capstone (disable every removable board
+  peripheral — `usb3`, `qusb2phy`, `ufshc`, `ufsphy`, `wifi`,
+  `pm8005_regulators`; RPM stays enabled) on the new confirmed baseline.
+  **Still resets, still `0x20`.** The residual fault, like the original
+  NoC fault, is SoC core/firmware-level, not peripheral bring-up.
+- **K034**: disabled the APSS watchdog node (`watchdog@17817000`)
+  outright — a different manipulation than K024's kernel-side pet under
+  the old fault regime. **Still resets, still `0x20`.** This watchdog is
+  innocent under both the old and new fault regimes.
+- **Diagnostic aside**: pulled the *full* LOS dmesg after K034 (no new
+  reboot needed, phone was already up) and found two lines our narrow
+  grep had missed: `"[Display] Current Reset Reason Value : 0x20,
+  NORMAL"` and `"Boot reason: 0x20 not handled, defaulting to Normal
+  Boot"` — **downstream's own boot chain doesn't treat 0x20 as a real
+  crash code at all**; it's an unhandled/default fallback. This raises
+  the live possibility that no TZ detector is writing anything anymore,
+  and `0x20` may just be IMEM's resting/default state.
+- **K035 (kernel patch applied, build in progress at last edit)**:
+  reintroduced Ember's 2026-07-06 IMEM-oracle initcall
+  (`drivers/soc/qcom/joan_imem_oracle.c`, originally commit `f0d368d28`,
+  on a different branch — not present on `joan/latest-clean-test` until
+  now) on top of the confirmed K030 baseline. Writes a deliberately
+  distinctive seed (`0x6D6303EE`) to the IMEM restart-reason offset
+  (`0x146bf000 + 0x65c`) from an `early_initcall`, before whatever causes
+  the reset. `/dev/mem` is absent on this LineageOS (previously-known
+  dead channel) so the original sentinel-offset readback doesn't work,
+  but that's not needed: the restart-reason offset is exactly what the
+  bootloader already exposes automatically via
+  `androidboot.product.lge.bootreasoncode` — the same channel every
+  prior K-test has read from. If next boot reports the seed **unchanged**
+  (`0x6D6303EE`), that proves no TZ detector fires anymore. If it reports
+  something **else**, a detector is still active and just named a new
+  cause. Check the ledger's K035 entry for the actual result — this
+  checkpoint was written while the kernel rebuild was still running.
 
 ## Why anoc1_smmu
 
