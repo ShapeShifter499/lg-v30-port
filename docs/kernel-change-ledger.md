@@ -1514,3 +1514,41 @@ noise eliminated, the only remaining unknown is what produces
 K023e's original list) on top of this new confirmed baseline, to learn
 whether the residual fault is peripheral-side or core/firmware-side,
 same question K023e answered for the old NoC fault.
+
+## K033 — capstone re-run on the fixed baseline: residual fault is ALSO core/firmware, not peripheral
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Confirmed clean baseline (K032: full DTS + anoc1_smmu skip-reset + default
+cmdline) plus the K023e capstone peripheral list re-applied verbatim
+(`usb3`, `qusb2phy`, `ufshc`, `ufsphy`, `wifi`, `pm8005_regulators`
+disabled; RPM stays enabled as core scaffolding — same set K023e used
+against the old NoC fault). `out/ember-k033-skipreset-corestrip-
+2026-07-07.dts`, image `out/boot-joan-skipreset-corestrip-k033.img`,
+sha256 `2aae7771a60e8f21cd74ee49dafdd5fd32a142c22059b8b315c08737a85b0342`.
+Runner `out/ember-k033-valid-retry-2026-07-07.log`.
+
+Result: **reset persists**, LOS returned t+56s (44s after handoff, within
+the previously-noted bimodal ~31-58s spread), PON PS_HOLD, bootreasoncode
+still `0x20` (`UNDEFINED_CRITICAL_ERROR`), `hiddenreset=0` — identical
+classification to K030/K031/K032 despite every removable peripheral being
+gone.
+
+Conclusion: the residual fault, like the original NoC fault before it,
+is **SoC core/firmware-level, not peripheral bring-up**. Stripping every
+board peripheral changes nothing. The search space narrows to what's
+left enabled in this "core" configuration: RPM (required scaffolding,
+do not touch again — K028), the un-removable architectural blocks
+(GIC, arm,armv7-timer-mem, SCM/PSCI), and — notably — the
+`watchdog@17817000` APSS node, which K023e/K033 both leave enabled
+(it's part of joan's `&soc` peripheral enable, not in the removable
+list) and which K024 only *petted* from the kernel under the OLD fault
+regime, never *disabled outright*. `pm8998_gpios`, `pm8998_resin`,
+`tlmm`, `blsp2_uart1` remain enabled too but are basic/low-suspicion.
+
+Next (K034): disable the APSS watchdog node entirely (`status =
+"disabled"` on the joan `&soc` watchdog override, not a pet) on top of
+this same confirmed baseline, as a genuinely new manipulation distinct
+from K024's kernel-side pet.
