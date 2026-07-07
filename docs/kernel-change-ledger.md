@@ -1322,3 +1322,46 @@ property at all, yet `status` defaults enabled, so arm-smmu-v2 still
 probes/touches it with nothing voting for its fabric segment. anoc2
 (wifi), adreno_smmu (gpu), mmss_smmu (video, inert since MMCC=m defers it)
 are left untouched.
+
+## K029 — anoc1_smmu disabled (on top of K027) ALSO regresses to Config NoC
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Onion-peel step 3. Built `&anoc1_smmu { status = "disabled"; };` on top of
+K027's DTS+cmdline (RPM left enabled per the K028 lesson). Rationale:
+anoc1_smmu is the only SMMU in msm8998.dtsi with zero `iommus=` consumers
+anywhere in the tree AND no `clocks=` property at all, yet defaults to
+`status = "okay"`, so arm-smmu-v2 still probes/touches it every boot.
+DTS: `out/ember-k029-noanoc1-2026-07-07.dts`. Image
+`out/boot-joan-noanoc1clkpd-k029.img`, sha256
+`72b88d1e079fbc06493b6650216971e23cd3d2b75b1d265fa19e7d40b1edb363`. Kernel
+Image.gz unchanged (Jul 6 16:39 build) — DTS/cmdline-only test. Runner
+`out/ember-k029-valid-retry-2026-07-07.log`.
+
+Result: **reset persists**, LOS returned t+52s (40s after handoff), PON
+PS_HOLD. Bootreasoncode: **`0x6D630309` (TZ_CONF_NOC_ERR) — regressed from
+K027's `0x6D630306` MM_NOC, same as K028's regression.**
+
+Interpretation: this is now a *pattern*, not a coincidence. Two independent
+"remove one thing" experiments (K028: disable RPM; K029: disable
+anoc1_smmu) have both fallen back to the exact same Config NoC code, while
+the *only* configuration that has ever reached the deeper MM NoC fault is
+K027 — RPM enabled, clk/pd retained, and the **full, unmodified** board
+file otherwise. Disabling `anoc1_smmu` doesn't remove a harmless orphan; it
+removes something the boot chain needs, exactly like disabling RPM did.
+Best current read: `anoc1_smmu`'s arm-smmu-v2 probe (global ID/config
+register reads, SMMU reset) touches shared aggregator-NoC infrastructure
+in a way that keeps the Config NoC alive for later accesses, even with no
+translation consumer — plausibly because its missing `clocks=` property is
+itself a mainline DT omission (the block may need an explicit clock this
+node doesn't model), and the *symptom* of that omission is masked rather
+than fixed by disabling the node outright.
+
+Method correction: stop hypothesizing "orphan nodes are safe to cut."
+Test *additions*/*corrections* against K027's untouched full DTS instead
+of further subtractions until the MM NoC fault is reproduced past K027's
+own baseline. Next candidate (K030): check downstream DT for the
+anoc1-equivalent SMMU's `clocks=` property (mainline may simply be missing
+one) rather than disabling the mainline node again.
