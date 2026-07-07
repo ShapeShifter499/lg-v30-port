@@ -1365,3 +1365,68 @@ of further subtractions until the MM NoC fault is reproduced past K027's
 own baseline. Next candidate (K030): check downstream DT for the
 anoc1-equivalent SMMU's `clocks=` property (mainline may simply be missing
 one) rather than disabling the mainline node again.
+
+## K030 — SMMU skip-reset patch: the specific TZ NoC-fault signature is GONE
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Root-cause lead, not a subtraction test. Downstream
+`arch/arm/boot/dts/qcom/msm-arm-smmu-8998.dtsi` marks `anoc1_smmu`
+(`arm,smmu-anoc1@1680000`) `qcom,skip-init` + `qcom,register-save`: real
+Qualcomm properties meaning TZ/XBL already owns and configured this SMMU
+instance, and the downstream driver deliberately never runs a global
+reset on it. Mainline's `arm_smmu_device_reset()`
+(`drivers/iommu/arm/arm-smmu/arm-smmu.c`) has no equivalent concept — it
+unconditionally clears sGFSR, forces every SMR invalid and every S2CR to
+bypass, and invalidates the TLB on every probed SMMU, every boot.
+
+Added a debug-only kernel patch gating that entire sequence behind a new
+`ember,debug-skip-reset` DT boolean (patch saved to
+`out/ember-k030-skip-smmu-reset-debug.patch`, applied then built into a
+fresh `Image.gz`; `strings vmlinux` confirmed the new warn string before
+testing). DTS: K027's **untouched** baseline (RPM enabled, full DTS
+otherwise, `clk_ignore_unused pd_ignore_unused` retention) with only
+`&anoc1_smmu { ember,debug-skip-reset; };` added — node stays enabled,
+unlike K029. `out/ember-k030-skipreset-2026-07-07.dts`, image
+`out/boot-joan-skipreset-k030.img`, sha256
+`207bae675b32e4f4598c46df62d746c818753ea7867e0abd63b9c003f546cf43`. Runner
+`out/ember-k030-valid-retry-2026-07-07.log`.
+
+Result: **reset still occurs** (LOS returned t+42s, 30s after handoff — same
+timing as K027, PON still PS_HOLD/Hard-Reset-cold-boot, identical
+electrical signature). But the reported reason **changed namespace
+entirely**:
+
+- Every prior test (K022 through K029) reported
+  `lge.bootreason=<crash-ish>` / `hiddenreset=1` and an
+  `LGE_RB_MAGIC | LGE_ERR_TZ | subcode` code (`0x6D630309` CONF_NOC or
+  `0x6D630306` MM_NOC).
+- K030 reports `lge.bootreason=NORMAL`, **`hiddenreset=0`**, and
+  `androidboot.product.lge.bootreasoncode=0x20` — no `LGE_RB_MAGIC`
+  prefix at all. Cross-checked against the preserved public header
+  (`out/aurel-k027-public-bullhead-reboot_reason.h`): `0x20` is
+  `UNDEFINED_CRITICAL_ERROR` in the **older, separate** `pon_restart_reason`
+  enum (0x00-0x37 range: `TZ_MM_NOC_ERROR=0x2D`, `TZ_CONF_NOC_ERROR=0x30`
+  live in this same enum, confirming it's the low-level counterpart of the
+  LGE_RB_MAGIC subcodes we'd been reading). `hiddenreset=0` in particular
+  had never appeared before this test.
+
+Reading: the specific TZ NoC-fault detector that fired on every previous
+test (whatever hardware/firmware logic recognizes "Config NoC" or "MM
+NoC" specifically) **did not fire this time**. Skipping the SMMU global
+reset on `anoc1_smmu` removed that exact fault signature. The boot chain
+fell back to reporting only a generic, undetailed "undefined critical
+error" — meaning something *else* still forces PS_HOLD at roughly the
+same ~30s mark, now unclassified rather than NoC-specific. This is
+forward progress (a real, named fault class eliminated) but not yet a
+fix. Do not report this as solved.
+
+Next (K031, staged): downstream marks ALL FIVE msm8998 SMMU-v2 instances
+(`anoc1`, `anoc2`, `lpass_q6`, `mmss`, `kgsl`/adreno) with the same
+`qcom,skip-init` + `qcom,register-save` pair — a blanket SoC policy, not
+an anoc1-only quirk. `out/ember-k031-allsmmu-skipreset-2026-07-07.dts` is
+staged (K027 baseline + `ember,debug-skip-reset` on all five nodes) to
+test whether extending the same patch removes the residual generic
+reset too.
