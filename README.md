@@ -293,6 +293,26 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   bark (`0x3a`) or thermal secure bite (`0x3b`). Artifact:
   `out/aurel-lge-imem-k026-result-2026-07-06.txt`.
 
+
+- **K027 decoded the K026 bootreason as TZ Config NoC error; clk/power-retention image is built but not validly device-tested.**
+  Public older LG/QCOM `reboot_reason.h` from the bullhead msm kernel defines
+  `LGE_ERR_TZ_CONF_NOC_ERR = 0x0009`, so K026's `0x6D630309` decodes as
+  `LGE_RB_MAGIC | LGE_ERR_TZ | LGE_ERR_TZ_CONF_NOC_ERR`: a TrustZone Config
+  NoC error. Aurel preserved that public header as
+  `out/aurel-k027-public-bullhead-reboot_reason.h` (sha256
+  `90e24ee46dfedef922c02a55f492b01af460bbbdae1a1c9c3bd40e4fdb8b0355`).
+  Downstream MSM8998 has legacy `msm_bus`/NoC/BIMC vote plumbing; mainline joan
+  has no MSM8998 ICC provider/votes. A cmdline-only K027 discriminator was built
+  with `panic=0 ignore_loglevel clk_ignore_unused pd_ignore_unused` as
+  `out/boot-joan-clkpd-k027.img` (sha256
+  `60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e`), but the
+  device attempt is **inconclusive**: no fastboot `Sending`/`Booting` OKAY was
+  captured, normal-user fastboot hit permissions/timeout, and the phone then
+  disappeared from adb/fastboot/USB for a 224s passive observation window. Do not
+  treat K027 as rejected or fixed until Lance physically recovers the phone and
+  the image is retried with one-client sudo-fastboot discipline. Artifact:
+  `out/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`.
+
 ## Previous status (2026-07-05)
 
 - **P0 DONE — test image ready for tethered boot.** Kernel built clean
@@ -339,5 +359,9 @@ Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
 
 Updated-by: Aurel Nymvale (agent-aurel) — K026 LGE IMEM default restart-reason oracle
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+Updated-by: Aurel Nymvale (agent-aurel) — K027 CONF_NOC decode and inconclusive clk/power-retention attempt
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06

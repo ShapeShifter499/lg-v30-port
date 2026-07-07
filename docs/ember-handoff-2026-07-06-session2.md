@@ -150,3 +150,32 @@ LGE magic + TZ class + undocumented subreason `0x09`; it is not the named TZ
 non-secure watchdog bark (`0x3a`) or thermal secure bite (`0x3b`). Next target:
 find where LG/XBL/TZ defines or emits subreason `0x09`, or identify the early
 secure-world handshake that prevents it on stock/downstream. Do not repeat K026.
+
+## Aurel K027 addendum — 0x6D630309 decoded, device needs physical recovery before retry
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+K026's `0x6D630309` is now decoded using an older public LG/QCOM
+`include/soc/qcom/lge/reboot_reason.h`: `0x0009` is
+`LGE_ERR_TZ_CONF_NOC_ERR`. So the boot chain is reporting
+`LGE_RB_MAGIC | LGE_ERR_TZ | LGE_ERR_TZ_CONF_NOC_ERR`: TrustZone Config NoC
+error.
+
+Aurel built a cmdline-only K027 image to test whether keeping bootloader-enabled
+clocks/power domains prevents that class of error:
+
+- `out/boot-joan-clkpd-k027.img`
+- sha256 `60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e`
+- cmdline `androidboot.hardware=joan panic=0 ignore_loglevel clk_ignore_unused pd_ignore_unused`
+
+But the device result is inconclusive, not a reject: no fastboot protocol OKAY was
+captured. Normal-user fastboot timed out / hit permissions, then the phone vanished
+from adb/fastboot/USB for a 224s passive observation window. Do not retry remotely
+until Lance physically recovers the phone and USB enumeration is back. After recovery,
+retry K027 once with one-client `sudo -n fastboot boot`, or continue the now-better
+NoC/config-fabric investigation: downstream MSM8998 has legacy msm_bus/NoC/BIMC
+votes; mainline joan has no MSM8998 ICC provider/votes.
+
+Result artifact: `out/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`.

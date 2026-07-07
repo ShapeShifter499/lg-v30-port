@@ -1116,3 +1116,66 @@ path against mainline, especially:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+## Aurel follow-up — K027 decoded as TZ CONF_NOC_ERR; clk/power-retention attempt inconclusive
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-06
+
+K026's returned downstream bootreason `0x6D630309` is now decoded using a public
+older LG/QCOM header from the bullhead msm kernel:
+
+- URL: `https://android.googlesource.com/kernel/msm.git/+/android-msm-bullhead-3.10-n-preview-1/include/soc/qcom/lge/reboot_reason.h?format=TEXT`
+- Preserved artifact: `out/aurel-k027-public-bullhead-reboot_reason.h`
+- Header hash: `90e24ee46dfedef922c02a55f492b01af460bbbdae1a1c9c3bd40e4fdb8b0355`
+- Relevant define: `LGE_ERR_TZ_CONF_NOC_ERR = 0x0009`
+
+Therefore `0x6D630309 = LGE_RB_MAGIC | LGE_ERR_TZ | LGE_ERR_TZ_CONF_NOC_ERR`.
+The reset is specifically being reported by the downstream boot chain/kernel as a
+TrustZone Config NoC error, not only a generic TZ-class event.
+
+Comparison notes:
+
+- Downstream MSM8998 includes Qualcomm legacy `msm_bus`/NoC/BIMC fabric plumbing
+  and many `qcom,msm-bus` vote tables (`qseecom-noc`, `qcrypto-noc`,
+  `qcedev-noc`, `msm-rng-noc`, UFS, USB, IPA, PCIe, Venus, TSIF, etc.).
+- Mainline MSM8998/joan has generic QCOM interconnect support enabled in `.config`,
+  but no MSM8998 ICC provider and no MSM8998/joan interconnect votes in the active
+  DT.
+- A cheap cmdline-only discriminator was built to keep bootloader-enabled clocks and
+  power domains from being disabled: `clk_ignore_unused pd_ignore_unused`, retaining
+  the K023 `panic=0` classifier.
+
+Artifacts:
+
+- Result: `out/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`
+- Image: `out/boot-joan-clkpd-k027.img`, sha256
+  `60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e`
+- Cmdline artifact: `out/aurel-k027-clkpd-cmdline-2026-07-06.txt`, sha256
+  `cd7ec2fb23b86cc00fcd34f433f1bfbfcaee4573f2be24833cadb3588f400ace`
+- Fastboot/attempt log: `out/aurel-k027-clkpd-fastboot-2026-07-06.txt`, sha256
+  `92fd7bec7355c4cb62978904186e013ec976bd7a3dc6a7225c0a4e455af491df`
+- Passive post-timeout observation: `out/aurel-k027-post-timeout-observe-2026-07-06.txt`,
+  sha256 `bf7dad650ef88d18b97a4e784b6980e33ddf68d523722f68d694d85176adedb1`
+
+Device result:
+
+- **Inconclusive / not a valid device test.**
+- No `fastboot boot` `Sending`/`Booting` OKAY was captured.
+- Normal-user `fastboot boot out/boot-joan-clkpd-k027.img` timed out after 45s;
+  immediate diagnostics first saw a fastboot USB device with `no permissions`, then
+  the phone disappeared from adb/fastboot/USB entirely.
+- A 224s passive observation loop saw no adb device, no fastboot device, and no
+  LG/Google/Qualcomm phone USB device.
+- No PON readback was possible.
+
+Interpretation:
+
+- K027's source decode is useful and should be carried forward: the clue is
+  `TZ_CONF_NOC_ERR`.
+- The clk/power-retention image is neither accepted nor rejected; it still needs a
+  valid one-client sudo-fastboot retry after physical phone recovery.
+- Do not spend more remote attempts while the phone is absent from USB. After
+  recovery, either retry the exact K027 image once or move to a better-supported
+  NoC/config-fabric oracle based on downstream MSM8998 bus/ICC parity.
