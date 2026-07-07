@@ -1474,3 +1474,43 @@ the confirmed anoc1 skip-reset baseline (previous K023 eliminations were
 proven under the old NoC-fault regime and may not all transfer), or look
 for other PON/QSEE-log detail that distinguishes `UNDEFINED_CRITICAL_ERROR`
 from a plain unhandled watchdog.
+
+## K032 — clk/pd retention is NOT load-bearing; anoc1 skip-reset alone is the real fix
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Same DTB/kernel as K030 (anoc1-only skip-reset), cmdline changed to
+**plain default** (`androidboot.hardware=joan panic=0 ignore_loglevel`,
+no `clk_ignore_unused pd_ignore_unused`). Image
+`out/boot-joan-skipreset-defaultcmdline-k032.img`, sha256
+`2d172bdde1fdcbce6fcc18701a696b556d028ea67d8a18eb2781f9c063820d30`.
+Runner `out/ember-k032-valid-retry-2026-07-07.log`.
+
+Result: **identical to K030/K031** — LOS returned t+48s (37s after
+handoff), PON PS_HOLD, bootreasoncode `0x20`
+(`UNDEFINED_CRITICAL_ERROR`), `hiddenreset=0`. The cmdline change made
+no observable difference whatsoever.
+
+**Correction to the K027-era hypothesis (docs/k028-conf-noc-sweep-
+hypothesis-2026-07-07.md and the K027/K028/K029 readings that built on
+it):** the late clk/genpd sweep retention was never actually the fix.
+It was a coincidental correlation — present in K027 when the deeper
+MM_NOC fault first surfaced, absent when K028/K029's *subtractions*
+regressed things, which read as "retention matters." It doesn't. The
+real, load-bearing fix the whole time was `anoc1_smmu`'s reset being
+skipped; K032 proves the cmdline flags contribute nothing once that's
+in place. **Confirmed clean baseline going forward: full, otherwise-
+untouched joan DTS + `&anoc1_smmu { ember,debug-skip-reset; };` (the
+K030 kernel patch) + plain default cmdline.** No cmdline workaround
+needed.
+
+This simplifies the standing question from K030/K031: with cmdline
+noise eliminated, the only remaining unknown is what produces
+`UNDEFINED_CRITICAL_ERROR` (0x20). Next: re-run the K023e capstone
+(disable every removable board peripheral: `usb3`, `qusb2phy`, `ufshc`,
+`ufsphy`, `wifi`, `pm8005_regulators` — RPM stays enabled, matching
+K023e's original list) on top of this new confirmed baseline, to learn
+whether the residual fault is peripheral-side or core/firmware-side,
+same question K023e answered for the old NoC fault.
