@@ -1277,3 +1277,48 @@ Next: **K028 = K027 cmdline + `&rpm_requests` disabled** (proven K023d DTS
 edit) — removes the whole RPM stratum under retention. Survive ⇒ split
 regulators vs clk-handoff next. Reset ⇒ RPM stratum innocent; read the new
 label and peel the next stratum (SMMU blacklist pass is staged as K029).
+
+## K028 — RPM disabled (on top of K027) REGRESSES to Config NoC; RPM must stay enabled
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Onion-peel step 2. Built `&rpm_requests { status = "disabled"; }` (K023d
+pattern) on top of K027's DTS+cmdline (full joan DTS otherwise,
+`clk_ignore_unused pd_ignore_unused`). DTS: `out/ember-k028-norpm-clkpd-
+2026-07-07.dts`, DTB via cpp+dtc (kernel Image.gz unchanged, Jul 6 16:39
+build). Image `out/boot-joan-norpmclkpd-k028.img`, sha256
+`068fee7299dcfafa90de5ede5b92f35240b2b5d61497c7a01f28467b246b1ecf`. Runner
+`out/ember-k028-valid-retry-2026-07-07.log`.
+
+Result: **reset persists**, LOS returned t+61s (49s after handoff), PON
+PS_HOLD. Bootreasoncode: **`0x6D630309` (TZ_CONF_NOC_ERR) — back to K026's
+code, NOT K027's `0x6D630306` (TZ_MM_NOC_ERR).**
+
+Interpretation: removing RPM regresses past the point K027 had reached.
+RPM's `clk-smd-rpm` icc_clks handoff (one-shot INT_MAX vote to RPM firmware
+for aggre1/aggre2 NoC, BIMC, SNoC, **CNoC**, MMSS NoC AXI at probe, never
+lowered, never CCF-registered so unsweepable) is load-bearing scaffolding:
+with it gone, boot re-hits the same Config NoC wall K026 hit. With it
+present (K027) AND the late clk/genpd sweeps also held off, boot gets
+further and a **different, MM-specific** NoC fault surfaces instead —
+implying the Config NoC failure needs BOTH an RPM bus/QoS vote AND a
+clock the late sweep would otherwise kill; removing either one re-exposes
+it. **Binding: keep `&rpm_requests` ENABLED in all further tests}** — this
+is scaffolding to preserve, not a suspect.
+
+Ledger correction to K023d: that earlier no-RPM-alone test (default
+cmdline, sweeps ON) also showed "reset persists" — now understood as
+*also* hitting the Config NoC wall (RPM removed = its own separate route
+to the same CNoC failure), not evidence RPM/regulators are unrelated to
+NoC health as originally read.
+
+Next (K029, queued/running): keep K027's base (RPM enabled, clk/pd
+retained) and peel a component specifically on the **MM** side. Candidate
+selected: `anoc1_smmu` (iommu@1680000) — the only SMMU in msm8998.dtsi
+with zero `iommus=` consumers anywhere in the tree and no `clocks=`
+property at all, yet `status` defaults enabled, so arm-smmu-v2 still
+probes/touches it with nothing voting for its fabric segment. anoc2
+(wifi), adreno_smmu (gpu), mmss_smmu (video, inert since MMCC=m defers it)
+are left untouched.
