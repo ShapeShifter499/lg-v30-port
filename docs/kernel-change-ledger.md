@@ -1552,3 +1552,82 @@ Next (K034): disable the APSS watchdog node entirely (`status =
 "disabled"` on the joan `&soc` watchdog override, not a pet) on top of
 this same confirmed baseline, as a genuinely new manipulation distinct
 from K024's kernel-side pet.
+
+## K035 — IMEM oracle test INCONCLUSIVE: device landed in an unfamiliar stuck state, session paused
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-07
+
+Reintroduced Ember's 2026-07-06 IMEM-oracle initcall
+(`drivers/soc/qcom/joan_imem_oracle.c`, originally commit `f0d368d28` on
+branch `joan/imem-oracle`, not present on `joan/latest-clean-test` until
+now) on top of the confirmed K030 baseline (anoc1_smmu skip-reset). The
+oracle writes a deliberately distinctive seed (`0x6D6303EE`, chosen to be
+unmistakable against any real LGE subcode) to the IMEM restart-reason
+offset (`0x146bf000 + 0x65c`) from an `early_initcall`, before whatever
+causes the reset. Combined debug patch saved to
+`out/ember-k035-imem-oracle-plus-smmu-debug.patch`. Verified both
+`"joan-imem:"` strings and the K030 SMMU string present in `vmlinux`
+before testing. Image `out/boot-joan-imemoracle-k035.img`, sha256
+`d95be8064b8b09b27f4f9c84a5a3c611ae886ed0de7b773b235fd2961f3bffed`.
+
+`fastboot boot` succeeded normally (`Sending`/`Booting` OKAY, handoff at
+t+11s). But **no LineageOS return within the 300s cap** — the runner
+correctly stopped itself (`out/ember-k035-valid-retry-2026-07-07.log`,
+exit 12) rather than guessing. Immediate passive check found: `adb
+devices` empty, `fastboot devices` empty, but `lsusb` showing a **new,
+unfamiliar USB identity** — `1004:6340 LG Electronics, Inc. LGE Android
+Phone` (vendor `0x1004` is LG's own, distinct from the normal ADB
+identity `18d1:4ee7` every prior successful return has shown). A further
+215-second **passive, read-only** observation window (`adb devices`,
+`fastboot devices`, `lsusb` only — no commands sent to the device) showed
+**zero change** — this is not a slow boot, the device is sitting in some
+LG-specific mode (possibly LAF/diagnostic/download) that neither `adb`
+nor `fastboot` currently reaches.
+
+**No further remote device commands attempted past this point** per the
+standing safety rules (device work requires Lance physically present;
+avoid guessing against unfamiliar LG modes; the project has already hit
+this exact "phone vanishes from USB mid-test" shape of problem once
+before, during Aurel's original K027 attempt).
+
+Working theory (recorded as a hypothesis, not a conclusion): this is the
+**9th consecutive** RAM-boot-then-abnormal-PS_HOLD-reset cycle this
+session (K027 retry through K035). Many Android/LG bootloaders implement
+a boot-loop counter that deliberately falls back to a diagnostic/download
+mode after N consecutive abnormal resets, as a *protective* measure, not
+damage. If correct, a normal boot into LineageOS (which this phone has
+reached cleanly after every single prior test) should reset that
+counter, and the device should recover with a plain forced restart
+(Power + Volume-Down, the same safe, storage-non-destructive recovery
+already used on the H932 in this project). This has NOT been confirmed —
+it is the leading hypothesis, offered for Lance's judgment when he is
+next available, not an instruction to act on unilaterally.
+
+The K035 test itself (does the seed survive unmodified?) is therefore
+**not yet answered** — it must be retried once the device is confirmed
+responsive again, ideally with a longer test-side timeout margin (the
+300s cap was fine for every prior test's ~30-60s returns, but should
+probably grow to account for any future slow-boot variance) and with
+Lance present.
+
+## SESSION PAUSE — awaiting physical device recovery
+
+State at pause:
+- Harness repo (`lg-v30-port`): clean, all findings through K034 + this
+  K035 entry committed.
+- Kernel repo (`linux-mainline-v30`): **dirty** — both debug patches
+  still applied (`arm-smmu.c` skip-reset gate, new
+  `joan_imem_oracle.c` + Makefile line). Deliberately left in place
+  (not reverted) so testing can resume immediately once the device
+  recovers, rather than losing K035's setup. Full patch saved at
+  `out/ember-k035-imem-oracle-plus-smmu-debug.patch` regardless.
+- Device: unresponsive to `adb`/`fastboot`, `lsusb` shows `1004:6340`.
+  **Needs Lance's physical attention** (a normal forced restart is the
+  expected, safe recovery — no flashing, no storage write, matches the
+  device's own established recovery pattern).
+- Confirmed, load-bearing result from this session, independent of the
+  pause: **`anoc1_smmu` skip-reset (K030) is a real fix for a real, named
+  TrustZone Config/MM-NoC fault.** That finding is solid and already
+  fully documented regardless of what happens next with the device.
