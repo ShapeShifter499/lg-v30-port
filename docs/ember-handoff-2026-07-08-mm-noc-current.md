@@ -71,6 +71,21 @@ First systematic look at how OTHER msm8998 mainline ports handle this
   most likely from a different boot, and this reset is the event-driven
   MM_NOC fabric fault. joan's `watchdog@17817000` node is not helping and
   could be dropped. Full detail: ledger "Community research + K037" entry.
+- **Bootloader display CLEARED (K038).** Tested the display-underflow
+  theory directly: a debug initcall disabled both DSI controllers + the DPU
+  INTF timing engines (authoritative offsets, non-secure regs) on the
+  anoc1-fix baseline. Reset persisted at ~44s, `0x20` — the bootloader-left
+  display is NOT the MM_NOC cause (msm8998's panel is command-mode, so the
+  MDP goes idle after the last kickoff and isn't DMAing the splash to
+  underflow). Reverted.
+- **Linux-side leads are now EXHAUSTED.** No mainline driver touches the MM
+  subsystem in bring-up (DRM_MSM=m, MMCC=m, no GPU — none load). With the
+  watchdog, display, peripherals, clock-sweep class, and SMMUs-beyond-anoc1
+  all eliminated, there is no remaining "a Linux driver/DTS touches an MM
+  block" candidate. MM_NOC is one of exactly two bigger efforts: (1) the
+  full msm8998 interconnect provider (systematic missing NoC config; the
+  Config-NoC→MM-NoC layering supports it), or (2) TZ-side secure/SCM
+  archaeology (Aurel's domain). No cheap Linux-side test remains.
 
 ## 1. Confirmed fix: `anoc1_smmu` skip-reset (K030)
 
