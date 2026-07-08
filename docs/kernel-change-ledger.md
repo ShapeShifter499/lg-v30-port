@@ -2191,3 +2191,53 @@ programs the MM-NoC QoS mode), replicating what downstream's msm_bus does
 for the mnoc fabric. If that stops the fault, THEN write the full,
 properly-attributed provider. If not, the interconnect path is likely a
 dead end and we saved the big build.
+
+## K039 (interconnect small pass) — MMCC=y (MM clock/power management) does NOT change the fault
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+The interconnect QoS programming requires the MMSS clocks/GDSC up (per
+downstream `node-qos-clks` on each MM master), so MMCC being built-in is a
+PREREQUISITE for the interconnect path. Tested that prerequisite alone as
+the small pass: `CONFIG_MSM_MMCC_8998=y` (was =m, never loaded in bring-up)
++ anoc1-fix DTB + `clk_ignore_unused pd_ignore_unused` (so the now-registered
+MMSS clocks aren't swept). Image `out/boot-joan-mmcc-k039.img` sha256
+`d7a74484398518e334921038616e9f0a783f13bd4988dba8a492347d9a837f31`.
+
+Result: **reset persists at ~30s (t+43, handoff t+13), 0x20, unchanged.**
+Bringing up MM clock/power management (with clocks held) does not affect
+the MM_NOC fault. Caveat: with clk_ignore_unused the MMSS clocks stayed on
+either way (MMCC=m left them on too), so the hardware state was similar —
+this weakly tests "MM management present" but doesn't exercise active MM
+QoS/vote programming. Not a strong negative, but no signal.
+
+Reverted MMCC back to =m (clean baseline). MMCC=y is available to
+re-enable for the larger pass (the full ICC provider needs it).
+
+## Interconnect path — honest status before the larger pass (decision point)
+
+The small-pass explorations have not produced a signal:
+- MMCC=y (K039): no change.
+- QoS programming: doubtful (no active MM master — K038; QoS is arbitration
+  not fault-gating) AND requires precise blind NoC register pokes (hang
+  risk, no console).
+- RPM bw-vote: risky (RPM comms, blind), and NoC errors aren't obviously
+  "vote timeouts."
+
+The larger pass (full msm8998 ICC provider, ~1700 lines derived from
+sdm660.c/msm8996.c) remains the definitive test, BUT:
+1. It's a big blind build — joan has no console, so a probe failure is a
+   silent boot-fail indistinguishable from "didn't fix it." Very hard to
+   develop correctly blind.
+2. It's a substantial adaptation of AngeloGioacchino Del Regno's /
+   Yassine Oudjana's GPL work (attribution plan recorded in
+   docs/public-upstreaming-plan.md).
+3. Confidence it fixes MM_NOC is LOW — no mechanistic theory survives
+   scrutiny (no active master; QoS/vote don't cleanly explain a NoC error).
+
+Recommendation: this is a genuine fork for Lance. The full provider is a
+days-scale, low-confidence, hard-to-debug-blind effort. The alternative is
+to accept the Linux side is exhausted and take the TZ-side secure route
+(Aurel), where the fault detail actually lives. Recorded for the decision.
