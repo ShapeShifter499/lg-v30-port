@@ -2456,7 +2456,7 @@ end for joan's command-mode panel. Observability paths that remain:
    live display. Software-testable, non-destructive.
 Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
 
-## K042 WIP — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (not built/tested yet)
+## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (built, not device-tested yet)
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
@@ -2483,7 +2483,17 @@ Handles/evidence:
   `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`
 - Patch sha256:
   `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`
-- Touched files in that saved patch:
+- Build log:
+  `out/aurel-k042-build-2026-07-08.log`
+- Build log sha256:
+  `e81c6d94ecf3124100009838b4405cd92a223bacb23d5972560c91ecef1b7a20`
+- Packaged RAM-only boot image:
+  `out/boot-joan-smmu-cfgprobe-k042.img`
+- Boot image sha256:
+  `bc8099c241dc18865079e4fffce95d13cb9f3885705ae67ac2f570ec3fd85c4f`
+- Packaged cmdline:
+  `androidboot.hardware=joan panic=0 ignore_loglevel`
+- Touched files in the saved patch:
   - `drivers/iommu/arm/arm-smmu/arm-smmu.c` — carries Ember K030 debug
     `ember,debug-skip-reset` gate in `arm_smmu_device_reset()`;
   - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` — adds the K030
@@ -2500,16 +2510,26 @@ Verification/state at record time:
 - Build attempt 1 accidentally omitted `ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-`
   and failed with host GCC rejecting arm64 flags (`-mlittle-endian`,
   `-msign-return-address=non-leaf`).
-- Build attempt 2 used the documented cross toolchain
-  `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image.gz
-  qcom/msm8998-lge-joan.dtb`, but the session was interrupted before completion
-  after Kconfig prompted for new upstream symbols. No K042 `Image.gz`, boot image,
-  or device result exists yet.
-- Current classification: **not tested**. Do not infer success/failure.
+- Build attempt 2 was interrupted by the session before completion, after Kconfig
+  prompted for new upstream symbols.
+- Final build settled config noninteractively with
+  `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig`, which reported
+  `No change to .config`, then built successfully with
+  `make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image.gz
+  qcom/msm8998-lge-joan.dtb`.
+- Built artifact hashes:
+  - `Image.gz`: `c1571e4e6c4d0282815ff3ebf1901965c904db1a69e161e0a807854386186a77`
+  - `msm8998-lge-joan.dtb`: `29ff3d3e31d495e3b0c82205b2362e03d6f875372df8c3af63da2261165fbda5`
+  - `vmlinux`: `f496cd27ba8807dcaf0fd81d037ce4ab48e7f0255ea3beca90b0d39b954d3ca5`
+- `strings vmlinux | grep -E 'EMBER K030|AUREL K042'` verified both debug
+  strings are present:
+  - `EMBER K030 DEBUG: skipping global SMMU reset`
+  - `AUREL K042 DEBUG: skipping MSM8998 S2CR bypass quirk probe`
+- Current classification: **built but not device-tested**. Do not infer
+  success/failure.
+- Current live phone state before any K042 device action: LineageOS adb visible as
+  `LGUS9986e606d55` and USB `18d1:4ee7`; no fastboot action taken yet for K042.
 
-Next if continuing K042: settle config noninteractively first (for example
-`make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig`, after verifying
-the intended joan/QCOM options), rebuild `Image.gz` + joan DTB, package a
-`panic=0` RAM-only image, verify `strings vmlinux` contains both the K030 and
-K042 debug strings, then run exactly one `sudo -n fastboot boot` via
-`scripts/tethered-test.sh` while Lance is physically present.
+Next if continuing K042: with Lance physically present and ready, run exactly one
+RAM-only test through `scripts/tethered-test.sh out/boot-joan-smmu-cfgprobe-k042.img`
+(or equivalent one-client `sudo -n fastboot boot` flow).

@@ -141,10 +141,10 @@ When opening a public PR or patch series, include:
 - K041 rejected late-Linux `simple-framebuffer` as an observability path on joan's
   command-mode panel; do not reintroduce simplefb/fbcon as a public patch unless a
   separate early-display mechanism is proven.
-- K042 is currently a saved WIP debug oracle only: it suppresses MSM8998 Qualcomm
-  SMMU cfg-probe's S2CR bypass-quirk write/read on top of K030. It has not built
-  to a tested image yet and is `do not publish` unless it becomes a clean,
-  justified upstream fix.
+- K042 is currently a built debug oracle only: it suppresses MSM8998 Qualcomm
+  SMMU cfg-probe's S2CR bypass-quirk write/read on top of K030. A RAM-only
+  image exists, but it has not been device-tested yet and is `do not publish`
+  unless it becomes a clean, justified upstream fix.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
@@ -172,7 +172,7 @@ change.
 | `joan_imem_oracle.c` (debug, reverted) | IMEM offsets + LGE_RB_MAGIC/reason constants from downstream `lge_handle_panic.c` / `reboot_reason.h` | Qualcomm/LGE | GPL-2.0 | debug-only, not for upstream; constants credited in comments |
 | `joan_disp_quiesce.c` (debug, reverted) | DSI/DPU register offsets from mainline `dsi.xml` + `dpu_3_0_msm8998.h` | (same GPL kernel tree — not external) | GPL-2.0 | debug-only |
 | `out/aurel-k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Aurel) | GPL-2.0 | reference only |
-| K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Aurel code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`; debug-only, not built/tested yet, do not publish |
+| K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Aurel code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`; built as `out/boot-joan-smmu-cfgprobe-k042.img` sha256 `bc8099c241dc18865079e4fffce95d13cb9f3885705ae67ac2f570ec3fd85c4f`; not device-tested yet, do not publish |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
 | initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
 
