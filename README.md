@@ -159,11 +159,12 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   300s; a 215-second passive, read-only observation then found the
   phone sitting in an unfamiliar LG-vendor USB mode (`1004:6340`, not the
   normal ADB `18d1:4ee7`), unreachable by `adb`/`fastboot`. **No further
-  remote commands were attempted.** Leading (unconfirmed) theory: a
-  boot-loop protection counter after 9 consecutive abnormal resets in a
-  row this session — likely just needs a plain forced restart
-  (Power+Volume-Down, the H932's established recovery pattern), **not**
-  flashing/KDZ territory. Full detail:
+  remote commands were attempted.** Cause confirmed by Lance: the USB 3.0
+  port didn't keep the phone charged through 9 consecutive
+  RAM-boot-then-reset cycles this session — not a bootloader/firmware
+  issue. Fix: moved to a USB 2.0 port. Standing caution for future long
+  device-test sessions: watch battery/charge state across many
+  consecutive tethered boots. Full detail:
   `docs/ember-handoff-2026-07-07-k029-onion-peel.md`.
 - **New reusable tooling:** `scripts/tethered-test.sh` extracts the full
   tethered-boot workflow (one-client fastboot discipline, LOS-return

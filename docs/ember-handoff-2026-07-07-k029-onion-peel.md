@@ -2,25 +2,26 @@
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
-Date: 2026-07-07 (SESSION PAUSED — see banner below)
+Date: 2026-07-07, updated 2026-07-08 (SESSION PAUSED — see banner below)
 
-## SESSION PAUSED — device stuck, needs Lance's physical attention
+## SESSION PAUSED — device recovering, cause confirmed (USB power, not firmware)
 
 After 9 consecutive RAM-boot-then-reset cycles (K027 retry through K035),
-the phone landed in an unfamiliar state: `lsusb` shows `1004:6340` (LG's
+the phone landed in an unfamiliar state: `lsusb` showed `1004:6340` (LG's
 own vendor ID, not the normal `18d1:4ee7` ADB identity every prior
-successful return showed), and neither `adb` nor `fastboot` reach it. A
-215-second passive, read-only observation window showed zero change — not
-a slow boot, genuinely stuck. **No further remote device commands were
-attempted.** Full detail in the ledger's K035 entry.
+successful return showed), and neither `adb` nor `fastboot` reached it. A
+215-second passive, read-only observation window showed zero change. No
+remote device commands were attempted past that point.
 
-Working theory (unconfirmed, offered for Lance's judgment): a boot-loop
-protection counter in LG's bootloader, falling back to a diagnostic mode
-after many consecutive abnormal resets — a normal, protective response,
-not damage. A plain forced restart (Power + Volume-Down) is the expected
-safe recovery, matching the H932's established recovery pattern. **Do
-not attempt KDZ/flash/exotic recovery tools — this almost certainly just
-needs a normal restart once Lance is available.**
+**Cause confirmed by Lance (2026-07-08): the USB 3.0 port didn't keep the
+phone charged through 9 consecutive tethered-boot cycles.** Not a
+bootloader boot-loop counter, not any firmware protection mechanism, not
+damage — a mundane power-delivery issue from that specific port. Fix:
+moved the phone to a USB 2.0 port. Lance will confirm when it's back
+online. Standing caution for future long device-test sessions: watch
+battery/charge state across many consecutive tethered boots, and prefer
+a USB 2.0 port (or otherwise-verified adequate charging) for extended
+runs.
 
 The confirmed win from this session (the `anoc1_smmu` skip-reset fix,
 K030) stands regardless of this pause — it eliminated a real, named
