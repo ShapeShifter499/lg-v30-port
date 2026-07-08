@@ -1795,3 +1795,46 @@ Resets early → check the reported bootreasoncode: same `0x20`/MM NoC
 family → this hypothesis is wrong or incomplete, look for a different
 MM-NoC-adjacent block; something else entirely → new information,
 follow it.
+
+## K036 result — REJECTED, sibling MMSS-NoC-bridge clocks are not the cause
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Device-tested with Lance present (phone recovered from K035's crash
+screen via Volume-Down hold, confirmed healthy before testing).
+`scripts/tethered-test.sh out/boot-joan-mmnoc-critical-k036.img 300`.
+
+Result: **reset persists**, LOS returned t+43s (30s after handoff, same
+ballpark as every test in this arc), PON PS_HOLD, bootreasoncode still
+`0x20` (`UNDEFINED_CRITICAL_ERROR`, understood since K035 as almost
+certainly MM_NOC in Android's generic mis-reporting). Marking
+`gcc_mmss_sys_noc_axi_clk`, `gcc_mmss_qm_ahb_clk`, and
+`gcc_mmss_qm_core_clk` `CLK_IS_CRITICAL` — matching their sibling
+`gcc_mmss_noc_cfg_ahb_clk`'s existing, documented protection — made no
+observable difference.
+
+**Rejected.** These three specific clocks are not the (sole) cause of
+the MM NoC fault. The hypothesis was well-motivated (same register bank,
+same documented RPM-interaction crash class as an already-protected
+sibling) but wrong, or at best incomplete. Reverted from the kernel tree
+(patch remains saved at `out/ember-k036-mmnoc-critical-clocks.patch` for
+reference; do not reapply without new evidence). Kernel tree returns to
+carrying only the confirmed K030 `anoc1_smmu` skip-reset fix.
+
+Standing target unchanged: **MM NoC (`0x6D630306`) still not fixed.**
+Eliminated so far: board peripherals (K033), APSS watchdog (K034), RPM
+removal (K028, regresses), anoc1_smmu removal (K029, regresses), the
+other 4 SMMUs' reset behavior (K030 vs K031, identical), cmdline/sweep
+retention (K032), and now these 3 sibling GCC clocks (K036). Next
+candidates to consider: other sweepable GCC clocks feeding NoC segments
+(`gcc_aggre1_noc_xo_clk` — same "aggre1"/anoc1 NoC segment as the
+already-fixed SMMU, but the XO reference clock rather than the SMMU
+itself, a genuinely different mechanism worth checking; `gcc_boot_rom_ahb_clk`;
+`gcc_cfg_noc_usb3_axi_clk`; `gcc_bimc_hmss_axi_clk`), or reconsider
+whether `mmss_smmu` is truly fully inert (verify `&mmcc` really never
+resolves in this exact boot rather than continuing to trust the
+K023-era read), or look for a missing NoC/BCM bandwidth vote analogous
+to `anoc1_smmu`'s downstream `qcom,msm-bus` entry but for whatever block
+actually triggers MM_NOC specifically.
