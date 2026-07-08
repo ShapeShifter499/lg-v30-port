@@ -150,21 +150,38 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   downstream's own boot chain logs `0x20` as `"not handled, defaulting to
   Normal Boot"` — it may not be a live TZ-detected code at all, possibly
   just IMEM's resting state once no detector writes to it.
-- **K035 (IMEM seed oracle) is INCONCLUSIVE — session paused.**
+- **K035 (IMEM seed oracle): device photo reveals MM_NOC is still the
+  real fault, and the test itself likely crashed the firmware.**
   Reintroduced Ember's 2026-07-06 IMEM-oracle initcall
   (`drivers/soc/qcom/joan_imem_oracle.c`) on the confirmed K030 baseline
   to write a distinctive seed (`0x6D6303EE`) to the restart-reason offset
-  before the reset, to test directly whether any TZ detector still
-  fires. `fastboot boot` succeeded, but LineageOS never returned within
-  300s; a 215-second passive, read-only observation then found the
-  phone sitting in an unfamiliar LG-vendor USB mode (`1004:6340`, not the
-  normal ADB `18d1:4ee7`), unreachable by `adb`/`fastboot`. **No further
-  remote commands were attempted.** Cause confirmed by Lance: the USB 3.0
-  port didn't keep the phone charged through 9 consecutive
-  RAM-boot-then-reset cycles this session — not a bootloader/firmware
-  issue. Fix: moved to a USB 2.0 port. Standing caution for future long
-  device-test sessions: watch battery/charge state across many
-  consecutive tethered boots. Full detail:
+  before the reset. `fastboot boot` succeeded, but LineageOS never
+  returned; the phone landed in an unfamiliar USB mode
+  (`1004:6340`) first thought to be a USB 3.0 charging issue (it briefly
+  was, on an earlier pass, and moving to USB 2.0 fixed that) — but this
+  time Lance photographed the actual screen, revealing LG's UEFI-level
+  crash handler (never seen before in this project). Transcribed at full
+  photo resolution: an early-boot `tzbsp_reason: 0x6d630301`
+  (TZ_NON_SEC_WDT) followed later in the same boot by **`tzbsp_reason:
+  0x6D630306` — the same MM_NOC fault first found in K027** — then a
+  firmware `DXE_ASSERT!: [ResetRuntimeDxe] String.c (199)` NULL-pointer
+  crash and entry into Sahara mode (why neither `adb` nor `fastboot`
+  could reach it; recovered with a plain Volume-Down hold, per the
+  screen's own instructions).
+  **Conclusions:** (1) the residual fault K033/K034 saw as a generic
+  Android-property `0x20` was almost certainly this same MM_NOC value,
+  mis-reported/genericized by Android's own property layer rather than
+  a new third fault — their peripheral/watchdog eliminations still
+  stand, just against MM_NOC specifically, not an unnamed one; (2) the
+  DXE_ASSERT/Sahara crash is most likely a side effect of the IMEM
+  write landing near a string/pointer structure XBL's own
+  `ResetRuntimeDxe` also uses — this exact firmware crash never
+  appeared in any earlier test, including several that also hit
+  MM_NOC/Config NoC resets, and the only new variable this time was
+  that write. **Do not reuse a raw, unverified IMEM write at this offset
+  again.** The IMEM-oracle addition has been reverted from the kernel
+  tree (the confirmed-good `anoc1_smmu` skip-reset patch remains).
+  Full detail: `docs/kernel-change-ledger.md` (K035 entries),
   `docs/ember-handoff-2026-07-07-k029-onion-peel.md`.
 - **New reusable tooling:** `scripts/tethered-test.sh` extracts the full
   tethered-boot workflow (one-client fastboot discipline, LOS-return
@@ -172,16 +189,17 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   documented script, replacing this week's ephemeral per-test copies so
   future sessions/agents don't re-derive it from scratch. It also
   explicitly distinguishes "device absent" / "unfamiliar USB state, stop"
-  / "still fastboot, probably just slow" outcomes, which the K035 pause
-  had to work out manually.
-- **Next device action (Lance present, phone confirmed responsive):**
-  passively confirm recovery first (`adb devices` / `fastboot devices` /
-  `lsusb`), then retry K035
-  (`out/boot-joan-imemoracle-k035.img`) once via
-  `scripts/tethered-test.sh`, with a longer timeout margin than the 300s
-  used this session. If the seed survives unmodified, no TZ detector
-  remains active and the residual reset needs a different oracle; if
-  it's overwritten, read what replaced it.
+  / "still fastboot, probably just slow" outcomes.
+- **Next device action:** the standing target is unchanged and now
+  clarified rather than widened — **MM_NOC (`0x6D630306`) is still not
+  fixed**, and K033/K034 already showed it's neither a board peripheral
+  nor the APSS watchdog. Continue narrowing from "SoC core, always
+  present regardless of DTS peripheral toggles" (RPM is confirmed
+  required scaffolding, do not remove it again). No IMEM-write oracle
+  needed for now — the confirmed K030 baseline (full DTS + anoc1 skip-
+  reset + plain default cmdline) plus `scripts/tethered-test.sh` is
+  sufficient to keep reading the reset classification via the normal
+  Android bootreasoncode property.
 
 ## Previous status (2026-07-06)
 
