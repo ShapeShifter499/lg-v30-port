@@ -1917,3 +1917,28 @@ path is a confirmed no-op on joan. **Cleared: TLMM/pinctrl-msm is not a
 match for the "unconditional TZ-block touch" pattern.** Remove it from
 the candidate list; the QUP/GENI/BLSP serial family and a secure/SCM
 archaeology pass from the TrustZone side remain the live candidates.
+
+## Source-only check: QUP/GENI/BLSP family also does not match the anoc1_smmu pattern
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Second and final source-only check of the K036 correction's candidate
+list. MSM8998 predates Qualcomm's GENI/QUP peripheral IP entirely (that
+generation starts around sdm845) — it uses the older BLSP (Blsp Serial
+Processor) design, where each UART/I2C/SPI instance is a fully
+independent platform device with its own dedicated driver, and there is
+no shared BLSP-wide wrapper/bus controller node in `msm8998.dtsi` that
+would probe regardless of which individual peripherals a board enables.
+Only `blsp2_uart1` is enabled in joan's board file; every sibling
+instance defaults `status = "disabled"` and never probes at all. There
+is no cross-instance shared infrastructure here analogous to arm-smmu's
+five instances sharing one driver. **Cleared: no match.**
+
+Both Linux-side driver-family candidates raised in the K036 correction
+(pinctrl-msm/TLMM, QUP/GENI/BLSP) are now checked and cleared without
+a device test needed for either. This strengthens the case for the
+remaining candidate: **a secure/SCM archaeology pass from the
+TrustZone side is the most promising next direction**, not further
+Linux-driver subtraction.
