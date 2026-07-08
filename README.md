@@ -17,6 +17,7 @@ partition.
 
 Full background: `docs/recon-2026-07-04.md` (also on NC:
 `Shared_AI_agents_files/status/2026-07-04_lg-v30-joan-mainline-recon.md`).
+Project history / attribution index: `docs/project-history-and-attribution.md`.
 
 ## Repos and paths (all on nym-nest)
 

@@ -5,9 +5,10 @@ mainline the LG V30 (`joan`) enough for modern Linux/postmarketOS and, later,
 possibly a newer Android stack.
 
 This file is the kernel-change source of truth. README carries the short current
-status; detailed boot/debug evidence can live in dated handoff docs; this ledger
-tracks what changed, why, where it lives, whether it should survive upstreaming,
-and what evidence supports or rejects it.
+status; `docs/project-history-and-attribution.md` carries the one-glance
+who-worked-on-what timeline; detailed boot/debug evidence can live in dated
+handoff docs; this ledger tracks what changed, why, where it lives, whether it
+should survive upstreaming, and what evidence supports or rejects it.
 
 ## Rules for every agent
 

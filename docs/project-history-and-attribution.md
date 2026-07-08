@@ -1,198 +1,378 @@
-# LG V30 mainline project history and attribution
+# LG V30 project history and attribution index
 
-Purpose: give future humans/agents a one-glance timeline of who worked on what,
-when, and where the evidence lives. This is an index, not a replacement for the
-full evidence files.
+Purpose: one-glance history of who worked on what, when, and where the durable
+evidence lives for the LG V30 (`joan`, US998) mainline Linux bringup.
 
-If you continue this work, update this file before handoff whenever you add a
-new K-series result, public-candidate commit, borrowed-code source, or major
-handoff.
+This file is an index. It does not replace:
+
+- `README.md` — current operational status and safety rules;
+- `docs/kernel-change-ledger.md` — full K-series evidence ledger;
+- `docs/public-upstreaming-plan.md` — publishability/provenance rules;
+- dated handoffs under `docs/` — session narratives and current next-step state.
+
+## Attribution model
+
+All public-shaped kernel commits in this work are authored and DCO-certified by
+Lance:
+
+```text
+Signed-off-by: Lance <Gero3977@gmail.com>
+```
+
+AI/helper involvement is recorded with `Assisted-by`, not `Co-Authored-By`, and
+not AI `Signed-off-by` trailers. This follows the kernel.org/Linux Foundation
+coding-assistant convention already documented in `README.md` and
+`docs/public-upstreaming-plan.md`.
+
+For docs and shared artifacts, preserve greppable attribution blocks:
+
+```text
+Written-by: <agent/persona> (<agent id>)
+Agent-harness: <harness>:<model>
+Date: <date>
+```
+
+Never erase a prior agent's attribution. Append corrections or follow-ups with a
+new attribution block.
+
+## People / agents / roles
+
+| Actor | Role in this project | Attribution used |
+|---|---|---|
+| Lance | Device owner/operator, physical fastboot/phone approval, human DCO signer, final publication authority | `Signed-off-by: Lance <Gero3977@gmail.com>` |
+| Ember Nymbrand | Claude-Code agent that performed initial recon, early DTS/test harness work, the major 2026-07-06/07 onion-peel reset hunt, K022-K041 era handoffs, and many rejected-oracle docs | `Written-by: Ember Nymbrand (agent-ember)` / `Assisted-by: Claude-Code:claude-fable-5` where applicable |
+| Aurel Nymvale | Hermes agent that performed SCM/RPM/secure-world archaeology, K025-K027 follow-up work, K039-K040/K042 passes, documentation/provenance audits, WebDAV/Deck sync, and this index | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.5` |
+| Downstream LG/Qualcomm sources | Reference data for DTS, memory maps, watchdog/PON/SCM/RPM behavior, SMMU policy, restart reasons | Treat as GPL-2.0-derived unless independently sourced; cite exact files in ledger/provenance table |
+| Mainline / other msm8998 projects | Reference structure for msm8998 boards and planned upstreamable implementations | Preserve source authors/license/SPDX when borrowing code; see `docs/public-upstreaming-plan.md` |
+
+## Current repo state at this index
+
+Harness repo:
+
+- path: `~/vibe-coding-projects/coding/lg-v30-port/`
+- branch: `master`
+- latest committed state before this document: `2519246 docs: record K042 negative device test`
+
+Kernel repo:
+
+- path: `~/vibe-coding-projects/coding/linux-mainline-v30/`
+- active clean test branch: `joan/latest-clean-test`
+- upstream base: `8cdeaa50e` (`Linux 7.2-rc2`)
+- local public-shaped commits on top:
+  - `25a391c94` `arm64: dts: qcom: add initial LG V30 (joan) device tree`
+  - `a19ca9204` `arm64: dts: qcom: msm8998-lge-joan: match downstream ramoops layout`
+  - `7c906e841` `arm64: dts: qcom: msm8998-lge-joan: reserve LG firmware-owned memory`
+  - `0d7df4134` `arm64: dts: qcom: msm8998-lge-joan: add APSS watchdog node`
+- all four current kernel commits are authored by Lance and carry
+  `Assisted-by: Claude-Code:claude-fable-5`.
+
+Current technical status:
+
+- The phone accepts RAM-only `fastboot boot` and returns to LineageOS after the
+  failing tests.
+- Mainline still does not reach a durable mainline debug/userspace channel.
+- K030 found a real debug-only suppression: skipping global reset of `anoc1_smmu`
+  removes a TrustZone Config-NoC fault class.
+- The remaining blocker is still MM_NOC (`0x6D630306`) / early controlled reset.
+- K042 is now rejected: suppressing the MSM8998 Qualcomm SMMU cfg-probe S2CR
+  quirk-probe on top of K030 did not fix the reset.
+- No ready-to-test next device hypothesis exists at this document's creation.
+
+## Chronological history
+
+### 2026-07-04 — project start and recon
+
+Primary helper: Ember / Claude-Code.
+
+Main artifacts:
+
+- `docs/recon-2026-07-04.md`
+- initial `README.md` project home
+- initial kernel DTS commit lineage, later rewritten into `25a391c94`
+
+What happened:
+
+- Established the project goal: boot modern mainline Linux on LG V30 US998
+  without touching the installed Android/LineageOS system.
+- Confirmed there was no existing postmarketOS `device-lg-joan` port and no
+  obvious public mainline LG V30 tree.
+- Identified msm8998 prior art: OnePlus 5/5T, Sony yoshino, F(x)tec Pro1,
+  Xiaomi Mi 6, and laptop boards.
+- Started a minimal joan DTS from downstream LG data plus
+  `msm8998-oneplus-common.dtsi` patterns.
+
+Publication relevance:
+
+- This is the root of the eventual public DTS work.
+- The public provenance table now credits the OnePlus common DTS authors and
+  downstream Qualcomm/LGE data sources.
+
+### 2026-07-05 / early 2026-07-06 — first boot image and early debug harness
+
+Primary helper: Ember / Claude-Code.
+
+Main artifacts:
+
+- `make-testimage.sh`
+- initramfs work under `initramfs/`
+- `docs/bringup-debug-state-2026-07-06.md`
+- `docs/downstream-diag-2026-07-06.txt`
+
+What happened:
+
+- Built first bootable test images and proved the rough tethered boot loop.
+- Established that `fastboot boot` works when entered through
+  `adb reboot bootloader`.
+- Established binding safety rules: RAM-only tests, one fastboot client, no
+  phone storage writes, Lance physically present for device work.
+- Learned that several early observability ideas lied or were unavailable:
+  pstore/ramoops did not survive LG's boot chain, the initramfs busybox lacked
+  expected applets, and USB gadget channels did not appear before reset.
+- Produced downstream diagnostic capture for later comparison.
+
+Publication relevance:
+
+- Tooling and safety process are reusable evidence, not kernel payload.
+- The ramoops commit remains blocked because the device later proved pstore is
+  not a reliable debug path.
+
+### 2026-07-06 — public-shaped kernel stack and first reset hunt
+
+Primary helpers: Ember / Claude-Code, then Aurel / Hermes follow-ups.
+
+Clean kernel commits now on `joan/latest-clean-test`:
+
+| Commit | Purpose | Current public disposition |
+|---|---|---|
+| `25a391c94` | Initial joan DTS | upstream-candidate / needs cleanup |
+| `a19ca9204` | Match downstream ramoops layout | blocked until useful pstore story exists |
+| `7c906e841` | Reserve LG firmware-owned memory | likely upstream-candidate / needs cleanup |
+| `0d7df4134` | Add APSS watchdog node | blocked; behavior/placement not settled |
+
+Main docs/artifacts:
+
+- `docs/kernel-change-ledger.md` created
+- `docs/public-upstreaming-plan.md` created
+- `docs/ember-handoff-2026-07-06.md`
+- `docs/bringup-debug-state-2026-07-06.md`
+
+What happened:
+
+- The work shifted from "can we boot?" to "what resets the SoC before mainline
+  debug appears?".
+- Early hypotheses focused on secure watchdog, APSS watchdog, panic timing, SCM
+  calls, RPM/GLINK reachability, regulator defaults, PMIC/PON setup, DLOAD mode,
+  and IMEM/restart cookies.
+- Aurel added/recorded several secure-world and RPM liveness/state-change
+  oracles. They were useful negative evidence but did not solve the reset.
+- The ledger and public upstreaming plan became the durable evidence structure.
+
+Publication relevance:
+
+- This day created the distinction between public-shaped kernel commits and
+  rejected/debug-only oracle patches.
+- Many artifacts under `out/` are valuable evidence but are not for upstream.
+
+### 2026-07-06 session 2 — userspace/peripheral subtraction
+
+Primary helper: Ember / Claude-Code.
+
+Main artifacts:
+
+- `docs/ember-handoff-2026-07-06-session2.md`
+- `docs/nullinit-discriminator-run.md`
+- K022-K024 era entries in `docs/kernel-change-ledger.md`
+
+What happened:
+
+- Tested null-init and minimal-DTB/peripheral subtraction variants.
+- Proved the reset is not simply caused by userspace init behavior, USB, UFS,
+  RPM alone, or straightforward APSS watchdog petting.
+- Established stricter classifier semantics with `panic=0` and deliberate reboot
+  controls.
+
+Publication relevance:
+
+- These are not public patches, but they prevent repeating whole classes of bad
+  hypotheses.
+
+### 2026-07-06 / 2026-07-07 — secure interface, IMEM, and NoC clue
+
+Primary helper: Aurel / Hermes for several secure/SCM follow-ups, then Ember /
+Claude-Code for the onion-peel continuation.
+
+Main artifacts:
+
+- `docs/ember-handoff-2026-07-07-k027-complete.md`
+- `docs/k028-conf-noc-sweep-hypothesis-2026-07-07.md`
+- K025-K029 entries in `docs/kernel-change-ledger.md`
+
+What happened:
+
+- Secure-interface archaeology rejected inactive/already-covered downstream paths
+  before spending device cycles where possible.
+- The IMEM/restart-reason line exposed LG/TZ-coded reset classes such as
+  Config-NoC and later MM_NOC, but raw IMEM writes proved dangerous and are now
+  explicitly not to be repeated.
+- K027/K028/K029 reframed the reset as a NoC/TZ-owned-block interaction rather
+  than a generic watchdog.
+
+Publication relevance:
+
+- The important output is diagnostic evidence and cautionary rules, not code.
+
+### 2026-07-07 — K030 breakthrough and K031-K035 narrowing
+
+Primary helper: Ember / Claude-Code, with Lance physically present for device
+work.
+
+Main artifacts:
+
+- `docs/ember-handoff-2026-07-07-k029-onion-peel.md`
+- K030-K035 entries in `docs/kernel-change-ledger.md`
+
+What happened:
+
+- K030 found the first real fault-class fix: skip global reset on `anoc1_smmu`.
+  This matched downstream MSM8998's `qcom,skip-init` / `qcom,register-save`
+  policy and eliminated the specific TZ Config-NoC class.
+- K031 showed that skipping all five SMMUs added no benefit and carried more
+  correctness risk; the narrow anoc1-only debug gate is preferred.
+- K032 proved `clk_ignore_unused pd_ignore_unused` was not load-bearing once the
+  anoc1 fix was present.
+- K033/K034 eliminated removable board peripherals and the non-secure APSS
+  watchdog from the residual reset.
+- K035, via Lance's device photo of LG's own UEFI-level crash screen, showed the
+  remaining blocker is still MM_NOC and that raw IMEM writes can crash firmware.
+
+Publication relevance:
+
+- K030 is a confirmed debug finding, but not public-ready as the
+  `ember,debug-skip-reset` property. It needs a proper upstreamable Qualcomm
+  SMMU representation if it becomes part of a real fix.
+
+### 2026-07-08 — Linux-side exhaustion, edk2 reframe, and K042 rejection
+
+Primary helpers: Ember / Claude-Code through the consolidated handoff and K041;
+Aurel / Hermes for the provenance audit and K042 source-first/device test.
+
+Main artifacts:
+
+- `scripts/tethered-test.sh`
+- `docs/ember-handoff-2026-07-08-mm-noc-current.md`
+- `docs/ember-handoff-paste-2026-07-08.md`
+- `docs/public-upstreaming-plan.md`
+- K036-K042 entries in `docs/kernel-change-ledger.md`
+
+What happened:
+
+- K036 rejected sibling MMSS-NoC bridge critical clocks and corrected the whole
+  clock-sweep theory class.
+- Source checks cleared pinctrl-msm/TLMM and QUP/GENI/BLSP as worthwhile device
+  tests for MM_NOC.
+- K037 rejected the non-secure watchdog timeout theory.
+- K038 rejected bootloader display underflow / display quiesce as the cause.
+- edk2-msm8998/Renegade Project was identified as important reference evidence:
+  joan can survive far beyond 30s under a passive UEFI environment. This strongly
+  suggests Linux is provoking the reset through aggressive re-init, not missing a
+  positive keepalive.
+- K041 tested late Linux `simple-framebuffer`/fbcon observability and rejected it
+  on joan's command-mode panel.
+- Ember explicitly asked for borrowed-code/provenance cleanup. Aurel applied that
+  note to `docs/public-upstreaming-plan.md`.
+- K042 tested the next SMMU-adjacent source candidate: suppressing mainline's
+  MSM8998 Qualcomm SMMU cfg-probe S2CR BYPASS write/read quirk probe on top of
+  K030. It built and fastbooted, but LineageOS returned early 48s after handoff;
+  the test is rejected and the debug patch is reverted from the kernel tree.
+
+Publication relevance:
+
+- The project now has a clear evidence trail that many intuitive fixes are
+  rejected.
+- No ready-to-test next device hypothesis exists as of K042.
+- Future public work should not carry debug gates or timing oracles on a clean
+  branch.
+
+## K-series ownership summary
+
+This table is intentionally compact. Use `docs/kernel-change-ledger.md` for the
+full per-test details, hashes, and logs.
+
+| Range / item | Primary helper(s) | Scope | Current status |
+|---|---|---|---|
+| K001-K004 | Ember / Claude-Code, Lance DCO | Initial public-shaped DTS stack and APSS watchdog node | mixed: DTS/memory likely useful; ramoops/watchdog blocked |
+| K005-K011 | Aurel / Hermes plus earlier debug branches | Breadcrumbs, SCM/watchdog, latest-kernel and cmdline discriminators | debug-only / rejected evidence |
+| K012-K021 | Aurel / Hermes | DLOAD, QSEE log buffer, RPM/BOB/regulator/PON/Kryo comparison and oracles | rejected or comparison-only evidence |
+| K022-K024 | Ember / Claude-Code | Null init, minimal/peripheral subtraction, APSS watchdog petting | rejected; narrowed reset away from userspace/USB/UFS/APSS-WDT |
+| K025-K027 | Aurel / Hermes | Secure-interface archaeology, IMEM/restart-reason oracle, NoC clue follow-up | comparison/rejected, but produced important TZ NoC clue |
+| K028-K036 | Ember / Claude-Code | NoC onion-peel, anoc1 SMMU breakthrough, residual MM_NOC narrowing | K030 confirmed debug fix; surrounding tests rejected/narrowing |
+| K037-K041 | Ember / Claude-Code | Community research, watchdog/display/simplefb/edk2 reframing | rejected/observability evidence; edk2 is important reference |
+| K042 | Aurel / Hermes | SMMU cfg-probe S2CR quirk-probe subtraction | tested and rejected; patch preserved/reverted |
+
+Known limitation: older ledger entries were not all written with uniform
+`Written-by` / `Agent-harness` / `Date` fields inside each K entry. The history is
+still reconstructable from git commit trailers, handoffs, and this index. Going
+forward, each new K entry should include those fields directly.
+
+## Borrowed / derived material index
+
+The authoritative provenance table is in `docs/public-upstreaming-plan.md`.
+Highlights:
+
+| Material | Source basis | Attribution / license handling |
+|---|---|---|
+| `msm8998-lge-joan.dts` | `msm8998-oneplus-common.dtsi` plus downstream LG/Qualcomm joan DTS data | OnePlus common DTS credits Jami Kettunen and The Linux Foundation/Qualcomm; downstream LG kernel material treated as GPL-2.0-derived unless independently sourced |
+| K030 anoc1 skip-reset concept | downstream `msm-arm-smmu-8998.dtsi` `qcom,skip-init` + `qcom,register-save` | concept from Qualcomm/LGE; debug code original; not public-ready |
+| IMEM/restart reason constants | downstream `lge_handle_panic.c` / `reboot_reason.h` and public LG/QCOM references | GPL-2.0 evidence/debug only |
+| Display quiesce offsets | mainline `dsi.xml` / `dpu_3_0_msm8998.h` | same kernel tree / GPL-2.0 debug only |
+| Planned msm8998 interconnect provider | mainline `sdm660.c`, `msm8996.c`, downstream `msm8998-bus.dtsi` | must preserve AngeloGioacchino Del Regno / Yassine Oudjana / Qualcomm-LGE attribution if implemented |
+| initramfs busybox | Alpine `busybox-static` package | GPL-2.0 test harness only |
+
+Rule: if code is borrowed rather than merely used as evidence, preserve original
+SPDX and copyright lines, add a `based on` note naming the source file and author,
+and record the source in `docs/public-upstreaming-plan.md`.
+
+## Publication-readiness summary
+
+Public-shaped / potentially useful:
+
+- initial joan DTS, after regulator/board details are cleaned;
+- LG firmware-owned memory reservations, after overlaps/future GPU/WLAN placement
+  are explained;
+- maybe an APSS watchdog representation, but only after behavior and placement are
+  settled.
+
+Blocked / not public-ready as-is:
+
+- ramoops layout, because pstore did not survive the LG boot chain usefully;
+- K030 `ember,debug-skip-reset`, because it is a debug DT property rather than a
+  real upstream binding/implementation;
+- every timing oracle, raw register poke, direct SCM experiment, IMEM writer,
+  display quiesce hook, or SMMU K042-style subtraction patch.
+
+Rejected experiments should still be published as evidence only if we publish a
+bringup-history/debug repo. They should not be on a clean kernel PR branch.
+
+## Next-history maintenance checklist
+
+For every future material change:
+
+1. Add/update a K entry in `docs/kernel-change-ledger.md` with:
+   - handle: commit/patch/log/image path;
+   - class and public disposition;
+   - touched files and source basis;
+   - build/test evidence or reason not tested;
+   - `Written-by`, `Agent-harness`, and `Date`.
+2. If borrowed/derived material is involved, update
+   `docs/public-upstreaming-plan.md`.
+3. If the high-level story changes, update this file's timeline/status section.
+4. If an artifact should be visible to other agents, upload it to
+   `Talk/Shared_AI_agents_files/` and comment on Deck card #43.
+5. Keep rejected debug source reverted from public-shaped kernel branches after
+   preserving exact patches and hashes.
+
+## Attribution for this index
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-08
-
-## Source-of-truth map
-
-| Need | Source |
-|---|---|
-| Current short state and safety conventions | `README.md` |
-| Every kernel-impacting change / experiment | `docs/kernel-change-ledger.md` |
-| Public readiness, borrowed-code provenance, and license notes | `docs/public-upstreaming-plan.md` |
-| Current Ember handoff before K042 | `docs/ember-handoff-2026-07-08-mm-noc-current.md` |
-| Current Aurel update after K042 | this file + `README.md` + `docs/kernel-change-ledger.md` |
-| Shared cross-agent state | Deck board 4, card #43; WebDAV `Talk/Shared_AI_agents_files/{handoffs,patches,status}/` |
-| Clean kernel worktree | `~/vibe-coding-projects/coding/linux-mainline-v30`, branch `joan/latest-clean-test` |
-| Harness/evidence repo | `~/vibe-coding-projects/coding/lg-v30-port` |
-
-## Maintenance rule for Ember / future agents
-
-When you continue this project:
-
-1. Add a new row under **Chronological work log** for any meaningful session.
-2. Add or update rows under **K-series summary** for any new K-test / oracle / no-code finding.
-3. If you borrow or derive from another source file, update
-   `docs/public-upstreaming-plan.md`'s provenance table too.
-4. Preserve existing attributions. Append corrections; do not rewrite another
-   agent's conclusion as if it were yours.
-5. Use these fields in new sections or appended notes:
-
-```text
-Written-by: <agent/person>
-Agent-harness: <harness>:<model>
-Date: YYYY-MM-DD
-Evidence: <commit/log/patch/WebDAV/Deck pointer>
-```
-
-Kernel-style commits continue to use Lance as DCO signer plus an AI-assistance
-trailer:
-
-```text
-Signed-off-by: Lance <Gero3977@gmail.com>
-Assisted-by: <agent-harness>:<model>
-```
-
-Never use `Co-Authored-By` for AI assistance in this workflow.
-
-## People / agent identities
-
-| Identity | Role in this project | Attribution form |
-|---|---|---|
-| Lance | Device owner/operator; approves physical phone work; DCO signer for commits; provides photos/observations and project direction. | `Signed-off-by: Lance <Gero3977@gmail.com>` |
-| Aurel Nymvale | Hermes/Aurel agent; SCM/RPM/PON/source archaeology, mainline clean-branch shaping, K025-K027/K040/K042-style source-first experiments, documentation/provenance/WebDAV/Deck sync. | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.5` |
-| Ember Nymbrand | Ember/Claude-Code agent; early recon/handoffs, null-init and onion-peel classifier work, K022-K041-heavy investigation, edk2 UEFI insight, provenance-table prompt. | `Written-by: Ember Nymbrand (agent-ember)` / `Assisted-by: Claude-Code:claude-fable-5` where known |
-| Upstream/downstream projects | Source material only; not project agents. Includes Linux, Qualcomm/LGE downstream kernel, OnePlus msm8998 DTS work, edk2-msm8998/Renegade Project, AOSP bullhead references, BusyBox/Alpine initramfs package. | Track in `docs/public-upstreaming-plan.md` provenance table. |
-
-## Current state summary as of 2026-07-08
-
-- Mainline still does **not** boot far enough to expose a mainline debug channel
-  or userspace on LG V30 `joan`.
-- The named TrustZone Config/MM-NoC crash family was narrowed substantially.
-- K030 is the strongest confirmed finding: skipping global reset only for
-  `anoc1_smmu` removes the named Config/MM-NoC fault signature.
-- Residual MM_NOC still persists after K030. It usually appears to the host as an
-  early LineageOS return with bootreasoncode `0x20`, but K035's device photo
-  confirmed the firmware-level residual reason is still `0x6D630306` MM_NOC.
-- K042 was tested after Ember's handoff and rejected: skipping mainline's
-  MSM8998 Qualcomm SMMU cfg-probe S2CR bypass quirk-probe on top of K030 still
-  returned early 48s after handoff.
-- No ready-to-test next phone hypothesis exists at this writing. The best next
-  direction is source-first TrustZone/SCM/firmware archaeology or a new
-  observability path, not another blind phone boot.
-
-## Chronological work log
-
-| Date | Who | What changed / what was learned | Evidence |
-|---|---|---|---|
-| 2026-07-04 | Ember + Lance | Initial LG V30 `joan` recon; project goal and hardware/software context established. | `docs/recon-2026-07-04.md` |
-| 2026-07-04 to 2026-07-06 | Aurel + Lance | Initial public-shaped kernel DTS commits created: board DTS, ramoops layout, reserved memory, APSS watchdog node. | Kernel branch `joan/latest-clean-test`; commits `25a391c94`, `a19ca9204`, `7c906e841`, `0d7df4134`; ledger K001-K004 |
-| 2026-07-06 | Aurel | Latest upstream / latest clean branch work; CPU, idle, high-memory, SCM, RPM, PON, regulator and watchdog discriminators tested or compared. Most were rejected as sufficient fixes. | `docs/bringup-debug-state-2026-07-06.md`; ledger K006-K021; Aurel handoff `docs/ember-handoff-2026-07-06.md` |
-| 2026-07-06 | Ember + Lance | Null-init / minimal-DTB / full-DTB-minus-subsystems classifier work. USB, UFS, RPM, and removable board peripherals were eliminated; reset moved toward SoC core/firmware. | `docs/bringup-debug-state-2026-07-06.md`; ledger K022-K024; `docs/nullinit-discriminator-run.md` |
-| 2026-07-06 | Aurel + Ember | Secure-interface archaeology and IMEM oracle path. Aurel repackaged/tested the IMEM oracle as K026; returned TZ-class `0x6D630309` Config NoC. | Ledger K025-K026; `docs/ember-handoff-2026-07-06-session2.md` |
-| 2026-07-07 | Aurel | K027/K028/K029 chain decoded: Config NoC / MM NoC layering, RPM-disabled regression, and `anoc1_smmu` disable regression. | `docs/ember-handoff-2026-07-07-k027-complete.md`; ledger K027-K029 |
-| 2026-07-07 | Ember + Lance | K030 breakthrough: debug skip of global reset for `anoc1_smmu` removes the named TZ NoC-fault signature. K031 showed all-five-SMMU skip has no extra value; anoc1 alone is sufficient. K032 showed `clk_ignore_unused` / `pd_ignore_unused` was not load-bearing. | `docs/ember-handoff-2026-07-07-k029-onion-peel.md`; ledger K030-K032 |
-| 2026-07-07 to 2026-07-08 | Ember + Lance | K033/K035 series showed residual failure is still MM_NOC/core-firmware class, not board peripherals. K035 photo exposed firmware-level `0x6D630306` MM_NOC and a separate IMEM-write side-effect risk. | Ledger K033/K035; `docs/ember-handoff-2026-07-07-k029-onion-peel.md`; WebDAV K035 photos referenced in handoff |
-| 2026-07-08 | Ember | K036 rejected sibling MMSS-NoC critical clocks and effectively ruled out the late unused-clock sweep class. K037 cleared non-secure watchdog timeout as the tunable cause. K038 display-quiesce cleared bootloader-left display as the trigger. K039 MMCC=y did not change the fault. | Ledger K036-K039; `docs/ember-handoff-2026-07-08-mm-noc-current.md` |
-| 2026-07-08 | Ember + Lance | edk2-msm8998/Renegade Project source and Windows-on-ARM angle identified a passive UEFI reference that survives far past Linux's reset window. Late Linux simplefb/fbcon was then tested as K041 and rejected on joan's command-mode panel. | Ledger K041; `docs/ember-handoff-2026-07-08-mm-noc-current.md` |
-| 2026-07-08 | Aurel | Applied Ember's provenance directive: filled OnePlus common DTS author gap, generalized AI-assistance trailer wording, and recorded K042 provenance. | Commits `2f7d37c`, `e845140`; `docs/public-upstreaming-plan.md` |
-| 2026-07-08 | Aurel + Lance | K042 built and tested: MSM8998 Qualcomm SMMU cfg-probe S2CR bypass quirk-probe subtraction on top of K030. Fastboot boot OKAY, but LineageOS returned 48s after handoff; rejected. Debug patch preserved and reverted from kernel worktree. | Commit `2519246`; ledger K042; `out/tethered-test-2026-07-08T173429Z.log`; Deck #43 comment `14909` |
-| 2026-07-08 | Aurel | Created this project history/attribution index so future agents can maintain a compact who/what/when trail instead of forcing readers to reconstruct from the full ledger. | This file |
-
-## K-series summary
-
-This is intentionally compact. The detailed evidence, hashes, and file paths are
-in `docs/kernel-change-ledger.md`.
-
-| K range / item | Lead | Date | Short result | Status |
-|---|---|---|---|---|
-| K001-K004 | Aurel/Lance | 2026-07-04 to 2026-07-06 | Initial public-shaped DTS, ramoops, reserved memory, APSS watchdog node. | candidate / blocked per ledger |
-| K005 | Aurel | 2026-07-06 | Ramoops breadcrumb instrumentation did not produce useful persisted evidence. | rejected / debug-only |
-| K006-K008 | Aurel | 2026-07-06 | SEC_WDOG, panic/APSS-WDT, and downstream-style APSS WDT takeover paths did not fix reset. | rejected |
-| K009-K011 | Aurel | 2026-07-06 | Latest upstream/clean branch, maxcpus/cpuidle/high-memory discriminators did not expose diagnostics or fix reset. | rejected evidence / branch-shaping |
-| K012-K021 | Aurel | 2026-07-06 | DLOAD arg shape, QSEE log buffer, RPM reachability/BOB, regulator overlays, PON/TCSR, Kryo SCM comparisons all failed or were rejected before device test. | rejected / comparison-only |
-| K022-K024 | Ember | 2026-07-06 | Null-init/min-DTB/peripheral subtraction showed reset persists without userspace and is not USB/UFS/RPM/removable board peripheral. | rejected triggers / useful narrowing |
-| K025-K026 | Aurel + Ember | 2026-07-06 | Secure-interface archaeology; IMEM oracle showed TZ-class Config NoC path but not a fix. | useful evidence, debug-only |
-| K027-K029 | Aurel / Ember follow-up | 2026-07-07 | NoC reason decoded; RPM disable and anoc1 disable regress to Config NoC. | useful mechanism evidence |
-| K030 | Ember | 2026-07-07 | `anoc1_smmu` skip-reset removes named Config/MM-NoC signature. | confirmed debug finding, not upstream-ready as written |
-| K031-K032 | Ember | 2026-07-07 | All-five-SMMU skip adds no benefit; clk/pd retention not load-bearing. | rejected broader fixes |
-| K033-K035 | Ember + Lance | 2026-07-07/08 | Residual fault still core/firmware/MM_NOC; K035 photo confirms `0x6D630306`, IMEM write likely caused separate firmware bug. | useful evidence; avoid raw IMEM write |
-| K036-K039 | Ember | 2026-07-08 | Sibling MMSS-NoC clocks, non-secure watchdog timeout, display leftover, MMCC=y all rejected. | rejected candidate classes |
-| K040 | Aurel/Ember handoff context | 2026-07-08 | `scm_restore_sec_cfg` positive secure-call candidate tested negative/blunted by no observability. | rejected as tested |
-| K041 | Ember | 2026-07-08 | Late simplefb/fbcon on-screen console path failed; command-mode panel freezes on LG logo. | rejected observability path |
-| K042 | Aurel | 2026-07-08 | MSM8998 SMMU cfg-probe S2CR quirk-probe subtraction still reset at 48s after handoff. | rejected |
-
-## Public/publishable status
-
-| Area | Current status |
-|---|---|
-| Initial joan DTS | Public-candidate shape exists but needs review/cleanup before upstreaming. |
-| Reserved memory | Likely public-candidate, but final explanations and overlaps need review. |
-| Ramoops | Blocked unless a useful persistence story is proven. |
-| APSS watchdog node | Blocked/unknown; not proven to solve current reset. |
-| K030 anoc1 skip-reset | Important debug finding; not public-ready as an `ember,debug-skip-reset` property. Needs real Qualcomm SMMU representation if it becomes part of a fix. |
-| K042 SMMU cfg-probe skip | Rejected debug evidence only; do not publish. |
-| All raw oracles/timing probes | Preserve as evidence; keep out of clean public branches. |
-
-## Borrowed / derived source tracking
-
-The compact provenance table lives in `docs/public-upstreaming-plan.md`. As of
-this index, it tracks at least:
-
-- `msm8998-lge-joan.dts` basis from `msm8998-oneplus-common.dtsi` plus downstream
-  LG/Qualcomm DTS material;
-- K030 concept from downstream `qcom,skip-init` / `qcom,register-save` SMMU
-  policy;
-- IMEM/reboot reason constants from downstream LGE files and public AOSP bullhead
-  references;
-- display-quiesce debug offsets from mainline MSM display XML/header files;
-- K042 concept from comparing upstream `qcom_smmu_cfg_probe()` with downstream
-  MSM8998 SMMU policy;
-- planned interconnect provider sources (`sdm660.c`, `msm8996.c`, downstream
-  `msm8998-bus.dtsi`) and their required authorship preservation.
-
-Future agents: if you copy code, not just an idea, preserve the original SPDX and
-copyright lines in the new file and call that out here and in
-`docs/public-upstreaming-plan.md`.
-
-## Current no-repeat list
-
-Do not retry these without a materially different baseline or new evidence:
-
-- `SEC_WDOG_DIS` / secure watchdog SCM shapes already tried in K006/K025-era work.
-- APSS watchdog pet/takeover and non-secure watchdog timeout paths.
-- `panic=` timing, `maxcpus=1`, `cpuidle.off=1`, high-memory reservation.
-- DLOAD arg-shape, QSEE log-buffer registration, RPM reachability-only and BOB
-  one-off default votes.
-- PM8998 L19, L18/L19/BOB regulator-overlay minimal votes.
-- TCSR DLOAD phandle and PM8998 PON S3 / reset-sequence oracles.
-- Null-init, min-DTB naive interpretation, USB/UFS/RPM/peripheral subtraction.
-- Broad all-five-SMMU skip-reset (K031) as a better fix than anoc1-only.
-- `clk_ignore_unused` / `pd_ignore_unused` or sibling MMSS-NoC critical clocks as
-  the remaining root cause.
-- Raw unverified IMEM writes near the restart-reason offset used in K035.
-- Late Linux `simple-framebuffer` / fbcon as a joan command-mode panel console.
-- K042 MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction.
-
-## Suggested next documentation work
-
-Before a public push or external collaboration request:
-
-1. Normalize older K001-K021 ledger entries to include explicit `Written-by`,
-   `Agent-harness`, and `Date` fields where reconstructable.
-2. Add a small checker script that flags K entries missing attribution/status,
-   commits missing `Signed-off-by` / `Assisted-by`, and `TBD` provenance rows.
-3. Prepare a public branch map that names which kernel commits are candidates and
-   which evidence-only artifacts should stay in `lg-v30-port`.
-
-## Suggested next technical work
-
-No phone test should run just because there is an idea. Continue source-first:
-
-1. Re-read the TrustZone/SCM and boot-firmware paths against downstream and
-   edk2-msm8998, looking for a concrete state transition Linux performs that UEFI
-   avoids or downstream performs differently.
-2. Prefer observability improvements that do not perturb firmware state. K035
-   showed the device screen can reveal firmware-level reasons, but the raw IMEM
-   write likely introduced a separate firmware crash.
-3. Only build a new oracle after a specific source-backed candidate exists, and
-   test it once with `scripts/tethered-test.sh` while Lance is physically present.
