@@ -95,6 +95,9 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   reference-only.
 - **State**: when you finish or hand off, update your parcel card and, if the
   facts here changed, this README (append, don't rewrite history).
+- **Project history / attribution index**: when a session materially changes the
+  project, update `docs/project-history-and-attribution.md` so future agents can
+  see who did what and when without reconstructing the entire ledger.
 - **Kernel change tracking**: every kernel-impacting change must also be entered
   in `docs/kernel-change-ledger.md` before handoff, whether it is a final
   upstreamable commit, bringup-only patch, debug oracle, or rejected experiment.

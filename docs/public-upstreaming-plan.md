@@ -6,6 +6,8 @@ when the device finally boots far enough.
 
 This is not a replacement for `docs/kernel-change-ledger.md`. The ledger tracks
 all changes and experiments. This file defines what makes a change public-ready.
+For a compact who/what/when project timeline, keep
+`docs/project-history-and-attribution.md` current as well.
 
 ## Branch model
 
