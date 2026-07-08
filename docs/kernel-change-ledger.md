@@ -2133,3 +2133,61 @@ kind of effort than this session's Linux-side subtraction:
 
 No cheap Linux-side test remains; the next move is a commitment to one of
 these two larger efforts.
+
+## Interconnect path — recon + ATTRIBUTION plan + honest payoff concerns (source-only)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Scoped writing an msm8998 interconnect (NoC) provider. Findings:
+
+VALIDATED it's a real intervention: `qnoc_probe` (icc-rpm.c) calls
+`qcom_icc_qos_set()` for every ap_owned node AT PROBE (not just on bw
+request), and the framework has a `keep_alive` min-bw-vote mechanism — so
+adding the provider DOES program NoC QoS + can hold an RPM bandwidth vote
+at boot, the way downstream msm_bus does. NOC QoS regs: PRIORITYn @
+0x8+n*0x1000, MODEn @ 0xc+n*0x1000, per qos_port; mnoc base-name
+"mnoc-base", qos-off 0x1000. No msm8998 ICC provider exists upstream
+(searched; only msm8996/sdm660/msm8974/msm8909) — it's FROM SCRATCH.
+
+**ATTRIBUTION PLAN (Lance directive 2026-07-08 — track borrowed code +
+who did the work):** any msm8998 provider would be DERIVED from existing
+GPL-2.0 upstream drivers, primarily:
+- `drivers/interconnect/qcom/sdm660.c` — Copyright AngeloGioacchino Del
+  Regno (SoMainline / Sony Xperia mainlining project). Closest same-family
+  template.
+- `drivers/interconnect/qcom/msm8996.c` — Yassine Oudjana. Same
+  BIMC+NoC-QoS icc-rpm framework.
+- Topology/QoS VALUES from downstream `android_kernel_lge_msm8998`
+  `msm8998-bus.dtsi` (Copyright Qualcomm / LGE).
+Requirements when writing it: keep the original authors' Copyright lines +
+SPDX-License-Identifier GPL-2.0, add a "based on <file> by <author>" note,
+do NOT present it as original work; commit trailers = Signed-off-by: Lance,
+Assisted-by: Claude-Code:claude-fable-5. This is a provenance record per
+kernel.org policy and matters especially if ever upstreamed.
+
+HONEST PAYOFF CONCERNS (surfaced during recon, before committing to ~1700
+lines):
+1. **No MM master is active in bring-up.** K038 disabled the display and it
+   STILL MM-NoC-faulted; DRM/MMCC are =m (never load). So there's no active
+   MM master whose QoS arbitration would matter — and QoS is arbitration,
+   not fault-gating. The QoS-register angle is doubtful.
+2. **BUT a more promising sub-mechanism:** the fault's timeout-like jitter
+   (~30-49s) + MM-NoC specificity fits "the MM NoC expects an RPM bandwidth
+   vote / keepalive that downstream's msm_bus provides and mainline never
+   does." The ICC provider's `keep_alive`/RPM-bw-vote path (not QoS) is the
+   part that could actually matter. This is worth a FOCUSED test.
+3. **Executability risk:** joan bring-up has NO console (ramoops scrubbed,
+   panic=0) — a complex new driver that fails to probe (wrong clock name,
+   bad QoS, topology error) produces a SILENT boot-fail with zero
+   diagnostic. Writing 1700 lines and debugging silent probe failures blind
+   is very hard. Argues for the smallest testable increment first.
+
+RECOMMENDATION: don't write the full provider blind. Test the promising
+sub-mechanism cheaply first — a minimal debug initcall (the proven pattern:
+anoc1/display/imem) that sends the MM-NoC RPM bandwidth vote (+ optionally
+programs the MM-NoC QoS mode), replicating what downstream's msm_bus does
+for the mnoc fabric. If that stops the fault, THEN write the full,
+properly-attributed provider. If not, the interconnect path is likely a
+dead end and we saved the big build.
