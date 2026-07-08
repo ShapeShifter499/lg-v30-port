@@ -46,6 +46,13 @@ The initramfs (`initramfs/root/init`) brings up a USB ECM+ACM gadget at
 the host (`lsusb`), then `ip addr add 172.16.42.2/24 dev <usb-if>` and
 `telnet 172.16.42.1`.
 
+For debug/oracle images built against the `out/initramfs-k023b.cpio.gz`
+classifier ramdisk (spin + 90s deliberate reboot, `panic=0`), use
+`scripts/tethered-test.sh <boot.img> [timeout_seconds]` to run the full
+tethered-boot-and-classify workflow safely (one-client fastboot
+discipline, LOS-return classification, PON/bootreason readback). See the
+script's own header for its exit-code meanings.
+
 Boot format (from LineageOS BoardConfig): `Image.gz-dtb` appended DTB, base
 0x0, pagesize 4096. LG aboot may not support `fastboot boot` — untested;
 fallback is flashing the **recovery** partition (never boot) and key-combo
@@ -97,7 +104,85 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   `docs/public-upstreaming-plan.md`: clean topic commits, detailed rationale,
   verification evidence, no debug-only leftovers, and required trailers.
 
-## Current status (2026-07-06)
+## Current status (2026-07-07/08)
+
+- **CONFIRMED FIX: `anoc1_smmu` skip-reset eliminates the TZ Config/MM-NoC
+  fault.** `anoc1_smmu` (`iommu@1680000`, aggregator-NoC IOMMU) has zero
+  `iommus=` consumers anywhere in mainline's `msm8998.dtsi` and no
+  `clocks=` property, yet defaults `status = "okay"`, so mainline's
+  arm-smmu-v2 driver always runs its full global reset on it
+  (`arm_smmu_device_reset()`: clears sGFSR, forces every SMR
+  invalid/every S2CR to bypass, invalidates the TLB). Downstream
+  `msm-arm-smmu-8998.dtsi` marks this exact block (and all five msm8998
+  SMMU-v2 instances) `qcom,skip-init` + `qcom,register-save`: TZ/XBL
+  already owns and configured it, and downstream's driver deliberately
+  never resets it. A debug-only kernel patch
+  (`out/ember-k030-skip-smmu-reset-debug.patch`, gates the reset behind a
+  new `ember,debug-skip-reset` DT boolean) tagged onto `&anoc1_smmu`
+  alone eliminated the specific TZ NoC fault that had blocked every
+  session back to K022: bootreasoncode moved from the
+  `LGE_RB_MAGIC|LGE_ERR_TZ` crash family (`0x6D630309` Config NoC /
+  `0x6D630306` MM NoC) to a plain, non-magic `0x20`
+  (`UNDEFINED_CRITICAL_ERROR`). Device-tested (K030).
+- **K031 rejected the broader fix.** Tagging all five SMMUs (matching
+  downstream's blanket policy) gave an identical result to K030's
+  anoc1-only patch — no additional benefit — while carrying a real
+  correctness risk for wifi/GPU/audio's own SMMUs once their real
+  consumers attach domains (untested by the spin-only classifier). Since
+  K030 (their reset left normal) and K031 (their reset skipped) are
+  otherwise identical and gave the *same* result, this also rules out
+  those four SMMUs' reset behavior as a factor in the residual fault.
+  **Prefer K030's narrower patch.**
+- **K032 corrected the K027-era cmdline hypothesis.** The
+  `clk_ignore_unused pd_ignore_unused` retention in place since K027 was
+  never load-bearing — plain default cmdline gives an identical result
+  once the anoc1 fix is in place. `docs/k028-conf-noc-sweep-hypothesis-
+  2026-07-07.md`'s clock-sweep theory was a coincidental correlation, not
+  a cause. **Confirmed clean baseline: full untouched joan DTS +
+  `&anoc1_smmu { ember,debug-skip-reset; };` + plain default cmdline.**
+- **K033/K034 narrowed the residual fault to SoC core/firmware.**
+  Stripping every removable board peripheral (K033, same list as K023e:
+  `usb3`, `qusb2phy`, `ufshc`, `ufsphy`, `wifi`, `pm8005_regulators`) and
+  disabling the APSS watchdog node outright (K034, a different
+  manipulation than K024's kernel-side pet) both still hit the identical
+  `0x20` reset. Neither peripherals nor the non-secure APSS watchdog are
+  the residual cause. A full LOS dmesg pull (no new reboot needed) found
+  downstream's own boot chain logs `0x20` as `"not handled, defaulting to
+  Normal Boot"` — it may not be a live TZ-detected code at all, possibly
+  just IMEM's resting state once no detector writes to it.
+- **K035 (IMEM seed oracle) is INCONCLUSIVE — session paused.**
+  Reintroduced Ember's 2026-07-06 IMEM-oracle initcall
+  (`drivers/soc/qcom/joan_imem_oracle.c`) on the confirmed K030 baseline
+  to write a distinctive seed (`0x6D6303EE`) to the restart-reason offset
+  before the reset, to test directly whether any TZ detector still
+  fires. `fastboot boot` succeeded, but LineageOS never returned within
+  300s; a 215-second passive, read-only observation then found the
+  phone sitting in an unfamiliar LG-vendor USB mode (`1004:6340`, not the
+  normal ADB `18d1:4ee7`), unreachable by `adb`/`fastboot`. **No further
+  remote commands were attempted.** Leading (unconfirmed) theory: a
+  boot-loop protection counter after 9 consecutive abnormal resets in a
+  row this session — likely just needs a plain forced restart
+  (Power+Volume-Down, the H932's established recovery pattern), **not**
+  flashing/KDZ territory. Full detail:
+  `docs/ember-handoff-2026-07-07-k029-onion-peel.md`.
+- **New reusable tooling:** `scripts/tethered-test.sh` extracts the full
+  tethered-boot workflow (one-client fastboot discipline, LOS-return
+  classification, PON/bootreason readback) into a single committed,
+  documented script, replacing this week's ephemeral per-test copies so
+  future sessions/agents don't re-derive it from scratch. It also
+  explicitly distinguishes "device absent" / "unfamiliar USB state, stop"
+  / "still fastboot, probably just slow" outcomes, which the K035 pause
+  had to work out manually.
+- **Next device action (Lance present, phone confirmed responsive):**
+  passively confirm recovery first (`adb devices` / `fastboot devices` /
+  `lsusb`), then retry K035
+  (`out/boot-joan-imemoracle-k035.img`) once via
+  `scripts/tethered-test.sh`, with a longer timeout margin than the 300s
+  used this session. If the seed survives unmodified, no TZ detector
+  remains active and the residual reset needs a different oracle; if
+  it's overwritten, read what replaced it.
+
+## Previous status (2026-07-06)
 
 - **P5/debug continued — latest upstream still reboots before debug output.**
   Aurel rebased the joan debug stack onto fetched upstream `origin/master`
