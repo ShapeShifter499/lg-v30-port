@@ -169,22 +169,27 @@ anoc1_smmu was a *driver's own unconditional reset/init sequence*
 touching a TZ-owned block on every probe, independent of clock state —
 not a clock being gated. K030 vs K031 already extended this lens to
 clear the other four SMMU instances' own reset sequences. Candidates in
-the same spirit, not yet checked:
+the same spirit:
 
-- **pinctrl-msm / TLMM's own probe** — does it unconditionally
-  reconfigure pin muxing in a way that could clobber TZ-owned pin
-  config? `tlmm` is enabled in joan's board file.
+- ~~pinctrl-msm / TLMM's own probe~~ — **checked and cleared** (source
+  only, no device needed): `msm_pinctrl_probe()` doesn't touch hardware
+  unconditionally the way `arm_smmu_device_reset()` does; it only
+  applies explicitly-declared DT `pinctrl-0` states. Its one
+  `PS_HOLD`-writing restart-handler registration only fires if the
+  SoC's pin table defines a function named `"ps_hold"`, which
+  `pinctrl-msm8998.c` does not. Not a match.
 - **The QUP/GENI/BLSP serial-controller family** — `blsp2_uart1` is
   enabled for console; worth checking whether sibling BLSP instances'
   drivers touch shared infrastructure unconditionally even when their
-  own DT nodes aren't individually enabled.
+  own DT nodes aren't individually enabled. Not yet checked.
 - **A fresh secure/SCM archaeology pass** — genuinely Aurel's
   established strength (see the K025 addendum in
   `docs/ember-handoff-2026-07-06-session2.md` for the prior pass this
   built on). This session's investigation has been DTS/clock
   subtraction from the Linux side; the actual fault is TrustZone-side,
   and a pass from that direction may find what subtraction alone
-  can't.
+  can't. **Probably the strongest remaining angle** — two Linux-side
+  driver classes have now been checked and cleared without a hit.
 
 No further device test was run against pure reasoning alone this
 session — per the project's standing discipline, don't guess blind
