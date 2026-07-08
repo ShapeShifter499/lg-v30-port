@@ -2408,3 +2408,26 @@ command-mode "silently invisible" reasoning appears WRONG; the UEFI is the
 proof. NEXT TEST: add a simplefb node (0x9d400000, 1440x2880, a8r8g8b8) to
 joan's DTS + fbcon, boot, and read kernel logs off the screen (Lance
 photographs). If it works, every future test becomes observable.
+
+## K041 — on-screen console test (simplefb + fbcon + heartbeat), watched on-device
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Testing FINDING 2 from the edk2 read: add a mainline `simple-framebuffer`
+node at 0x9d400000 (1440x2880 a8r8g8b8, no clocks — exactly like the UEFI's
+SimpleFbDxe) + CONFIG_FB_SIMPLE + fbcon, so the kernel prints its boot log
+ON SCREEN. Heartbeat init prints ">>>> JOAN-ALIVE t=Ns <<<<" to the console
+every 1s so the last count on screen = the reset time.
+
+Config: +CONFIG_FB_SIMPLE (VT/FB/fbcon already =y). DTS:
+`out/ember-k041-simplefb-2026-07-08.dts` (joan + chosen/simple-framebuffer
++ anoc1 fix). Initramfs: `out/initramfs-k041-heartbeat.cpio.gz`. Image
+`out/boot-joan-simplefb-k041.img` sha256
+`b98655d370d7484a9448457aaf2d0822e3ffed231b88249b6cf7e60eed3e1a97`. Cmdline
+adds `console=tty0 fbcon=nodefer`. Lance watching/recording the screen.
+
+Expected if it works: kernel boot log scrolls on the panel, then the
+heartbeat counts up, then the screen freezes/resets at ~30s. That = the
+observability wall down. [RESULT PENDING — update after the device run.]
