@@ -217,6 +217,12 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   trigger. Artifact/log details are in `docs/kernel-change-ledger.md`; the
   rejected debug patch is preserved under `out/` and reverted from the kernel
   worktree.
+- **Post-reset observability update (2026-07-08):** pstore remains empty/not
+  useful, and `/sys/kernel/debug/tzdbg` exists on LineageOS but content reads
+  appear risky: a broad read-only probe reached `tzdbg/boot`, adb disappeared,
+  and the phone came back with short uptime plus bootreasoncode `0x6D630309`.
+  Do not read `tzdbg/*` casually; see
+  `docs/post-reset-observability-plan-2026-07-08.md`.
 - **Next device action:** no ready-to-test hypothesis currently exists.
   **MM_NOC (`0x6D630306`) is still not fixed**; board peripherals, the
   APSS watchdog, the whole clock-sweep theory class, late simplefb/fbcon,

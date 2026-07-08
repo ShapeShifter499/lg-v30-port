@@ -284,6 +284,11 @@ What happened:
   MSM8998 Qualcomm SMMU cfg-probe S2CR BYPASS write/read quirk probe on top of
   K030. It built and fastbooted, but LineageOS returned early 48s after handoff;
   the test is rejected and the debug patch is reverted from the kernel tree.
+- A read-only post-reset observability audit found pstore still empty/not useful
+  and discovered that LineageOS exposes `/sys/kernel/debug/tzdbg`, but content
+  reads appear risky: a broad probe reached `tzdbg/boot`, then adb disappeared;
+  after recovery the phone showed short uptime and bootreasoncode `0x6D630309`.
+  The resulting plan is `docs/post-reset-observability-plan-2026-07-08.md`.
 
 Publication relevance:
 
