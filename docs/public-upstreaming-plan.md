@@ -143,3 +143,31 @@ When opening a public PR or patch series, include:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-06
+
+---
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Consolidated provenance of borrowed / derived material (Lance directive
+2026-07-08: track borrowed code + who did the work). **Aurel / whoever
+knows an exact origin: please fill in the "author" gaps below and, where a
+prior code add reused something, add a "based on" line to that file.**
+
+| Item | Source it's derived from | Author / project | License | Status |
+|---|---|---|---|---|
+| `msm8998-lge-joan.dts` | `msm8998-oneplus-common.dtsi` (regulator rails, cont-splash approach) + downstream LG `android_kernel_lge_msm8998` DTS (memory map, ramoops, wdt) | OnePlus-5 mainline contributors (**exact author TBD**) + Qualcomm/LGE | BSD-3-Clause (joan) / verify vs source's dual GPL-2.0-or-BSD | in-file header + inline "copied from" notes present ✓ |
+| anoc1 skip-reset (K030, debug) | concept: downstream `msm-arm-smmu-8998.dtsi` `qcom,skip-init`+`qcom,register-save` | Qualcomm/LGE (concept only; **code is original**) | GPL-2.0 | concept credited in-file comment ✓; needs a real upstream binding before it's shippable |
+| `joan_imem_oracle.c` (debug, reverted) | IMEM offsets + LGE_RB_MAGIC/reason constants from downstream `lge_handle_panic.c` / `reboot_reason.h` | Qualcomm/LGE | GPL-2.0 | debug-only, not for upstream; constants credited in comments |
+| `joan_disp_quiesce.c` (debug, reverted) | DSI/DPU register offsets from mainline `dsi.xml` + `dpu_3_0_msm8998.h` | (same GPL kernel tree — not external) | GPL-2.0 | debug-only |
+| `out/aurel-k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Aurel) | GPL-2.0 | reference only |
+| **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
+| initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
+
+Rule going forward for any new borrowed code: preserve the origin file's
+`Copyright` line(s) and `SPDX-License-Identifier`, add a `based on <file>
+by <author>` note in the header, and keep the kernel.org commit trailers
+(`Signed-off-by: Lance`, `Assisted-by: Claude-Code:<model>`; never
+`Co-Authored-By`). If any prior add above is missing an author I've marked
+TBD and you know it, please append it.
