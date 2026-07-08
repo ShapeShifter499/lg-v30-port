@@ -2,26 +2,67 @@
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
-Date: 2026-07-07, updated 2026-07-08 (SESSION PAUSED — see banner below)
+Date: 2026-07-07, updated 2026-07-08 (two pauses, both resolved — see below)
 
-## SESSION PAUSED — device recovering, cause confirmed (USB power, not firmware)
+## Status as of 2026-07-08: MM_NOC confirmed still the real fault; IMEM oracle reverted
 
-After 9 consecutive RAM-boot-then-reset cycles (K027 retry through K035),
-the phone landed in an unfamiliar state: `lsusb` showed `1004:6340` (LG's
-own vendor ID, not the normal `18d1:4ee7` ADB identity every prior
-successful return showed), and neither `adb` nor `fastboot` reached it. A
-215-second passive, read-only observation window showed zero change. No
-remote device commands were attempted past that point.
+Two separate pauses happened getting K035 actually run, now both
+resolved and understood:
 
-**Cause confirmed by Lance (2026-07-08): the USB 3.0 port didn't keep the
-phone charged through 9 consecutive tethered-boot cycles.** Not a
-bootloader boot-loop counter, not any firmware protection mechanism, not
-damage — a mundane power-delivery issue from that specific port. Fix:
-moved the phone to a USB 2.0 port. Lance will confirm when it's back
-online. Standing caution for future long device-test sessions: watch
-battery/charge state across many consecutive tethered boots, and prefer
-a USB 2.0 port (or otherwise-verified adequate charging) for extended
-runs.
+**Pause 1 (charging):** after 9 consecutive RAM-boot-then-reset cycles,
+the phone landed in an unfamiliar USB state (`1004:6340`, not the normal
+`18d1:4ee7` ADB identity), unreachable by `adb`/`fastboot`. Lance
+confirmed the cause: the USB 3.0 port didn't keep the phone charged
+through that many tethered-boot cycles — not firmware, not damage. Fixed
+by charging separately and moving to a USB 2.0 port.
+
+**Pause 2 (this test's own result):** with the phone healthy and on USB
+2.0, K035 (the IMEM-oracle seed write on the confirmed K030 baseline)
+was retried via `scripts/tethered-test.sh`. It again didn't return, again
+showing `1004:6340`. This time Lance photographed the actual screen
+instead of just observing USB state, which turned out to be essential:
+it's **LG's UEFI-level "LGE Crash Handler"** — a diagnostic surface never
+seen before in this project, one level below Android entirely. Full
+transcription (cropped and read at the photo's native 8160x6120
+resolution) is in the ledger's K035 result entry. Key facts:
+
+- An early boot-stage `tzbsp_reason: 0x6d630301` (TZ_NON_SEC_WDT), then
+  later in the *same* boot, `tzbsp_reason: 0x6D630306` — **the identical
+  MM_NOC value first found in K027.** The MM_NOC fault was never gone;
+  it's what this test actually hit.
+- A firmware `DXE_ASSERT!: [ResetRuntimeDxe] String.c (199): String !=
+  (void *) 0` NULL-pointer crash, then entry into Sahara mode (a
+  different low-level Qualcomm protocol, explaining why neither `adb`
+  nor `fastboot` could reach it). Recovered with a plain Volume-Down
+  hold, per the screen's own on-screen instructions — not a generic
+  forced restart, not USB+QPST raw-dump.
+
+**Reasoned conclusions (see ledger for full detail):** the DXE_ASSERT/
+Sahara crash is most likely a side effect of the IMEM-oracle write
+itself — this exact firmware crash never happened in any earlier test,
+including several that also hit MM_NOC/Config NoC resets, and the only
+new variable in K035 was writing a marker value into
+`0x146bf000+0x65c`. **The IMEM-oracle file has been reverted from the
+kernel tree** (`drivers/soc/qcom/joan_imem_oracle.c` removed, Makefile
+line reverted); the confirmed-good `anoc1_smmu` skip-reset patch remains
+and the kernel rebuilds clean with just that. Do not reintroduce a raw
+IMEM write at that offset without a better reason to believe it's safe.
+
+This also retroactively clarifies K033/K034: their residual, seemingly-
+generic Android-property `bootreasoncode=0x20` was almost certainly this
+same MM_NOC value, mis-reported/genericized by Android's own property
+layer — not a new third fault. Their actual conclusions (board
+peripherals and the APSS watchdog are not the cause) still stand,
+against MM_NOC specifically.
+
+**Current target, unchanged and clarified rather than widened: MM_NOC
+(`0x6D630306`) is still not fixed.** Continue narrowing from "SoC core,
+present regardless of DTS peripheral toggles" — RPM is confirmed
+required scaffolding (do not remove it again); board peripherals and the
+APSS watchdog are cleared. No IMEM-write oracle needed going forward;
+the plain Android bootreasoncode property (read via
+`scripts/tethered-test.sh`) is sufficient once you know to interpret a
+generic `0x20` as probably-MM_NOC rather than a mystery.
 
 The confirmed win from this session (the `anoc1_smmu` skip-reset fix,
 K030) stands regardless of this pause — it eliminated a real, named
@@ -115,23 +156,19 @@ one layer at a time instead of chasing one root cause.
   crash code at all**; it's an unhandled/default fallback. This raises
   the live possibility that no TZ detector is writing anything anymore,
   and `0x20` may just be IMEM's resting/default state.
-- **K035 (kernel patch applied, build in progress at last edit)**:
-  reintroduced Ember's 2026-07-06 IMEM-oracle initcall
+- **K035**: reintroduced Ember's 2026-07-06 IMEM-oracle initcall
   (`drivers/soc/qcom/joan_imem_oracle.c`, originally commit `f0d368d28`,
   on a different branch — not present on `joan/latest-clean-test` until
   now) on top of the confirmed K030 baseline. Writes a deliberately
   distinctive seed (`0x6D6303EE`) to the IMEM restart-reason offset
-  (`0x146bf000 + 0x65c`) from an `early_initcall`, before whatever causes
-  the reset. `/dev/mem` is absent on this LineageOS (previously-known
-  dead channel) so the original sentinel-offset readback doesn't work,
-  but that's not needed: the restart-reason offset is exactly what the
-  bootloader already exposes automatically via
-  `androidboot.product.lge.bootreasoncode` — the same channel every
-  prior K-test has read from. If next boot reports the seed **unchanged**
-  (`0x6D6303EE`), that proves no TZ detector fires anymore. If it reports
-  something **else**, a detector is still active and just named a new
-  cause. Check the ledger's K035 entry for the actual result — this
-  checkpoint was written while the kernel rebuild was still running.
+  (`0x146bf000 + 0x65c`) from an `early_initcall`. **Result: see the
+  "Status as of 2026-07-08" banner at the top of this file.** Short
+  version — the phone didn't return, and a device photo revealed LG's
+  UEFI-level crash handler showing the real underlying fault was still
+  **MM_NOC (`0x6D630306`, identical to K027)**, plus a firmware
+  `DXE_ASSERT` NULL-pointer crash almost certainly caused by this exact
+  write landing near firmware-owned data. The IMEM-oracle file has since
+  been **reverted** from the kernel tree; do not reintroduce it.
 
 ## Why anoc1_smmu
 
