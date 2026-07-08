@@ -2367,3 +2367,44 @@ prebuilt joan UEFI to confirm it survives 30s (huge data point). Caveat:
 project self-describes as "terribly broken," Windows-focused; Linux-via-UEFI
 may not work OOTB, but the survival test + source read are valuable
 regardless.
+
+## edk2 UEFI source read — TWO big findings (passivity + on-screen console is possible)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Cloned edk2-porting/edk2-msm8998 (branch new) to
+`~/vibe-coding-projects/coding/edk2-msm8998` (read-only). Two findings:
+
+**FINDING 1 — the reset is caused by our kernel's AGGRESSIVE SoC re-init,
+NOT a missing keepalive/handshake.** The edk2 UEFI's msm8998 SoC library is
+just PlatformMemoryMapLib + PlatformPeiLib — it has NO clock, SMMU, NoC,
+interconnect, SCM, or hardware-watchdog driver at all (verified: joan.dsc /
+family dsc include none; QcomPkg/Library has only those two). It leaves the
+SoC exactly as XBL configured it, pets no watchdog, does no secure
+handshake — and SURVIVES to boot Windows (far past 30s). So no positive
+keepalive is required; the ~30s reset is provoked by something our Linux
+kernel DOES during its aggressive re-init that the passive UEFI does not.
+This VALIDATES the subtraction approach (anoc1 skip-reset was one such
+suppression) and casts serious doubt on the TZ/SCM "add a handshake"
+direction (K040) — the UEFI proves none is needed. Next: find the remaining
+aggressive init that provokes MM_NOC (beyond the anoc1 SMMU reset), using
+the passive UEFI as the "minimal that works" reference.
+
+**FINDING 2 — on-screen kernel console should ACTUALLY WORK (contradicts
+joan DTS's "simplefb invisible" assumption).** The UEFI's SimpleFbDxe.c
+does ZERO display-HW register access (MmioWrite/Read count = 0). It only
+blits pixels into the framebuffer (FrameBufferBlt) + WriteBackInvalidate
+cache flush, reading base/1440x2880 from PCDs. And it displays scrolling
+console text on screen (FrameBufferSerialPortLib is the UEFI's serial/
+console output). So XBL leaves joan's display actively scanning the
+framebuffer (0x9d400000, joan's cont_splash), and a PLAIN framebuffer
+write shows up — no DSI kickoff, no panel driver needed. Therefore a
+mainline `simple-framebuffer` node + fbcon SHOULD give on-screen kernel
+boot logs — the observability we've lacked, and exactly what Lance
+originally asked for ("kernel verbose to screen"). The earlier
+command-mode "silently invisible" reasoning appears WRONG; the UEFI is the
+proof. NEXT TEST: add a simplefb node (0x9d400000, 1440x2880, a8r8g8b8) to
+joan's DTS + fbcon, boot, and read kernel logs off the screen (Lance
+photographs). If it works, every future test becomes observable.
