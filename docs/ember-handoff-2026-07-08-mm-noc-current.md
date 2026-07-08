@@ -344,6 +344,17 @@ Kernel repo: ~/vibe-coding-projects/coding/linux-mainline-v30
   what's in a boot image — should show ONLY the K030 string.
 ```
 
+## 7b. Attribution / borrowed-code tracking (Lance directive 2026-07-08)
+
+`docs/public-upstreaming-plan.md` now has a consolidated provenance table
+(what's borrowed, from whom, license, status). **Aurel: please review it —
+fill in the author "TBD" gaps you know (esp. the exact `msm8998-oneplus-common.dtsi`
+contributors), and if any prior code add reused something without a "based
+on" line, add one.** The big upcoming one: the msm8998 interconnect provider
+will derive from `sdm660.c` (AngeloGioacchino Del Regno, SoMainline/Sony
+Xperia) + `msm8996.c` (Yassine Oudjana) — their Copyright lines + SPDX must
+be preserved and it must be marked "based on", never presented as original.
+
 ## 8. Where durable records live
 
 ```text
