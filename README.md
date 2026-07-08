@@ -203,18 +203,26 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   gated by the late sweep" theory class cannot explain MM_NOC** — not
   just these three clocks. Reverted from the kernel tree (patch kept at
   `out/ember-k036-mmnoc-critical-clocks.patch` for reference).
+- **K042 (Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction): tested,
+  REJECTED.** Aurel built a K030+K042 RAM-only image that skipped mainline's
+  MSM8998-specific `qcom_smmu_cfg_probe()` S2CR BYPASS write/read quirk probe
+  before `arm_smmu_device_reset()`. Fastboot boot succeeded, but LineageOS
+  returned early 48s after handoff with the same reset-persistent class
+  (`androidboot.product.lge.bootreasoncode=0x20`, PMIC PS_HOLD/GP1 readback).
+  This rules out that mainline-only S2CR quirk probe as the residual MM_NOC
+  trigger. Artifact/log details are in `docs/kernel-change-ledger.md`; the
+  rejected debug patch is preserved under `out/` and reverted from the kernel
+  worktree.
 - **Next device action:** no ready-to-test hypothesis currently exists.
   **MM_NOC (`0x6D630306`) is still not fixed**; board peripherals, the
-  APSS watchdog, and now the whole clock-sweep theory class are all
-  cleared. The lens that worked for the confirmed anoc1 fix — a
-  driver's own unconditional reset/init touching a TZ-owned block,
-  independent of clock state — needs a new driver family to check:
-  pinctrl-msm/TLMM's own probe, the QUP/GENI/BLSP serial family, or a
-  fresh secure/SCM archaeology pass from the TrustZone side (Aurel's
-  established strength). Full reasoning:
-  `docs/ember-handoff-2026-07-08-mm-noc-current.md` — **this is now the
-  current one-file handoff to start from**, superseding the onion-peel
-  doc for present state.
+  APSS watchdog, the whole clock-sweep theory class, late simplefb/fbcon,
+  SCM restore-sec-cfg, and now the SMMU cfg-probe subtraction oracle are
+  cleared. The lens that worked for the confirmed anoc1 fix — a driver's own
+  unconditional reset/init touching a TZ-owned block, independent of clock
+  state — still needs a new driver family or firmware-side clue. Start from
+  `docs/kernel-change-ledger.md` plus
+  `docs/ember-handoff-2026-07-08-mm-noc-current.md` for the pre-K042
+  reasoning and rejected-candidate map.
 
 ## Previous status (2026-07-06)
 

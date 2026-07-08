@@ -2456,13 +2456,13 @@ end for joan's command-mode panel. Observability paths that remain:
    live display. Software-testable, non-destructive.
 Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
 
-## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (built, not device-tested yet)
+## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (tested, REJECTED)
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-08
 
-Class: `debug-only` / `unknown`; Public/PR disposition: `do not publish`.
+Class: `debug-only` / `rejected`; Public/PR disposition: `do not publish`.
 
 Purpose: follow Ember's K041/edk2 conclusion that the remaining reset is more
 likely caused by aggressive Linux re-initialization than by a missing positive
@@ -2481,7 +2481,9 @@ Handles/evidence:
 
 - Saved dirty kernel patch:
   `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`
-- Patch sha256:
+- Final tested/rejected patch copy:
+  `out/aurel-k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch`
+- Patch sha256 (both copies):
   `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`
 - Build log:
   `out/aurel-k042-build-2026-07-08.log`
@@ -2525,11 +2527,32 @@ Verification/state at record time:
   strings are present:
   - `EMBER K030 DEBUG: skipping global SMMU reset`
   - `AUREL K042 DEBUG: skipping MSM8998 S2CR bypass quirk probe`
-- Current classification: **built but not device-tested**. Do not infer
-  success/failure.
-- Current live phone state before any K042 device action: LineageOS adb visible as
-  `LGUS9986e606d55` and USB `18d1:4ee7`; no fastboot action taken yet for K042.
+- Device test log:
+  `out/tethered-test-2026-07-08T173429Z.log`
+- Device test log sha256:
+  `8220325ab2249f92425342d172a71de31dba052157706d3061a9add4f9745772`
+- Test command:
+  `./scripts/tethered-test.sh out/boot-joan-smmu-cfgprobe-k042.img 420`
+- Test result:
+  - `adb reboot bootloader` succeeded.
+  - one-client `fastboot boot` succeeded: `Sending 'boot.img' ... OKAY`,
+    `Booting ... OKAY`, total fastboot time `5.444s`.
+  - kernel handoff at `t+12s`.
+  - LineageOS adb returned at `t+60s`, **48s after handoff**.
+  - Classifier result: `RESET PERSISTS (early LOS return)`.
+- PON/bootreason readback after the early return:
+  - Android bootreason property: `androidboot.product.lge.bootreasoncode=0x20`.
+  - PMIC SID0 power-off reason: `PS_HOLD`.
+  - PMIC SID2 power-off reason: `GP1 (Keypad_Reset1)`.
+  - PON lines include `PON=0x21:PON1:HARD_RESET` / `POFF=0x2:PS_HOLD` and
+    `POFF=0x8:GP1`.
+- Current classification: **tested and rejected**. Skipping the mainline-only
+  MSM8998 Qualcomm SMMU S2CR bypass quirk probe does not fix the residual reset
+  on top of K030.
+- Current live phone state after K042: LineageOS adb visible as
+  `LGUS9986e606d55` and USB `18d1:4ee7`.
+- Kernel worktree state after recording: K042/K030 debug source changes reverted;
+  artifacts above preserve the exact tested diff.
 
-Next if continuing K042: with Lance physically present and ready, run exactly one
-RAM-only test through `scripts/tethered-test.sh out/boot-joan-smmu-cfgprobe-k042.img`
-(or equivalent one-client `sudo -n fastboot boot` flow).
+Conclusion: K042 rules out this SMMU cfg-probe write/read as the residual MM_NOC
+trigger. Do not retest K042 unless the baseline materially changes.
