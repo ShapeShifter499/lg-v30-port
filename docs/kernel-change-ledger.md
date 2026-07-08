@@ -1894,3 +1894,26 @@ far as reasoning without new device data can take it this session.
 No further device test was run against this reasoning alone (per the
 project's own discipline: don't guess blind, and don't spend more
 passes without a specific reason to believe a candidate is right).
+
+## Source-only check: pinctrl-msm/TLMM probe does not match the anoc1_smmu pattern
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Quick source check (no device involved) of one candidate raised in the
+K036 methodological correction above. `msm_pinctrl_probe()`
+(`drivers/pinctrl/qcom/pinctrl-msm.c`) does not touch hardware
+unconditionally the way `arm_smmu_device_reset()` does: it only
+ioremaps its own register tile, registers the pinctrl framework, and
+applies whatever `pinctrl-0` states consumer nodes explicitly declare
+via DT — no "walk every pin/group and force a default state"
+sweep. `msm_pinctrl_setup_pm_reset()` registers a kernel restart/
+poweroff handler that writes a `PS_HOLD` pin directly (interesting
+given our whole fault surfaces as a `PS_HOLD` reset) but only if the
+SoC's own pin-function table defines a function literally named
+`"ps_hold"` — `pinctrl-msm8998.c` defines no such function, so this
+path is a confirmed no-op on joan. **Cleared: TLMM/pinctrl-msm is not a
+match for the "unconditional TZ-block touch" pattern.** Remove it from
+the candidate list; the QUP/GENI/BLSP serial family and a secure/SCM
+archaeology pass from the TrustZone side remain the live candidates.
