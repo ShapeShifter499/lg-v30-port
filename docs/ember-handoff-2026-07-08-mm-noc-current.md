@@ -87,6 +87,36 @@ First systematic look at how OTHER msm8998 mainline ports handle this
   Config-NoC→MM-NoC layering supports it), or (2) TZ-side secure/SCM
   archaeology (Aurel's domain). No cheap Linux-side test remains.
 
+## 0b. edk2 UEFI breakthrough (2026-07-08, Lance's suggestion)
+
+Lance surfaced the Windows-on-ARM angle. `edk2-porting/edk2-msm8998`
+(Renegade Project) supports LG V30 (joan), boots via `fastboot boot` (same
+RAM-only position as our kernel), and boots Windows (survives far past
+30s). Cloned read-only to `~/vibe-coding-projects/coding/edk2-msm8998`.
+Two findings that reframe the whole investigation:
+
+1. **The reset is caused by our kernel's AGGRESSIVE SoC re-init, NOT a
+   missing keepalive/handshake.** The UEFI's entire msm8998 SoC support is
+   two tiny libs (memory-map + PEI) — NO clock, SMMU, NoC, SCM, or HW-
+   watchdog driver. It leaves the SoC as XBL configured it, pets nothing,
+   does no secure handshake, and survives. So no positive keepalive is
+   needed; something our Linux kernel DOES provokes the reset. This
+   VALIDATES subtraction (anoc1 was one such suppression) and casts serious
+   doubt on the TZ/SCM "add a handshake" direction (K040 — the UEFI proves
+   none is needed). The remaining work: find the last aggressive init that
+   provokes MM_NOC, using the passive UEFI as the "minimal that works" ref.
+
+2. **On-screen kernel console is possible (K041 tests it).** The UEFI's
+   `SimpleFbDxe.c` does ZERO display-HW register access — just blits pixels
+   to the framebuffer @0x9d400000 + cache flush — and it shows scrolling
+   text on screen. So XBL leaves joan's display scanning the framebuffer
+   and a PLAIN write is visible; no DSI kickoff / panel driver needed. The
+   joan DTS's "simplefb would be invisible" assumption is WRONG. A mainline
+   `simple-framebuffer` (no clocks) + `CONFIG_FB_SIMPLE` + fbcon should
+   print kernel boot logs on the panel = the OBSERVABILITY we've lacked.
+   K041 is the on-device test (see ledger). If it works, every future test
+   becomes a clean on-screen read, and the whole port unblocks.
+
 ## 1. Confirmed fix: `anoc1_smmu` skip-reset (K030)
 
 `anoc1_smmu` (`iommu@1680000`, an aggregator-NoC IOMMU in
