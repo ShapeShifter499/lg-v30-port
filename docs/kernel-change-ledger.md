@@ -2428,6 +2428,30 @@ Config: +CONFIG_FB_SIMPLE (VT/FB/fbcon already =y). DTS:
 `b98655d370d7484a9448457aaf2d0822e3ffed231b88249b6cf7e60eed3e1a97`. Cmdline
 adds `console=tty0 fbcon=nodefer`. Lance watching/recording the screen.
 
-Expected if it works: kernel boot log scrolls on the panel, then the
-heartbeat counts up, then the screen freezes/resets at ~30s. That = the
-observability wall down. [RESULT PENDING — update after the device run.]
+RESULT (device, Lance watching): **NOTHING appeared on screen** — stayed on
+the frozen LG logo, phone reset to LOS at ~37s (0x20, unchanged as expected).
+Address/format were correct (UEFI PcdMipiFrameBufferAddress = 0x9d400000,
+1440x2880, verified in the edk2 repo), so NOT an address bug.
+
+Likely cause + correction to edk2 Finding 2 (it was too optimistic): by the
+time Linux's simplefb + fbcon come up (device_initcall, ~several seconds
+into boot), joan's display is in the command-mode FROZEN state — showing the
+GRAM-held last XBL frame (the frozen LG logo Lance always sees), NOT actively
+scanning the framebuffer. So CPU writes to 0x9d400000 aren't scanned out =
+invisible. Two flaws in the Finding-2 reasoning: (a) the on-screen UEFI
+crash/logo screens Lance photographed are LG's OWN ABL (which IS UEFI-based
+-- "LGE Crash Handler: UEFI Crash" -- and actively manages the display),
+NOT proof a plain framebuffer write works; (b) even if the edk2 UEFI's plain
+write works, it runs right after XBL (early, possibly still-scanning window),
+while Linux fbcon is much later (frozen window). So joan's original DTS
+"simplefb would be silently invisible" comment was RIGHT after all.
+
+Cannot easily debug further blind (need a console to see if simplefb even
+bound -- chicken/egg). On-screen console via late-Linux simplefb is a dead
+end for joan's command-mode panel. Observability paths that remain:
+1. UART cable (hardware, reliable) -- Lance exploring.
+2. Boot the edk2 UEFI ITSELF (fastboot boot the prebuilt joan image): it has
+   its own working on-screen console; if it boots + shows a shell, that's an
+   observable env, and if it can chainload mainline Linux we might inherit a
+   live display. Software-testable, non-destructive.
+Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
