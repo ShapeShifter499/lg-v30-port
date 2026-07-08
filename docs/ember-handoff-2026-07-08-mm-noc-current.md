@@ -27,15 +27,17 @@ mysterious secure-world reset; it is now understood precisely:
    fixed/superseded by a wrong side-track in K033/K034, then
    **reconfirmed as still the real, standing blocker** via a device
    photo of LG's own UEFI-level crash screen (K035, detailed below).
-3. **A concrete, well-precedented, not-yet-device-tested hypothesis is
-   ready to test**: three sibling GCC clocks in the same MMSS-NoC-bridge
-   register family as one mainline already protects (with an explicit
-   upstream comment describing a crash matching our exact symptom) are
-   plausibly also unprotected. Patch built, saved, ready
-   (`out/ember-k036-mmnoc-critical-clocks.patch`; kernel build was in
-   progress when this was written — check
-   `docs/kernel-change-ledger.md`'s K036 entry for whether it's been
-   tested yet).
+3. **The obvious next hypothesis (K036) was tested and REJECTED.** Three
+   sibling GCC clocks in the same MMSS-NoC-bridge register family as one
+   mainline already protects were marked `CLK_IS_CRITICAL` to match; no
+   change. Worse, re-checking existing evidence afterward showed the
+   *entire* "unclaimed clock gated by the late sweep" theory class
+   cannot explain MM NoC at all (K027 with clocks retained and K032
+   with the sweep running normally both hit it identically) — this
+   rules out every other clock-sweep candidate too, not just the three
+   tested. **No further device test has been run since**; see §3 for
+   the corrected reasoning and what kind of candidate is actually worth
+   testing next.
 
 ## 1. Confirmed fix: `anoc1_smmu` skip-reset (K030)
 
@@ -114,7 +116,7 @@ or removing `anoc1_smmu` itself — regresses to the *shallower* Config
 NoC fault instead of clearing anything; RPM is required scaffolding,
 not a suspect).
 
-## 3. Next hypothesis, ready to test: sibling MMSS-NoC-bridge clocks (K036)
+## 3. K036 tested and REJECTED — and it corrects the whole line of attack
 
 `drivers/clk/qcom/gcc-msm8998.c` defines `gcc_mmss_noc_cfg_ahb_clk`
 (register `0x9004`) with `CLK_IS_CRITICAL` and this exact upstream
@@ -130,49 +132,64 @@ comment:
 
 `mmssnoc_axi_rpm_clk` is literally one of RPM's `icc_clks`
 (`drivers/clk/qcom/clk-smd-rpm.c`'s `msm8998_icc_clks[]` — voted once
-at rpmcc probe via `clk_smd_rpm_handoff()`, INT_MAX, never
-CCF-registered, never swept). **This comment describes our exact
-configuration**: RPM enabled + this clock gated = documented crash.
-Mainline already protects this one clock. Three siblings in the *same*
-register bank (`0x9000`-`0x9030`, same MMSS NoC bridge hardware block)
-do **not** have the same protection:
+at rpmcc probe, never CCF-registered, never swept) — this comment
+describes our exact configuration (RPM enabled + this clock gated =
+documented crash). Three siblings in the same register bank
+(`gcc_mmss_sys_noc_axi_clk` `0x9000`, `gcc_mmss_qm_ahb_clk` `0x9030`,
+`gcc_mmss_qm_core_clk` `0x900c`) lack the same protection.
 
-- `gcc_mmss_sys_noc_axi_clk` (`0x9000`)
-- `gcc_mmss_qm_ahb_clk` (`0x9030`)
-- `gcc_mmss_qm_core_clk` (`0x900c`)
+**Tested (device, Lance present, phone recovered from K035 via
+Volume-Down hold): marking all three `CLK_IS_CRITICAL` made no
+difference.** Reset persists, same bootreasoncode `0x20`/MM NoC.
+**Rejected.** Reverted from the kernel tree (patch kept at
+`out/ember-k036-mmnoc-critical-clocks.patch` for reference only — do
+not reapply without new evidence).
 
-**Patch applied** (uncommitted, on top of the anoc1 fix): marks all
-three `CLK_IS_CRITICAL`, matching the exact, already-proven-safe
-pattern mainline uses for their sibling, with a comment explaining the
-joan-specific hypothesis. Saved to
-`out/ember-k036-mmnoc-critical-clocks.patch`. This is a **narrow,
-well-precedented, low-risk test** — not a novel mechanism like the IMEM
-write that caused K035's firmware crash (see §4) — if it works, it may
-be upstream-shaped as-is (or close to it) rather than needing a debug
-property.
+**This result is more useful than a simple negative, because checking
+*why* it should have worked exposed a bigger problem with the whole
+approach.** K027 (clock/pd retention ON, i.e. the late sweep
+effectively disabled) and K032 (retention OFF, sweep runs normally,
+after the anoc1 fix) both hit MM NoC identically. If MM NoC were caused
+by *any* clock whose only path to being gated is that generic sweep,
+retaining it in K027 should have prevented the fault — it didn't. **The
+entire "unclaimed clock gated by the late sweep" theory class is ruled
+out for MM NoC**, not just the three clocks actually tested. This
+retroactively also rules out (without needing to test them)
+`gcc_aggre1_noc_xo_clk`, `gcc_boot_rom_ahb_clk`,
+`gcc_cfg_noc_usb3_axi_clk`, `gcc_bimc_hmss_axi_clk`, and the original
+(already-superseded) K028-prep `gcc_prng_ahb_clk` hypothesis — do not
+test any of these on "it's an unclaimed GCC clock" reasoning alone, that
+reasoning is now known to be insufficient here. (It correctly explained
+the *original* Config NoC / anoc1_smmu mechanism — that fix is a
+driver's own unconditional reset sequence, a different kind of thing
+from a swept clock, and remains valid.)
 
-**Status at time of writing: kernel rebuild in progress, not yet
-device-tested.** Check `docs/kernel-change-ledger.md`'s K036 entry for
-the actual result before assuming either way. To test once built:
+**What's actually worth testing next**: the lens that worked for
+anoc1_smmu was a *driver's own unconditional reset/init sequence*
+touching a TZ-owned block on every probe, independent of clock state —
+not a clock being gated. K030 vs K031 already extended this lens to
+clear the other four SMMU instances' own reset sequences. Candidates in
+the same spirit, not yet checked:
 
-```bash
-K=~/vibe-coding-projects/coding/linux-mainline-v30
-ROOT=~/vibe-coding-projects/coding/lg-v30-port
-# DTB unchanged from the confirmed K030 baseline (out/ember-k030-skipreset-2026-07-07.dtb)
-cat "$K/arch/arm64/boot/Image.gz" "$ROOT/out/ember-k030-skipreset-2026-07-07.dtb" \
-  > "$ROOT/out/Image.gz-dtb-k036"
-mkbootimg --kernel "$ROOT/out/Image.gz-dtb-k036" \
-  --ramdisk "$ROOT/out/initramfs-k023b.cpio.gz" \
-  --base 0x00000000 --pagesize 4096 \
-  --cmdline "androidboot.hardware=joan panic=0 ignore_loglevel" \
-  --output "$ROOT/out/boot-joan-mmnoc-critical-k036.img"
-"$ROOT/scripts/tethered-test.sh" "$ROOT/out/boot-joan-mmnoc-critical-k036.img" 300
-```
+- **pinctrl-msm / TLMM's own probe** — does it unconditionally
+  reconfigure pin muxing in a way that could clobber TZ-owned pin
+  config? `tlmm` is enabled in joan's board file.
+- **The QUP/GENI/BLSP serial-controller family** — `blsp2_uart1` is
+  enabled for console; worth checking whether sibling BLSP instances'
+  drivers touch shared infrastructure unconditionally even when their
+  own DT nodes aren't individually enabled.
+- **A fresh secure/SCM archaeology pass** — genuinely Aurel's
+  established strength (see the K025 addendum in
+  `docs/ember-handoff-2026-07-06-session2.md` for the prior pass this
+  built on). This session's investigation has been DTS/clock
+  subtraction from the Linux side; the actual fault is TrustZone-side,
+  and a pass from that direction may find what subtraction alone
+  can't.
 
-Survives (≥90s, deliberate classifier reboot) → MM NoC fixed, move to
-the real bring-up initramfs to confirm USB actually enumerates. Resets
-early with the same or a new bootreasoncode → this sibling-clock theory
-is wrong or incomplete; check the ledger for what to try next.
+No further device test was run against pure reasoning alone this
+session — per the project's standing discipline, don't guess blind
+against the phone without a specific reason to believe a candidate is
+right.
 
 ## 4. Method correction: do not repeat the K035 IMEM write
 
@@ -216,7 +233,7 @@ Kept from earlier sessions' tables, extended:
 | K033 all board peripherals disabled (post-fix) | still resets, generic `0x20` | not peripherals |
 | K034 APSS watchdog disabled outright (post-fix) | still resets, generic `0x20` | not the non-secure watchdog |
 | K035 IMEM oracle write (post-fix) | firmware crash, Sahara mode | confirms `0x20` was MM NoC all along; write itself likely crashed XBL, reverted |
-| K036 sibling MMSS-NoC-bridge clocks CLK_IS_CRITICAL | **not yet tested** | ready to run |
+| K036 sibling MMSS-NoC-bridge clocks CLK_IS_CRITICAL | still resets, generic `0x20` | **rejected; also rules out the whole clock-sweep theory class for MM NoC (see §3)** |
 
 ## 6. Safety rules (binding, unchanged)
 
@@ -241,31 +258,31 @@ Kept from earlier sessions' tables, extended:
    a genuinely informative firmware crash screen, not just a generic
    wedge. Photos are worth taking.
 10. Save debug kernel patches to `out/*.patch` before building; revert
-    debug-only changes from the tree once a test line is concluded so
-    the tree doesn't silently drift dirty across sessions (current
-    exception: the confirmed-good anoc1 patch and the K036 hypothesis
-    patch are both deliberately still applied — see §7).
+    debug-only or rejected changes from the tree once a test line is
+    concluded so the tree doesn't silently drift dirty across sessions
+    (current exception: only the confirmed-good anoc1 patch remains
+    applied — see §7).
 
 ## 7. Repo state at time of writing
 
 ```text
 Harness repo: ~/vibe-coding-projects/coding/lg-v30-port
-  branch master, clean, commits through fa617b0 (this file not yet
-  committed at time of writing it — commit immediately after saving).
+  branch master, clean, commits through ee8492d.
   New reusable tooling: scripts/tethered-test.sh (one-client fastboot
   discipline, LOS-return classification, PON/bootreason readback,
   explicit handling of "device absent" / "unfamiliar USB state, stop" /
   "still fastboot, probably slow" outcomes).
 
 Kernel repo: ~/vibe-coding-projects/coding/linux-mainline-v30
-  branch joan/latest-clean-test, DIRTY on purpose:
+  branch joan/latest-clean-test, DIRTY on purpose with ONLY the
+  confirmed fix:
     M drivers/iommu/arm/arm-smmu/arm-smmu.c   (K030 fix, confirmed good)
-    M drivers/clk/qcom/gcc-msm8998.c          (K036 hypothesis, untested)
   joan_imem_oracle.c REMOVED (K035's write, reverted).
-  Both patches saved independently under out/*.patch regardless of tree
-  state. Last build (Image.gz) includes both; verify with
+  gcc-msm8998.c REVERTED (K036's hypothesis, rejected -- git checkout
+  brought it back to clean).
+  Rebuilds clean; verify with
   `strings vmlinux | grep -E "EMBER K030|joan-imem"` before trusting
-  what's in a boot image — should show the K030 string, NOT joan-imem.
+  what's in a boot image — should show ONLY the K030 string.
 ```
 
 ## 8. Where durable records live
@@ -285,9 +302,14 @@ K035 are at `Talk/Shared_AI_agents_files/20260708_051750.jpg` and
 
 ## Final instruction
 
-Start from this file. If K036 hasn't been tested yet, that's the next
-device action — the patch is built and the test command is in §3. If it
-has, check the ledger's K036 entry for the result and follow its own
-"next" pointer. If the phone is ever in an unfamiliar, unreachable USB
-state, look at the actual screen (§6 rule 9) before concluding it's
-stuck.
+Start from this file. **No hypothesis is currently loaded and ready to
+test** — K036 was rejected and, more importantly, ruled out the entire
+class of candidate it came from (see §3). The next device action needs
+a candidate from a genuinely different angle first: pinctrl-msm/TLMM's
+own probe, the QUP/GENI/BLSP serial family, or — most promising — a
+fresh secure/SCM archaeology pass from the TrustZone side (§3's list).
+Pick one, reason through it in source first (no device needed for
+that), and only then build and test via
+`scripts/tethered-test.sh`. If the phone is ever in an unfamiliar,
+unreachable USB state, look at the actual screen (§6 rule 9) before
+concluding it's stuck.
