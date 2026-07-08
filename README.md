@@ -52,7 +52,10 @@ classifier ramdisk (spin + 90s deliberate reboot, `panic=0`), use
 `scripts/tethered-test.sh <boot.img> [timeout_seconds]` to run the full
 tethered-boot-and-classify workflow safely (one-client fastboot
 discipline, LOS-return classification, PON/bootreason readback). See the
-script's own header for its exit-code meanings.
+script's own header for its exit-code meanings. After any early reset/panic,
+immediately run `scripts/read-pstore-partition.sh` from LineageOS root to pull
+the raw pstore partition; mounted `/sys/fs/pstore` can be empty while the raw
+partition still contains the mainline ramoops console.
 
 Boot format (from LineageOS BoardConfig): `Image.gz-dtb` appended DTB, base
 0x0, pagesize 4096. LG aboot may not support `fastboot boot` — untested;
@@ -207,32 +210,38 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   gated by the late sweep" theory class cannot explain MM_NOC** — not
   just these three clocks. Reverted from the kernel tree (patch kept at
   `out/ember-k036-mmnoc-critical-clocks.patch` for reference).
-- **K042 (Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction): tested,
-  REJECTED.** Aurel built a K030+K042 RAM-only image that skipped mainline's
-  MSM8998-specific `qcom_smmu_cfg_probe()` S2CR BYPASS write/read quirk probe
-  before `arm_smmu_device_reset()`. Fastboot boot succeeded, but LineageOS
-  returned early 48s after handoff with the same reset-persistent class
-  (`androidboot.product.lge.bootreasoncode=0x20`, PMIC PS_HOLD/GP1 readback).
-  This rules out that mainline-only S2CR quirk probe as the residual MM_NOC
-  trigger. Artifact/log details are in `docs/kernel-change-ledger.md`; the
-  rejected debug patch is preserved under `out/` and reverted from the kernel
-  worktree.
-- **Post-reset observability update (2026-07-08):** pstore remains empty/not
-  useful, and `/sys/kernel/debug/tzdbg` exists on LineageOS but content reads
-  appear risky: a broad read-only probe reached `tzdbg/boot`, adb disappeared,
-  and the phone came back with short uptime plus bootreasoncode `0x6D630309`.
-  Do not read `tzdbg/*` casually; see
-  `docs/post-reset-observability-plan-2026-07-08.md`.
-- **Next device action:** no ready-to-test hypothesis currently exists.
-  **MM_NOC (`0x6D630306`) is still not fixed**; board peripherals, the
-  APSS watchdog, the whole clock-sweep theory class, late simplefb/fbcon,
-  SCM restore-sec-cfg, and now the SMMU cfg-probe subtraction oracle are
-  cleared. The lens that worked for the confirmed anoc1 fix — a driver's own
-  unconditional reset/init touching a TZ-owned block, independent of clock
-  state — still needs a new driver family or firmware-side clue. Start from
-  `docs/kernel-change-ledger.md` plus
-  `docs/ember-handoff-2026-07-08-mm-noc-current.md` for the pre-K042
-  reasoning and rejected-candidate map.
+- **Post-reset observability breakthrough (2026-07-08): raw pstore works if
+  read from the block partition, not from mounted `/sys/fs/pstore`.** The first
+  256 KiB read of `/dev/block/platform/soc/1da4000.ufshc/by-name/pstore` from
+  LineageOS root preserved K042's mainline ramoops console. This overturned the
+  old conclusion that pstore was useless and showed K042 died at ~0.073s in
+  TLMM/GPIO registration before it could test the SMMU cfg-probe hypothesis.
+  Details: `docs/observability-tlmm-gpio-2026-07-08.md`.
+- **K042 reclassified: superseded/invalid SMMU oracle, not a valid SMMU
+  rejection.** The K042 RAM-only image did return to LineageOS early, but raw
+  pstore later proved the immediate failure was an MSM8998 pinctrl/gpio abort
+  (`gpiochip_add_data_with_key()` / `msm_gpio_get_direction()`), not the SMMU
+  cfg-probe code under test. Keep the K042 patch as preserved debug evidence,
+  but do not cite it as ruling out SMMU cfg-probe.
+- **K043-K050 TLMM/GPIO narrowing produced a current DTS-only candidate.**
+  Disabling TLMM (K043), skipping `msm_gpio_init()` (K044), and disabling
+  `get_direction` readback (K047) all survived the classifier window. Pstore
+  for K046/K048/K049 identified protected/inaccessible GPIO direction reads at
+  GPIO49, GPIO50, and GPIO81. K050, adding
+  `gpio-reserved-ranges = <0 4>, <49 4>, <81 4>;`, survived to the deliberate
+  reboot window (`t+123s`, 111s after handoff). Candidate patch:
+  `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`.
+- **Observability tooling/caution:** use `scripts/read-pstore-partition.sh`
+  immediately after failed RAM boots to capture the raw pstore partition.
+  `/sys/kernel/debug/tzdbg` exists on LineageOS, but reading its contents caused
+  adb/device disappearance during this session. Do not casually
+  `cat /sys/kernel/debug/tzdbg/*`; prefer raw-pstore capture first.
+- **Next device/software action:** K050 is source-supported for GPIO81..84 by
+  multiple upstream MSM8998 DTS files, but GPIO49..52 is currently
+  pstore/device-proven rather than source-obvious. Find stronger source evidence
+  for `<49 4>` or decide that joan firmware behavior is enough, then turn K050
+  into a cleaned candidate and run one RAM-only confirmation test before public
+  push.
 
 ## Previous status (2026-07-06)
 

@@ -15,8 +15,9 @@ Safe/currently useful:
   post-reset signal from LineageOS.
 - PMIC/PON readback through the existing harness remains useful for confirming
   PS_HOLD-style reset class.
-- Listing `/sys/fs/pstore` is safe but currently not useful: it is mounted and
-  empty after these tests.
+- Listing `/sys/fs/pstore` is safe but misleading by itself: it can be mounted
+  and empty even when the raw pstore partition still contains mainline ramoops.
+  Use `scripts/read-pstore-partition.sh`.
 - Source archaeology confirms downstream has an IMEM restart-reason path at
   `0x146bf000 + 0x65c`, but raw writes to this area are unsafe after K035.
 
@@ -32,8 +33,8 @@ Unsafe / do not use casually:
   controlled reproduction.
 - Do not repeat K035's raw IMEM restart-reason write. It likely crashed LG/XBL's
   reset handler into Sahara/DXE_ASSERT.
-- Do not rely on ramoops/pstore as a mainline crash channel unless a new
-  persistence story is proven.
+- Do not rely on mounted `/sys/fs/pstore` alone. The raw pstore partition is now
+  proven useful if read quickly after reset; see the supersession note below.
 
 ## Evidence handles from this audit
 
@@ -56,14 +57,15 @@ and the K035/K041/K042 handoffs:
 
 - `fastboot boot` is accepted from adb-entered bootloader.
 - Mainline still fails before its USB gadget/debug channel appears.
-- pstore/ramoops did not survive LG's boot chain usefully; even LOS-to-LOS warm
-  paths lost content.
+- Mounted `/sys/fs/pstore` did not expose useful content, but raw block reads of
+  the `pstore` partition later proved useful.
 - K035's device photo showed LG firmware can display `tzbsp_reason` directly,
   and confirmed residual `0x6D630306` MM_NOC. That screen is valuable when it
   appears naturally, but trying to force it with IMEM writes is unsafe.
 - K041 proved late Linux simplefb/fbcon does not provide useful on-screen
   console on joan's command-mode panel.
-- K042 rejected SMMU cfg-probe subtraction and left no ready-to-test fix.
+- K042 was later superseded by raw-pstore evidence: it died in TLMM/GPIO before
+  testing SMMU cfg-probe. K050 is now the ready-to-review candidate line.
 
 ## Source findings
 
@@ -134,14 +136,14 @@ Relevant evidence/source:
 - `/sys/fs/pstore` is mounted in LineageOS.
 - Probe result: pstore directory was empty when readable; later shell read was
   permission denied.
-- Existing ledger evidence says ramoops content does not survive LG's boot chain
-  usefully.
+- Superseding result: raw `/dev/block/.../by-name/pstore` reads preserved K042
+  mainline ramoops when captured quickly from LineageOS root.
 
 Implication:
 
-- Keep pstore checks in the harmless checklist, but do not spend more mainline
-  kernel iterations trying to make ramoops the primary channel unless a new LG
-  backup path is found.
+- Keep raw-pstore capture as the harmless first-line checklist item after early
+  reset/panic tests. Use `scripts/read-pstore-partition.sh`; do not rely on
+  mounted `/sys/fs/pstore` alone.
 
 ### Qualcomm minidump / SMEM
 
@@ -230,3 +232,24 @@ If none of those exists, do not spend device cycles on another blind boot.
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-08
+
+## Aurel supersession note — raw pstore/TLMM breakthrough
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-08
+
+This plan is superseded in two important ways by
+`docs/observability-tlmm-gpio-2026-07-08.md`:
+
+1. Mounted `/sys/fs/pstore` being empty was misleading. The raw pstore partition
+   `/dev/block/platform/soc/1da4000.ufshc/by-name/pstore` preserved K042's
+   mainline ramoops console when read quickly from LineageOS root. Use
+   `scripts/read-pstore-partition.sh` after future failed RAM boots.
+2. K042 is not a valid SMMU cfg-probe rejection. Raw pstore showed it died first
+   in MSM8998 TLMM/GPIO registration. K043-K050 then isolated the failure to
+   protected GPIO direction readback and produced the K050 candidate:
+   `gpio-reserved-ranges = <0 4>, <49 4>, <81 4>;`.
+
+The `tzdbg` caution below still stands: broad debugfs content reads caused adb
+disappearance in this session. Prefer raw pstore before touching `tzdbg/*`.

@@ -73,10 +73,12 @@ Current technical status:
 - Mainline still does not reach a durable mainline debug/userspace channel.
 - K030 found a real debug-only suppression: skipping global reset of `anoc1_smmu`
   removes a TrustZone Config-NoC fault class.
-- The remaining blocker is still MM_NOC (`0x6D630306`) / early controlled reset.
-- K042 is now rejected: suppressing the MSM8998 Qualcomm SMMU cfg-probe S2CR
-  quirk-probe on top of K030 did not fix the reset.
-- No ready-to-test next device hypothesis exists at this document's creation.
+- The old "no pstore" assumption is superseded: mounted `/sys/fs/pstore` can be
+  empty while the raw `pstore` partition still preserves mainline ramoops.
+- K042 is reclassified: it did not validly reject SMMU cfg-probe, because raw
+  pstore showed an earlier TLMM/GPIO abort.
+- K050 is the current best candidate line: reserve TLMM GPIO ranges
+  `<49 4>` and `<81 4>` in addition to existing `<0 4>`, after source review.
 
 ## Chronological history
 
@@ -251,7 +253,7 @@ Publication relevance:
   `ember,debug-skip-reset` property. It needs a proper upstreamable Qualcomm
   SMMU representation if it becomes part of a real fix.
 
-### 2026-07-08 — Linux-side exhaustion, edk2 reframe, and K042 rejection
+### 2026-07-08 — observability breakthrough and TLMM/GPIO reserved-ranges lead
 
 Primary helpers: Ember / Claude-Code through the consolidated handoff and K041;
 Aurel / Hermes for the provenance audit and K042 source-first/device test.
@@ -262,14 +264,17 @@ Main artifacts:
 - `docs/ember-handoff-2026-07-08-mm-noc-current.md`
 - `docs/ember-handoff-paste-2026-07-08.md`
 - `docs/public-upstreaming-plan.md`
-- K036-K042 entries in `docs/kernel-change-ledger.md`
+- K036-K050 entries in `docs/kernel-change-ledger.md`
+- `docs/observability-tlmm-gpio-2026-07-08.md`
+- `scripts/read-pstore-partition.sh`
 
 What happened:
 
 - K036 rejected sibling MMSS-NoC bridge critical clocks and corrected the whole
   clock-sweep theory class.
-- Source checks cleared pinctrl-msm/TLMM and QUP/GENI/BLSP as worthwhile device
-  tests for MM_NOC.
+- The earlier source-only "pinctrl-msm/TLMM cleared" conclusion was superseded
+  by device evidence: raw pstore showed TLMM/GPIO registration was the first
+  concrete aborting path.
 - K037 rejected the non-secure watchdog timeout theory.
 - K038 rejected bootloader display underflow / display quiesce as the cause.
 - edk2-msm8998/Renegade Project was identified as important reference evidence:
@@ -280,21 +285,25 @@ What happened:
   on joan's command-mode panel.
 - Ember explicitly asked for borrowed-code/provenance cleanup. Aurel applied that
   note to `docs/public-upstreaming-plan.md`.
-- K042 tested the next SMMU-adjacent source candidate: suppressing mainline's
-  MSM8998 Qualcomm SMMU cfg-probe S2CR BYPASS write/read quirk probe on top of
-  K030. It built and fastbooted, but LineageOS returned early 48s after handoff;
-  the test is rejected and the debug patch is reverted from the kernel tree.
-- A read-only post-reset observability audit found pstore still empty/not useful
-  and discovered that LineageOS exposes `/sys/kernel/debug/tzdbg`, but content
-  reads appear risky: a broad probe reached `tzdbg/boot`, then adb disappeared;
-  after recovery the phone showed short uptime and bootreasoncode `0x6D630309`.
-  The resulting plan is `docs/post-reset-observability-plan-2026-07-08.md`.
+- K042 initially looked like a negative SMMU cfg-probe test, but the later
+  raw-pstore read reclassified it: the image died first in TLMM/GPIO
+  registration before SMMU behavior could be tested.
+- K043-K050 used that pstore evidence to isolate MSM8998 protected GPIO
+  direction readback. K050 (`gpio-reserved-ranges = <0 4>, <49 4>, <81 4>;`)
+  survived the classifier and is the current best candidate pending source review.
+- The raw pstore partition path became the preferred observability channel:
+  mounted `/sys/fs/pstore` can be empty, but
+  `/dev/block/platform/soc/1da4000.ufshc/by-name/pstore` preserved mainline
+  ramoops when read quickly after reset. A helper now exists at
+  `scripts/read-pstore-partition.sh`.
+- LineageOS exposes `/sys/kernel/debug/tzdbg`, but content reads appear risky:
+  reading `tzdbg/general` made adb disappear. Prefer raw pstore first.
 
 Publication relevance:
 
 - The project now has a clear evidence trail that many intuitive fixes are
   rejected.
-- No ready-to-test next device hypothesis exists as of K042.
+- K050 is a ready-to-review candidate line, not yet public-ready code.
 - Future public work should not carry debug gates or timing oracles on a clean
   branch.
 
@@ -312,7 +321,8 @@ full per-test details, hashes, and logs.
 | K025-K027 | Aurel / Hermes | Secure-interface archaeology, IMEM/restart-reason oracle, NoC clue follow-up | comparison/rejected, but produced important TZ NoC clue |
 | K028-K036 | Ember / Claude-Code | NoC onion-peel, anoc1 SMMU breakthrough, residual MM_NOC narrowing | K030 confirmed debug fix; surrounding tests rejected/narrowing |
 | K037-K041 | Ember / Claude-Code | Community research, watchdog/display/simplefb/edk2 reframing | rejected/observability evidence; edk2 is important reference |
-| K042 | Aurel / Hermes | SMMU cfg-probe S2CR quirk-probe subtraction | tested and rejected; patch preserved/reverted |
+| K042 | Aurel / Hermes | SMMU cfg-probe S2CR quirk-probe subtraction | superseded: pstore showed earlier TLMM/GPIO abort, not a valid SMMU rejection |
+| K043-K050 | Aurel / Hermes | Raw-pstore observability and TLMM/GPIO reserved-range narrowing | K050 survivor; `<81 4>` has upstream MSM8998 precedent, `<49 4>` is pstore/device-proven and source-review pending |
 
 Known limitation: older ledger entries were not all written with uniform
 `Written-by` / `Agent-harness` / `Date` fields inside each K entry. The history is
@@ -349,11 +359,15 @@ Public-shaped / potentially useful:
 
 Blocked / not public-ready as-is:
 
-- ramoops layout, because pstore did not survive the LG boot chain usefully;
+- the original ramoops layout remains blocked for public value until the raw
+  pstore-partition workflow is cleaned up and explained; mounted `/sys/fs/pstore`
+  alone is misleading, but raw pstore is now proven useful;
 - K030 `ember,debug-skip-reset`, because it is a debug DT property rather than a
   real upstream binding/implementation;
 - every timing oracle, raw register poke, direct SCM experiment, IMEM writer,
-  display quiesce hook, or SMMU K042-style subtraction patch.
+  display quiesce hook, or SMMU K042-style subtraction patch;
+- K050 is promising but not yet public-ready until the reserved GPIO ranges are
+  source-reviewed and converted to a clean commit.
 
 Rejected experiments should still be published as evidence only if we publish a
 bringup-history/debug repo. They should not be on a clean kernel PR branch.

@@ -2457,13 +2457,13 @@ end for joan's command-mode panel. Observability paths that remain:
    live display. Software-testable, non-destructive.
 Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
 
-## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (tested, REJECTED)
+## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (tested, later superseded by pstore)
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-08
 
-Class: `debug-only` / `rejected`; Public/PR disposition: `do not publish`.
+Class: `debug-only` / `superseded`; Public/PR disposition: `do not publish`.
 
 Purpose: follow Ember's K041/edk2 conclusion that the remaining reset is more
 likely caused by aggressive Linux re-initialization than by a missing positive
@@ -2547,13 +2547,109 @@ Verification/state at record time:
   - PMIC SID2 power-off reason: `GP1 (Keypad_Reset1)`.
   - PON lines include `PON=0x21:PON1:HARD_RESET` / `POFF=0x2:PS_HOLD` and
     `POFF=0x8:GP1`.
-- Current classification: **tested and rejected**. Skipping the mainline-only
-  MSM8998 Qualcomm SMMU S2CR bypass quirk probe does not fix the residual reset
-  on top of K030.
+- Original classification at test time was **tested and rejected** based only on
+  early LineageOS return. This is now corrected by K043/K046 raw-pstore evidence:
+  K042 died in MSM8998 TLMM/GPIO registration at ~0.073s before it could reach
+  the SMMU cfg-probe path under test.
 - Current live phone state after K042: LineageOS adb visible as
   `LGUS9986e606d55` and USB `18d1:4ee7`.
 - Kernel worktree state after recording: K042/K030 debug source changes reverted;
   artifacts above preserve the exact tested diff.
 
-Conclusion: K042 rules out this SMMU cfg-probe write/read as the residual MM_NOC
-trigger. Do not retest K042 unless the baseline materially changes.
+Conclusion correction (Aurel, 2026-07-08): K042 does **not** rule out the SMMU
+cfg-probe write/read. It is superseded by pstore evidence that exposed an
+earlier TLMM/GPIO abort. Do not cite K042 as a valid negative SMMU result.
+
+
+### K043-K050 — raw-pstore observability and MSM8998 TLMM/GPIO reserved-ranges narrowing
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-08
+
+Class: mixed `debug-only` oracles plus one `unknown`/candidate DTS result;
+Public/PR disposition: K043-K049 `do not publish`; K050 `needs cleanup`.
+
+Purpose: follow the user's "observability before more fixes" direction. Instead
+of another blind SMMU/SCM test, read post-reset persistent evidence from
+LineageOS and use it to identify the actual early fault.
+
+Observability finding:
+
+- Mounted `/sys/fs/pstore` was empty/misleading, but the raw pstore partition
+  `/dev/block/platform/soc/1da4000.ufshc/by-name/pstore` preserved the K042
+  mainline ramoops console when read quickly from LineageOS root. The helper
+  `scripts/read-pstore-partition.sh` now captures the first 256 KiB plus strings
+  and metadata.
+- Evidence:
+  - `out/lineage-root-observability-2026-07-08/pstore-partition-first256k.bin`
+    sha256 `e0573c228d85349c292be545a239a6741ecb6f3965b65538805a1465024c89bc`
+  - `out/lineage-root-observability-2026-07-08/pstore-partition-first256k.bin.strings.txt`
+    sha256 `323df4a1e65649492ba07d9e35f717748268f7f2fa0ce2166adbf3feb02b63d8`
+- K042 pstore showed `Asynchronous SError Interrupt` at ~0.073s in
+  `gpiochip_add_data_with_key()` / `msm_pinctrl_probe()`, invalidating the old
+  SMMU-cfg-probe rejection.
+- `/sys/kernel/debug/tzdbg` exists but content reads are risky: reading
+  `tzdbg/general` caused adb/device disappearance in this session. Do not use
+  broad `tzdbg/*` cats casually.
+
+Test matrix:
+
+| Test | Handle | Change | Result | Evidence |
+|---|---|---|---|---|
+| K043 | `out/aurel-k043-tlmm-disabled-debug-2026-07-08.patch` | DTS debug: `&tlmm { status = "disabled"; }` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181424Z.log` sha256 `def3e144ea58140815a1767e4feb5b6b7f6f9122f674f3fb19b0e7779e5be1b9` |
+| K044 | `out/aurel-k044-msm8998-skip-gpio-init-debug-2026-07-08.patch` | Source debug: skip `msm_gpio_init()` on msm8998 | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181914Z.log` sha256 `6b69bdaac61158b8f43c7ce16701f7d7a201fc9e722965cdc5c909e516fbcf12` |
+| K045 | `out/aurel-k045-msm8998-gpiochip-no-irq-debug-2026-07-08.patch` | Source debug: register gpiochip without TLMM IRQ chip | Early reset; pstore still panicked in `gpiochip_add_data_with_key()` | `out/tethered-test-2026-07-08T182336Z.log` sha256 `80b82ca63e8c154e0b1e3047a7910f9688bc9843d2db0f8e0378b4b586158316` |
+| K046 | `out/aurel-k046-drop-gpio-reserved-ranges-debug-2026-07-08.patch` | DTS debug: remove `gpio-reserved-ranges` | Pstore synchronous external abort in `msm_gpio_get_direction()` at offset `0x531000` = GPIO49 | `out/tethered-test-2026-07-08T182655Z.log` sha256 `5aeb7c9bb4bcd8238757b6dd5fbfa52776c28bae092de0f2dba7fda25c59f590` |
+| K047 | `out/aurel-k047-msm8998-no-get-direction-debug-2026-07-08.patch` | Source debug: set `get_direction = NULL` on msm8998 TLMM | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T183330Z.log` sha256 `e7618f19b8cdc011d8b383f6c921132cd6f8d3c864add79820c312a4b694bc1e` |
+| K048 | `out/aurel-k048-reserve-gpio49-debug-2026-07-08.patch` | DTS debug: reserve `<49 1>` in addition to `<0 4>` | Abort moved to `0x532000` = GPIO50 | `out/tethered-test-2026-07-08T183742Z.log` sha256 `8a4ff5c3257cf5f827f381a899a40f75861d1878512c1d42cec7abbf93689c32` |
+| K049 | `out/aurel-k049-reserve-gpio49-52-debug-2026-07-08.patch` | DTS debug: reserve `<49 4>` | Abort moved to `0x151000` = GPIO81 | `out/tethered-test-2026-07-08T184003Z.log` sha256 `dd9cf4176fe1e31eb10c588670835a785e9f6e77a2485abeceb768e76de5a605` |
+| K050 | `out/aurel-k050-reserve-gpio49-52-81-84-debug-2026-07-08.patch` | DTS debug/candidate: reserve `<49 4>` and `<81 4>` plus existing `<0 4>` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T184221Z.log` sha256 `ed68d29ed4cd5b586f33347db739f1be3655f2c0e1c160f7d07292184f09e138` |
+
+Candidate patch:
+
+- Clean candidate artifact:
+  `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`
+  sha256 `6a0227897f48940fb488747f0a8d927916816140627af8a62aba289f0a7b601a`.
+- Candidate DTS content:
+
+```dts
+&tlmm {
+	gpio-reserved-ranges = <0 4>, <49 4>, <81 4>;
+};
+```
+
+Interpretation:
+
+- `0x531000 = NORTH 0x500000 + GPIO49 * 0x1000`.
+- `0x532000 = NORTH 0x500000 + GPIO50 * 0x1000`.
+- `0x151000 = WEST 0x100000 + GPIO81 * 0x1000`.
+- The failure is a protected/inaccessible TLMM direction read during gpiolib's
+  initial direction readback, not an SMMU cfg-probe failure.
+- Reserving the observed inaccessible ranges makes gpiolib skip those direction
+  reads and lets the kernel reach the classifier's deliberate reboot path.
+
+Initial source review after K050:
+
+- Upstream MSM8998 boards `msm8998-mtp.dts`, `msm8998-oneplus-common.dtsi`,
+  `msm8998-xiaomi-sagit.dts`, and `msm8998-clamshell.dtsi` already reserve
+  `<81 4>`, independently supporting GPIO81..84.
+- Downstream joan common pinctrl defines modes over GPIO49..52 and GPIO81..84,
+  but a source search found no active references to those labels in the joan DTS
+  tree; one KR MME variant references GPIO81 directly.
+- No current mainline joan node consumes GPIO49..52 or GPIO81..84.
+- GPIO49..52 is still source-weak but pstore/device-proven on this phone.
+
+Open follow-up before public commit:
+
+1. Find stronger source evidence for GPIO49..52 if possible, or explicitly justify
+   it as joan/LGE-firmware-specific behavior.
+2. Decide whether DTS reserved ranges are sufficient/clean or whether a
+   driver-level msm8998 `get_direction` quirk is required. K047 proves the
+   driver route also survives, but it is broader.
+3. Convert K050 into a clean kernel commit only after review, then rerun one
+   RAM-only confirmation test.
+4. Keep raw-pstore capture in the harness for every future early-reset test.
+
+Kernel worktree after this session: clean `joan/latest-clean-test` at
+`0d7df4134`; all K043-K050 debug changes reverted/preserved as `out/*.patch`.

@@ -422,3 +422,29 @@ concrete SCM-side candidate exists, reason it through in source first,
 then build and test via `scripts/tethered-test.sh`. If the phone is
 ever in an unfamiliar, unreachable USB state, look at the actual screen
 (§6 rule 9) before concluding it's stuck.
+
+## Aurel addendum — 2026-07-08 raw-pstore/TLMM correction
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-08
+
+This handoff's source-only conclusion that pinctrl-msm/TLMM was "checked and
+cleared" is now superseded by device evidence. A raw read of the LineageOS
+`pstore` partition preserved the K042 mainline ramoops log and showed the image
+panicked at ~0.073s in MSM8998 TLMM/GPIO registration, before the SMMU cfg-probe
+hypothesis could be tested. K043-K050 isolated the issue to protected/inaccessible
+GPIO direction readback in `msm_gpio_get_direction()` during `gpiochip_add_data()`.
+
+Current best candidate from K050:
+
+```dts
+&tlmm {
+	gpio-reserved-ranges = <0 4>, <49 4>, <81 4>;
+};
+```
+
+K050 survived the classifier window (`t+123s`, 111s after handoff). See
+`docs/observability-tlmm-gpio-2026-07-08.md` and the K043-K050 ledger entry for
+full artifacts/hashes. Do not continue from the old "TLMM cleared" statement
+without this correction.
