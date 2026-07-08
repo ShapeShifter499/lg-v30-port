@@ -114,8 +114,15 @@ Two findings that reframe the whole investigation:
    joan DTS's "simplefb would be invisible" assumption is WRONG. A mainline
    `simple-framebuffer` (no clocks) + `CONFIG_FB_SIMPLE` + fbcon should
    print kernel boot logs on the panel = the OBSERVABILITY we've lacked.
-   K041 is the on-device test (see ledger). If it works, every future test
-   becomes a clean on-screen read, and the whole port unblocks.
+   K041 TESTED THIS ON-DEVICE: **NEGATIVE** — nothing on screen (frozen LG
+   logo). Cause: by the time Linux fbcon comes up (~seconds in), joan's
+   command-mode panel is frozen on the GRAM-held last XBL frame, not
+   scanning the framebuffer, so writes are invisible. Correction: the
+   on-screen UEFI screens are LG's own ABL (actively drives the display),
+   not proof a plain write works; joan's original 'simplefb invisible'
+   comment was right. On-screen console via late-Linux simplefb is a DEAD
+   END for this panel. Finding 1 still stands. Observability now: UART
+   cable (hardware), or boot the edk2 UEFI itself (its own console).
 
 ## 1. Confirmed fix: `anoc1_smmu` skip-reset (K030)
 
