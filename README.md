@@ -190,16 +190,31 @@ Active. Parcels marked *no-device* are fully doable without the phone.
   future sessions/agents don't re-derive it from scratch. It also
   explicitly distinguishes "device absent" / "unfamiliar USB state, stop"
   / "still fastboot, probably just slow" outcomes.
-- **Next device action:** the standing target is unchanged and now
-  clarified rather than widened — **MM_NOC (`0x6D630306`) is still not
-  fixed**, and K033/K034 already showed it's neither a board peripheral
-  nor the APSS watchdog. Continue narrowing from "SoC core, always
-  present regardless of DTS peripheral toggles" (RPM is confirmed
-  required scaffolding, do not remove it again). No IMEM-write oracle
-  needed for now — the confirmed K030 baseline (full DTS + anoc1 skip-
-  reset + plain default cmdline) plus `scripts/tethered-test.sh` is
-  sufficient to keep reading the reset classification via the normal
-  Android bootreasoncode property.
+- **K036 (sibling MMSS-NoC-bridge clocks marked critical): tested,
+  REJECTED — and it corrects the whole line of attack.** `gcc_mmss_noc_
+  cfg_ahb_clk` is already `CLK_IS_CRITICAL` with an upstream comment
+  documenting a crash in exactly our RPM configuration; three sibling
+  clocks in the same register bank (`gcc_mmss_sys_noc_axi_clk`,
+  `gcc_mmss_qm_ahb_clk`, `gcc_mmss_qm_core_clk`) lacked the same
+  protection. Marking them critical too made no difference — still
+  resets, still `0x20`. More importantly: comparing K027 (clock
+  retention on) against K032 (retention off, after the anoc1 fix), both
+  of which hit MM_NOC identically, shows the **entire "unclaimed clock
+  gated by the late sweep" theory class cannot explain MM_NOC** — not
+  just these three clocks. Reverted from the kernel tree (patch kept at
+  `out/ember-k036-mmnoc-critical-clocks.patch` for reference).
+- **Next device action:** no ready-to-test hypothesis currently exists.
+  **MM_NOC (`0x6D630306`) is still not fixed**; board peripherals, the
+  APSS watchdog, and now the whole clock-sweep theory class are all
+  cleared. The lens that worked for the confirmed anoc1 fix — a
+  driver's own unconditional reset/init touching a TZ-owned block,
+  independent of clock state — needs a new driver family to check:
+  pinctrl-msm/TLMM's own probe, the QUP/GENI/BLSP serial family, or a
+  fresh secure/SCM archaeology pass from the TrustZone side (Aurel's
+  established strength). Full reasoning:
+  `docs/ember-handoff-2026-07-08-mm-noc-current.md` — **this is now the
+  current one-file handoff to start from**, superseding the onion-peel
+  doc for present state.
 
 ## Previous status (2026-07-06)
 
