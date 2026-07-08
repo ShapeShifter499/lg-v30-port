@@ -1942,3 +1942,73 @@ a device test needed for either. This strengthens the case for the
 remaining candidate: **a secure/SCM archaeology pass from the
 TrustZone side is the most promising next direction**, not further
 Linux-driver subtraction.
+
+## Community research + K037 (watchdog timeout test) — non-secure watchdog CLEARED as the tunable cause
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-sonnet-4-5
+Date: 2026-07-08
+
+First systematic look at how OTHER msm8998 mainline ports handle this,
+instead of pure joan-side subtraction. Findings:
+
+**1. OnePlus 5/5T BOOTS mainline** (JamiKettunen/linux-mainline-oneplus5,
+~40s boot) using the SAME shared `msm8998.dtsi` — same `anoc1_smmu`, same
+arm-smmu-v2 unconditional reset. So the SMMU reset is NOT inherently fatal
+on msm8998; joan's fault is device/firmware-specific. Their documented
+gotchas: `clk_ignore_unused` for clock spam, `modprobe.blacklist=ipa` (IPA
+module panics without firmware), only one appended DTB or it won't boot.
+None is our MM_NOC.
+
+**2. The CoreSight-on-retail pattern (KEY conceptual find).** postmarketOS/
+OnePlus doc: *"a built kernel doesn't boot ... tracked down to CoreSight
+tracing activating, which seems to cause kernel panics on retail hardware
+- simply delete the etf, etm*, etr, funnel*, replicator1 & stm nodes."*
+This establishes that on RETAIL/secure msm8998, TZ-owned debug blocks fault
+when Linux touches them — the same class as our anoc1_smmu fix. NOT our
+direct cause though: joan's 17 coresight nodes are all `status=disabled` in
+the DTB and `CONFIG_CORESIGHT=m` never loads in bring-up. Cleared, but the
+lens is validated and real.
+
+**3. Mainline msm8998.dtsi has NO watchdog node** — joan is the ONLY
+msm8998 device that added one (to try to get the mainline qcom-wdt driver
+to pet LG's bootloader-armed watchdog). OnePlus/yoshino boot with no
+watchdog node at all.
+
+**4. Watchdog deep-dive → K037 test → CLEARED.** The mainline qcom-wdt
+driver: default timeout `min(max_timeout, 30U)` = 30s (matches our reset
+window), `CONFIG_QCOM_WDT=y` + `HANDLE_BOOT_ENABLED=y`, but does NOT set
+`max_hw_heartbeat_ms` (so the core won't auto-pet a HW_RUNNING watchdog
+before userspace opens `/dev/watchdog`; bare bring-up initramfs never
+does). `sleep_clk` is a fixed-clock (always available → driver binds).
+This looked like a perfect fit for a 30s NON_SEC_WDT reset.
+
+K037 test (device): joan baseline (anoc1 skip-reset) + `timeout-sec = <60>`
+on the watchdog node. Image `out/boot-joan-wdt-timeout60-k037.img` sha256
+`04e561b1033f817ebb202a609d05f5d72343ca9ae332ddb155e9907c4cb08a1c`.
+**Result: reset UNCHANGED at ~30s (t+43, handoff t+13), bootreasoncode
+0x20.** timeout-sec had zero effect.
+
+Interpretation: if the mainline non-secure watchdog driver were biting at
+its configured timeout, 60s would have moved the reset to ~60s. It didn't.
+So the mainline `qcom,kpss-wdt`@0x17817000 is NOT the effective control
+surface for whatever resets joan (its `is_running()` likely reads
+WDT_EN=0 and never engages, or a different/secure watchdog is involved).
+Downstream `watchdog_v2.c` uses the IDENTICAL register offsets (RST 0x04,
+EN 0x08, BARK 0x10, BITE 0x14) — so NOT an offset bug — with bark 11s /
+pet 10s (would bite ~14s unpetted, not 30s). Our jittery 30-49s timing
+across all runs argues against a fixed HW-watchdog bite anyway (those are
+rock-steady). **The NON_SEC_WDT code on K035's crash screen was most
+likely from a different boot in the sequence; this reset is the
+event-driven MM_NOC fabric fault.** K037 cleanly retires the "unpetted
+mainline watchdog" hypothesis (the one joan's own DTS comment proposed).
+
+Consequence: joan's added `watchdog@17817000` node is not helping and
+could arguably be dropped. The standing target remains MM_NOC, and the
+strongest direction remains a secure/SCM/TZ-side pass — now further
+supported by the community finding that retail msm8998 specifically faults
+when Linux touches TZ-owned blocks (CoreSight was one instance; anoc1_smmu
+another; MM_NOC is a third, still-unidentified block on the MM fabric).
+
+K037 debug DTS is in out/ (untracked); no kernel change (DTB-only test),
+tree stays at the confirmed anoc1-only baseline.
