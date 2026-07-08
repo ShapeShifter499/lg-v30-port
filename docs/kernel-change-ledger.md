@@ -1631,3 +1631,23 @@ State at pause:
   pause: **`anoc1_smmu` skip-reset (K030) is a real fix for a real, named
   TrustZone Config/MM-NoC fault.** That finding is solid and already
   fully documented regardless of what happens next with the device.
+
+## K035 pause — root cause confirmed: USB 3.0 port undercharging, not boot-loop protection
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Lance identified the actual cause of the K035 pause: the USB 3.0 port the
+phone was tethered to did not keep it charged through 9 consecutive
+RAM-boot-then-reset cycles, and the resulting low-battery state produced
+the unfamiliar `1004:6340` USB identity / unreachable adb+fastboot state
+— **not** a bootloader boot-loop protection counter (that theory, recorded
+in this file and the README/handoff at pause time, is superseded and
+should not be repeated). Fix: moved the phone to a USB 2.0 port. Lance
+will confirm when it's back online; no further device action until then.
+
+This is a useful standing caution for future long device-test sessions:
+watch for the phone's charge state across many consecutive tethered
+`fastboot boot` cycles, and prefer a USB 2.0 port (or otherwise-verified
+adequate charging) for extended runs.
