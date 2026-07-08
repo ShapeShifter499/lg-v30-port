@@ -2287,3 +2287,37 @@ anoc1-fix baseline. Patch `out/ember-k040-scm-restore-sec-cfg-debug.patch`.
 If the MM_NOC fault is because the MM subsystem's secure SMMU config was
 never established from the non-secure side, restoring it via TZ should
 stop the reset. Build in progress; result pending device test.
+
+## K040 result — scm_restore_sec_cfg for MM devices: negative (but blunted by no observability)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Device-tested. Image `out/boot-joan-scm-restore-k040.img` sha256
+`7dba1a9ca0e3b0df3ff3b4241b51628f84b16d1bae96a2c9c813d3645a2d1067`.
+Result: **reset persists at ~34s (t+47, handoff t+13), 0x20, unchanged.**
+Calling `qcom_scm_restore_sec_cfg()` for the 7 MM-subsystem TZ device ids
+(VIDEO/MDSS/MDSS_BOOT/ROT/VFE/CPP/JPEG) did not stop the MM_NOC fault.
+
+IMPORTANT caveat — the negative is BLUNTED by no observability: joan has no
+console, so I can't see whether the SCM calls (a) hit the `_available()`
+guard and no-op'd, (b) ran but returned errors from TZ (likely, since these
+devices aren't attached), or (c) ran successfully but didn't help. All
+three produce the same "reset at ~30s, 0x20." Downstream DOES use
+scm_restore_sec_cfg so the TZ supports it, which argues the calls ran — but
+their return values are invisible. This is the same observability wall that
+has limited the whole port: a clean negative needs to SEE the SCM returns.
+
+TZ/SCM pass status: found a genuine mainline gap (arm-smmu-v2 never calls
+scm_restore_sec_cfg for the msm8998 SMMUs; only the unrelated qcom_iommu.c
+does), tested the most-obvious form of it, negative-but-inconclusive. Other
+secure calls remain (qseecom listener registration, the RPM/AOP master
+handshake, SCM_SVC_BOOT setup) but each faces the same "can't see the
+result" limit. Reverted; tree back to anoc1-only.
+
+CONCLUSION reinforced: the serial UART console (blsp2_uart1, needs the 1.8V
+USB-C SBU debug cable) is now the highest-leverage unblock — with it, every
+TZ/SCM test becomes a clean read (SCM return values, probe order, the exact
+last message before the TZ reset) instead of an ambiguous survive/reset
+binary. Without it, TZ/SCM archaeology can propose but not cleanly confirm.
