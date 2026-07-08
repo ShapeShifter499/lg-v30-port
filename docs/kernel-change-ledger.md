@@ -1738,3 +1738,60 @@ source access):**
   crash screen's own instructions — not a generic Power+VolDown forced
   restart, and definitely not USB+QPST raw-dump (no reason to pull a
   raw memory dump for this).
+
+## K036 — sibling MMSS-NoC-bridge clocks marked CLK_IS_CRITICAL (built, not yet device-tested)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Concrete, well-precedented next hypothesis for the standing MM NoC
+fault (`0x6D630306`, confirmed still present per K035's device photo).
+
+`drivers/clk/qcom/gcc-msm8998.c` already marks `gcc_mmss_noc_cfg_ahb_clk`
+(register `0x9004`) `CLK_IS_CRITICAL` with an explicit upstream comment:
+*"Any access to mmss depends on this clock. Gating this clock has been
+shown to crash the system when mmssnoc_axi_rpm_clk is inited in
+rpmcc."* `mmssnoc_axi_rpm_clk` is literally one of RPM's `icc_clks`
+(`clk-smd-rpm.c`'s `msm8998_icc_clks[]`, voted once at rpmcc probe,
+never CCF-registered, never swept) — this comment describes our exact
+configuration (RPM enabled + this clock gated = documented crash).
+Three sibling clocks in the *same* register bank (`0x9000`-`0x9030`,
+same MMSS NoC bridge hardware block) lack the same protection:
+`gcc_mmss_sys_noc_axi_clk` (`0x9000`), `gcc_mmss_qm_core_clk` (`0x900c`),
+`gcc_mmss_qm_ahb_clk` (`0x9030`).
+
+Patch: marks all three `CLK_IS_CRITICAL`, matching the exact,
+already-proven-safe pattern mainline uses for their sibling. Saved to
+`out/ember-k036-mmnoc-critical-clocks.patch`, applied on top of the
+confirmed K030 anoc1_smmu fix (kernel tree now carries both patches).
+Kernel rebuilds clean (`strings vmlinux` shows the K030 string, no
+`joan-imem` — confirms the K035 revert held). DTB unchanged from the
+K030 baseline (`out/ember-k030-skipreset-2026-07-07.dtb`). Image built:
+`out/boot-joan-mmnoc-critical-k036.img`, sha256
+`f80be59ae31695bcf41425a989721ee09b2e92ec0210d87c417503992ba5e8f3`.
+Cmdline: plain default (`androidboot.hardware=joan panic=0
+ignore_loglevel` — K032 already proved retention flags aren't needed).
+
+This is a narrower, more conservative test than the K035 IMEM write: it
+reuses an existing, upstream-proven mechanism (`CLK_IS_CRITICAL`) on
+clocks in the identical register family as one already fixed for the
+identical documented reason, rather than inventing a new one. If
+confirmed, it may be close to upstream-shaped as-is, unlike the
+`ember,debug-skip-reset` hack from K030 which needs a real binding
+design before it could ever be proposed upstream.
+
+**Not yet device-tested at time of writing** — Lance is recovering the
+phone (Volume-Down hold, per K035's crash screen instructions) after
+the K035 firmware crash. Test command:
+
+```bash
+scripts/tethered-test.sh out/boot-joan-mmnoc-critical-k036.img 300
+```
+
+Survives (>=90s) → MM NoC likely fixed by this specific clock family;
+move to the real bring-up initramfs for a true USB-enumeration test.
+Resets early → check the reported bootreasoncode: same `0x20`/MM NoC
+family → this hypothesis is wrong or incomplete, look for a different
+MM-NoC-adjacent block; something else entirely → new information,
+follow it.
