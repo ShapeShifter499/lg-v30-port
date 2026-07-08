@@ -2455,3 +2455,61 @@ end for joan's command-mode panel. Observability paths that remain:
    observable env, and if it can chainload mainline Linux we might inherit a
    live display. Software-testable, non-destructive.
 Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
+
+## K042 WIP — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (not built/tested yet)
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.5
+Date: 2026-07-08
+
+Class: `debug-only` / `unknown`; Public/PR disposition: `do not publish`.
+
+Purpose: follow Ember's K041/edk2 conclusion that the remaining reset is more
+likely caused by aggressive Linux re-initialization than by a missing positive
+secure-world keepalive. K030 already showed that suppressing mainline's global
+`arm_smmu_device_reset()` on `anoc1_smmu` removes a named TrustZone
+Config/MM-NoC reset class, but K030 does not cover earlier Qualcomm-specific
+SMMU cfg-probe code. Mainline's `qcom_smmu_cfg_probe()` unconditionally performs
+an S2CR BYPASS write/read quirk probe for every `qcom,msm8998-smmu-v2` instance
+before the later reset hook. Downstream 4.4's MSM8998 arm-smmu path has no
+equivalent Qualcomm `cfg_probe` S2CR write and marks the MSM8998 SMMUs
+`qcom,skip-init` + `qcom,register-save`. K042 is a narrow subtraction oracle:
+skip only that MSM8998 S2CR bypass-quirk probe while leaving the node enabled
+and leaving the later SMR readback loop intact.
+
+Handles/evidence:
+
+- Saved dirty kernel patch:
+  `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`
+- Patch sha256:
+  `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`
+- Touched files in that saved patch:
+  - `drivers/iommu/arm/arm-smmu/arm-smmu.c` — carries Ember K030 debug
+    `ember,debug-skip-reset` gate in `arm_smmu_device_reset()`;
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` — adds the K030
+    `&anoc1_smmu { ember,debug-skip-reset; };` baseline property;
+  - `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c` — adds the Aurel K042
+    MSM8998-only skip around the S2CR BYPASS quirk probe.
+- Attribution/provenance: K042 code is original debug instrumentation, but the
+  hypothesis is derived from comparing upstream Linux `qcom_smmu_cfg_probe()`
+  with Qualcomm/LGE downstream `qcom,skip-init` / `qcom,register-save` policy.
+
+Verification/state at record time:
+
+- `git diff --check` passed after the K042 patch and the corrected DTS placement.
+- Build attempt 1 accidentally omitted `ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-`
+  and failed with host GCC rejecting arm64 flags (`-mlittle-endian`,
+  `-msign-return-address=non-leaf`).
+- Build attempt 2 used the documented cross toolchain
+  `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image.gz
+  qcom/msm8998-lge-joan.dtb`, but the session was interrupted before completion
+  after Kconfig prompted for new upstream symbols. No K042 `Image.gz`, boot image,
+  or device result exists yet.
+- Current classification: **not tested**. Do not infer success/failure.
+
+Next if continuing K042: settle config noninteractively first (for example
+`make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig`, after verifying
+the intended joan/QCOM options), rebuild `Image.gz` + joan DTB, package a
+`panic=0` RAM-only image, verify `strings vmlinux` contains both the K030 and
+K042 debug strings, then run exactly one `sudo -n fastboot boot` via
+`scripts/tethered-test.sh` while Lance is physically present.

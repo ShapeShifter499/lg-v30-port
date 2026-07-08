@@ -128,13 +128,23 @@ When opening a public PR or patch series, include:
 - links or references to the public ledger/evidence docs if they are published;
 - known rejected approaches, summarized briefly enough to prevent duplicate work.
 
-## Current public-readiness snapshot (2026-07-06)
+## Current public-readiness snapshot (2026-07-08)
 
-- Clean candidate commits exist for the initial DTS and LG reserved-memory work.
-- The reset/watchdog blocker is not solved; do not publish a claim that the phone
-  fully boots mainline yet.
-- The APSS watchdog node may be useful but remains `unknown` until the reset path
-  is understood.
+- Clean candidate commits exist for the initial DTS and LG reserved-memory work,
+  but the device still does not fully boot mainline. Do not publish any claim that
+  joan is booted or usable until a RAM-only test actually reaches a mainline debug
+  channel or userspace.
+- K030 (`anoc1_smmu` skip-reset) is an important confirmed debug finding: it
+  removes a named TrustZone Config/MM-NoC reset class, but it is **not** public-ready
+  code as written. It needs a real upstreamable Qualcomm SMMU representation, not
+  an `ember,debug-skip-reset` property.
+- K041 rejected late-Linux `simple-framebuffer` as an observability path on joan's
+  command-mode panel; do not reintroduce simplefb/fbcon as a public patch unless a
+  separate early-display mechanism is proven.
+- K042 is currently a saved WIP debug oracle only: it suppresses MSM8998 Qualcomm
+  SMMU cfg-probe's S2CR bypass-quirk write/read on top of K030. It has not built
+  to a tested image yet and is `do not publish` unless it becomes a clean,
+  justified upstream fix.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
@@ -151,23 +161,25 @@ Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Consolidated provenance of borrowed / derived material (Lance directive
-2026-07-08: track borrowed code + who did the work). **Aurel / whoever
-knows an exact origin: please fill in the "author" gaps below and, where a
-prior code add reused something, add a "based on" line to that file.**
+2026-07-08: track borrowed code + who did the work). Keep this table current
+whenever a new external source, downstream file, or mainline template informs a
+change.
 
 | Item | Source it's derived from | Author / project | License | Status |
 |---|---|---|---|---|
-| `msm8998-lge-joan.dts` | `msm8998-oneplus-common.dtsi` (regulator rails, cont-splash approach) + downstream LG `android_kernel_lge_msm8998` DTS (memory map, ramoops, wdt) | OnePlus-5 mainline contributors (**exact author TBD**) + Qualcomm/LGE | BSD-3-Clause (joan) / verify vs source's dual GPL-2.0-or-BSD | in-file header + inline "copied from" notes present ✓ |
+| `msm8998-lge-joan.dts` | `msm8998-oneplus-common.dtsi` (regulator rails, cont-splash approach) + downstream LG `android_kernel_lge_msm8998` DTS (memory map, ramoops, wdt) | Jami Kettunen `<jamipkettunen@gmail.com>` + The Linux Foundation / Qualcomm for the OnePlus common DTS; Qualcomm/LGE for downstream joan data | BSD-3-Clause for joan and OnePlus common DTS; downstream LG kernel material must be treated as GPL-2.0-derived unless independently sourced | in-file header says "based on msm8998-oneplus-common.dtsi" + inline downstream notes present ✓ |
 | anoc1 skip-reset (K030, debug) | concept: downstream `msm-arm-smmu-8998.dtsi` `qcom,skip-init`+`qcom,register-save` | Qualcomm/LGE (concept only; **code is original**) | GPL-2.0 | concept credited in-file comment ✓; needs a real upstream binding before it's shippable |
 | `joan_imem_oracle.c` (debug, reverted) | IMEM offsets + LGE_RB_MAGIC/reason constants from downstream `lge_handle_panic.c` / `reboot_reason.h` | Qualcomm/LGE | GPL-2.0 | debug-only, not for upstream; constants credited in comments |
 | `joan_disp_quiesce.c` (debug, reverted) | DSI/DPU register offsets from mainline `dsi.xml` + `dpu_3_0_msm8998.h` | (same GPL kernel tree — not external) | GPL-2.0 | debug-only |
 | `out/aurel-k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Aurel) | GPL-2.0 | reference only |
+| K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Aurel code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`; debug-only, not built/tested yet, do not publish |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
 | initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
 
 Rule going forward for any new borrowed code: preserve the origin file's
 `Copyright` line(s) and `SPDX-License-Identifier`, add a `based on <file>
 by <author>` note in the header, and keep the kernel.org commit trailers
-(`Signed-off-by: Lance`, `Assisted-by: Claude-Code:<model>`; never
+(`Signed-off-by: Lance`, `Assisted-by: <agent-harness>:<model>` using the
+actual helper/model, e.g. `Hermes:gpt-5.5` or `Claude-Code:<model>`; never
 `Co-Authored-By`). If any prior add above is missing an author I've marked
 TBD and you know it, please append it.
