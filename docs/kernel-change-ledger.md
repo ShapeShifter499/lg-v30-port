@@ -1651,3 +1651,90 @@ This is a useful standing caution for future long device-test sessions:
 watch for the phone's charge state across many consecutive tethered
 `fastboot boot` cycles, and prefer a USB 2.0 port (or otherwise-verified
 adequate charging) for extended runs.
+
+## K035 result (from device photo): MM_NOC fault confirmed still present; IMEM write likely triggered a separate firmware bug
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+K035 (anoc1_smmu skip-reset baseline + IMEM-oracle seed write at
+`0x146bf000+0x65c`) did not return to LineageOS or produce a normal
+Android-property bootreason. Lance photographed the phone's screen and
+uploaded it (`Talk/Shared_AI_agents_files/20260708_051750.jpg` and
+`...051754.jpg`). It shows LG's **UEFI-level "LGE Crash Handler" screen**
+— a diagnostic surface never seen before in this project, one level
+below Android/LineageOS entirely (offers "connect USB + QPST raw dump"
+or "Press Volume Down and Hold a Second" to reboot; the device was
+sitting in Sahara mode, explaining why neither `adb` nor `fastboot`
+could reach it).
+
+Transcribed precisely by cropping the photo into a grid at full
+8160x6120 resolution and reading each region closely (displayed size
+alone was too small to trust for hex values):
+
+- Early boot-stage block (`JOAN_NAO board_rev: 1.0`, msm/ufs serials):
+  `reboot_reason 0x6d630600` (`LGE_RB_MAGIC|LGE_ERR_LK`, generic
+  bootloader-stage attribution) and **`tzbsp_reason: 0x6d630301`**
+  (`LGE_RB_MAGIC|LGE_ERR_TZ|0x01` = **TZ_NON_SEC_WDT**, TrustZone's own
+  classification of the non-secure/APSS watchdog). `gcc_reset_status:
+  0x203`, `dload_entry_cnt: 1` (first time, not a cumulative counter —
+  weighs against any "boot-loop protection after N resets" theory).
+- Later, near `Loader Build Info` / `OS Loader` stage: **`tzbsp_reason:
+  0x6D630306`** (`LGE_ERR_TZ|0x06` = **MM_NOC**, identical to K027's
+  original finding) with the same `gcc_rst_sts: 0x203`. The value
+  genuinely differs from the earlier block's `0x301` — read at two
+  different points in the same boot sequence, meaning something
+  actively rewrote it in between.
+- Immediately following: `DXE_ASSERT!: [ResetRuntimeDxe] String.c
+  (199): String != (void *) 0`, then `Enter Sahara Mode.0`.
+
+**Interpretation (reasoned from this evidence, not certain without XBL
+source access):**
+
+1. The underlying kernel-level fault behind this test was still
+   **MM_NOC (`0x6D630306`) — the same fault first found in K027**, not
+   a new independent failure mode.
+2. This retroactively reframes K033/K034's residual, "generic" Android-
+   property `bootreasoncode=0x20` (`UNDEFINED_CRITICAL_ERROR`, which
+   downstream logged as "not handled, defaulting to Normal Boot"): it
+   was very likely **Android's own property-generation code
+   mis-reporting/genericizing this same MM_NOC value**, not evidence of
+   a third, distinct fault. The K033/K034 conclusions themselves
+   (peripherals and the APSS watchdog are not the cause) likely still
+   hold, but the framing "residual reset is a different, unnamed fault"
+   in the K033/K034 ledger entries and the README should be read as
+   "residual reset is still MM_NOC, misreported by Android as 0x20" —
+   corrected here rather than rewriting those entries.
+3. **The DXE_ASSERT/Sahara-mode crash is most likely a side effect of
+   the IMEM-oracle write itself**, not a new discovery about the
+   MM_NOC cause. This exact firmware crash never appeared in any prior
+   test this project (including several that also hit MM_NOC/Config
+   NoC resets) — the one new variable in K035 was writing a
+   deliberately-distinctive marker (`0x6D6303EE`) to
+   `0x146bf000+0x65c`. The strong circumstantial read: that offset sits
+   close enough to (or overlaps) some string/pointer structure XBL's
+   `ResetRuntimeDxe` module also reads while formatting/handling the
+   reset reason, and our write corrupted it, causing the NULL-pointer
+   assertion on this boot. Not proven without XBL source, but well
+   supported by "this exact crash only ever appeared once, and only in
+   the one test that added this exact write."
+
+**Consequences for method going forward:**
+
+- Do not reuse a raw, unverified IMEM write at this offset again. If
+  restart-reason instrumentation is needed later, treat `0x65c` as
+  unsafe to write arbitrary marker values to — only the specific
+  `LGE_RB_MAGIC`-shaped values the boot chain already expects should be
+  written there, if anything.
+- The real, standing target is unchanged and clarified rather than
+  widened: **MM_NOC (`0x6D630306`)** is still not fixed. K033
+  (peripherals stripped) and K034 (APSS watchdog disabled) both still
+  hit it, so neither is the cause. The search continues from the same
+  "SoC core, not peripheral, not the non-secure watchdog" narrowing —
+  the K035 detour does not change that, it just corrects what the
+  residual code actually was.
+- Device needs a physical Volume-Down (held ~1s) to recover, per the
+  crash screen's own instructions — not a generic Power+VolDown forced
+  restart, and definitely not USB+QPST raw-dump (no reason to pull a
+  raw memory dump for this).
