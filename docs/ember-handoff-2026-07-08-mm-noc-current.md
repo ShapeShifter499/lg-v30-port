@@ -178,18 +178,24 @@ the same spirit:
   `PS_HOLD`-writing restart-handler registration only fires if the
   SoC's pin table defines a function named `"ps_hold"`, which
   `pinctrl-msm8998.c` does not. Not a match.
-- **The QUP/GENI/BLSP serial-controller family** — `blsp2_uart1` is
-  enabled for console; worth checking whether sibling BLSP instances'
-  drivers touch shared infrastructure unconditionally even when their
-  own DT nodes aren't individually enabled. Not yet checked.
+- ~~The QUP/GENI/BLSP serial-controller family~~ — **checked and
+  cleared** (source only): MSM8998 predates GENI/QUP entirely (that IP
+  starts around sdm845); it uses the older BLSP design where each
+  UART/I2C/SPI instance is a fully independent platform device with no
+  shared wrapper/bus controller. Only `blsp2_uart1` is enabled; every
+  sibling defaults disabled and never probes. No cross-instance
+  infrastructure exists here analogous to arm-smmu's five instances.
+  Not a match.
 - **A fresh secure/SCM archaeology pass** — genuinely Aurel's
   established strength (see the K025 addendum in
   `docs/ember-handoff-2026-07-06-session2.md` for the prior pass this
-  built on). This session's investigation has been DTS/clock
-  subtraction from the Linux side; the actual fault is TrustZone-side,
-  and a pass from that direction may find what subtraction alone
-  can't. **Probably the strongest remaining angle** — two Linux-side
-  driver classes have now been checked and cleared without a hit.
+  built on). **This is now the strongest remaining direction by
+  elimination**: both Linux-side driver-family candidates raised by
+  this session's own correction (pinctrl-msm, QUP/GENI/BLSP) have been
+  checked and cleared without a device test needed for either. This
+  session's whole investigation has been DTS/clock subtraction from the
+  Linux side; the actual fault is TrustZone-side, and a pass from that
+  direction is the next thing genuinely worth trying.
 
 No further device test was run against pure reasoning alone this
 session — per the project's standing discipline, don't guess blind
@@ -308,13 +314,15 @@ K035 are at `Talk/Shared_AI_agents_files/20260708_051750.jpg` and
 ## Final instruction
 
 Start from this file. **No hypothesis is currently loaded and ready to
-test** — K036 was rejected and, more importantly, ruled out the entire
-class of candidate it came from (see §3). The next device action needs
-a candidate from a genuinely different angle first: pinctrl-msm/TLMM's
-own probe, the QUP/GENI/BLSP serial family, or — most promising — a
-fresh secure/SCM archaeology pass from the TrustZone side (§3's list).
-Pick one, reason through it in source first (no device needed for
-that), and only then build and test via
-`scripts/tethered-test.sh`. If the phone is ever in an unfamiliar,
-unreachable USB state, look at the actual screen (§6 rule 9) before
-concluding it's stuck.
+device-test.** K036 was rejected and ruled out its whole candidate
+class (§3); the two Linux-side driver families that class's correction
+suggested next — pinctrl-msm/TLMM and QUP/GENI/BLSP — have both since
+been checked in source and cleared too, no device needed for either.
+**By elimination, a fresh secure/SCM archaeology pass from the
+TrustZone side is the strongest remaining direction** — genuinely
+Aurel's established strength, and a different angle than this entire
+session's DTS/clock/driver subtraction from the Linux side. Once a
+concrete SCM-side candidate exists, reason it through in source first,
+then build and test via `scripts/tethered-test.sh`. If the phone is
+ever in an unfamiliar, unreachable USB state, look at the actual screen
+(§6 rule 9) before concluding it's stuck.
