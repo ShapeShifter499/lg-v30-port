@@ -2075,3 +2075,61 @@ the real fix path is then cont_splash handover / clean early teardown (or,
 long-term, the DSC panel driver — joan's known hardest problem). If it
 still resets → display cleared, revisit the ICC provider gamble. No device
 test run yet; this is a strategic fork for Lance to choose.
+
+## K038 — display-quiesce test: bootloader-left display CLEARED as the MM_NOC cause
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Tested the display-underflow theory (from the interconnect-scoping entry)
+directly. Debug initcall `joan_disp_quiesce.c` (device_initcall, runs ~3s,
+well before the reset) writes 0 to: both DSI controllers' CTRL register
+(DSI0 0xc994000+0x0, DSI1 0xc996000+0x0) and the DPU INTF timing-engine
+enables (INTF_1/DSI0 at mdp+0x6a800, INTF_2/DSI1 at mdp+0x6b000). Offsets
+authoritative (dsi.xml CTRL=0x0; dpu_3_0_msm8998.h INTF bases;
+dpu_hw_intf.c TIMING_ENGINE_EN=0x0). All non-secure display regs; MDSS
+clocks left on by bootloader (MMCC=m) so they're accessible. On the
+confirmed anoc1-fix baseline. Patch `out/ember-k038-disp-quiesce-debug.patch`,
+image `out/boot-joan-disp-quiesce-k038.img` sha256
+`7e9b12deda7f4a39d77c9b277acfa18421bda7dd37069272e1da854f1ed573be`.
+
+Result: **reset persists**, LOS returned t+57s (44s after handoff, normal
+jittery range), bootreasoncode `0x20`. Quiescing the display output path
+did NOT stop the MM_NOC reset. **The bootloader-left display is CLEARED as
+the cause** — confirming, empirically, the mechanical doubt raised while
+building it (msm8998's panel is command-mode, so the MDP goes idle after
+the bootloader's last kickoff; it isn't continuously DMAing the splash to
+underflow). Minor caveat: no mainline console, so the writes-landed can't
+be positively confirmed, but the offsets are authoritative and the block
+is clocked, so confidence is high.
+
+Reverted from the kernel tree; tree back to the confirmed anoc1-only
+baseline.
+
+## Session tally: Linux-side driver leads for MM_NOC are now exhausted
+
+This session (research + K037 + K038) eliminated, empirically or by
+analysis: the non-secure watchdog (K037), the bootloader display (K038),
+and — via the interconnect scoping — established that **no mainline driver
+touches the MM subsystem at all in bring-up** (DRM_MSM=m, MSM_MMCC_8998=m,
+no GPU — none load from the bare initramfs). Combined with the earlier
+eliminations (board peripherals K033, clock-sweep class K036, SMMUs beyond
+anoc1 K030/K031, RPM-is-scaffolding K028/K029), there is no remaining
+"a mainline Linux driver/DTS touches an MM block" candidate.
+
+Therefore MM_NOC is one of exactly two things, both requiring a different
+kind of effort than this session's Linux-side subtraction:
+1. **Systematic missing NoC configuration** — downstream's msm_bus programs
+   QoS/config for ALL fabrics (a1noc,a2noc,bimc,cnoc,mnoc,snoc); mainline
+   has zero msm8998 interconnect support. The Config-NoC-then-MM-NoC
+   *layering* (each fix reveals the next fabric fault) is consistent with a
+   whole missing subsystem. Test = write the full msm8998 ICC provider
+   (sdm660.c template, bounded but real; scoping entry above).
+2. **A TZ-side secure handshake mainline omits** — the CoreSight-on-retail
+   finding validates that touching/failing-to-service a TZ-owned block on
+   this secure SoC causes exactly this class of reset. Needs secure/SCM
+   archaeology (Aurel's domain; prior K025 pass is the starting point).
+
+No cheap Linux-side test remains; the next move is a commitment to one of
+these two larger efforts.
