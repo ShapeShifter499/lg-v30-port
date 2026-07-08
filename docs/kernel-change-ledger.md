@@ -2241,3 +2241,49 @@ Recommendation: this is a genuine fork for Lance. The full provider is a
 days-scale, low-confidence, hard-to-debug-blind effort. The alternative is
 to accept the Linux side is exhausted and take the TZ-side secure route
 (Aurel), where the fault detail actually lives. Recorded for the decision.
+
+## TZ/SCM pass + K040 — missing secure handshake: scm_restore_sec_cfg for MM SMMU devices
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Ember's own TZ/SCM archaeology pass (Lance directed it after both
+observability upgrades — screen-verbose and serial UART — turned out
+blocked/specialized; see below). Builds on Aurel's K025.
+
+Observability answers (why this pass instead of getting a log):
+- **Screen verbose (fbcon/simplefb):** BLOCKED by joan's SW43402 panel
+  being DSI COMMAND-mode + DSC. Command-mode panels don't continuously
+  scan a framebuffer; each new frame needs an active DSI kickoff from a
+  panel driver. Mainline has none for SW43402, so fbcon writes land in a
+  buffer that never reaches the panel — invisible (this is exactly why
+  joan has no simplefb). The screen shows the frozen last bootloader frame.
+- **Serial UART:** joan DTS already enables blsp2_uart1 @0xc1b0000; adding
+  `earlycon console=ttyMSM0` would stream the full boot log. But it needs
+  SPECIALIZED HARDWARE: a 1.8V USB-UART adapter on the USB-C SBU pins via a
+  resistor-ID "Qualcomm debug cable", or internal test pads — and it's
+  unverified LG routes UART to USB-C on the V30. Physical-access dependent.
+
+TZ/SCM finding (the payoff): downstream `drivers/iommu/arm-smmu.c` calls
+`scm_restore_sec_cfg(smmu->sec_id, 0)` — a secure SCM call asking TZ to
+(re)program a device's SECURE SMMU config. **Mainline's arm-smmu-v2 driver
+(handles msm8998's SMMUs) NEVER calls it** — only the unrelated
+`qcom_iommu.c` driver does, and that doesn't bind to msm8998. So mainline
+never does the POSITIVE secure handshake downstream does; the K030 anoc1
+fix only skipped the bad non-secure reset. `qcom_scm_restore_sec_cfg(u32
+device_id, u32 spare)` IS present + EXPORT_SYMBOL_GPL in mainline
+(qcom_scm.c), CONFIG_QCOM_SCM=y, with a `_available()` guard. Downstream's
+`tz_smmu_device_id` enum gives the MM-subsystem device ids: VIDEO=0,
+MDSS=1, MDSS_BOOT=3, ROT=21, VFE=22, CPP=26, JPEG=27.
+
+Not the SMMU_PROGRAM/ATOS path (that's active-translation, per-CB) nor
+static-cb restore (msm8998 SMMUs aren't static-cb). This is the plain
+device-level secure-config restore.
+
+K040 test: debug initcall (late_initcall) calling
+`qcom_scm_restore_sec_cfg()` for the 7 MM-subsystem device ids on the
+anoc1-fix baseline. Patch `out/ember-k040-scm-restore-sec-cfg-debug.patch`.
+If the MM_NOC fault is because the MM subsystem's secure SMMU config was
+never established from the non-secure side, restoring it via TZ should
+stop the reset. Build in progress; result pending device test.
