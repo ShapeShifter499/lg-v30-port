@@ -1838,3 +1838,59 @@ resolves in this exact boot rather than continuing to trust the
 K023-era read), or look for a missing NoC/BCM bandwidth vote analogous
 to `anoc1_smmu`'s downstream `qcom,msm-bus` entry but for whatever block
 actually triggers MM_NOC specifically.
+
+## Methodological correction — the whole "unclaimed/sweepable clock" theory class is ruled out for MM NoC
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+K036's rejection prompted a re-check of what evidence actually
+constrains MM NoC, rather than reaching for the next individual clock
+to test. Result: the entire "an unclaimed clock gets gated by the late
+`clk_disable_unused`/genpd sweep, causing the fault" theory class —
+which correctly explained the *original* Config NoC fault's mechanism
+— **cannot be the explanation for MM NoC**, and this was already
+provable from existing data without a new test:
+
+- K027 (`clk_ignore_unused pd_ignore_unused`, sweep effectively
+  disabled, clocks retained) hit MM NoC.
+- K032 (plain default cmdline, sweep runs normally, after the anoc1
+  fix) hit the identical fault.
+
+Since MM NoC occurs whether the late sweep runs or is suppressed, no
+clock whose *only* mechanism of being turned off is that generic sweep
+can be the cause — if it were, retaining it (K027) should have
+prevented the fault, and it didn't. This retroactively invalidates the
+"next candidates" list at the end of the K036 entry above
+(`gcc_aggre1_noc_xo_clk`, `gcc_boot_rom_ahb_clk`,
+`gcc_cfg_noc_usb3_axi_clk`, `gcc_bimc_hmss_axi_clk`, and by the same
+logic `gcc_prng_ahb_clk` from the original, already-superseded K028-prep
+hypothesis) — **do not test these individually on the strength of "it's
+an unclaimed GCC clock," that reasoning is now known to be
+insufficient.** A systematic check (`comm` between every `GCC_*_CLK`
+defined in the driver and every one referenced anywhere in
+`msm8998.dtsi`/`msm8998-lge-joan.dts`) turned up dozens of unclaimed
+clocks; none of them are worth testing on this basis alone anymore.
+
+**The lens that actually worked for the original Config NoC fault
+(anoc1_smmu, K030) was different in kind**: a specific *driver's own
+unconditional reset/init sequence* touching a TZ-owned block on every
+probe, independent of any clock-retention state — not a clock being
+swept. K030 vs K031 already extended this same lens to rule out the
+other four SMMU instances' own reset sequences too. **The productive
+next step is to find another driver (not necessarily SMMU-family) that
+does something similarly unconditional to a TZ-owned block**, not
+another clock to flag critical. Candidates not yet considered:
+pinctrl-msm's TLMM probe (does it reconfigure pin muxing
+unconditionally, potentially clobbering TZ-owned pin config?), the QUP/
+GENI/BLSP serial-controller family (`blsp2_uart1` is enabled; do its
+siblings' probes touch anything unconditionally even when not
+`status = "okay"`?), or a fresh secure/SCM-archaeology pass in Aurel's
+established strength area — genuinely different investigative angles
+rather than more DTS/clock subtraction, which has been pushed about as
+far as reasoning without new device data can take it this session.
+
+No further device test was run against this reasoning alone (per the
+project's own discipline: don't guess blind, and don't spend more
+passes without a specific reason to believe a candidate is right).
