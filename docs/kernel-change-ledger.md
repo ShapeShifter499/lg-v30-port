@@ -2321,3 +2321,49 @@ USB-C SBU debug cable) is now the highest-leverage unblock — with it, every
 TZ/SCM test becomes a clean read (SCM return values, probe order, the exact
 last message before the TZ reset) instead of an ambiguous survive/reset
 binary. Without it, TZ/SCM archaeology can propose but not cleanly confirm.
+
+## LEAD: edk2-msm8998 UEFI (Renegade Project) — boots joan past 30s, open-source reference
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Lance surfaced the Windows-on-ARM UEFI angle. Investigated:
+`github.com/edk2-porting/edk2-msm8998` (Renegade Project) — EDK2 UEFI for
+Snapdragon 835. **LG V30 (joan) is a supported target** with ACPI/Windows
+boot. Also `github.com/lumingyu0423/edk2-MSM8998`.
+
+KEY architectural insight: the edk2 UEFI is loaded by ABL in the EXACT same
+position as our mainline kernel — it disguises itself as a Linux kernel
+(magic header + appended DTB) and is launched via `fastboot boot
+boot_joan.img` (RAM-only, same as our tests), running in the normal world
+after XBL+ABL. It is NOT getting special early treatment. Yet it boots
+Windows, which takes far longer than 30s. **Therefore the ~30s MM_NOC/TZ
+reset is AVOIDABLE from exactly the boot position our kernel runs in** —
+the UEFI does (or periodically services) something our null-init kernel
+(K022) does not.
+
+Why this is the best lead in a while:
+1. **Cheap definitive test:** `fastboot boot` the prebuilt joan UEFI image
+   (non-destructive, RAM-only). If it survives past 30s (it must, to boot
+   Windows), that PROVES the reset is fixable from our position and reframes
+   the whole problem from "is it possible?" to "read the UEFI to see how."
+   Bonus: the UEFI uses the XBL framebuffer + a UEFI shell — a potential
+   OBSERVABILITY channel we lack.
+2. **Open-source reference, far more tractable than the Android kernel:**
+   edk2-msm8998 is small, focused C. Its main dispatch loop / SoC init /
+   watchdog + SCM handling shows exactly the keepalive/handshake that keeps
+   msm8998 alive past 30s — the thing our kernel is missing. This is likely
+   a periodic secure/watchdog service (fits: K022 null-init still resets =>
+   something must be serviced within 30s; the UEFI services it).
+3. **Possible bypass:** if the edk2 UEFI can chainload a mainline Linux
+   EFI-stub kernel, boot mainline FROM the UEFI (already-inited SoC) —
+   uncertain (Linux boot via this UEFI is undocumented / "terribly broken"
+   per its own docs), but would sidestep the reset entirely.
+
+NEXT: (a) read the edk2-msm8998 source for its watchdog/SCM/periodic
+service and NoC/SMMU init (software, doable now); (b) Lance test-boots the
+prebuilt joan UEFI to confirm it survives 30s (huge data point). Caveat:
+project self-describes as "terribly broken," Windows-focused; Linux-via-UEFI
+may not work OOTB, but the survival test + source read are valuable
+regardless.
