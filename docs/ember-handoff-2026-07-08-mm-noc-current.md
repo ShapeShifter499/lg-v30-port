@@ -39,6 +39,39 @@ mysterious secure-world reset; it is now understood precisely:
    the corrected reasoning and what kind of candidate is actually worth
    testing next.
 
+## 0. Community research + watchdog elimination (2026-07-08 addendum)
+
+First systematic look at how OTHER msm8998 mainline ports handle this
+(not just joan-side subtraction):
+
+- **OnePlus 5/5T boots mainline (~40s)** with the SAME shared
+  `msm8998.dtsi` — same `anoc1_smmu`, same arm-smmu-v2 reset. So the SMMU
+  reset is not inherently fatal on this SoC; joan's fault is
+  device/firmware-specific. Their gotchas (`clk_ignore_unused`,
+  `modprobe.blacklist=ipa`, single-DTB) are not our MM_NOC.
+- **CoreSight-on-retail pattern** (postmarketOS/OnePlus): retail/secure
+  msm8998 *"kernel panics ... tracked down to CoreSight tracing
+  activating on retail hardware — delete the etf/etm/etr/funnel/
+  replicator/stm nodes."* This VALIDATES the lens behind the anoc1 fix:
+  on this secure SoC, Linux touching a TZ-owned block causes a secure
+  reset. Not our direct cause (joan's coresight nodes are all
+  `status=disabled`, `CONFIG_CORESIGHT=m` never loads) — but it means
+  MM_NOC is very likely a third such TZ-owned block on the MM fabric.
+- **Mainline `msm8998.dtsi` has no watchdog node.** joan is the only
+  msm8998 device that added one.
+- **Non-secure watchdog CLEARED (K037).** The mainline qcom-wdt driver
+  defaults to a 30s timeout and doesn't set `max_hw_heartbeat_ms` (so the
+  core won't auto-pet a bootloader-running watchdog before userspace opens
+  `/dev/watchdog`) — a near-perfect fit for a 30s NON_SEC_WDT reset. But
+  the on-device test (`timeout-sec = <60>` on the node) left the reset at
+  ~30s, unchanged. Downstream uses identical register offsets (not an
+  offset bug), and the jittery 30-49s timing across all runs argues
+  against a fixed HW-watchdog bite. So the mainline non-secure watchdog is
+  not the tunable cause; the NON_SEC_WDT code on K035's crash screen was
+  most likely from a different boot, and this reset is the event-driven
+  MM_NOC fabric fault. joan's `watchdog@17817000` node is not helping and
+  could be dropped. Full detail: ledger "Community research + K037" entry.
+
 ## 1. Confirmed fix: `anoc1_smmu` skip-reset (K030)
 
 `anoc1_smmu` (`iommu@1680000`, an aggregator-NoC IOMMU in
