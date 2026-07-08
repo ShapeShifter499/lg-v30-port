@@ -2012,3 +2012,66 @@ another; MM_NOC is a third, still-unidentified block on the MM fabric).
 
 K037 debug DTS is in out/ (untracked); no kernel change (DTB-only test),
 tree stays at the confirmed anoc1-only baseline.
+
+## Scoping: msm8998 interconnect provider feasibility for MM_NOC (source-only)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-08
+
+Scoped whether a mainline msm8998 interconnect (NoC) provider is a feasible
+test for the MM_NOC fault, prompted by Lance's "why not just apply what
+makes 4.4 boot" — the most direct instance of that being: downstream has a
+full msm_bus/NoC stack (`msm8998-bus.dtsi`, fab-mnoc et al.), mainline has
+ZERO msm8998 interconnect support (no provider file, no CONFIG), and the
+fault is literally an MM-NoC error.
+
+Feasibility (WRITE): **feasible, bounded.** `drivers/interconnect/qcom/
+sdm660.c` (by AngeloGioacchino Del Regno, who also did mainline Sony
+yoshino msm8998) is a near-perfect template — same `icc-rpm` framework,
+same SoC family, ~1700 lines, 77 QoS nodes. The RPM interconnect CLOCK
+plumbing already exists in mainline (`clk-smd-rpm.c` `msm8998_icc_clks[]` +
+the `icc_smd_rpm` platform device); what's missing is only the
+topology/QoS provider. Downstream `msm8998-bus.dtsi` supplies every
+master/slave ID and link. A "minimal MM-NoC-only" shim is actually HARDER
+than the full port (the ICC framework models end-to-end master→slave paths
+across fabrics, not single NoCs).
+
+Feasibility (FIX MM_NOC): **uncertain — de-prioritized.** What qnoc_probe
+actually does: (1) `clk_bulk_prepare_enable` the NoC interface clocks, and
+(2) program per-master QoS (NOC_QOS_MODE_FIXED) via regmap. Neither
+obviously prevents a NoC transaction FAULT: the MM-NoC clocks are already
+held (RPM INT_MAX handoff vote + `gcc_mmss_noc_cfg_ahb_clk` is
+CLK_IS_CRITICAL; K036 tested the siblings), and QoS is arbitration
+priority, not fault gating. Logical point against: mainline currently has
+NO msm8998 ICC provider, so it never touches the MM-NoC QoS registers —
+the MM NoC keeps the bootloader's config untouched. So the fault is NOT
+mainline mis-programming the MM NoC; adding a provider is a gamble that
+could help or hurt, for real effort.
+
+Better-fitting theory the scoping surfaced (display underflow): the
+bootloader leaves the DSC command-mode panel + MDP (`mdss@c900000`)
+actively scanning out `cont_splash_mem@9d400000` over the MM NoC — the LG
+splash Lance sees on screen during our boot. Mainline never refreshes or
+tears it down (`CONFIG_DRM_MSM=m`, `CONFIG_MSM_MMCC_8998=m` — neither loads
+in the bare bring-up initramfs; display-subsystem node is disabled anyway,
+but the bootloader-left hardware runs independently of DT status). A
+command-mode panel with no refresh/TE kicks, or an MDP whose DMA underflows
+after a timeout, faults on the MM NoC. This fits ALL evidence: MM
+specificity (display is the big MM consumer), the jittery ~30-49s
+(timeout/underflow event, NOT a fixed watchdog — matches K037's finding
+that it's not a fixed HW bite), why OnePlus 5 differs (its panel/simplefb
+holds the display; OnePlus common dtsi even carries a simplefb "necessary
+due to unused clk cleanup & no panel driver yet"), and why downstream boots
+(its DRM/MDP driver takes over the cont_splash handoff cleanly).
+
+Recommendation: before writing a full ICC provider (real effort, uncertain
+payoff), test the display-underflow theory — cheaper and better-fitting.
+Discriminating test: quiesce the bootloader-left MDP early (small debug
+initcall mapping the mdss/MDP region ~0xc900000 and stopping the display
+DMA/interface — display regs are non-secure, unlike the SMMU/IMEM that bit
+us). If stopping the MDP stops the ~30s reset → display underflow confirmed;
+the real fix path is then cont_splash handover / clean early teardown (or,
+long-term, the DSC panel driver — joan's known hardest problem). If it
+still resets → display cleared, revisit the ICC provider gamble. No device
+test run yet; this is a strategic fork for Lance to choose.
