@@ -23,6 +23,11 @@ Project history / attribution index: `docs/project-history-and-attribution.md`.
 
 ## Repos and paths (the original maintainers' local layout)
 
+This table documents how the original maintainers arrange things on their own
+build host. Treat it as a guideline: replicate it only if you want an
+identical setup — any layout works as long as the build/test commands are
+adjusted to match.
+
 | What | Where |
 |---|---|
 | This project (harness, docs) | `~/vibe-coding-projects/coding/lg-v30-port/` |
