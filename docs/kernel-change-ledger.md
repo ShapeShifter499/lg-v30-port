@@ -2653,3 +2653,95 @@ Open follow-up before public commit:
 
 Kernel worktree after this session: clean `joan/latest-clean-test` at
 `0d7df4134`; all K043-K050 debug changes reverted/preserved as `out/*.patch`.
+
+### K051 — K050 converted to clean commit + RAM-only confirmation (SURVIVOR)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-10
+
+- Source review outcome (handoff follow-ups 1+2): DTS `gpio-reserved-ranges`
+  route chosen over a driver-level msm8998 `get_direction` quirk. Rationale:
+  the protection is per-board LG TrustZone/XPU policy, not an SoC erratum —
+  a driver quirk would disable direction readback for every MSM8998 board;
+  `gpio-reserved-ranges` is the established binding (5 mainline 8998 boards
+  already reserve `<81 4>` this way).
+- `<49 4>` source evidence strengthened: downstream
+  `msm8998-joan-common-pinctrl.dtsi` muxes GPIO49-52 as `blsp_spi9`
+  (`spi_9_active`/`spi_9_sleep`) with NO downstream HLOS consumer of those
+  labels anywhere in the joan tree, and joan's fingerprint node
+  (`msm8998-fingerprint-fpc1022.dtsi`) carries only reset/IRQ GPIOs (27/121)
+  with no SPI bus reference — the fpc1022's SPI traffic runs inside the TEE.
+  A TZ-owned secure SPI on BLSP9 explains the per-pin direction-read aborts.
+  Classified as joan/LGE-firmware-specific, documented as such in the commit.
+- Clean kernel commit: `950cf8554` on `joan/latest-clean-test`
+  ("arm64: dts: qcom: msm8998-lge-joan: reserve TZ-protected TLMM GPIO
+  ranges"), trailers `Signed-off-by: Lance`, `Assisted-by: Hermes:gpt-5.5`
+  (Aurel's K043-K050 isolation) + `Assisted-by: Claude-Code:claude-fable-5`
+  (review/commit). Branch now ahead of origin/master by 5.
+- Rebuilt incrementally, repackaged with K023b classifier ramdisk, cmdline
+  `androidboot.hardware=joan panic=0 ignore_loglevel`:
+  `out/boot-joan-k050-clean-950cf8554.img` sha256
+  `e33c2b61aa0a95182ee4bf1b44decc394fbce7039b55953833bac186930f2aa2`.
+- Result: **SURVIVOR** — LOS returned at t+124s (111s after handoff),
+  identical window to Aurel's original K050 run.
+  Log: `out/tethered-test-2026-07-10T142008Z.log`.
+- Raw pstore read immediately after
+  (`out/pstore-partition-2026-07-10T142231Z.{bin,strings.txt,meta.txt}`):
+  contains ONLY the stale Jul-8 crash record (build #69, abort at 0.067s) —
+  no new crash record, consistent with clean survival + deliberate
+  classifier reboot.
+- Class: `upstream-candidate` (commit 950cf8554); K050 ledger disposition
+  "needs cleanup" is now RESOLVED.
+- Lance authorization note: tethered tests this session run without physical
+  presence per Lance's explicit go-ahead (2026-07-10, sleeping in next room,
+  accepts wedge risk).
+
+New clean baseline: `joan/latest-clean-test` @ `950cf8554`.
+
+### K052-K053 — MILESTONE 1: mainline userspace + USB gadget + network + shell
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-10
+
+- K052: gadget-initramfs image from clean baseline `950cf8554`
+  (`out/boot-joan-gadget-k052-950cf8554.img` sha256
+  `e6912a005119428c176c3583f5066dc2783943443094ed07cf97c172eba0365d`,
+  make-testimage.sh, cmdline `androidboot.hardware=joan panic=5
+  ignore_loglevel`). RAM-only boot: **phone enumerated as 18d1:4e26
+  "V30 mainline bring-up" (ECM+ACM)**, host ping 172.16.42.1 OK, live
+  busybox root shell over ttyACM0 (`/proc/uptime` readback). First
+  mainline userspace + working USB gadget on joan. Init's 15-min
+  self-recovery rebooted to LOS on schedule; raw pstore after
+  (`out/pstore-partition-2026-07-10T144053Z.*`) shows successful boots
+  leave NO new console record in the partition (crash-path-only
+  preservation).
+- K053: repeat boot with persistent host-side serial logger
+  (`out/k053-gadget-capture.sh`, log `out/k053-serial-2026-07-10T144230Z.log`,
+  runner log `out/tethered-test-k053-gadget-2026-07-10T144230Z.log`).
+  `touch /keep` held the boot; full diag dump pulled over the ECM link
+  via busybox `nc -l` on the phone (host ufw drops phone→host SYNs; a
+  temporary host iptables accept on the usb if was used and removed):
+  `out/k053-diag-2026-07-10.bin` sha256
+  `d2400d5c41d5de163c065801e33a74b7ef320200744a8d6b463c4089f6e1099b`
+  (75264 B: WDT log, version, cmdline, UDC, ip addr, /proc/interrupts,
+  clk_summary, regulator_summary, full dmesg).
+- Diag ground truth: running kernel `7.2.0-rc2-g950cf8554050 #70`
+  (clean, non-dirty). `wdkill`: WDT EN=0 at entry — APSS watchdog was
+  never armed on this boot path. dmesg failures ONLY: `efi: UEFI not
+  found` (expected), `psci: failed to set PC mode: -3` (known), and
+  deferred-probe timeout -110 on the two TZ-owned SMMUs
+  (`5040000.iommu`, `cd00000.iommu`) — no other subsystem errors.
+  The K030 anoc1 skip-reset debug patch was NOT needed: mainline
+  tolerates the SMMU probe failures once TLMM no longer aborts.
+- Gadget quirks noted: init's mass-storage diag LUN did not attach on
+  K053 (ECM+ACM only on re-bind; 4-day-old host dmesg had confused an
+  earlier check) — diag came over network instead. ACM serial sessions
+  survive the re-bind; interact after ~t+75s.
+- Class: milestone evidence, `bringup-local` (initramfs/tooling);
+  kernel tree unchanged from `950cf8554`.
+- NEXT (Lance directive 2026-07-10): backup boot/recovery partitions
+  BEFORE any flash. Flashing now authorized EXCEPT anything that could
+  brick or block recovery (never xbl/abl/tz/hyp/rpm/modem/laf).
+  Goal: postmarketOS with wifi+BT (cellular later).
