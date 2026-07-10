@@ -29,6 +29,13 @@ Project history / attribution index: `docs/project-history-and-attribution.md`.
 | Downstream reference kernel | `~/vibe-coding-projects/coding/android_kernel_lge_msm8998/` (LineageOS 4.4, **read-only reference — never build or modify**) |
 | Downstream joan DTS | `arch/arm64/boot/dts/lge/msm8998-joan/` in the downstream tree |
 
+## Provenance
+
+See [PROVENANCE.md](PROVENANCE.md) for what is original to this project vs
+borrowed/derived (and from where), and `docs/project-history-and-attribution.md`
+for who did what, when. Kernel branch: [ShapeShifter499/linux-lg-v30-joan
+`joan/latest-clean-test`](https://github.com/ShapeShifter499/linux-lg-v30-joan/tree/joan/latest-clean-test).
+
 ## Build + test image
 
 ```bash
