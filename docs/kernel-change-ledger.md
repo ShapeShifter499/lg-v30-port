@@ -2745,3 +2745,9 @@ Date: 2026-07-10
   BEFORE any flash. Flashing now authorized EXCEPT anything that could
   brick or block recovery (never xbl/abl/tz/hyp/rpm/modem/laf).
   Goal: postmarketOS with wifi+BT (cellular later).
+
+Correction (Lance, 2026-07-10, after K051-K053 entry): the no-touch list
+drops `laf` — the download-mode partition is designated as the pmOS boot
+slot (recovery stays intact instead). Preconditions: laf+lafbak backups
+verified (done today); restore paths = fastboot flash laf / recovery /
+dd from LOS root. xbl/abl/tz/hyp/rpm/modem remain absolutely no-touch.

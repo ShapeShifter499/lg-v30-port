@@ -17,8 +17,10 @@ Date: 2026-07-10
 - Both repos are public with PROVENANCE.md + CONTRIBUTING.md; PRs welcome.
 - Owner authorizations on record (ledger K051-K053): unattended tethered
   tests; flashing allowed with backups taken first (23 partitions saved +
-  mirrored) — but NEVER xbl/abl/tz/hyp/rpm/modem/laf or anything that could
-  block recovery. End goal: **postmarketOS with full wifi + BT** (cellular
+  mirrored) — but NEVER xbl/abl/tz/hyp/rpm/modem or anything that could
+  block recovery (owner correction 2026-07-10: laf MAY host the pmOS
+  boot image — see Boot model below — since recovery + fastboot both
+  remain as restore paths and laf/lafbak are backed up). End goal: **postmarketOS with full wifi + BT** (cellular
   later).
 
 ## Next: storage is the gate (start here)
@@ -41,11 +43,17 @@ yet). Without storage there is no rootfs, so:
 
 ## postmarketOS plan (P6)
 
-- **Boot model**: kernel from `fastboot boot` while tethered; once stable,
-  flash the pmOS boot image to the **recovery** partition (backed up;
-  re-flashable; key-combo boot Vol-Down+Power) so LineageOS `boot` stays
-  untouched. Rootfs on **microSD** first; internal UFS later only with
-  explicit owner sign-off per partition.
+- **Boot model** (corrected by owner 2026-07-10): kernel from
+  `fastboot boot` while tethered; once stable, flash the pmOS boot image
+  to the **laf (download-mode) partition** — NOT recovery, which stays
+  intact for LG/LOS recovery flows. Enter it with the download-mode key
+  combo (power off, hold Vol-Up, insert USB). Both `laf` and `lafbak`
+  are in the verified 2026-07-10 backup; while pmOS occupies laf,
+  download mode is unavailable until laf is restored (via
+  `fastboot flash laf`, recovery, or dd from LOS root — all remain
+  usable). LineageOS `boot` and `recovery` stay untouched. Rootfs on
+  **microSD** first; internal UFS later only with explicit owner
+  sign-off per partition.
 - **pmaports skeleton**: `device/testing/device-lge-joan/` — deviceinfo
   (arch=aarch64, boot method fastboot, appended dtb, pagesize 4096, base
   0x0 per BoardConfig), `linux-postmarketos-lge-joan` APKBUILD building
