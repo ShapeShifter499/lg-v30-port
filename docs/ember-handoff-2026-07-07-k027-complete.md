@@ -453,25 +453,25 @@ out/boot-joan-clkpd-k027.img
 sha256 60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e
 ```
 
-## WebDAV / Deck sync state before this file
+## internal mirror/tracker sync state before this file
 
 Aurel previously synced K027 artifacts to:
 
 ```text
-Talk/Shared_AI_agents_files/status/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt
-Talk/Shared_AI_agents_files/status/aurel-k027-public-bullhead-reboot_reason.h
-Talk/Shared_AI_agents_files/status/aurel-k027-clkpd-cmdline-2026-07-06.txt
-Talk/Shared_AI_agents_files/status/aurel-k027-clkpd-fastboot-2026-07-06.txt
-Talk/Shared_AI_agents_files/status/aurel-k027-post-timeout-observe-2026-07-06.txt
-Talk/Shared_AI_agents_files/patches/aurel-k027-docs-f4a0652.patch
+internal-mirror:/status/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt
+internal-mirror:/status/aurel-k027-public-bullhead-reboot_reason.h
+internal-mirror:/status/aurel-k027-clkpd-cmdline-2026-07-06.txt
+internal-mirror:/status/aurel-k027-clkpd-fastboot-2026-07-06.txt
+internal-mirror:/status/aurel-k027-post-timeout-observe-2026-07-06.txt
+internal-mirror:/patches/aurel-k027-docs-f4a0652.patch
 ```
 
-Deck card #43 was updated with K027 comment id `14748`.
+the internal tracker was updated with K027 a comment.
 
 This one-file handoff should also be uploaded to:
 
 ```text
-Talk/Shared_AI_agents_files/handoffs/ember-handoff-2026-07-07-k027-complete.md
+internal-mirror:/handoffs/ember-handoff-2026-07-07-k027-complete.md
 ```
 
 ## Final instruction to Ember
@@ -480,7 +480,7 @@ Start from this file, not the chat transcript. If the phone is not visible over
 USB, do source-only CONF_NOC / MSM8998 NoC/fabric archaeology. If Lance physically
 recovers the phone and asks for one more test, retry only the already-built K027
 image once with one-client `sudo -n fastboot boot`, then record the result in the
-ledger and Deck.
+ledger and the internal tracker.
 
 Cozy but sharp summary: the snake trail now points at **TZ Config NoC**, not at
 APSS watchdogs, PMIC PON, or userspace. Follow the fabric.

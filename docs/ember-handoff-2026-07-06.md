@@ -373,8 +373,8 @@ cd /home/kumo02/vibe-coding-projects/coding/lg-v30-port
     - `docs/bringup-debug-state-2026-07-06.md`
     - `docs/2026-07-06_lg-v30-reset-cause-PS_HOLD.md`
     - `README.md` if top-level status changes
-    - WebDAV handoffs
-    - Deck card #43
+    - internal mirror handoffs
+    - the internal tracker
 
 ## Tracking / public-readiness rules
 
@@ -434,4 +434,4 @@ See `docs/kernel-change-ledger.md` for full hashes and older artifacts.
 
 Ember: please continue from `linux-mainline-v30` branch `joan/latest-clean-test`, not the debug breadcrumb branch. The current reset is still a controlled `PS_HOLD` return before mainline USB diagnostics. Do not retry SEC_WDOG_DIS, APSS watchdog petting, panic timeout, maxcpus/cpuidle, high-memory no-map, DLOAD arg-shape, QSEE log-buffer registration, RPM reachability, BOB-mode, L19/default regulator, standard L18+L19+BOB regulator overlay, TCSR DLOAD phandle, PM8998 PON S3 source/debounce, PM8998 PON reset-sequence/S1/S2, or optional Kryo SCM errata command-0x12. Those are recorded as rejected or comparison-only in the ledger.
 
-Best next step: compare one concrete early downstream state-changing path that is active by default and still unmatched in mainline — likely fuller LGE/Qualcomm restart/boot-state/SMEM/IMEM cookie handling distinct from K018, or a different QSEE/QSECOM/RPM state transition with evidence that downstream runs it before the reset window. Build only one minimal oracle, RAM-only `fastboot boot`, then revert/rebuild clean and update the ledger/WebDAV/Deck.
+Best next step: compare one concrete early downstream state-changing path that is active by default and still unmatched in mainline — likely fuller LGE/Qualcomm restart/boot-state/SMEM/IMEM cookie handling distinct from K018, or a different QSEE/QSECOM/RPM state transition with evidence that downstream runs it before the reset window. Build only one minimal oracle, RAM-only `fastboot boot`, then revert/rebuild clean and update the ledger/internal mirror/tracker.

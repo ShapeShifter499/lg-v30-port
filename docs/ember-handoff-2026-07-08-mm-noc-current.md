@@ -402,10 +402,10 @@ docs/k028-conf-noc-sweep-hypothesis-2026-07-07.md — SUPERSEDED (K032 disproved
                                                      sweep theory); kept for history
 ```
 
-WebDAV mirrors of handoffs live at
-`Talk/Shared_AI_agents_files/handoffs/`. Device crash-screen photos from
-K035 are at `Talk/Shared_AI_agents_files/20260708_051750.jpg` and
-`...051754.jpg`. Deck card #43 has the running commentary.
+internal mirror mirrors of handoffs live at
+`internal-mirror:/handoffs/`. Device crash-screen photos from
+K035 are at `internal-mirror:/20260708_051750.jpg` and
+`...051754.jpg`. the internal tracker has the running commentary.
 
 ## Final instruction
 

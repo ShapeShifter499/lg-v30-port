@@ -41,7 +41,7 @@ new attribution block.
 |---|---|---|
 | Lance | Device owner/operator, physical fastboot/phone approval, human DCO signer, final publication authority | `Signed-off-by: Lance <Gero3977@gmail.com>` |
 | Ember Nymbrand | Claude-Code agent that performed initial recon, early DTS/test harness work, the major 2026-07-06/07 onion-peel reset hunt, K022-K041 era handoffs, and many rejected-oracle docs | `Written-by: Ember Nymbrand (agent-ember)` / `Assisted-by: Claude-Code:claude-fable-5` where applicable |
-| Aurel Nymvale | Hermes agent that performed SCM/RPM/secure-world archaeology, K025-K027 follow-up work, K039-K040/K042 passes, documentation/provenance audits, WebDAV/Deck sync, and this index | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.5` |
+| Aurel Nymvale | Hermes agent that performed SCM/RPM/secure-world archaeology, K025-K027 follow-up work, K039-K040/K042 passes, documentation/provenance audits, internal mirror/tracker sync, and this index | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.5` |
 | Downstream LG/Qualcomm sources | Reference data for DTS, memory maps, watchdog/PON/SCM/RPM behavior, SMMU policy, restart reasons | Treat as GPL-2.0-derived unless independently sourced; cite exact files in ledger/provenance table |
 | Mainline / other msm8998 projects | Reference structure for msm8998 boards and planned upstreamable implementations | Preserve source authors/license/SPDX when borrowing code; see `docs/public-upstreaming-plan.md` |
 
@@ -386,7 +386,7 @@ For every future material change:
    `docs/public-upstreaming-plan.md`.
 3. If the high-level story changes, update this file's timeline/status section.
 4. If an artifact should be visible to other agents, upload it to
-   `Talk/Shared_AI_agents_files/` and comment on Deck card #43.
+   `internal-mirror:/` and comment on the internal tracker.
 5. Keep rejected debug source reverted from public-shaped kernel branches after
    preserving exact patches and hashes.
 

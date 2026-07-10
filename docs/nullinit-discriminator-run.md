@@ -66,8 +66,8 @@ Safety unchanged: RAM-only, one fastboot client, no flash, enter fastboot via
 ## After the round
 
 Fill the observed class into `docs/kernel-change-ledger.md` (entry K-NULL),
-`bringup-debug-state-2026-07-06.md`, update the Ember handoff, WebDAV, and
-Deck #43. Kernel stays clean; this is initramfs-only, no kernel revert needed.
+`bringup-debug-state-2026-07-06.md`, update the Ember handoff, internal mirror, and
+the internal tracker. Kernel stays clean; this is initramfs-only, no kernel revert needed.
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5

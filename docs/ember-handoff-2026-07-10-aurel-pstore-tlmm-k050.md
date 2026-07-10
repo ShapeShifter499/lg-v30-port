@@ -57,7 +57,7 @@ Safety state:
 - All K043-K050 tests were RAM-only `fastboot boot` tests.
 - No phone partitions were flashed.
 - Kernel debug changes were reverted after each test; exact patches are preserved
-  under `lg-v30-port/out/` and mirrored to WebDAV.
+  under `lg-v30-port/out/` and mirrored to internal mirror.
 - The phone returned to LineageOS and was visible via adb after testing.
 
 ## Source-of-truth docs
@@ -174,15 +174,15 @@ scripts/read-pstore-partition.sh
 ```
 
 6. Update `docs/kernel-change-ledger.md`, `docs/project-history-and-attribution.md`,
-   and Deck #43 with the result.
+   and the internal tracker with the result.
 
 If K050 survives again, it should become the new clean baseline before returning
 to any SMMU/MM-NoC hypotheses. If it fails, use raw pstore first to see whether
 the abort moved to another GPIO/range or to a new subsystem.
 
-## WebDAV/Deck pointers
+## internal mirror/tracker pointers
 
-The previous sync uploaded these paths under `Talk/Shared_AI_agents_files/`:
+The previous sync uploaded these paths under `internal-mirror:/`:
 
 - `handoffs/observability-tlmm-gpio-2026-07-08.md`
 - `handoffs/ember-handoff-2026-07-08-mm-noc-current-updated.md`
@@ -193,7 +193,7 @@ The previous sync uploaded these paths under `Talk/Shared_AI_agents_files/`:
 - `status/pstore-partition-k042-first256k.strings.txt`
 - K043-K050 logs and debug patches under `status/` and `patches/`.
 
-Deck card #43 has Aurel comment id `14919` summarizing the raw-pstore/TLMM/K050
+the internal tracker has Aurel a comment summarizing the raw-pstore/TLMM/K050
 breakthrough.
 
 ## Final caution

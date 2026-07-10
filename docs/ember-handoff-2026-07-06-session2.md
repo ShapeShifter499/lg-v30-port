@@ -99,7 +99,7 @@ downstream's *kernel* keeps alive somehow (stock kernel RAM-boots fine).
 
 - Kernel `joan/latest-clean-test` clean (rebuilt), 4 DTS commits ahead of
   v7.2-rc2. Harness repo clean. Phone in LineageOS, no fastboot client.
-- Ledger K022 / K023 / K023b-e / K024 current; WebDAV + Deck #43 updated.
+- Ledger K022 / K023 / K023b-e / K024 current; internal mirror + the internal tracker updated.
 
 ## Aurel K025 addendum — secure-interface archaeology checked, no boot oracle
 

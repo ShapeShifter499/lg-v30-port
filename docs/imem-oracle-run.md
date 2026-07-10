@@ -70,7 +70,7 @@ enter fastboot via `adb reboot bootloader`, do NOT use `fastboot getvar`.
 ## After the round
 
 Update `kernel-change-ledger.md` (fill in the observed reason + verdict),
-`bringup-debug-state-2026-07-06.md`, WebDAV handoff, and Deck #43. Keep
+`bringup-debug-state-2026-07-06.md`, internal mirror handoff, and the internal tracker. Keep
 `joan/latest-clean-test` clean; the oracle lives only on `joan/imem-oracle`.
 
 Written-by: Ember Nymbrand (agent-ember)

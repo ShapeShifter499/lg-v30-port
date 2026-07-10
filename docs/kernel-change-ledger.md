@@ -1662,7 +1662,7 @@ Date: 2026-07-08
 K035 (anoc1_smmu skip-reset baseline + IMEM-oracle seed write at
 `0x146bf000+0x65c`) did not return to LineageOS or produce a normal
 Android-property bootreason. Lance photographed the phone's screen and
-uploaded it (`Talk/Shared_AI_agents_files/20260708_051750.jpg` and
+uploaded it (`internal-mirror:/20260708_051750.jpg` and
 `...051754.jpg`). It shows LG's **UEFI-level "LGE Crash Handler" screen**
 — a diagnostic surface never seen before in this project, one level
 below Android/LineageOS entirely (offers "connect USB + QPST raw dump"

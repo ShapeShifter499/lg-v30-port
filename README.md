@@ -1,11 +1,14 @@
 # LG V30 (joan, US998) mainline Linux port
 
-Multi-agent project home. Any agent (or human) picking up a work parcel starts
-here — this file is the single source of truth for state and conventions.
-Coordination happens on **Deck board 4 "Shared Tasks", epic card #43** plus one
-card per parcel. Artifacts that Lance should see go to
-`Talk/Shared_AI_agents_files/{handoffs,patches,status}/` with a pointer in the
-card.
+Project home for humans and AI agents alike. Anyone picking up a work parcel
+starts here — this file is the single source of truth for state and
+conventions. **Contributions are welcome via GitHub pull requests and issues**
+on this repo and on the kernel repo
+([`linux-lg-v30-joan`](https://github.com/ShapeShifter499/linux-lg-v30-joan),
+branch `joan/latest-clean-test`) — see [CONTRIBUTING.md](CONTRIBUTING.md).
+(Historical docs under `docs/` also mention an internal tracker and an
+"internal mirror" used by the original maintainers' agents; those are not
+publicly accessible and nothing essential lives only there.)
 
 ## Goal
 
@@ -15,8 +18,7 @@ be LineageOS 22.2 (Android 15 on downstream 4.4) — the port never touches that
 install: test kernels boot tethered (`fastboot boot`) or from the recovery
 partition.
 
-Full background: `docs/recon-2026-07-04.md` (also on NC:
-`Shared_AI_agents_files/status/2026-07-04_lg-v30-joan-mainline-recon.md`).
+Full background: `docs/recon-2026-07-04.md`.
 Project history / attribution index: `docs/project-history-and-attribution.md`.
 
 ## Repos and paths (all on nym-nest)
@@ -71,19 +73,20 @@ booting it (Vol-Down + Power, release/re-hold Power at the LG logo).
 
 ## Work parcels
 
-Each parcel has a Deck card. **Claim = assign yourself / comment on the card
-and move it to Active.** Don't work an unclaimed-by-you card that's already
-Active. Parcels marked *no-device* are fully doable without the phone.
+**Claim a parcel by opening a GitHub issue on this repo (or commenting on an
+existing one) so work isn't duplicated; deliver via pull request.** Parcels
+marked *no-device* are fully doable without the phone. P0 and P5 are complete
+(the board boots mainline to userspace via `fastboot boot`).
 
-| # | Parcel | Card | Needs device? | Depends on |
+| # | Parcel | Status | Needs device? | Depends on |
 |---|---|---|---|---|
-| P0 | Verify kernel build + boot.img packaging | #43 (epic) | no | — (Ember, in progress) |
-| P1 | Cross-check RPM regulator voltages vs downstream `msm8998-joan-common-pm.dtsi`; fix `msm8998-lge-joan.dts` (currently copied from OnePlus 5) | see board | no | — |
-| P2 | Extract SW43402 panel data from downstream (`dsi-panel-sw43402*.dtsi`): DSI init sequence, timings, DSC PPS params → `docs/panel-sw43402.md` | see board | no | — |
-| P3 | DSC-on-MDP5 feasibility verdict: read mainline `drivers/gpu/drm/msm` (mdp5 vs dpu DSC), downstream DSC usage; deliverable = written verdict + recommended display path in `docs/display-path.md` | see board | no | — |
-| P4 | Draft touchscreen node: downstream `msm8998-joan-touch-stm-ftm4.dtsi` → mainline `stmfts` DT node (i2c bus, gpios, supplies), committed `status = "disabled"` | see board | no | P1 helps |
-| P5 | Device chunk: confirm stock Pie, `fastboot oem unlock`, LineageOS 22.2 install, test `fastboot boot`, read actual hw rev + board-id, first tethered mainline boot | see board | **yes + Lance** | P0 |
-| P6 | pmOS `device-lg-joan` package skeleton (pmaports layout, deviceinfo, kernel APKBUILD against our branch) | later | no | P5 proof of life |
+| P0 | Verify kernel build + boot.img packaging | DONE | no | — |
+| P1 | Cross-check RPM regulator voltages vs downstream `msm8998-joan-common-pm.dtsi`; fix `msm8998-lge-joan.dts` (currently copied from OnePlus 5) | open | no | — |
+| P2 | Extract SW43402 panel data from downstream (`dsi-panel-sw43402*.dtsi`): DSI init sequence, timings, DSC PPS params → `docs/panel-sw43402.md` | open | no | — |
+| P3 | DSC-on-MDP5 feasibility verdict: read mainline `drivers/gpu/drm/msm` (mdp5 vs dpu DSC), downstream DSC usage; deliverable = written verdict + recommended display path in `docs/display-path.md` | open | no | — |
+| P4 | Draft touchscreen node: downstream `msm8998-joan-touch-stm-ftm4.dtsi` → mainline `stmfts` DT node (i2c bus, gpios, supplies), committed `status = "disabled"` | open | no | P1 helps |
+| P5 | Device chunk: unlock, LineageOS install, `fastboot boot`, first tethered mainline boot | DONE (2026-07-10: mainline userspace + USB gadget) | — | — |
+| P6 | pmOS `device-lg-joan` package skeleton (pmaports layout, deviceinfo, kernel APKBUILD against our branch) | open | no | — |
 
 ## Conventions (binding)
 

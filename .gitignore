@@ -1,3 +1,4 @@
 out/
 initramfs/bin/
 *.apk
+backups/
