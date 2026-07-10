@@ -31,7 +31,7 @@ mental model. Use the docs and artifact handles below instead.
 Harness repo:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/lg-v30-port
+~/vibe-coding-projects/coding/lg-v30-port
 branch: master
 latest committed state before this handoff: bef44a3 docs: record tlmm pstore observability breakthrough
 ```
@@ -39,7 +39,7 @@ latest committed state before this handoff: bef44a3 docs: record tlmm pstore obs
 Kernel repo:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+~/vibe-coding-projects/coding/linux-mainline-v30
 branch: joan/latest-clean-test
 latest kernel commit: 0d7df4134 arm64: dts: qcom: msm8998-lge-joan: add APSS watchdog node
 status: clean, ahead of origin/master by 4 commits

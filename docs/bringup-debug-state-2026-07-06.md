@@ -1,6 +1,6 @@
 # V30 mainline bringup — debug state handoff (2026-07-06)
 
-Session: Ember on nym-nest, ~18 tethered boot rounds with Lance at the
+Session: Ember on the maintainers' build host, ~18 tethered boot rounds with Lance at the
 device. Read this TOP TO BOTTOM before touching the phone — half of
 this session's cost went to instruments that silently lie.
 
@@ -68,7 +68,7 @@ vs panic=5 A/B cleanly, now that instruments are trustworthy).
 - ✘ **busybox in initramfs had NO telnetd, NO devmem** — silent
   no-ops behind `2>/dev/null`. Alpine's busybox-static also lacks
   both. The M1 "telnet shell" needs busybox rebuilt from source
-  (toolchain on nym-nest: `aarch64-linux-gnu-gcc`) or dedicated
+  (toolchain on the build host: `aarch64-linux-gnu-gcc`) or dedicated
   static tools like wdkill. VERIFY APPLETS with `grep -ac NAME bin`
   before trusting any of them.
 - ✘ **ACM serial + RNDIS data under downstream 4.4 gadget**: enumerate
@@ -88,7 +88,7 @@ vs panic=5 A/B cleanly, now that instruments are trustworthy).
 3. Phone-side: diagnostic initramfs now self-reboots after 15min
    (`/keep` to cancel) so dead-end boots don't need the power button.
 
-## Repos/branches (all nym-nest)
+## Repos/branches (maintainers' build host)
 
 - kernel `coding/linux-mainline-v30`:
   - `lge-joan-bringup` = clean bringup work (3 commits: DTS scaffold,
@@ -105,7 +105,7 @@ vs panic=5 A/B cleanly, now that instruments are trustworthy).
 
 ## Suggested next moves (in order)
 
-1. Park-state check: phone in LOS, adb authorized for nym-nest, adb
+1. Park-state check: phone in LOS, adb authorized for the build host, adb
    root enabled (LOS "Rooted debugging").
 2. TZ sec-wdog SCM disable hack in kernel (see key finding above for
    the exact call); retest with a SINGLE watcher.

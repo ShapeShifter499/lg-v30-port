@@ -177,9 +177,9 @@ part of a ledger experiment.
 ### K006 — SEC_WDOG_DIS / SEC_WDOG_TRIG SCM experiments
 
 - Handles:
-  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-sec-wdog-scm-experiments-2026-07-06.patch`
-  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-qcom-scm-oracle-leftover-2026-07-06.patch`
-  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-scm-retcode-oracle-leftover-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-sec-wdog-scm-experiments-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-qcom-scm-oracle-leftover-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-scm-retcode-oracle-leftover-2026-07-06.patch`
 - Class: `rejected` unless new evidence shows a boot-mode-specific difference.
 - Files experimented with:
   - `drivers/firmware/qcom/qcom_scm.c`
@@ -221,8 +221,8 @@ part of a ledger experiment.
 ### K008 — downstream-style APSS WDT takeover experiments
 
 - Handles:
-  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-downstream-style-wdt-clean-test-2026-07-06.patch`
-  - `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-wdt-en3-test-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-downstream-style-wdt-clean-test-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-wdt-en3-test-2026-07-06.patch`
 - Class: `rejected` as a sufficient fix; code is not for upstream.
 - Files experimented with:
   - `drivers/watchdog/qcom-wdt.c`
@@ -245,7 +245,7 @@ part of a ledger experiment.
 - Handles:
   - branch `joan/latest-kernel` at `88bf16047` — `JOAN DEBUG: ramoops breadcrumbs in head.S and setup_arch`
   - base `origin/master` `8cdeaa50e` — `Linux 7.2-rc2`
-  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-kernel.img`
+  - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-kernel.img`
   - image sha256 `2c8af0cc49b05ccd5d0c5452b5bd8f607aadbe89675fdcc6f7b92f023f32c325`
 - Class: `bringup-local` branch refresh / regression evidence.
 - Files changed by carried commits:
@@ -280,7 +280,7 @@ part of a ledger experiment.
 - Handles:
   - branch `joan/latest-clean-test` at `0d7df4134` — `arm64: dts: qcom: msm8998-lge-joan: add APSS watchdog node`
   - base `origin/master` `8cdeaa50e` — `Linux 7.2-rc2`
-  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-clean.img`
+  - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-clean.img`
   - image sha256 `47418aebd86c929b59cd09d243d93abe7ab03d85310d11015dfcd530474d47c1`
 - Class: `bringup-local` baseline / public-shaping evidence.
 - Files changed by carried commits:
@@ -314,10 +314,10 @@ part of a ledger experiment.
 
 - Handles:
   - branch `joan/latest-clean-test` at `0d7df4134` plus command-line-only image variants;
-  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-maxcpus1.img`, sha256 `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8`;
-  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-cpuidleoff.img`, sha256 `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d`;
-  - saved patch `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/aurel-latest-highmem-reserve-test-2026-07-06.patch`;
-  - image `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-highmem-reserve.img`, sha256 `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`.
+  - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-maxcpus1.img`, sha256 `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8`;
+  - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-cpuidleoff.img`, sha256 `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d`;
+  - saved patch `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-latest-highmem-reserve-test-2026-07-06.patch`;
+  - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-highmem-reserve.img`, sha256 `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`.
 - Class: `rejected` / `debug-only` discriminators.
 - Purpose:
   - Test whether the reset is caused by secondary CPU bringup/Kryo errata, CPU

@@ -21,7 +21,7 @@ partition.
 Full background: `docs/recon-2026-07-04.md`.
 Project history / attribution index: `docs/project-history-and-attribution.md`.
 
-## Repos and paths (all on nym-nest)
+## Repos and paths (the original maintainers' local layout)
 
 | What | Where |
 |---|---|
@@ -96,7 +96,7 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   `Signed-off-by: Lance <Gero3977@gmail.com>` +
   `Assisted-by: <your-harness>:<model actually running>` (e.g.
   `Claude-Code:claude-fable-5`, `OpenClaw:<model>`). Never `Co-Authored-By`.
-  See `~/vibe-coding-projects/README.md` for the full policy.
+  See [CONTRIBUTING.md](CONTRIBUTING.md) for the full policy.
 - **Branches**: small topic branches `joan/<topic>` off `lge-joan-bringup`,
   merged back into `lge-joan-bringup` when the parcel is done. Don't rebase or
   amend another agent's commits.
@@ -107,7 +107,7 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   or any partition without Lance present and approving. Test images are built
   to `lg-v30-port/out/` and go nowhere else. The downstream kernel tree is
   reference-only.
-- **State**: when you finish or hand off, update your parcel card and, if the
+- **State**: when you finish or hand off, update your parcel issue and, if the
   facts here changed, this README (append, don't rewrite history).
 - **Project history / attribution index**: when a session materially changes the
   project, update `docs/project-history-and-attribution.md` so future agents can
@@ -486,10 +486,10 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
 
 - Recon done (see docs/). Kernel scaffold committed (`3d3868854`); DTB
   compiles. `Image.gz` rebuild with gadget configs built-in was backgrounded on
-  nym-nest — if `arch/arm64/boot/Image.gz` is missing, rerun the build line
+  the maintainers' build host — if `arch/arm64/boot/Image.gz` is missing, rerun the build line
   above. Test-image pipeline untested until the kernel image exists (P0).
 - Phone not yet confirmed/connected; P5 blocked on Lance.
-- Toolchain installed on nym-nest: `aarch64-linux-gnu-gcc` 16.1,
+- Toolchain installed on the maintainers' build host: `aarch64-linux-gnu-gcc` 16.1,
   `android-tools` (adb/fastboot/mkbootimg), `dtc`. `dtschema` NOT installed, so
   `CHECK_DTBS=y` doesn't work yet — install it if you want binding checks.
 

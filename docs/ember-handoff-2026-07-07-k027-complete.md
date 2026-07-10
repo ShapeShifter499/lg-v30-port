@@ -45,7 +45,7 @@ before selecting one concrete oracle.
 Harness/project repo:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/lg-v30-port
+~/vibe-coding-projects/coding/lg-v30-port
 branch: master
 baseline before this handoff: f4a0652 docs: decode joan K027 TZ config NoC clue
 handoff file commit: current/top handoff commit in the harness repo (`git log -1` after receipt)
@@ -55,7 +55,7 @@ status at handoff: clean
 Kernel repo:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+~/vibe-coding-projects/coding/linux-mainline-v30
 branch: joan/latest-clean-test
 status at handoff: clean, ahead of origin/master by 4
 base: origin/master / v7.2-rc2 / 8cdeaa50e Linux 7.2-rc2
@@ -114,7 +114,7 @@ These are binding unless Lance explicitly changes them:
 Classifier ramdisk:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/initramfs-k023b.cpio.gz
+~/vibe-coding-projects/coding/lg-v30-port/out/initramfs-k023b.cpio.gz
 ```
 
 Behavior:
@@ -126,8 +126,8 @@ Behavior:
 Standard package shape:
 
 ```bash
-ROOT=/home/kumo02/vibe-coding-projects/coding/lg-v30-port
-K=/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+ROOT=~/vibe-coding-projects/coding/lg-v30-port
+K=~/vibe-coding-projects/coding/linux-mainline-v30
 cat "$K/arch/arm64/boot/Image.gz" \
     "$K/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb" \
     > "$ROOT/out/Image.gz-dtb"
@@ -168,7 +168,7 @@ helps a TZ Config NoC reset.
 Image:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-clkpd-k027.img
+~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-clkpd-k027.img
 sha256 60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e
 ```
 
@@ -392,7 +392,7 @@ If the phone is in LineageOS and Lance is present, retry K027 exactly once:
 adb reboot bootloader
 # wait until sudo-fastboot sees exactly one device
 sudo -n fastboot devices
-sudo -n fastboot boot /home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-clkpd-k027.img
+sudo -n fastboot boot ~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-clkpd-k027.img
 ```
 
 Monitor with the existing one-client discipline. Do not start a second fastboot

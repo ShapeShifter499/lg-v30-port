@@ -18,11 +18,11 @@ The best current interpretation remains:
 
 Current safe baseline:
 
-- Kernel repo: `/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30`
+- Kernel repo: `~/vibe-coding-projects/coding/linux-mainline-v30`
 - Kernel branch: `joan/latest-clean-test`
 - Kernel base: `origin/master` `8cdeaa50e` (`Linux 7.2-rc2`)
 - Kernel state at handoff: clean, four clean DTS commits ahead of upstream
-- Harness/docs repo: `/home/kumo02/vibe-coding-projects/coding/lg-v30-port`
+- Harness/docs repo: `~/vibe-coding-projects/coding/lg-v30-port`
 - Harness latest commit before this handoff update: `196e97f docs: record joan Kryo SCM errata comparison`
 
 Use these current source-of-truth files first:
@@ -45,7 +45,7 @@ Unless Lance explicitly changes them:
 - Use exactly one fastboot client at a time.
 - Avoid `fastboot getvar`; it previously wedged LG aboot.
 - If the monitor sees LineageOS adb return, classify immediately and stop waiting.
-- Keep test images under `/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/`.
+- Keep test images under `~/vibe-coding-projects/coding/lg-v30-port/out/`.
 - Report any package installs. Aurel installed none in this batch.
 
 Fastboot script precheck notes:
@@ -59,7 +59,7 @@ Fastboot script precheck notes:
 Kernel path:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+~/vibe-coding-projects/coding/linux-mainline-v30
 ```
 
 Branch:
@@ -358,8 +358,8 @@ Avoid:
 ```bash
 git diff --check
 make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) Image.gz dtbs
-cd /home/kumo02/vibe-coding-projects/coding/lg-v30-port
-./make-testimage.sh /home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+cd ~/vibe-coding-projects/coding/lg-v30-port
+./make-testimage.sh ~/vibe-coding-projects/coding/linux-mainline-v30
 ```
 
 6. Copy image to a descriptive `out/boot-joan-latest-<oracle>.img`.
@@ -406,7 +406,7 @@ Avoid using `joan/latest-kernel` as the baseline unless specifically testing its
 Recent Aurel artifacts live in:
 
 ```text
-/home/kumo02/vibe-coding-projects/coding/lg-v30-port/out/
+~/vibe-coding-projects/coding/lg-v30-port/out/
 ```
 
 Most important latest artifacts:

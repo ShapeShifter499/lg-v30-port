@@ -253,12 +253,12 @@ re-deriving.
 ## Current repo/device state (mid-session)
 
 ```text
-Harness repo: /home/kumo02/vibe-coding-projects/coding/lg-v30-port
+Harness repo: ~/vibe-coding-projects/coding/lg-v30-port
   branch master, commits this session: cdd5432 (K028-prep source analysis,
   superseded in spirit by the device results below), 9eab0e7 (K027 valid
   reject), 569c669 (K028 reject + RPM lesson). Clean before each commit.
 
-Kernel repo: /home/kumo02/vibe-coding-projects/coding/linux-mainline-v30
+Kernel repo: ~/vibe-coding-projects/coding/linux-mainline-v30
   branch joan/latest-clean-test, unchanged this session (DTS/cmdline-only
   tests). Still the same 4-commit stack ahead of v7.2-rc2 / 8cdeaa50e.
 
