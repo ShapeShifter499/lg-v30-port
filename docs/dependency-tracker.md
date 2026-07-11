@@ -39,7 +39,12 @@ Rules:
 | 2026-07-11 | linux-lg-v30-joan source tarball @ ce78c1369 | github.com/ShapeShifter499 (our own fork) | pmbootstrap cache (`cache_distfiles`) | pmOS kernel package build | Ember (via pmbootstrap) |
 | 2026-07-11 | Alpine chroots + packages (native + aarch64) | Alpine/postmarketOS mirrors | `~/.local/var/pmbootstrap/` (managed by pmbootstrap; `pmbootstrap zap` cleans) | pmOS rootfs/kernel build environment | Ember (via pmbootstrap) |
 | 2026-07-11 | joan panel/DSC/board dtsi (3 files) | LG/LineageOS downstream `android_kernel_lge_msm8998` (GPL-2.0) | `docs/downstream-refs/` | SW43402 panel data for the mainline driver (P2) | Ember |
+| 2026-07-11 | `msm8998-mainline/linux` public reference @ `2b7263ccccbdafba3e8696349d9a3e9b115c6dd8` (including clock fix commit `878adc31071b`) | `https://gitlab.com/msm8998-mainline/linux.git` | `/tmp/msm8998-mainline-linux-ref` (filtered/sparse reference clone) | compare known MSM8998 MMCC/DSI clock fixes after K062 | Aurel |
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
 Date: 2026-07-11

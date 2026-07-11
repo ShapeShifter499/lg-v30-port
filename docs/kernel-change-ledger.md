@@ -2929,3 +2929,146 @@ Date: 2026-07-11
   make the mmss SMMU probe — qcom SMMU stream-mapping/handoff quirks
   (qcom_smmu, `qcom,adreno-smmu`-style or the -500 impl-def bypass), NOT the
   K030 blanket skip. Once it probes, MDSS→DPU→DSI→panel should cascade.
+
+### K060 — display dependencies built in; SMMU now probes, but boot resets
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K059 could not fairly test the module-less display chain: its effective
+  config had `MSM_GPUCC_8998` disabled, while MSM8998 MMCC, the SW43402 panel,
+  and backlight support were not all built in. Enabled
+  `CONFIG_MSM_GPUCC_8998=y`, `CONFIG_MSM_MMCC_8998=y`,
+  `CONFIG_DRM_PANEL_LG_SW43402=y`, and built-in backlight support, then rebuilt
+  Image.gz + DTBs.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k060-clockctrl-builtins.img`, sha256
+  `ac6739c33a7dba577a50252ab78090b2d5b8fbbe18d998175f269621d4e39269`.
+  Fastboot transcript:
+  `out/k060-clockctrl-builtins-ramboot-20260711T144700Z.log`.
+- The screen stayed black and LineageOS eventually returned. Raw pstore was
+  extracted immediately afterward; evidence:
+  `out/k060-clockctrl-builtins-pstore-20260711T1452Z.strings.txt`, sha256
+  `9be28fa8feab7fb3434e24676c8913b2e51b862ab6d8909d8648e8d480e5289e`.
+  No panic/oops/SError signature was present.
+- K060 changed the diagnosis: with the missing clock-controller/display
+  drivers built in, both MSM8998 SMMUs can probe. The reset moved later into
+  the active display path. The K059 `-110` was therefore a missing built-in
+  dependency symptom, not the final display blocker.
+- Class: `bringup-local` config correction; no kernel source change.
+
+### K061 — MMCC-only isolation exposes the first decisive fault
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- Disabled GPUCC again while keeping MMCC, SW43402, and backlight built in.
+  This one-variable test separated the display/mmss path from the adreno SMMU
+  and GPU clock-controller path.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k061-mmcc-only.img`, sha256
+  `2e7780ae575ab067aa7724e2e801042cb7e0625569731dac40d53a084577aa6a`.
+  The boot reset and LineageOS returned 47 seconds after handoff; transcript:
+  `out/k061-mmcc-only-ramboot-20260711T145639Z.log`.
+- Raw pstore evidence:
+  `out/k061-mmcc-only-pstore-20260711T1500Z.strings.txt`, sha256
+  `6cc3c6c22a5095834e5aca8a394c7126ceb0751491b925443c7820a799bcc3ef`.
+  The decisive sequence is:
+  `cd00000.iommu` probes, reports zero preserved boot mappings,
+  `c900000.display-subsystem` joins IOMMU group 0, then SID 0 immediately
+  raises a stage-1 translation fault at boot-framebuffer IOVA `0x9ddaaa00`
+  (`FSR=0x402`, `FSYNR0=0x21`, context bank 0).
+- Interpretation: device-core default-domain attachment enabled translation
+  before drm/msm had taken over the display and installed its own paging
+  domain. Bootloader display DMA was still using a physical/identity address,
+  so the default translated domain faulted immediately. K061 also disproves
+  GPUCC/adreno as the necessary reset trigger.
+- Class: diagnostic isolation; no kernel source change.
+
+### K062 — MSM8998 MDSS identity-domain fix survives and reaches DRM fb0
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- Added `qcom,msm8998-mdss` to `qcom_smmu_client_of_match[]` in
+  `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c`. This follows the existing
+  Qualcomm MDSS policy: DRM display clients start in an identity domain, then
+  drm/msm attaches its own paging domain at the controlled takeover point.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k062-msm8998-mdss-identity.img`, sha256
+  `f5b2f95539c8f1fcb6cf41047663c85b0e4007b06effa93fb79a0602a40db7b1`.
+  Result: **SURVIVOR** — mainline gadget `18d1:4e26` appeared eight seconds
+  after fastboot handoff; transcript:
+  `out/k062-msm8998-mdss-identity-ramboot-20260711T150134Z.log`.
+- Live dmesg:
+  `out/k062-dmesg-2026-07-11.txt`, sha256
+  `5d28e85ca28c1f9d4dc095a8b247440a7fa5a1b210bb1fec4a5c970ecf7f7943`.
+  MDSS binds DSI, DPU initializes, DRM registers, and fbcon reports
+  `fb0: msmdrmfb frame buffer device`. This confirms the identity-domain
+  change passes K061's early-fault/reset point.
+- The internal panel still showed no visible output. Live DRM diagnostics
+  (`out/k062-live-display-diag-2026-07-11.txt`, sha256
+  `22df69232cf970fc62796ff035d090dffd39d6bc480f6f9f36df261d70577170`)
+  report DSI-1 connected with the 1440x2880 mode active, but MMCC warns that
+  `pclk0_clk_src` and `byte0_clk_src` did not update. Clock summary shows
+  stale half-rate values (`57036853` and `42777639` Hz), followed by command
+  mode commit/vblank timeouts. Later SID0 faults from the boot framebuffer
+  remain visible during controlled DRM domain takeover, but unlike K061 they
+  no longer reset the machine.
+- Clean verified kernel commit:
+  `7ff461605d7f71b528785913cee116e1e49ecb00` (`iommu/arm-smmu-qcom: Add
+  MSM8998 MDSS identity domain`).
+- Class: `upstream-candidate`; survival/DRM initialization verified, visible
+  display explicitly not yet achieved.
+
+### K063 — DSI clock parent-enable experiment REJECTED
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- Hypothesis: the MMCC RCG update warnings meant the DSI PLL parent was not
+  enabled while changing the byte/pixel rates. Added
+  `CLK_OPS_PARENT_ENABLE` to active `byte0_clk_src` and `pclk0_clk_src` on top
+  of K062.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k063-dsi-parent-enable.img`, sha256
+  `f928d549c2465759a7420c20c4cae7ce50b7aee493a8fde4aa24fabd90e3248a`.
+  Mainline still survived and enumerated, but Lance confirmed the screen
+  remained completely black. Evidence:
+  `out/k063-dsi-parent-enable-ramboot-20260711T151526Z.log` and
+  `out/k063-dmesg-2026-07-11.txt` (sha256
+  `334e3f3b5ebfb9753199574808a3f302c735d99bc60c41570ec1058283a6c4a7`).
+- K063 is a clear regression: dmesg adds zero-divisor warnings for the DSI PLL
+  clocks, repeated `DSI PLL(0) lock failed`, clock disable/unprepare imbalance
+  warnings, RCG update failure, and repeated DPU commit/vblank timeouts.
+  The patch was fully reverted and must not be carried forward.
+- A serial-triggered reboot subsequently left the phone absent from USB;
+  physical Power+Volume-Down recovery was requested. No partition was flashed.
+- Class: `rejected-experiment`.
+
+### K064 — MSM8998 no-rate-cache clock fix staged, NOT YET DEVICE-TESTED
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- Source comparison against the public `msm8998-mainline/linux` tree found
+  commit `878adc31071b02c1511e8908974a78dcb8d3dff0`, which adds
+  `CLK_GET_RATE_NOCACHE` to MSM8998 byte0/byte1 and pclk0/pclk1. Its stated
+  rationale exactly matches K062: a VCO shutdown can clear frequency setup,
+  while CCF's cached rate prevents reprogramming it.
+- Staged RAM-only image (K062 identity fix + that four-clock patch):
+  `out/boot-joan-20260711-aurel-k064-dsi-rate-nocache.img`, sha256
+  `1880b11f42d2f30f482f39a589547a36bc2bf8fbb6eea8aa3d0f5e7ccaaa8983`.
+  Patch artifact:
+  `out/20260711-aurel-k064-dsi-rate-nocache.patch`, sha256
+  `44ca62d58616b82adde68d645c33ceddf3bb568cbb55ac23377a39b55c5a8366`.
+- Device test is intentionally pending until the phone has been physically
+  recovered from K063 and healthy authorized LineageOS ADB is reconfirmed.
+  Current kernel source is clean at K062's verified commit; the unverified
+  no-cache change exists only in the preserved K064 image/patch artifact.
+- Class: `source-backed diagnostic candidate`, unverified.
