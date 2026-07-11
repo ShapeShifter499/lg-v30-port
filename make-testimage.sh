@@ -29,6 +29,7 @@ mkbootimg \
     --ramdisk "$OUT/initramfs.cpio.gz" \
     --base 0x00000000 \
     --pagesize 4096 \
+    --ramdisk_offset 0x02000000 \
     --cmdline "androidboot.hardware=joan panic=5 ignore_loglevel" \
     --output "$OUT/boot-joan-mainline.img"
 
