@@ -97,9 +97,11 @@ Direction (NOT the K030 blanket skip — that was a debug hack):
 ## Conventions (binding — same for Aurel)
 
 - Commit trailers: `Signed-off-by: Lance <Gero3977@gmail.com>` +
-  `Assisted-by: <harness>:<model actually running>` (Aurel =
-  `Hermes:gpt-5.5`). NEVER `Co-Authored-By`. Detailed body: what + why +
-  evidence + what was left out.
+  `Assisted-by: <harness>:<model actually running at write time>` — always
+  the live model, never a copied/stale string. Aurel is on Hermes; his model
+  id updates over time (currently `gpt-5.6-sol`, so `Hermes:gpt-5.6-sol` —
+  but write whatever is actually running). NEVER `Co-Authored-By`. Detailed
+  body: what + why + evidence + what was left out.
 - Borrowed code/data: keep license/SPDX, cite the downstream file in the
   commit body, and add a row to `docs/dependency-tracker.md`. Downstream
   LG/Qualcomm data = GPL-2.0; verbatim copies live in `docs/downstream-refs/`.
