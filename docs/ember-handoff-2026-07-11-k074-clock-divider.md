@@ -103,3 +103,25 @@ discipline). pmaports `pmaports-lge-joan` device-lge-joan unchanged.
 Conventions: no force-push; Assisted-by = live model (Aurel Hermes:<current>);
 dependency-tracker for imports; downstream-refs GPL-2.0. Phone: LOS, healthy,
 nothing flashed.
+
+
+## UPDATE: K075 staged (boot this FIRST next session)
+
+Built and packaged but not yet booted (Lance out of budget mid-build):
+`out/boot-joan-20260711-ember-k075-panel-instr.img` sha256
+`18f0d9b9675c3a88085208532c0ac290cacfb4ef2226a86216e391a651561bf3`
+(K074 clock base + dev_info logs in the SW43402 panel prepare;
+patch `out/20260711-ember-k075-panel-instrumentation.patch`).
+
+Boot it first — it answers, in one shot, whether the black panel is the
+clock (half-rate byte) or something past it:
+- Pull dmesg: `ncat 172.16.42.1 9600` after the gadget enumerates.
+- Read the `K075 ...` lines. Decisive value = `accum_err`:
+  - accum_err != 0  => DSI init commands FAILED => the K074 half-rate byte
+    clock (out_div /4 vs /2) is the direct cause; go fix the divider
+    (dsi_phy_10nm out-div programming vs /tmp/msm8998-mainline-linux-ref).
+  - accum_err == 0  => init reached the panel fine; the problem is DPU
+    scanout / command-mode TE kickoff (no TE pinctrl wired for TLMM 10),
+    NOT the clock. Pivot to TE/DPU commit path.
+
+Device is in LineageOS, healthy, nothing flashed. Same binding boot rules.
