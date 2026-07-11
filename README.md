@@ -148,9 +148,11 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   pclk0/byte0 RCG programming or takeover sequence. K068 confirmed a black/off
   screen: parent-enabling the RCGs removes their update warnings but prepares the
   PLL with stale divider state and causes lock/clock-balance failures. Downstream
-  Linux 4.4 explicitly programs the PLL output divider before locking it; that
-  one ordering difference is the next evidence-backed discriminator.
-- Phone is recovered to fully booted authorized LineageOS. Every K060-K068 test
+  Linux 4.4 explicitly programs the PLL output divider before locking it. K069
+  tested a narrow `/2` pre-lock override, but the final tree returned to `/4`
+  and the panel remained black. The next step is register-order instrumentation,
+  not another blind clock override.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K069 test
   was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
   documentation are local/unpushed.
 

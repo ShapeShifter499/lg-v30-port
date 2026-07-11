@@ -195,3 +195,26 @@ Do not select another broad clock flag. The next candidate should isolate that
 one pre-lock output-divider ordering difference while preserving K068 as the
 control. Keep it debug-only unless a generic mainline-safe implementation is
 demonstrated on more than joan.
+
+## Follow-up — K069 pre-lock `/2` result
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K069 implemented the narrow downstream-inspired discriminator: K068's
+  parent-enable control plus a MSM8998-only `/2` output-divider write immediately
+  before PLL start/lock.
+- The RAM-only boot survived, but Lance again observed completely black/off.
+  RCG update warnings remained cleared, while a PLL0 lock failure remained.
+- Final live rates were unchanged from K068: `/4` PLL output 342.221118 MHz,
+  pixel 171.110559 MHz, and byte 42.777639 MHz. The `/2` write therefore did not
+  persist into the final live tree and did not reproduce downstream's complete
+  cached-selection behavior.
+- Phone recovered cleanly to fully booted authorized LineageOS. The K069 patch
+  is preserved under `out/`, reverted from source, and the clean kernel rebuilt.
+
+Next should be instrumentation, not another blind override: log the requested
+VCO, cached divider, live output-divider register, `CLK_CFG0`, and `CLK_CFG1` in
+VCO prepare and handoff save/restore. That will identify exactly where `/2` is
+lost before attempting a generic fix.

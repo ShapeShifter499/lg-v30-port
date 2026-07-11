@@ -3264,3 +3264,52 @@ Date: 2026-07-11
   retain `CLK_OPS_PARENT_ENABLE` alone. The smallest next discriminator is the
   downstream pre-lock out-divider ordering on top of the K068 control, not
   another unrelated clock flag.
+
+### K069 — forced pre-lock `/2` output divider does not persist or light the panel
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K069 kept K068's parent-enable control and added one debug-only MSM8998 action
+  based on downstream 4.4: force `PLL_PLL_OUTDIV_RATE=1` (`/2`) immediately
+  before starting and polling PLL lock. The override was restricted to the
+  MSM8998 old-timings 10nm PHY quirk.
+- The target rates are independently reproduced from the panel mode and current
+  mainline DSC formulas: pixel 114,073,709 Hz, byte 85,555,281 Hz, and bit clock
+  684,442,248 Hz. `/2` is therefore the intended divider for the corrected
+  1,368,884,472-Hz VCO in this mode.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k069-parent-enable-prelock-outdiv.img`, sha256
+  `3d261ef3f3ce055dedbd264e59dac1a8e00ed955be13ccca8b4bd3bc19bff653`.
+  Exact debug patch:
+  `out/20260711-aurel-k069-parent-enable-prelock-outdiv.patch`, sha256
+  `beefd96f87286224f305b9dc69f4b9515f0f7918ad50e029cfac25d3334326cc`.
+- The single approved fastboot command completed normally. Mainline USB appeared
+  11 seconds after handoff. Transcript:
+  `out/k069-parent-enable-prelock-outdiv-ramboot-20260711T1837Z.log`, sha256
+  `e5042a81c367a09fda45312d188c7fe74cd51ef082ec736f296a32fd5c652dec`.
+  Lance observed the screen as **completely black/off**.
+- Dmesg `out/k069-live-dmesg-2026-07-11.txt`, sha256
+  `a10a0968de5afca65d0977fe34d1f1ba41a3f26bc39e0c6dcdb478a5d8e93eae`,
+  still has a PLL0 lock failure and clock-disable imbalance warning, while the
+  MMCC RCG update-warning count remains zero.
+- Live diagnostics `out/k069-live-display-diag-2026-07-11.txt`, sha256
+  `5f74cfbfc3335eadd517200cb48e3462b203197eadb2ba865377cb4c257e2d85`,
+  are effectively identical to K068: connector connected at 1440x2880, VCO
+  1,368,884,472 Hz, final PLL output still `/4` at 342,221,118 Hz, pixel
+  171,110,559 Hz, and byte 42,777,639 Hz.
+- Interpretation is deliberately narrow: a blind `/2` write in VCO prepare is
+  insufficient and does not remain reflected in the final clock tree. This does
+  not reproduce downstream's full logical-divider sequencing, where the chosen
+  divider is cached and reapplied during enable. Mainline's handoff-state restore
+  or later generic-divider programming can overwrite the debug value; K069 did
+  not directly log those register transitions, so do not claim which one yet.
+- K069 recovered cleanly to fully booted authorized LineageOS via ACM
+  `reboot -f`; nothing was flashed. The debug patch was reverted and a clean
+  `Image.gz dtbs` rebuild completed. Clean `Image.gz` sha256:
+  `eb9c96519b05e09be77115f7d5853ed5a61d5ffa56c273b7ed95cbff3c1e6fea`.
+- Class: `source-backed diagnostic`, **rejected as implemented**. Before another
+  behavioral fix, instrument VCO prepare plus handoff save/restore to record the
+  requested VCO, cached divider, live `PLL_OUTDIV_RATE`, `CLK_CFG0`, and
+  `CLK_CFG1` in exact order.

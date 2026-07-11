@@ -164,6 +164,10 @@ When opening a public PR or patch series, include:
   the MMCC RCG-update warnings but caused PLL-lock/clock-balance failures and a
   confirmed black screen. It is rejected debug evidence and must remain off the
   public-shaped kernel branch.
+- K069 forced the mode-correct `/2` PLL output divider before lock on top of the
+  K068 control. The phone still showed black, PLL lock still failed once, and the
+  final live tree returned to `/4`. The hardcoded override is rejected debug
+  evidence; instrument the overwrite sequence before designing a generic fix.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
