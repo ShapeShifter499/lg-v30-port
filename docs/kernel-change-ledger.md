@@ -2751,3 +2751,38 @@ drops `laf` — the download-mode partition is designated as the pmOS boot
 slot (recovery stays intact instead). Preconditions: laf+lafbak backups
 verified (done today); restore paths = fastboot flash laf / recovery /
 dd from LOS root. xbl/abl/tz/hyp/rpm/modem remain absolutely no-touch.
+
+### K054 — M2 STORAGE: UFS + microSD both up; SD ext4 mount+write verified
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- Root cause of K053's dead UFS: NOT the DTS (joan's &ufshc/&ufsphy supplies
+  already matched oneplus-common) — `CONFIG_SCSI_UFS_QCOM` and
+  `CONFIG_PHY_QCOM_QMP(_UFS)` were `=m` and the bringup initramfs carries no
+  modules. Forced `=y` (plus EXT4/VFAT already in).
+- New kernel commit `ce78c1369` "enable SD card slot": &sdhc2 with downstream
+  regulators (vdd=l21, vdd-io=l13), joan-local `sdc2_cd_joan` pinctrl state
+  (CD = GPIO 40 ACTIVE_LOW per downstream `cd-gpios = <&tlmm 40 0x1>`;
+  SoC-level sdc2_cd assumes MTP GPIO 95). Pushed to public fork.
+- Test: RAM-only gadget boot `out/boot-joan-gadget-k054-storage.img` sha256
+  `4f27c685544871384334e0196926a5ab11694c98c25da30de0abd7b32fe18825`
+  (runner `out/k054-gadget-capture.sh`; evidence in
+  `out/k054-serial-2026-07-11T013605Z.log` +
+  `out/tethered-test-k054-gadget-2026-07-11T013605Z.log`).
+- Results:
+  - **UFS fully probes: /dev/sda..sdg (all 7 LUNs), 86 /proc/partitions
+    entries.** Read-only discipline held — no UFS device was mounted or
+    written.
+  - **microSD: `sdhci_msm c0a4900.mmc` probes, CD GPIO found, card
+    enumerates as mmc0 SDR104: `mmcblk0 SD200 183 GiB`, partition p1.**
+    (Card: SanDisk Ultra 200GB provided by Lance 2026-07-11, fresh ext4,
+    disposable.)
+  - **ext4 on SD: mount + write (`hello-from-mainline.txt`) + readback +
+    clean umount all OK; 179.4G usable.** pmOS rootfs path is proven.
+- Class: `upstream-candidate` (ce78c1369); config change = bringup-local
+  (defconfig fragment TBD for the pmOS APKBUILD).
+- M2 (storage) COMPLETE per docs/ember-handoff-2026-07-10-milestone1-pmos-plan.md.
+  Next = M3: pmOS rootfs on SD (pmbootstrap image), kernel via fastboot boot,
+  later laf-partition flash per owner's boot-slot decision.
