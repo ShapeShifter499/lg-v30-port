@@ -2905,3 +2905,27 @@ Date: 2026-07-11
   display-enabled bringup image + on-device DPU/DSI/panel probe test.
 - Provenance: downstream panel dtsi copied verbatim to docs/downstream-refs/
   (GPL-2.0), cited in the driver commit + dependency-tracker.
+
+### K059 — M4 diagnostic boot: display chain sound, blocked exactly at mmss SMMU
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- Built a display-enabled bringup image (DRM/DRM_MSM/DPU/DSI + panel forced
+  built-in; QCOM_LLCC/OCMEM also forced =y to allow DRM_MSM=y;
+  `out/boot-joan-k059-display.img`, ramdisk_offset 0x02000000 per K056) and
+  RAM-booted it. Evidence: `out/k059-dmesg-2026-07-11.txt` (465 lines, pulled
+  over USB net via phone `nc -l`).
+- RESULT (as predicted, clean): DTS parses fully, all display nodes present,
+  panel driver does NOT crash. The "Fixed dependency cycle" lines are normal
+  fw_devlink resolution, not errors. Chain reaches msm-mdss probe.
+- Single blocker confirmed:
+  `arm-smmu cd00000.iommu: probe ... failed with error -110` →
+  `msm-mdss c900000.display-subsystem: probe ... failed with error -110`.
+  MDSS times out waiting for its (TZ-owned) mmss SMMU. Nothing else in the
+  display path fails. K058 driver+DTS are structurally validated on device.
+- CONCLUSION: mmss SMMU (`cd00000`) is the sole M4 gate. Next session:
+  make the mmss SMMU probe — qcom SMMU stream-mapping/handoff quirks
+  (qcom_smmu, `qcom,adreno-smmu`-style or the -500 impl-def bypass), NOT the
+  K030 blanket skip. Once it probes, MDSS→DPU→DSI→panel should cascade.
