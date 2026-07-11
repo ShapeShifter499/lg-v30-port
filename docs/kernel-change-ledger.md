@@ -2818,3 +2818,46 @@ Date: 2026-07-11
   (idempotent, gated on has_unallocated_space).
 - NEXT: apply the resize cmdline, rebuild+re-export boot.img, then first
   pmOS boot via `fastboot boot` and watch for USB-network + sshd.
+
+### K056 — first pmOS boot attempt FAILED: boot.img kernel/ramdisk load overlap (diagnosed+fixed, phone wedged pending physical reset)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- Applied resize: `deviceinfo_kernel_cmdline += pmos.force-partition-resize`
+  (needs pkgrel bump on device-lge-joan to actually reinstall into rootfs —
+  a checksum update alone does NOT rebuild an installed pkg). Verified the
+  flag is in the boot.img header cmdline before booting.
+- UUID note: every `pmbootstrap install` regenerates the rootfs image with
+  fresh partition/fs UUIDs; boot.img references root by fs UUID, so boot.img
+  and the SD image MUST come from the same build. Re-wrote the SD with the
+  matching rebuild (fs UUID 9a5df9d1…), verified byte-for-byte (sha
+  `0dcecdb8…`).
+- First `fastboot boot` of the pmbootstrap-built boot.img: LG aboot showed
+  transient `18d1:d00d`, then USB disconnected and the phone went fully dark
+  (no fastboot/adb/gadget, no serial bytes). NOT a slow boot — the kernel
+  never ran.
+- ROOT CAUSE (measured from the boot.img headers): kernel_offset 0x8000 +
+  kernel 18,981,009 B ends at 0x1222091 (~19.0 MiB), but ramdisk_offset was
+  0x01000000 (16.0 MiB). **The ramdisk load address sits INSIDE the kernel
+  image** → aboot copies the ramdisk over the kernel tail → corrupt kernel →
+  hang. Our working bringup images never hit this because that kernel is
+  14.8 MiB (fits under 16 MiB). The pmOS kernel is bigger largely due to the
+  BTF/DWARF5 debug info pmOS's kconfig check requires.
+- FIX (two forms):
+  1. Immediate, ready-to-test with the CURRENT SD (same UUID): manually
+     repackaged `out/boot-joan-pmos-ramdiskfix.img` (sha
+     `9bdc4a58…`) — extracted the pmOS kernel+ramdisk+cmdline from the
+     pmbootstrap boot.img and re-`mkbootimg` with `--ramdisk_offset
+     0x02000000` (32 MiB). Verified overlap=False.
+  2. Durable: `deviceinfo_flash_offset_ramdisk` 0x01000000 -> 0x02000000 in
+     pmaports device-lge-joan (pkgrel=2, pushed). Future full builds are
+     correct (they will churn UUIDs and need an SD rewrite).
+- DEVICE STATE: **WEDGED, needs a physical Power+VolDown ~8s hold** (Lance) to
+  reset — RAM-only boot corrupted, aboot did not fall back to LOS within
+  ~8 min of watching. No partitions were flashed; LineageOS on the boot
+  partition is untouched and will return after the manual reset.
+- NEXT (when phone is back): `fastboot boot out/boot-joan-pmos-ramdiskfix.img`
+  and watch for pmOS USB network + sshd (172.16.42.1). If it boots, first-boot
+  resize grows root to ~199 GB.
