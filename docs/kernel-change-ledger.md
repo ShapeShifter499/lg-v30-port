@@ -3483,3 +3483,45 @@ Date: 2026-07-11
   still black WITH clean dmesg, inspect: byte0/pclk0 live rates + RCG-update,
   panel prepare (regulator enable + DSI cmd ACK), then compare enable ORDER
   against the working ref's dsi_host clock sequence.
+
+### K074 — NOCACHE config: PLL locks, no hang, but byte clock at HALF rate (out_div /4 not /2) + splash SMMU faults; panel still black
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+Config: clean b549c9f5b + K072 vco seed + CLK_GET_RATE_NOCACHE on
+byte0/pclk0 (working-msm8998-reference config, NOT K068 parent-enable) +
+v2 stable-capture init. RAM-boot, Lance present/approved, recovered to LOS.
+Artifacts: patch `out/20260711-ember-k074-k072seed-plus-nocache.patch`,
+image sha256 `d31ae627b5bb...` (full beside image), dmesg
+`out/k074-live-dmesg-2026-07-11.txt`, clk `out/k074-clk-2026-07-11.txt`.
+
+RESULTS:
+- PLL locks (K072 lock result rc=0, vco=1.368884480 GHz). 0 vblank timeouts.
+  fb0 registered, DPU bound c994000.dsi. **No hang** (confirms the K073 hang
+  was purely K068's CLK_OPS_PARENT_ENABLE; NOCACHE is safe).
+- CLK_GET_RATE_NOCACHE alone did NOT clear `rcg didn't update its
+  configuration` (still 4x, on byte0/pclk0 during msm_dsi_host_power_on).
+- Panel STILL BLACK (Lance visual).
+- **Two concrete leads found (capture now reliable):**
+  1. Live DSI clock rates too LOW: byte0=42.78 MHz, pclk0=57.04 MHz; VCO
+     1.369 GHz with out_div=/4 (dsi0_pll_out_div_clk=342 MHz). For
+     1440x2880 60Hz DSC-8bpp/4-lane the byte clock should be ~2x higher
+     (~70 MHz), i.e. out_div should be /2. This is the same /4-vs-/2
+     divider issue Aurel chased in K069/K070. STRONG suspect for black:
+     half-rate DSI link => panel gets no valid signal.
+  2. Bounded burst of 10x `arm-smmu cd00000.iommu: Unhandled context
+     fault iova=0x9d400000` during handoff — that IOVA is our
+     cont_splash_mem (bootloader framebuffer). Bootloader display still
+     scanning out through the mmss SMMU during mainline takeover; the
+     MDSS identity domain (7ff461605) passes through until the DPU
+     attaches its translating domain for fb0, then the old splash addr
+     faults. Bounded (stops after ~10), not a storm.
+
+NEXT (see handoff docs/ember-handoff-2026-07-11-k074-clock-divider.md):
+primary = make the PLL out_div /2 (correct byte/pixel rate) in a way that
+STICKS with K072's seed — the RCG can't latch because the target rate
+math/divider is off, not because the parent is disabled. Compare our
+dsi_phy_10nm out_div/postdiv programming against the working reference.
+Secondary = the splash handoff fault. Kernel reverted clean; nothing pushed.
