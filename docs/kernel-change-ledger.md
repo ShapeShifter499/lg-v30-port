@@ -3207,3 +3207,60 @@ Date: 2026-07-11
   but K067's physical display outcome is unobserved. The earliest evidenced
   remaining failure is the DSI PLL output-divider/MMCC RCG programming or
   takeover sequence.
+
+### K068 — parent-enable retest clears RCG update warnings but regresses PLL locking
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol-pro (hypothesis, patch, and build)
+Agent-harness: Hermes:gpt-5.6-sol (device test, analysis, and documentation)
+Date: 2026-07-11
+
+- K063 had tested `CLK_OPS_PARENT_ENABLE` before the later VCO-rate and DSI-VDD
+  corrections. K068 repeated the exact active-DSI0 byte/pixel RCG change on the
+  K067 baseline to answer one bounded question: were K063's PLL failures only
+  consequences of the then-unfixed VCO math or missing real DSI supply?
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k068-parent-enable-retest.img`, sha256
+  `6794ab253be6132d39bdb5b1b13bd6e4bb3ac30963318b4ff553c30d6c0a05f4`.
+  Exact debug patch:
+  `out/20260711-aurel-k068-dsi-parent-enable-retest.patch`, sha256
+  `8edde358256330c1f9b09cc674b32cdd8f54f36b535a469cf2eb051d7d3919a3`.
+- The first transfer attempt hung in LG aboot at `Sending 'boot.img'` and never
+  reached `OKAY`/`Booting`; it is transport-only evidence, not a kernel result.
+  Log: `out/k068-parent-enable-retest-ramboot-20260711T1802Z.log`, sha256
+  `91f70eb0b752e210299ccbdb6427d97e6d814eb2a419106b0420aefc716d89f7`.
+  Lance physically recovered LineageOS before explicitly approving one retry.
+- The approved retry completed (`OKAY`, `Booting`) and mainline USB/ACM appeared
+  eight seconds after handoff. Transcript:
+  `out/k068-parent-enable-retry2-ramboot-20260711T1808Z.log`, sha256
+  `f2643d5aa8c991955a9c41e897e9651e9d5e7ed3792afadb607fc8c2c2976498`.
+  Lance observed the panel as **completely black/off**.
+- Dmesg `out/k068-live-dmesg-2026-07-11.txt`, sha256
+  `a3e60679e531871b059dc67539779e98f2eac2ad039997c9168a44d2ca6238be`,
+  contains zero `rcg didn't update its configuration` messages (K067 had four),
+  but adds DSI PLL0 lock failures and clock-disable imbalance warnings. Thus
+  parent enabling does let MMCC reprogram its RCGs, but it prepares the PLL at
+  an invalid/stale divider point and is not a usable fix by itself.
+- Live diagnostics `out/k068-live-display-diag-2026-07-11.txt`, sha256
+  `e569b749de873ef6561c368800a2d9ecac3cad5e2f0a4dbf4d6235bea9769496`,
+  still report DSI-1 connected at 1440x2880. VCO remains corrected at
+  1,368,884,472 Hz, but PLL out-div remains `/4` at 342,221,118 Hz. The byte
+  path remains 42,777,639 Hz; the pixel RCG now accepts 171,110,559 Hz rather
+  than K067's 57,036,853 Hz, still not the required ~114,073,709 Hz.
+- The downstream LG/Qualcomm 4.4 driver gives the now-leading sequencing clue.
+  `drivers/clk/msm/mdss/mdss-dsi-pll-8998.c::dsi_pll_enable()` explicitly writes
+  `PLL_PLL_OUTDIV_RATE` before starting/locking the PLL because its logical
+  output-divider selection otherwise arrives after VCO rate setup. Current
+  mainline `dsi_pll_10nm_vco_prepare()` starts and polls the PLL without that
+  pre-lock write; its generic divider and handoff-state restoration can retain
+  joan's inherited `/4` state.
+- K068 was recovered to fully booted authorized LineageOS. An initial malformed
+  ACM recovery command did not execute; the corrected literal `reboot -f`
+  recovered the phone in 31 seconds. Nothing was flashed.
+- The K068 debug change was reverted. A clean `Image.gz dtbs` rebuild completed;
+  the clean source worktree is restored. Clean `Image.gz` sha256:
+  `4e150748be1caafa5a0bacb8f2bf6dda8e23159a3e47a36d135c72ff04a02fa8`.
+- Class: `source-backed diagnostic`, **rejected as a standalone fix**. Do not
+  retain `CLK_OPS_PARENT_ENABLE` alone. The smallest next discriminator is the
+  downstream pre-lock out-divider ordering on top of the K068 control, not
+  another unrelated clock flag.

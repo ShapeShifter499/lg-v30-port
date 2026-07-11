@@ -145,9 +145,12 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   DMA0 latches it, ruling out stale boot-splash addressing as the leading
   post-DRM failure.
 - The remaining evidenced display blocker is the DSI PLL output-divider/MMCC
-  pclk0/byte0 RCG programming or takeover sequence. K067's physical screen result
-  is unobserved; no timeout/silence was treated as an observation.
-- Phone is recovered to fully booted authorized LineageOS. Every K060-K067 test
+  pclk0/byte0 RCG programming or takeover sequence. K068 confirmed a black/off
+  screen: parent-enabling the RCGs removes their update warnings but prepares the
+  PLL with stale divider state and causes lock/clock-balance failures. Downstream
+  Linux 4.4 explicitly programs the PLL output divider before locking it; that
+  one ordering difference is the next evidence-backed discriminator.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K068 test
   was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
   documentation are local/unpushed.
 

@@ -162,3 +162,36 @@ Recorded in `docs/dependency-tracker.md`.
 - Do not read `tzdbg/*`.
 - One fastboot client/process only.
 - Preserve exact image hashes and capture dmesg/pstore evidence before interpreting screen behavior.
+
+## Follow-up — K068 result and downstream 4.4 clue
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K068 retested K063's active `byte0_clk_src`/`pclk0_clk_src`
+  `CLK_OPS_PARENT_ENABLE` change after the VCO and DSI-VDD fixes. It is still not
+  a solution: Lance observed a completely black/off display and dmesg gained
+  PLL0 lock/clock-balance failures.
+- The test was nevertheless discriminating. K067's four RCG update failures
+  disappeared, proving the MMCC roots can update while the parent is live.
+  The resulting tree remained wrong: VCO 1.368884472 GHz, inherited `/4`
+  PLL output 342.221118 MHz, byte 42.777639 MHz, and pixel 171.110559 MHz.
+- The first K068 fastboot transfer hung before `OKAY` and is not a kernel result.
+  A single explicitly approved retry booted mainline. The phone was then
+  recovered to fully booted authorized LineageOS; no partition was flashed.
+- The K068 patch is preserved under `out/` and reverted from the kernel. A clean
+  `Image.gz dtbs` rebuild completed; kernel source is clean at the K067 tip.
+- Full audit of Ember's eleven handoff documents and the project-history index
+  is complete for current-work clues. Older reset-hunt conclusions remain valid
+  context but do not supply a later display fix that K060-K068 missed.
+- The strongest new clue is direct downstream 4.4 behavior:
+  `mdss-dsi-pll-8998.c::dsi_pll_enable()` writes `PLL_PLL_OUTDIV_RATE` before
+  starting and checking PLL lock, with an explicit comment that output-divider
+  selection otherwise happens too late. Mainline's 10nm VCO prepare path omits
+  this ordering step and joan keeps its inherited `/4` state.
+
+Do not select another broad clock flag. The next candidate should isolate that
+one pre-lock output-divider ordering difference while preserving K068 as the
+control. Keep it debug-only unless a generic mainline-safe implementation is
+demonstrated on more than joan.

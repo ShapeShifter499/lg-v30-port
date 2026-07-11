@@ -449,3 +449,22 @@ For every future material change:
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.5
 Date: 2026-07-08
+
+## 2026-07-11 follow-up — K068 and downstream DSI-divider ordering
+
+K068 repeated K063's parent-enable diagnostic after the VCO and DSI-VDD
+corrections. It removed the MMCC RCG update warnings but did not produce visible
+output and introduced PLL0 lock/clock-balance failures. The exact patch and all
+RAM-boot/ACM evidence are preserved; rejected debug code was reverted and the
+clean kernel rebuilt.
+
+The follow-up audit covered all eleven Ember handoff documents through the M3/M4
+handoff plus this index. The current display investigation now has a concrete
+downstream Linux 4.4 sequencing difference: MSM8998's downstream DSI PLL driver
+writes the selected PLL output divider before starting/locking the PLL, whereas
+the current mainline 10nm VCO prepare path does not. That clue, not another
+unrelated flag, gates the next experiment.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11

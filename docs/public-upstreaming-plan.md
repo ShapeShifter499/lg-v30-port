@@ -160,6 +160,10 @@ When opening a public PR or patch series, include:
 - K067's one-line joan DSI VDD supply correction is source-backed and removed the
   dummy-regulator fallback. The physical K067 screen result is unobserved; the
   remaining RCG/commit-timeout path is still present.
+- K068 retested `CLK_OPS_PARENT_ENABLE` after the VCO/VDD corrections. It cleared
+  the MMCC RCG-update warnings but caused PLL-lock/clock-balance failures and a
+  confirmed black screen. It is rejected debug evidence and must remain off the
+  public-shaped kernel branch.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
@@ -192,6 +196,7 @@ change.
 | MSM8998 MDSS identity-domain client | mainline Qualcomm SMMU identity-domain table and same-class MDSS entries | Aurel/Lance change; Qualcomm mainline policy pattern | GPL-2.0 | local commit `7ff461605`; K062 RAM-boot verified, wider review required |
 | 10nm DSI VCO formula | exact public `msm8998-mainline/linux` commit `707f3fc86f6a` | AngeloGioacchino Del Regno `<angelogioacchino.delregno@somainline.org>` | GPL-2.0 | exact patch-id preserved in local commit `5306416d2`; original author/date retained; K065 rate correction verified |
 | joan DSI controller VDD supply | mainline `dsi_cfg.c` regulator declaration + downstream `msm8998-mdss.dtsi` PM8998 L1/L2 mapping + public MSM8998 OnePlus DTS | Qualcomm/LGE plus public MSM8998 board reference; Aurel/Lance one-line board mapping | BSD-3-Clause for joan DTS; sources used as hardware mapping evidence | local commit `b549c9f5b`; K067 removed dummy-regulator fallback; physical result unobserved |
+| MSM8998 DSI PLL pre-lock output-divider ordering | downstream `drivers/clk/msm/mdss/mdss-dsi-pll-8998.c::dsi_pll_enable()` compared with mainline `drivers/gpu/drm/msm/dsi/phy/dsi_phy_10nm.c::dsi_pll_10nm_vco_prepare()` | Qualcomm/LGE downstream behavior used as diagnostic evidence; no downstream code copied yet | GPL-2.0 | K068 exposed the ordering failure; next experiment must remain debug-only until a generic implementation is justified |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
 | initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
 
