@@ -1,4 +1,4 @@
-# Handoff — M4 reaches DRM fb0; K064 clock candidate waits on phone recovery
+# Handoff — M4 reaches DRM fb0; DSI VCO fixed but output dividers remain stale
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.6-sol
@@ -19,7 +19,8 @@ Date: 2026-07-11
 3. K062 added `qcom,msm8998-mdss` to the Qualcomm SMMU identity-domain client table. The phone survived, enumerated the mainline gadget, initialized DPU/DSI/DRM, and registered fb0. Lance still saw a completely black screen.
 4. K062 live diagnostics showed DSI-1 connected and 1440x2880 active, but `pclk0_clk_src` and `byte0_clk_src` RCG updates failed. Clock summary retained stale half-rates (57,036,853 and 42,777,639 Hz), followed by command-mode commit/vblank timeouts.
 5. K063 tested `CLK_OPS_PARENT_ENABLE` on byte0/pclk0. This was a clear regression: DSI PLL zero-divisor/lock failures and clock imbalance warnings appeared; screen remained black. The change was fully reverted.
-6. The public `msm8998-mainline/linux` fork contains a more specific known fix, commit `878adc31071b`: `CLK_GET_RATE_NOCACHE` on MSM8998 byte0/byte1/pclk0/pclk1 because VCO shutdown can clear hardware rate state while CCF retains a stale cache. K064 is built with this patch but has not been booted.
+6. K064 tested the public MSM8998 `CLK_GET_RATE_NOCACHE` clock fix (`878adc31071b`). It made no difference: same RCG warnings, same 57/42-MHz pixel/byte outputs, and the screen remained black.
+7. K065 tested public MSM8998 commit `707f3fc86f6a` (`drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation`). It corrected the exact factor-of-two error at the VCO: `dsi0vco_clk` became 1.368884472 GHz. The PLL output divider and MMCC RCGs still failed to latch, leaving 57/42-MHz output clocks and a black panel.
 
 ## Kernel source state
 
@@ -37,7 +38,7 @@ The commit was RAM-boot verified by K062 but has not been pushed. It carries:
 - `Signed-off-by: Lance <Gero3977@gmail.com>`
 - `Assisted-by: Hermes:gpt-5.6-sol`
 
-The unverified no-cache source change is not left dirty in the kernel tree. It is preserved in the K064 image/patch artifacts below.
+The no-cache K064 source change was reverted after showing no improvement. The worktree currently carries only K065's three-line 10nm VCO calculation patch while its interaction with the stale output-divider/RCG programming is investigated. It is not committed yet.
 
 ## Key artifacts
 
@@ -56,39 +57,45 @@ The unverified no-cache source change is not left dirty in the kernel tree. It i
 - K063 rejected image and dmesg:
   - `out/boot-joan-20260711-aurel-k063-dsi-parent-enable.img`
   - `out/k063-dmesg-2026-07-11.txt`
-- K064 staged image:
+- K064 tested image:
   - `out/boot-joan-20260711-aurel-k064-dsi-rate-nocache.img`
   - sha256 `1880b11f42d2f30f482f39a589547a36bc2bf8fbb6eea8aa3d0f5e7ccaaa8983`
 - K064 full patch artifact (K062 identity fix + no-cache clock test):
   - `out/20260711-aurel-k064-dsi-rate-nocache.patch`
   - sha256 `44ca62d58616b82adde68d645c33ceddf3bb568cbb55ac23377a39b55c5a8366`
+- K064 diagnostics:
+  - `out/k064-dmesg-2026-07-11.txt`
+  - `out/k064-live-display-diag-2026-07-11.txt`
+- K065 VCO-fix image:
+  - `out/boot-joan-20260711-aurel-k065-10nm-vco-rate.img`
+  - sha256 `cfe1e802c28087ded8c03d8318bd2b28ee930734c69a48fad2d87def54fbb993`
+- K065 diagnostics:
+  - `out/k065-dmesg-2026-07-11.txt`
+  - `out/k065-live-display-diag-2026-07-11.txt`
 
-The complete K060-K064 evidence and interpretation is appended to `docs/kernel-change-ledger.md`.
+The complete K060-K065 evidence and interpretation is appended to `docs/kernel-change-ledger.md`.
 
-## Device state / hard gate
+## Device state
 
-After K063, mainline remained reachable long enough to capture dmesg. A paced ACM command wrote `b` to `/proc/sysrq-trigger`; the phone then disappeared from USB and did not return to LineageOS within 180 seconds. No partition was flashed.
+Lance physically recovered the phone after K063. K064 and K065 were then tested RAM-only and each recovered cleanly using `reboot -f` over ACM.
 
-**Do not run another device command or K064 until Lance physically holds Power + Volume Down for about 8–10 seconds and confirms the phone has recovered.** Then verify:
+Current verified state after K065:
 
-1. Normal LineageOS appears on screen.
-2. `sudo adb devices -l` shows authorized `device` state.
-3. No stale `fastboot` process exists.
-4. Only then run the standard one-shot RAM-only `fastboot boot` workflow.
+1. Normal LineageOS is booted.
+2. Authorized ADB is restored (`LGUS9986e606d55`, `LG-US998`).
+3. `sys.boot_completed=1` was verified.
+4. No partition was flashed.
 
-## Next test: K064
+## Next investigation
 
-Use exactly:
+Do not stack another speculative clock flag. K064 and K065 establish two separate facts:
 
-`out/boot-joan-20260711-aurel-k064-dsi-rate-nocache.img`
+- CCF rate caching is not the first-takeover blocker.
+- Correcting the 10nm VCO formula doubles the VCO as predicted, but the PLL output divider and MMCC RCG `CMD_UPDATE` still do not latch.
 
-Expected discriminator:
+The next patch/test should be chosen only after tracing the MSM8998 DSI PLL output-divider and MMCC RCG programming order against the public MSM8998 tree and downstream clock sequencing. Also determine whether the repeated SID0 boot-framebuffer faults independently prevent a visible frame despite an active DRM CRTC.
 
-- Improvement: no stale-rate behavior/RCG warning, DSI clock rates change to the requested values, commit/vblank succeeds, and the screen lights.
-- No change: same RCG warnings and half-rates as K062; the no-cache patch is insufficient.
-- Regression: DSI PLL lock/zero-divisor behavior like K063; stop and recover, do not stack more clock flags.
-
-Capture live dmesg over ACM as soon as `18d1:4e26` appears. Ask Lance about visible screen state. If mainline cannot be reached, recover to LineageOS and extract raw pstore before another experiment.
+For any next RAM-only image, capture live dmesg and clock summary over ACM, explicitly ask Lance about visible screen state, and recover to LineageOS before changing another variable.
 
 ## Source provenance
 
@@ -97,7 +104,9 @@ Reference clone:
 - `https://gitlab.com/msm8998-mainline/linux.git`
 - temporary filtered/sparse checkout: `/tmp/msm8998-mainline-linux-ref`
 - checkout tip: `2b7263ccccbdafba3e8696349d9a3e9b115c6dd8`
-- relevant commit: `878adc31071b02c1511e8908974a78dcb8d3dff0`
+- relevant clock commits:
+  - `878adc31071b02c1511e8908974a78dcb8d3dff0` (no-rate-cache; K064 no change)
+  - `707f3fc86f6a24e9f710887eb028bd8d0df82580` (10nm VCO calculation; K065 partial correction)
 
 Recorded in `docs/dependency-tracker.md`.
 

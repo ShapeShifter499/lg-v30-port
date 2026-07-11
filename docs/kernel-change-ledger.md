@@ -3050,7 +3050,7 @@ Date: 2026-07-11
   physical Power+Volume-Down recovery was requested. No partition was flashed.
 - Class: `rejected-experiment`.
 
-### K064 — MSM8998 no-rate-cache clock fix staged, NOT YET DEVICE-TESTED
+### K064 — MSM8998 no-rate-cache clock fix tested: NO CHANGE
 
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.6-sol
@@ -3059,16 +3059,69 @@ Date: 2026-07-11
 - Source comparison against the public `msm8998-mainline/linux` tree found
   commit `878adc31071b02c1511e8908974a78dcb8d3dff0`, which adds
   `CLK_GET_RATE_NOCACHE` to MSM8998 byte0/byte1 and pclk0/pclk1. Its stated
-  rationale exactly matches K062: a VCO shutdown can clear frequency setup,
-  while CCF's cached rate prevents reprogramming it.
-- Staged RAM-only image (K062 identity fix + that four-clock patch):
+  rationale matches one plausible K062 failure mode: a VCO shutdown can clear
+  frequency setup while CCF's cached rate prevents reprogramming it.
+- RAM-only image (K062 identity fix + that four-clock patch):
   `out/boot-joan-20260711-aurel-k064-dsi-rate-nocache.img`, sha256
   `1880b11f42d2f30f482f39a589547a36bc2bf8fbb6eea8aa3d0f5e7ccaaa8983`.
   Patch artifact:
   `out/20260711-aurel-k064-dsi-rate-nocache.patch`, sha256
   `44ca62d58616b82adde68d645c33ceddf3bb568cbb55ac23377a39b55c5a8366`.
-- Device test is intentionally pending until the phone has been physically
-  recovered from K063 and healthy authorized LineageOS ADB is reconfirmed.
-  Current kernel source is clean at K062's verified commit; the unverified
-  no-cache change exists only in the preserved K064 image/patch artifact.
-- Class: `source-backed diagnostic candidate`, unverified.
+- After physical recovery from K063, healthy authorized LineageOS ADB was
+  reconfirmed and K064 was RAM-booted. Mainline gadget appeared eight seconds
+  after handoff, but Lance again observed a completely black/off screen.
+  Transcript: `out/k064-dsi-rate-nocache-ramboot-20260711T154301Z.log`.
+- Dmesg `out/k064-dmesg-2026-07-11.txt` (sha256
+  `64c9fe547dfaa3a806f034fed181a28a9acf61c44fcd29fec3755d2212b1d17e`)
+  still has the same four pclk0/byte0 RCG update warnings. Live diagnostics
+  `out/k064-live-display-diag-2026-07-11.txt` (sha256
+  `67a11ec5cd6b4dcfb875e9ecd1089bf969a3076fdae15a81d66eb2cd7abe45e0`)
+  show the exact same 57,036,853-Hz pixel and 42,777,639-Hz byte rates as
+  K062. Connector/mode/CRTC remain connected, 1440x2880, enabled, and active.
+- Result: `CLK_GET_RATE_NOCACHE` is not sufficient for this first takeover;
+  it neither clears the RCG update failure nor changes the hardware rates.
+  The source change remains absent from the clean kernel baseline.
+- Class: `source-backed diagnostic`, no improvement.
+
+### K065 — 10nm VCO calculation fix doubles VCO correctly, but panel remains black
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- A second public MSM8998 reference commit, `707f3fc86f6a24e9f710887eb028bd8d0df82580`
+  (`drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation`), changes the 10nm PLL
+  set/recalc formulas from a `ref_clk * 2` model to the physical reference
+  clock and stops overwriting `vco_current_rate` during recalc.
+- K064's observed outputs were mathematically exact half-rates. From the
+  1440x2880 DSC mode, the expected pixel/byte/VCO chain is approximately
+  114,073,709 / 85,555,281 / 684,442,248 Hz; K064 reported 57,036,853 /
+  42,777,639 / 342,221,118 Hz (all 0.5 within rounding). This made the
+  reference commit a strong one-variable diagnostic rather than a blind quirk.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k065-10nm-vco-rate.img`, sha256
+  `cfe1e802c28087ded8c03d8318bd2b28ee930734c69a48fad2d87def54fbb993`.
+  Patch artifact:
+  `out/20260711-aurel-k065-10nm-vco-rate.patch`, sha256
+  `241d550e563e0691b6e32bfd449530d63b5827bb94b14734b7560138a5fb2d8b`.
+- Mainline survived and the gadget appeared eight seconds after handoff, but
+  Lance again observed a completely black/off panel. Transcript:
+  `out/k065-10nm-vco-rate-ramboot-20260711T155141Z.log`.
+- K065 did make the predicted low-level change: live clock summary now reports
+  `dsi0vco_clk = 1,368,884,472 Hz`, exactly double K064's programmed VCO-side
+  value. Evidence: `out/k065-live-display-diag-2026-07-11.txt`, sha256
+  `a71c9bdebbe4534efc62ca0d676e5637585bedbddb394b3818ee94e5f938f71a`.
+- However, the PLL output divider and MMCC RCGs did not latch new divisors:
+  `dsi0_pll_out_div_clk` remained 342,221,118 Hz and pixel/byte outputs stayed
+  57,036,853 / 42,777,639 Hz. Dmesg
+  `out/k065-dmesg-2026-07-11.txt` (sha256
+  `1fccf1e87e3ef602e2023a22abd8bbdbf61b9f71579980151cd1738e7992e1e5`)
+  still contains the same four pclk0/byte0 RCG update warnings.
+- Interpretation: the 10nm VCO formula fix is source-backed and demonstrably
+  corrects one factor-of-two error, but is insufficient alone. The next root
+  cause is the stale PLL output-divider/MMCC RCG programming or takeover
+  sequencing, not the panel mode declaration itself.
+- K065 recovered cleanly to authorized LineageOS with `reboot -f`; nothing was
+  flashed. The kernel worktree currently carries this one uncommitted source
+  patch for continued investigation.
+- Class: `source-backed partial correction`, visible display not achieved.
