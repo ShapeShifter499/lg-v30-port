@@ -2786,3 +2786,35 @@ Date: 2026-07-11
 - M2 (storage) COMPLETE per docs/ember-handoff-2026-07-10-milestone1-pmos-plan.md.
   Next = M3: pmOS rootfs on SD (pmbootstrap image), kernel via fastboot boot,
   later laf-partition flash per owner's boot-slot decision.
+
+### K055 — M3: postmarketOS image built + written to SD (verified), resize gap found
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- pmbootstrap built + exported a pmOS rootfs for `lge-joan`:
+  `/tmp/postmarketOS-export/lge-joan.img` (1206910976 B = exactly 1151 MiB;
+  GPT: p1 243 MiB EFI/boot, p2 906 MiB Linux root ext4). sha256
+  `2d6b73ece751848dc1aa9ec87713566b83e4077655512e9210b9106595cde336`.
+  boot.img sha256 `66d7baea279eff4d0e92b6d8ebec7e24db9a5f6a48b128a93b477a9016275672`.
+- Written to the SanDisk 200GB microSD (mmcblk0) over the phone's USB link.
+  IMPORTANT transfer lesson: busybox `nc -l | dd` truncates. With stdin from
+  `</dev/null` it half-closes after ~73 KB; with `tail -f /dev/null` holding
+  stdin it never signals EOF to dd. RELIABLE METHOD = HTTP: host
+  `python3 -m http.server`, phone `wget -O /dev/mmcblk0 http://172.16.42.2:PORT/img`
+  (content-length → deterministic, WGET_RC=0, "/dev/mmcblk0 saved").
+  Needs a temporary host iptables ACCEPT on the usb-if for phone→host
+  (ufw drops it); removed after (confirmed no leftover rule).
+- VERIFIED: phone `dd if=/dev/mmcblk0 bs=1M count=1151 | sha256sum` ==
+  host image hash, byte-for-byte match.
+- **RESIZE GAP (answer to "use the whole 200GB?"): NO by default.** pmOS
+  initramfs `resize_root_partition()` only grows p2 to 100% when the kernel
+  cmdline has `pmos.force-partition-resize` (else it hits the else-branch:
+  "Unable to resize root partition"). Our deviceinfo cmdline lacks it, so
+  root would stay 906 MiB on the 200 GB card. FIX PENDING: add
+  `pmos.force-partition-resize` to `deviceinfo_kernel_cmdline`, rebuild
+  boot.img; first boot then runs parted resizepart 2 100% + resize2fs
+  (idempotent, gated on has_unallocated_space).
+- NEXT: apply the resize cmdline, rebuild+re-export boot.img, then first
+  pmOS boot via `fastboot boot` and watch for USB-network + sshd.
