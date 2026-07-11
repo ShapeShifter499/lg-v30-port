@@ -2861,3 +2861,23 @@ Date: 2026-07-11
 - NEXT (when phone is back): `fastboot boot out/boot-joan-pmos-ramdiskfix.img`
   and watch for pmOS USB network + sshd (172.16.42.1). If it boots, first-boot
   resize grows root to ~199 GB.
+
+### K057 — M3 COMPLETE: postmarketOS boots on joan (SSH over USB, full 200GB root)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- `fastboot boot out/boot-joan-pmos-ramdiskfix.img` (sha `9bdc4a58…`) after
+  Lance's physical reset: clean OKAY in 5.8s (vs the K056 wedge) — the
+  ramdisk_offset 0x02000000 fix was the complete answer.
+- pmOS initramfs gadget enumerated (18d1:d001), ping 172.16.42.1 OK, sshd up:
+  `Linux lge-joan 7.2.0-rc2 #2-lge-joan`, "postmarketOS edge", key auth via
+  id_pi_migration.
+- **First-boot resize worked: / = /dev/mmcblk0p2 at 180.5G** (was 906M in the
+  image) — pmos.force-partition-resize did its job on the 200GB SanDisk.
+- Internal UFS (sda, 118.8G LineageOS) visible, unmounted, untouched.
+- Vitals: 3.6G RAM seen, load nominal, 499-line dmesg with only 5
+  fail/error lines (evidence: `out/pmos-firstboot-dmesg-2026-07-11.txt`).
+- MILESTONE M3 (headless postmarketOS) COMPLETE. Remaining: M4 display/touch,
+  M5 wifi/BT, laf-partition flash for cable-free boot, pmaports upstream MR.
