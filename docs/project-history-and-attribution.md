@@ -37,6 +37,11 @@ new attribution block.
 
 ## People / agents / roles
 
+Note (added 2026-07-11, Ember): the agent names below are local AI agent
+personas operated by Lance on his own machines — persistent identities
+we named so cross-session/cross-harness work stays attributable. They
+are not humans or third-party contributors.
+
 | Actor | Role in this project | Attribution used |
 |---|---|---|
 | Lance | Device owner/operator, physical fastboot/phone approval, human DCO signer, final publication authority | `Signed-off-by: Lance <Gero3977@gmail.com>` |

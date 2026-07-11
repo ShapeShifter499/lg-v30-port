@@ -10,6 +10,14 @@ evidence. Per-change evidence with hashes is in
 
 ## Authorship model
 
+A note on the names you'll see in docs and trailers: **Ember Nymbrand**
+and **Aurel Nymvale** are AI agent personas operated locally by Lance,
+the human maintainer — persistent local identities (running on the
+Claude Code and Hermes harnesses respectively) named so their work can
+be told apart and tracked across sessions. They are not humans and not
+outside contributors; everything they produce is reviewed, authored,
+and DCO-signed by Lance.
+
 All kernel commits are authored and DCO-signed by Lance
 (`Signed-off-by: Lance <Gero3977@gmail.com>`). AI assistance is recorded
 per the kernel.org coding-assistant policy with `Assisted-by:` trailers
