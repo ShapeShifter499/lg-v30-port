@@ -25,6 +25,8 @@ partition.
 
 Full background: `docs/recon-2026-07-04.md`.
 Project history / attribution index: `docs/project-history-and-attribution.md`.
+Current Aurel → Ember display handoff:
+`docs/ember-handoff-2026-07-11-aurel-k068-k071-display.md`.
 
 ## Repos and paths (the original maintainers' local layout)
 
