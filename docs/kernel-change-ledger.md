@@ -3525,3 +3525,28 @@ STICKS with K072's seed — the RCG can't latch because the target rate
 math/divider is off, not because the parent is disabled. Compare our
 dsi_phy_10nm out_div/postdiv programming against the working reference.
 Secondary = the splash handoff fault. Kernel reverted clean; nothing pushed.
+
+### K075 — panel-prepare instrumentation (BUILT, ready-to-boot, NOT yet tested)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+Base = K074 clock config (K072 seed + CLK_GET_RATE_NOCACHE) + dev_info logs
+in sw43402_prepare() to answer the one open question the K074 clock analysis
+could not: does the panel init sequence actually reach the panel?
+- Logs: "K075 panel prepare: enabling supplies", supply-enable failure,
+  "reset done, sending init seq", and "K075 panel prepare DONE, accum_err=%d".
+- The `accum_err` value is decisive: it accumulates errors from every
+  mipi_dsi_*_multi() call. accum_err != 0 => the DSI command transfers
+  FAILED (link/clock not ready) => init never reached the panel, so the
+  half-rate byte clock (K074 finding) is the direct cause. accum_err == 0
+  but still black => commands went out fine; the problem is DPU scanout /
+  command-mode TE kickoff, not the panel init.
+Artifacts: patch `out/20260711-ember-k075-panel-instrumentation.patch`;
+image `out/boot-joan-20260711-ember-k075-panel-instr.img` sha256
+`18f0d9b9675c3a88085208532c0ac290cacfb4ef2226a86216e391a651561bf3` (uses the
+v2 stable-capture initramfs; pull dmesg from tcp/9600). BUILT and packaged,
+kernel tree reverted clean; awaiting a device boot (Lance present/approved).
+This is the first thing to boot next session — it partitions the remaining
+problem in one shot.
