@@ -46,7 +46,7 @@ are not humans or third-party contributors.
 |---|---|---|
 | Lance | Device owner/operator, physical fastboot/phone approval, human DCO signer, final publication authority | `Signed-off-by: Lance <Gero3977@gmail.com>` |
 | Ember Nymbrand | Claude-Code agent that performed initial recon, early DTS/test harness work, the major 2026-07-06/07 onion-peel reset hunt, K022-K041 era handoffs, and many rejected-oracle docs | `Written-by: Ember Nymbrand (agent-ember)` / `Assisted-by: Claude-Code:claude-fable-5` where applicable |
-| Aurel Nymvale | Hermes agent that performed SCM/RPM/secure-world archaeology, K025-K027 follow-up work, K039-K040/K042 passes, documentation/provenance audits, internal mirror/tracker sync, and this index | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.5` |
+| Aurel Nymvale | Hermes agent that performed SCM/RPM/secure-world archaeology, K025-K027 follow-up work, K039-K040/K042 passes, raw-pstore/TLMM follow-up, K060-K067 display bring-up, documentation/provenance audits, internal mirror/tracker sync, and this index | `Written-by: Aurel Nymvale (agent-aurel)` / `Assisted-by: Hermes:gpt-5.6-sol` for current work; preserve older live-model trailers |
 | Downstream LG/Qualcomm sources | Reference data for DTS, memory maps, watchdog/PON/SCM/RPM behavior, SMMU policy, restart reasons | Treat as GPL-2.0-derived unless independently sourced; cite exact files in ledger/provenance table |
 | Mainline / other msm8998 projects | Reference structure for msm8998 boards and planned upstreamable implementations | Preserve source authors/license/SPDX when borrowing code; see `docs/public-upstreaming-plan.md` |
 
@@ -312,6 +312,47 @@ Publication relevance:
 - Future public work should not carry debug gates or timing oracles on a clean
   branch.
 
+### 2026-07-11 — mainline userspace, storage, and display takeover
+
+Primary helpers: Ember / Claude-Code through the postmarketOS/M3 and early M4
+handoff; Aurel / Hermes for K060-K067 display dependency, SMMU, clock, regulator,
+and framebuffer investigation; Lance for physical device operation.
+
+What changed:
+
+- Mainline reached stable USB userspace and storage milestones; M1-M3 are done.
+- K060-K061 completed the module-less display dependency chain and exposed an
+  immediate MSM8998 MDSS SID0 translation fault during SMMU handoff.
+- K062 added the narrow upstream-shaped `qcom,msm8998-mdss` identity-domain
+  policy. The phone then survived, initialized DPU/DSI/DRM, and registered fb0.
+- K063 rejected `CLK_OPS_PARENT_ENABLE`; K064 rejected the public no-rate-cache
+  fix as the active blocker.
+- K065 preserved AngeloGioacchino Del Regno's exact public 10nm-DSI VCO fix and
+  verified the factor-of-two correction, but the PLL output divider and MMCC
+  RCGs remained stale.
+- K066 rejected `clk_ignore_unused` as causal. K067 added the missing real DSI
+  VDD rail, removed the dummy-regulator fallback, and proved the active DRM
+  framebuffer uses fresh IOVA `0x2000` in active DMA0. The inherited-splash
+  SID0 faults are therefore not the leading explanation for post-DRM black
+  output.
+- K067's physical screen result is unobserved because the clarification prompt
+  expired; silence is not recorded as a result. The device was recovered to
+  fully booted authorized LineageOS and no partition was flashed.
+
+Local kernel commits at this checkpoint:
+
+- `7ff461605` — MSM8998 MDSS identity domain, K062 RAM-boot verified.
+- `5306416d2` — exact public 10nm VCO rate fix, original author preserved.
+- `b549c9f5b` — joan DSI VDD supply correction, K067 evidence verified.
+
+All remain local/unpushed. M4 display is still in progress; the earliest
+remaining evidenced failure is the DSI PLL output-divider/MMCC RCG programming
+or takeover sequence.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
 ## K-series ownership summary
 
 This table is intentionally compact. Use `docs/kernel-change-ledger.md` for the
@@ -328,6 +369,8 @@ full per-test details, hashes, and logs.
 | K037-K041 | Ember / Claude-Code | Community research, watchdog/display/simplefb/edk2 reframing | rejected/observability evidence; edk2 is important reference |
 | K042 | Aurel / Hermes | SMMU cfg-probe S2CR quirk-probe subtraction | superseded: pstore showed earlier TLMM/GPIO abort, not a valid SMMU rejection |
 | K043-K050 | Aurel / Hermes | Raw-pstore observability and TLMM/GPIO reserved-range narrowing | K050 survivor; `<81 4>` has upstream MSM8998 precedent, `<49 4>` is pstore/device-proven and source-review pending |
+| K051-K059 | Ember / Claude-Code | Mainline survival, postmarketOS/storage milestones, initial display and MMSS-SMMU gating | M1-M3 done; K059 established the M4 MMSS-SMMU handoff gate |
+| K060-K067 | Aurel / Hermes | Built-in display dependencies, MDSS identity handoff, DSI clock/VCO/regulator and fb/KMS isolation | DRM reaches fb0; VCO and VDD corrections retained; output-divider/MMCC RCG failure remains |
 
 Known limitation: older ledger entries were not all written with uniform
 `Written-by` / `Agent-harness` / `Date` fields inside each K entry. The history is
@@ -346,6 +389,8 @@ Highlights:
 | IMEM/restart reason constants | downstream `lge_handle_panic.c` / `reboot_reason.h` and public LG/QCOM references | GPL-2.0 evidence/debug only |
 | Display quiesce offsets | mainline `dsi.xml` / `dpu_3_0_msm8998.h` | same kernel tree / GPL-2.0 debug only |
 | Planned msm8998 interconnect provider | mainline `sdm660.c`, `msm8996.c`, downstream `msm8998-bus.dtsi` | must preserve AngeloGioacchino Del Regno / Yassine Oudjana / Qualcomm-LGE attribution if implemented |
+| 10nm DSI VCO formula | public `msm8998-mainline/linux` commit `707f3fc86f6a` | exact patch retained in `5306416d2`; original author AngeloGioacchino Del Regno and author date preserved |
+| Joan DSI VDD rail | mainline DSI regulator declaration plus downstream MSM8998 and public OnePlus L1/L2 mappings | one-line board DT correction in `b549c9f5b`; source provenance recorded in dependency tracker/ledger |
 | initramfs busybox | Alpine `busybox-static` package | GPL-2.0 test harness only |
 
 Rule: if code is borrowed rather than merely used as evidence, preserve original
@@ -360,7 +405,11 @@ Public-shaped / potentially useful:
 - LG firmware-owned memory reservations, after overlaps/future GPU/WLAN placement
   are explained;
 - maybe an APSS watchdog representation, but only after behavior and placement are
-  settled.
+  settled;
+- MSM8998 MDSS identity-domain policy, after broader review of handoff semantics;
+- exact public 10nm DSI VCO fix, with original authorship preserved;
+- joan DSI VDD supply correction, source-backed and device-verified to remove the
+  dummy-regulator fallback.
 
 Blocked / not public-ready as-is:
 

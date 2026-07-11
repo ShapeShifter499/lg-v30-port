@@ -21,6 +21,8 @@ Date: 2026-07-11
 5. K063 tested `CLK_OPS_PARENT_ENABLE` on byte0/pclk0. This was a clear regression: DSI PLL zero-divisor/lock failures and clock imbalance warnings appeared; screen remained black. The change was fully reverted.
 6. K064 tested the public MSM8998 `CLK_GET_RATE_NOCACHE` clock fix (`878adc31071b`). It made no difference: same RCG warnings, same 57/42-MHz pixel/byte outputs, and the screen remained black.
 7. K065 tested public MSM8998 commit `707f3fc86f6a` (`drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation`). It corrected the exact factor-of-two error at the VCO: `dsi0vco_clk` became 1.368884472 GHz. The PLL output divider and MMCC RCGs still failed to latch, leaving 57/42-MHz output clocks and a black panel.
+8. K066 confirmed `clk_ignore_unused` does not clear the earlier RCG update failures. Source audit then found the MSM8998 DSI controller's mandatory 0.9-V `vdd` rail missing from joan; K067 added the exact PM8998 L1 supply used by downstream and the public working MSM8998 OnePlus DTS. K067 booted despite the harness being interrupted after `fastboot boot`: passive USB/ACM checks proved live mainline. The dummy-regulator warning disappeared, but the same pclk0/byte0 RCG and commit-timeout path remained. No reliable K067 physical screen observation was captured, so its visible result is explicitly unobserved.
+9. K067 framebuffer/KMS state mapped the active framebuffer at fresh IOVA `0x2000`, and active `sspp_8`/DMA0 latched `0x2000`. Reserved boot-splash addresses appeared only in inactive SSPPs. SID0 splash faults therefore explain loss of the inherited splash during handoff, not persistent black output after DRM owns a fresh framebuffer.
 
 ## Kernel source state
 
@@ -28,17 +30,25 @@ Repository: `/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30`
 
 Branch: `joan/latest-clean-test`
 
-Current clean source commit:
+Current clean source tip:
 
-- `7ff461605d7f71b528785913cee116e1e49ecb00`
-- `iommu/arm-smmu-qcom: Add MSM8998 MDSS identity domain`
+- `b549c9f5b32a42dfa4a100d33df804e8ed042287`
+- `arm64: dts: qcom: msm8998-lge-joan: Add DSI VDD supply`
 
-The commit was RAM-boot verified by K062 but has not been pushed. It carries:
+New local source-backed commits after the SMMU fix:
 
-- `Signed-off-by: Lance <Gero3977@gmail.com>`
-- `Assisted-by: Hermes:gpt-5.6-sol`
+- `5306416d22b41dbf64d04887cdaa368fe6388e3e` — exact public
+  `drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation` change from
+  `707f3fc86f6a`, preserving original author AngeloGioacchino Del Regno.
+- `b549c9f5b32a42dfa4a100d33df804e8ed042287` — joan DSI controller
+  `vdd-supply = <&vreg_l1a_0p875>;` correction.
 
-The no-cache K064 source change was reverted after showing no improvement. The worktree currently carries only K065's three-line 10nm VCO calculation patch while its interaction with the stale output-divider/RCG programming is investigated. It is not committed yet.
+The earlier `7ff461605d7f71b528785913cee116e1e49ecb00` MSM8998 MDSS
+identity-domain commit was RAM-boot verified by K062. All three commits remain
+local/unpushed and carry Lance's sign-off plus the live Hermes model trailer.
+The no-cache K064 source change and K066 cmdline diagnostic are not retained in
+the source tree. The kernel worktree is clean after a successful `Image.gz dtbs`
+rebuild.
 
 ## Key artifacts
 
@@ -72,14 +82,36 @@ The no-cache K064 source change was reverted after showing no improvement. The w
 - K065 diagnostics:
   - `out/k065-dmesg-2026-07-11.txt`
   - `out/k065-live-display-diag-2026-07-11.txt`
+- K066 diagnostic image and dmesg:
+  - `out/boot-joan-20260711-aurel-k066-vco-clk-ignore-unused.img`
+  - sha256 `8c6100b2842a75b513cf8a79202d23b44df4ae1f04c6e7abfa817cf780f6102f`
+  - `out/k066-dmesg-2026-07-11.txt`
+  - sha256 `1cf6f933e726176e7e24046fce4588d3198e3b37caad2f65354a29aba5fb64ad`
+- K067 VCO + real DSI supply image:
+  - `out/boot-joan-20260711-aurel-k067-dsi-vdd-vco.img`
+  - sha256 `f5aceb687f12b172f137e21882d8f4b695d7a8c13c0d672a5a24e3c0e1792b52`
+- K067 transcript and diagnostics:
+  - `out/k067-dsi-vdd-vco-ramboot-20260711T161252Z.log`
+  - `out/k067-dmesg-2026-07-11.txt`
+  - `out/k067-live-display-diag-2026-07-11.txt`
+  - `out/k067-live-fb-kms-diag-2026-07-11.txt`
+  - hashes are recorded in `docs/kernel-change-ledger.md`.
+- Exact checkpoint commit patches:
+  - `out/20260711-aurel-k065-vco-commit-5306416.patch`, sha256
+    `eabc6a516d9dea24007b7f3cf69858da540fe5cfe6a0c3713988735afc9c2bf6`.
+  - `out/20260711-aurel-k067-dsi-vdd-commit-b549c9f.patch`, sha256
+    `a6f5248bcb4e1726e72435eefd0f96a997eb41bf6032a94b017a89882eea0b53`.
 
-The complete K060-K065 evidence and interpretation is appended to `docs/kernel-change-ledger.md`.
+The complete K060-K067 evidence and interpretation is appended to `docs/kernel-change-ledger.md`.
 
 ## Device state
 
-Lance physically recovered the phone after K063. K064 and K065 were then tested RAM-only and each recovered cleanly using `reboot -f` over ACM.
+Lance physically recovered the phone after K063. K064-K067 were then tested
+RAM-only and each recovered cleanly using `reboot -f` over ACM. K066 and K067
+have no reliable physical screen observation; prompt timeout/silence is not an
+observation.
 
-Current verified state after K065:
+Current verified state after K067:
 
 1. Normal LineageOS is booted.
 2. Authorized ADB is restored (`LGUS9986e606d55`, `LG-US998`).
@@ -88,14 +120,26 @@ Current verified state after K065:
 
 ## Next investigation
 
-Do not stack another speculative clock flag. K064 and K065 establish two separate facts:
+Do not stack another speculative clock flag. K064-K067 establish four separate
+facts:
 
 - CCF rate caching is not the first-takeover blocker.
-- Correcting the 10nm VCO formula doubles the VCO as predicted, but the PLL output divider and MMCC RCG `CMD_UPDATE` still do not latch.
+- Correcting the 10nm VCO formula doubles the VCO as predicted, but the PLL
+  output divider and MMCC RCG `CMD_UPDATE` still do not latch.
+- `clk_ignore_unused` does not affect the earlier programming failure.
+- The real DSI VDD supply removes a genuine dummy-regulator fallback but does
+  not clear the evidenced RCG/commit-timeout path.
 
-The next patch/test should be chosen only after tracing the MSM8998 DSI PLL output-divider and MMCC RCG programming order against the public MSM8998 tree and downstream clock sequencing. Also determine whether the repeated SID0 boot-framebuffer faults independently prevent a visible frame despite an active DRM CRTC.
+The K067 fb/KMS capture also removes the leading SMMU-framebuffer theory: DRM
+maps a fresh IOVA and active DMA0 latches it. The next patch/test should be
+chosen only after tracing the MSM8998 DSI PLL output-divider and MMCC RCG
+programming/enable order against the public MSM8998 tree and downstream clock
+sequencing. Start at the earliest divider/RCG update that fails to latch; do not
+revisit the inactive boot-splash addresses as the primary black-screen cause.
 
-For any next RAM-only image, capture live dmesg and clock summary over ACM, explicitly ask Lance about visible screen state, and recover to LineageOS before changing another variable.
+For any next RAM-only image, capture live dmesg and clock summary over ACM,
+explicitly ask Lance about visible screen state with the five-minute prompt,
+and recover to LineageOS before changing another variable.
 
 ## Source provenance
 

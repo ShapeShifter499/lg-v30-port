@@ -3122,6 +3122,88 @@ Date: 2026-07-11
   cause is the stale PLL output-divider/MMCC RCG programming or takeover
   sequencing, not the panel mode declaration itself.
 - K065 recovered cleanly to authorized LineageOS with `reboot -f`; nothing was
-  flashed. The kernel worktree currently carries this one uncommitted source
-  patch for continued investigation.
+  flashed. The exact public patch is now preserved in local kernel commit
+  `5306416d22b41dbf64d04887cdaa368fe6388e3e`, with original author/date
+  retained and Lance's sign-off added.
 - Class: `source-backed partial correction`, visible display not achieved.
+
+### K066 — clk_ignore_unused does not clear the clock-programming failure
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- The public MSM8998 issue tracker records that disabling unused clocks can
+  blank working OnePlus/F(x)tec displays. Repacked the K065 binary with only
+  `clk_ignore_unused` added to the command line; no source or DT change.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k066-vco-clk-ignore-unused.img`, sha256
+  `8c6100b2842a75b513cf8a79202d23b44df4ae1f04c6e7abfa817cf780f6102f`.
+  Mainline survived; transcript:
+  `out/k066-vco-clk-ignore-unused-ramboot-20260711T160138Z.log`.
+- Dmesg `out/k066-dmesg-2026-07-11.txt`, sha256
+  `1cf6f933e726176e7e24046fce4588d3198e3b37caad2f65354a29aba5fb64ad`,
+  confirms the flag took effect (`clk: Not disabling unused clocks`) but the
+  same four pclk0/byte0 RCG update warnings occur before the unused-clock
+  sweep. Thus this known workaround does not solve the active programming
+  failure. Lance was not present to supply a reliable screen observation.
+- K066 recovered cleanly to authorized LineageOS; nothing was flashed.
+- Class: `source-backed cmdline diagnostic`, no technical improvement.
+
+### K067 — real DSI VDD supply removes dummy regulator; physical result unobserved
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- Source audit found K062-K066 consistently logged
+  `msm_dsi c994000.dsi: supply vdd not found, using dummy regulator`.
+  Joan already supplied the controller's 1.2-V `vdda` rail and the PHY's
+  0.875-V `vdds` rail, but omitted the controller's `vdd-supply`.
+- This is not speculative: mainline `dsi_cfg.c` declares MSM8998 DSI `vdd`
+  (0.9 V) and `vdda` (1.2 V) regulators; downstream `msm8998-mdss.dtsi`
+  maps them to PM8998 L1/L2; and the public working MSM8998 OnePlus DTS maps
+  `vdd` to L1 and `vdda` to L2. Added exactly
+  `vdd-supply = <&vreg_l1a_0p875>;` to joan's `&mdss_dsi0`.
+- K067 combined that one-line DT correction with K065's exact VCO formula
+  fix. RAM-only image:
+  `out/boot-joan-20260711-aurel-k067-dsi-vdd-vco.img`, sha256
+  `f5aceb687f12b172f137e21882d8f4b695d7a8c13c0d672a5a24e3c0e1792b52`.
+  Full patch artifact sha256
+  `2988e0abb4d29e821826c9299d5013dc5b20af90b975b8a7042ce6da03fc80cd`.
+- The harness process was interrupted with exit 130 after `fastboot boot`, but
+  passive USB/ACM inspection proved K067 had completed the transition and was
+  running live mainline. Transcript:
+  `out/k067-dsi-vdd-vco-ramboot-20260711T161252Z.log`, sha256
+  `fb269634c6c09bbb4ba779c6845d550846e23a28fb2f75598da0b2915a540687`.
+- No reliable physical screen observation was captured before the clarification
+  prompt expired and the session moved to checkpointing. Silence is not treated
+  as a display result. K067 dmesg
+  `out/k067-dmesg-2026-07-11.txt`, sha256
+  `e537ef8776cf008725104785c06d9c017896a6fa1bb39054267110574019e0e2`,
+  confirms the missing-`vdd` dummy-regulator warning is gone, while the same
+  pclk0/byte0 RCG update warnings and commit/vblank timeout path remain.
+- Live display diagnostics:
+  `out/k067-live-display-diag-2026-07-11.txt`, sha256
+  `42000a10b001d94bcb03b82b4845b8ba6a3adf8a788e370d07fad75edc1450ef`.
+  The VCO remains corrected near 1.369 GHz but downstream divider/MMCC rates
+  remain stale.
+- Live framebuffer/KMS diagnostics:
+  `out/k067-live-fb-kms-diag-2026-07-11.txt`, sha256
+  `f17a57925e23b5877f7aa30e4af4f9a5fc625b8631d42e48c71c533bea31f59d`.
+  DRM mapped the active framebuffer at fresh IOVA `0x2000`, and active
+  `sspp_8`/DMA0 latched source address `0x2000`. Bootloader splash addresses
+  in the reserved `0x9d400000..0x9f7fffff` range appeared only in inactive
+  SSPPs. Therefore the recurring SID0 boot-splash faults explain loss of the
+  inherited splash during handoff but do not explain the previously observed
+  persistent black output after DRM owns and maps a fresh framebuffer.
+- K067 recovered cleanly to fully booted authorized LineageOS; nothing was
+  flashed.
+- The exact public VCO change is now preserved in local kernel commit
+  `5306416d22b41dbf64d04887cdaa368fe6388e3e`, retaining original author
+  AngeloGioacchino Del Regno. The joan DSI VDD correction is local commit
+  `b549c9f5b32a42dfa4a100d33df804e8ed042287`. Both remain unpushed.
+- Class: `source-backed partial corrections`; regulator and VCO state improved,
+  but K067's physical display outcome is unobserved. The earliest evidenced
+  remaining failure is the DSI PLL output-divider/MMCC RCG programming or
+  takeover sequence.

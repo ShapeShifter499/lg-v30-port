@@ -134,7 +134,24 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   `docs/public-upstreaming-plan.md`: clean topic commits, detailed rationale,
   verification evidence, no debug-only leftovers, and required trailers.
 
-## Current status (2026-07-07/08)
+## Current status (2026-07-11)
+
+- **Latest checkpoint:** mainline reaches USB userspace, UFS/microSD, postmarketOS
+  headless operation, and DRM/fb0. M1-M3 are done; built-in display M4 remains
+  in progress. See `docs/aurel-handoff-2026-07-11-m4-display-next.md`.
+- K062's MSM8998 MDSS identity-domain policy removed the fatal display-SMMU
+  handoff gate. K065 fixed the 10nm DSI VCO factor-of-two calculation, and K067
+  added the real DSI VDD rail. DRM now maps a fresh framebuffer IOVA and active
+  DMA0 latches it, ruling out stale boot-splash addressing as the leading
+  post-DRM failure.
+- The remaining evidenced display blocker is the DSI PLL output-divider/MMCC
+  pclk0/byte0 RCG programming or takeover sequence. K067's physical screen result
+  is unobserved; no timeout/silence was treated as an observation.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K067 test
+  was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
+  documentation are local/unpushed.
+
+### Earlier reset-hunt history
 
 - **CONFIRMED FIX: `anoc1_smmu` skip-reset eliminates the TZ Config/MM-NoC
   fault.** `anoc1_smmu` (`iommu@1680000`, aggregator-NoC IOMMU) has zero

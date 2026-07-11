@@ -129,12 +129,11 @@ When opening a public PR or patch series, include:
 - links or references to the public ledger/evidence docs if they are published;
 - known rejected approaches, summarized briefly enough to prevent duplicate work.
 
-## Current public-readiness snapshot (2026-07-08)
+## Current public-readiness snapshot (2026-07-11)
 
-- Clean candidate commits exist for the initial DTS and LG reserved-memory work,
-  but the device still does not fully boot mainline. Do not publish any claim that
-  joan is booted or usable until a RAM-only test actually reaches a mainline debug
-  channel or userspace.
+- Mainline now reaches stable USB userspace, storage, and DRM/fb0 on joan. M1-M3
+  are done; M4 display remains in progress. Do not claim visible built-in display
+  support yet.
 - K030 (`anoc1_smmu` skip-reset) is an important confirmed debug finding: it
   removes a named TrustZone Config/MM-NoC reset class, but it is **not** public-ready
   code as written. It needs a real upstreamable Qualcomm SMMU representation, not
@@ -152,6 +151,15 @@ When opening a public PR or patch series, include:
   the RAM-only classifier window. Initial source review supports `<81 4>` from
   existing upstream MSM8998 boards; `<49 4>` is pstore/device-proven but needs
   stronger source justification before public use.
+- K062's MSM8998 MDSS identity-domain policy is RAM-boot verified and
+  upstream-shaped, but it needs wider review of bootloader-active display handoff
+  semantics before submission.
+- K065 retained the exact public `707f3fc86f6a` 10nm DSI VCO formula correction
+  with original author/date preserved. Device evidence confirms the rate fix,
+  though it is not sufficient for visible output.
+- K067's one-line joan DSI VDD supply correction is source-backed and removed the
+  dummy-regulator fallback. The physical K067 screen result is unobserved; the
+  remaining RCG/commit-timeout path is still present.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
@@ -180,7 +188,10 @@ change.
 | `joan_disp_quiesce.c` (debug, reverted) | DSI/DPU register offsets from mainline `dsi.xml` + `dpu_3_0_msm8998.h` | (same GPL kernel tree — not external) | GPL-2.0 | debug-only |
 | `out/aurel-k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Aurel) | GPL-2.0 | reference only |
 | K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Aurel code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch` and `out/aurel-k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch` sha256 `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`; built image sha256 `bc8099c241dc18865079e4fffce95d13cb9f3885705ae67ac2f570ec3fd85c4f`; device-tested but later superseded by pstore evidence: K042 died in TLMM/GPIO before SMMU; do not publish |
-| K050 TLMM GPIO reserved-ranges candidate | pstore-guided TLMM/GPIO abort isolation: K046/K048/K049 showed protected direction reads on GPIO49/50/81; K050 reserves `<49 4>` and `<81 4>` in addition to existing `<0 4>` | Aurel DTS change is original; source basis is upstream MSM8998 pinctrl layout and pstore fault addresses | BSD-3-Clause for DTS if promoted; currently debug/candidate evidence | saved as `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`; RAM-only K050 survivor; needs source review before public commit |
+| K050 TLMM GPIO reserved-ranges candidate | pstore-guided TLMM/GPIO abort isolation: K046/K048/K049 showed protected direction reads on GPIO49/50/81; K050 reserves `<49 4>` and `<81 4>` in addition to existing `<0 4>` | Aurel DTS change is original; source basis is upstream MSM8998 pinctrl layout and pstore fault addresses | BSD-3-Clause for DTS if promoted; currently debug/candidate evidence | saved as `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`; RAM-only K050 survivor, source review still required for `<49 4>` |
+| MSM8998 MDSS identity-domain client | mainline Qualcomm SMMU identity-domain table and same-class MDSS entries | Aurel/Lance change; Qualcomm mainline policy pattern | GPL-2.0 | local commit `7ff461605`; K062 RAM-boot verified, wider review required |
+| 10nm DSI VCO formula | exact public `msm8998-mainline/linux` commit `707f3fc86f6a` | AngeloGioacchino Del Regno `<angelogioacchino.delregno@somainline.org>` | GPL-2.0 | exact patch-id preserved in local commit `5306416d2`; original author/date retained; K065 rate correction verified |
+| joan DSI controller VDD supply | mainline `dsi_cfg.c` regulator declaration + downstream `msm8998-mdss.dtsi` PM8998 L1/L2 mapping + public MSM8998 OnePlus DTS | Qualcomm/LGE plus public MSM8998 board reference; Aurel/Lance one-line board mapping | BSD-3-Clause for joan DTS; sources used as hardware mapping evidence | local commit `b549c9f5b`; K067 removed dummy-regulator fallback; physical result unobserved |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
 | initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
 
@@ -188,6 +199,10 @@ Rule going forward for any new borrowed code: preserve the origin file's
 `Copyright` line(s) and `SPDX-License-Identifier`, add a `based on <file>
 by <author>` note in the header, and keep the kernel.org commit trailers
 (`Signed-off-by: Lance`, `Assisted-by: <agent-harness>:<model>` using the
-actual helper/model, e.g. `Hermes:gpt-5.5` or `Claude-Code:<model>`; never
+actual helper/model, e.g. `Hermes:gpt-5.6-sol` or `Claude-Code:<model>`; never
 `Co-Authored-By`). If any prior add above is missing an author I've marked
 TBD and you know it, please append it.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
