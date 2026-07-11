@@ -2881,3 +2881,27 @@ Date: 2026-07-11
   fail/error lines (evidence: `out/pmos-firstboot-dmesg-2026-07-11.txt`).
 - MILESTONE M3 (headless postmarketOS) COMPLETE. Remaining: M4 display/touch,
   M5 wifi/BT, laf-partition flash for cable-free boot, pmaports upstream MR.
+
+### K058 — M4 begins: SW43402 panel driver + display DTS (builds; on-device blocked on mmss SMMU)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- P2/P3 docs landed first (panel-sw43402.md, display-path.md,
+  downstream-refs/) — verdict: mainline DPU1 (dpu_3_0_msm8998.h has both DSC
+  1.1 blocks), NOT MDP5.
+- New driver `drivers/gpu/drm/panel/panel-lg-sw43402.c` (kernel commit
+  `6d7550d4a`): adapted from in-tree panel-lg-sw43408.c (same LG family,
+  DSC 1.1). Real DV3.1 data: 1440x2880 cmd-mode, DSC 720x16/2-slice/8bpc/
+  8bpp/block-pred, 19-cmd init sequence, PPS pack + compression-mode-ext.
+  Kconfig+Makefile added. **Compiles clean** (panel-lg-sw43402.o built).
+- DTS commit `86fbeea5b`: &mdss/&mdss_mdp/&mdss_dsi0/&mdss_dsi0_phy enabled,
+  panel@0 node (reset TLMM35, vddio/vpnl = new gpio fixed-regulators on
+  TLMM92/69), dsi0_out 4-lane + te-source. **DTB compiles clean.**
+- NOT on-device yet: MDSS masters through mmss SMMU `cd00000.iommu` (TZ-owned,
+  -110 deferred-probe). That SMMU is now the M4 gate. Next: get the mmss SMMU
+  to probe (qcom smmu stream-mapping handoff quirks, not K030 skip), then a
+  display-enabled bringup image + on-device DPU/DSI/panel probe test.
+- Provenance: downstream panel dtsi copied verbatim to docs/downstream-refs/
+  (GPL-2.0), cited in the driver commit + dependency-tracker.

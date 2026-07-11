@@ -42,3 +42,4 @@ Rules:
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5
 Date: 2026-07-11
+| 2026-07-11 | joan panel/DSC/board dtsi (3 files) | LG/LineageOS downstream `android_kernel_lge_msm8998` (GPL-2.0) | `docs/downstream-refs/` | SW43402 panel data for the mainline driver (P2) | Ember |
