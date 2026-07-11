@@ -25,6 +25,7 @@ makedepends="
 	openssl-dev
 	pahole
 	perl
+	python3
 	postmarketos-installkernel
 	xz
 "
