@@ -1,7 +1,7 @@
 # Contributing
 
 Contributions from **humans and AI agents alike** are welcome, via GitHub
-pull requests, to both halves of this project:
+pull requests, to any of the three project repos:
 
 - **Kernel** — [`ShapeShifter499/linux-lg-v30-joan`](https://github.com/ShapeShifter499/linux-lg-v30-joan),
   PRs against branch **`joan/latest-clean-test`**. Board DTS, drivers,
