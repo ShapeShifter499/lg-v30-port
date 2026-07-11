@@ -3550,3 +3550,87 @@ v2 stable-capture initramfs; pull dmesg from tcp/9600). BUILT and packaged,
 kernel tree reverted clean; awaiting a device boot (Lance present/approved).
 This is the first thing to boot next session — it partitions the remaining
 problem in one shot.
+
+### K076 — divider writer trace + panel instrumentation (TESTED, black/off)
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-11
+
+Base = K075/K074 behavior plus filtered instrumentation in the generic divider
+and 10 nm DSI PLL save/set/prepare/restore paths. RAM-only boot succeeded;
+serial, live dmesg, clock summary, regulators, interrupt snapshots, and the
+panel helper status were captured before returning to LineageOS.
+
+Direct evidence:
+- Every transfer first programmed `dsi0_pll_out_div_clk` to encoding 1 (`/2`,
+  684.442248 MHz) and then programmed encoding 2 (`/4`, 342.221120 MHz).
+- Final framework clocks were half-rate: pixel 57.036853 MHz and byte
+  42.777639 MHz.
+- `K075 panel prepare DONE, accum_err=0` proves only that the host-side write
+  helper calls returned successfully. These were write-only transfers without
+  validated ACK/readback, so it does not prove the panel received or accepted
+  the commands. This corrects the over-strong K075 interpretation above.
+- No PLL-lock, MMCC RCG-update, or vblank-timeout message was captured.
+
+Source tracing identified the second 342.221120 MHz request as the
+`byte_intf_clk` rate operation. Mainline parents both MSM8998 byte branches
+directly to `byte0_clk_src`, so requesting byte-interface rate 42.777640 MHz
+propagates through the shared byte source and PHY byte /8 chain, forcing the
+PLL output divider to `/4`. Downstream MSM8998 instead models a dedicated
+byte-interface divider at MMCC register `0x237c`.
+
+Artifacts: `out/boot-joan-20260711-aurel-k076-divider-panel-instrumentation.img`,
+`out/20260711-aurel-k076-divider-panel-instrumentation.patch`,
+`out/k076-live-dmesg-2026-07-11.txt`, and
+`out/k076-live-serial-diag-2026-07-11.txt`.
+
+### K077 — skip byte-interface set_rate discriminator (TESTED, rejected as fix)
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-11
+
+Exactly one behavior changed from K076: `dsi_link_clk_set_rate_6g()` temporarily
+skipped `clk_set_rate(byte_intf_clk, byte_intf_clk_rate)`. This is a diagnostic
+bypass, not a production/upstream candidate.
+
+The host capture process was interrupted by the agent/tool reset after
+`fastboot boot` had already returned `OKAY`. The phone remained in the known
+mainline USB gadget state (`18d1:4e26`); evidence was subsequently salvaged
+through `/dev/ttyACM0`, then the phone was rebooted with the exact serial
+`reboot -f` command. LineageOS returned with `sys.boot_completed=1` in 31 s.
+
+Direct K077 evidence:
+- 13 output-divider writes all selected encoding 1 (`/2`); there were zero
+  encoding-2 (`/4`) writes.
+- Final clock summary: VCO 1.368884472 GHz, PLL out 684.442236 MHz, pixel
+  114.073706 MHz, byte 85.555279 MHz. Thus the K076 source attribution and
+  half-rate-clock diagnosis are confirmed.
+- `mdss_byte0_intf_clk` also remained 85.555279 MHz instead of its intended
+  42.777640 MHz, which is why skipping the rate call cannot be the real fix.
+- DRM state was active at 1440x2880@60: fbcon framebuffer 86 on plane 0,
+  CRTC enabled/active, DSI-1 attached, dual mixers/DSC assigned.
+- No PLL-lock failure, RCG-update failure, or vblank timeout was captured.
+- The SMMU context-fault IRQ count was 2448 in both samples five seconds
+  apart (delta 0); three textual fault reports were present, but no active
+  steady-state fault storm was proven.
+- Panel helper status remained `accum_err=0`.
+- Lance's physical observation: screen completely black/off.
+
+Disposition: K077 proves that the byte-interface rate request caused the `/4`
+half-rate state, and that correcting the pixel/byte clock rates alone is not
+sufficient for visible output. Reject the skip as a fix. The source-correct
+clock follow-up is the dedicated MSM8998 byte-interface `/2` divider; after
+that, investigate panel receipt/acceptance and the DSI video/command sequence
+rather than returning to the already-correct active DPU scanout state.
+
+Artifacts and hashes:
+- image `out/boot-joan-20260711-aurel-k077-skip-byteintf-rate.img`, SHA-256
+  `5c90e6ed619b909c8643c605d79a9940131630bf851e6533342e67c2d1d68af5`;
+- patch `out/20260711-aurel-k077-skip-byteintf-rate.patch`;
+- recovered serial evidence `out/k077-live-serial-diag-2026-07-11.txt`;
+- interrupted runner transcript `out/k077-ramboot-20260711T214307Z.log`;
+- manifest `out/k077-hashes.txt`.
+
+Kernel experiment tree remains dirty and uncommitted; nothing was pushed.
