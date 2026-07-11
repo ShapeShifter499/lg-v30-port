@@ -468,3 +468,22 @@ unrelated flag, gates the next experiment.
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes:gpt-5.6-sol
 Date: 2026-07-11
+
+## 2026-07-11 — K069-K071 divider and initial-VCO interaction experiments
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K069 tested the downstream-inspired pre-lock `/2` override; it did not persist
+  into the final clock tree and the panel remained black.
+- K070 instrumented save/restore/prepare ordering. It proved bootloader divider
+  state was already correct and isolated the early parent-enable lock failure to
+  `vco_current_rate=0`.
+- Upstream provenance review found commit `8a48e35becb2`, whose initial-rate fix
+  interacts with the public-reference VCO formula patch's removed state update.
+- K071 restored the recalc state assignment as a one-line source-backed test. It
+  was rejected after the live DSI clock tree collapsed to 0 Hz with repeated PLL
+  failures and a black display.
+- Every test remained RAM-only. Each debug patch was preserved then reverted,
+  and the phone was recovered to fully booted LineageOS.

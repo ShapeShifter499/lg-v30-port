@@ -173,6 +173,10 @@ When opening a public PR or patch series, include:
   between the public-reference VCO formula patch and upstream initial-rate fix
   `8a48e35becb2`. Instrumentation is debug-only; the one-line state assignment
   candidate should be evaluated independently before any public disposition.
+- K071 evaluated that one-line recalc side effect and collapsed the final DSI0
+  clock tree to 0 Hz, with repeated PLL-lock/vblank failures. It is rejected.
+  Any follow-up must keep recalc pure and test an explicit nonzero init-time seed
+  rather than copying current-upstream side effects out of their patch context.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 

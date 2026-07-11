@@ -153,8 +153,10 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   and the panel remained black. K070 instrumentation then found the real early
   failure: correct saved divider state but `vco_current_rate=0`, caused by an
   interaction between the VCO formula patch and upstream initial-rate handling.
-  K071 is the one-line state-assignment discriminator.
-- Phone is recovered to fully booted authorized LineageOS. Every K060-K070 test
+  K071 tested the one-line recalc state assignment, but it was worse: the final
+  DSI0 clock hierarchy collapsed to 0 Hz with repeated PLL failures. A future
+  test must keep recalc pure and seed a nonzero initial VCO value explicitly.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K071 test
   was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
   documentation are local/unpushed.
 

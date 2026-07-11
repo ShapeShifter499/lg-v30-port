@@ -3366,3 +3366,48 @@ Date: 2026-07-11
   `5d10ff584fcccf70a05642124053ec48e382eed07b4d543b279b44b17f01ba9c`.
 - Class: `diagnostic instrumentation`, **rejected from production source**;
   result identifies a source-backed one-line fix candidate for K071.
+
+### K071 — recalc side-effect restoration collapses the live clock tree to zero
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K071 dropped K069's hardcoded divider and all K070 instrumentation. It kept
+  K068's `CLK_OPS_PARENT_ENABLE` control and restored exactly one line removed by
+  public-reference commit `707f3fc86f6a`:
+  `pll_10nm->vco_current_rate = vco_rate` in the 10nm VCO recalc callback.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k071-vco-state-parent-enable.img`, sha256
+  `0d07f16366da832b3334499e1bbf8a3be9f5c7b02c576684effb489ac7ac2c58`.
+  Exact patch:
+  `out/20260711-aurel-k071-vco-state-parent-enable.patch`, sha256
+  `48fbaf902e4f6ccec347b2750235c7e166ec3f828af1605fbfdb933d16d946d5`.
+- The approved RAM-only boot completed normally; mainline USB appeared after
+  18 seconds. Transcript:
+  `out/k071-vco-state-parent-enable-ramboot-20260711T1903Z.log`, sha256
+  `7cb49ce7d91ccd31d6f57824042bd391f964cac30c9430f420586fa98c04cb6e`.
+  Lance observed the screen as **completely black/off**.
+- K071 is worse than K068-K070. Dmesg
+  `out/k071-live-dmesg-2026-07-11.txt`, sha256
+  `7e5b41325483ea1e6d8df5801f810253eafcfa98b3631dc84f343c46822a317b`,
+  records four PLL-lock failure events, one byte0 RCG update failure, three
+  clock-disable imbalance warnings, and 31 vblank timeouts.
+- Live diagnostics `out/k071-live-display-diag-2026-07-11.txt`, sha256
+  `a9dc7d577677c0abdc63e71ec6ea75d8f85c9eafc31290669332d120a81e34f2`,
+  show the entire DSI0 VCO/output/bit/pixel/byte clock hierarchy at **0 Hz**.
+- Interpretation: restoring recalc's global side effect is not safe in this local
+  combination. A recalc that observes inaccessible/unprepared PLL registers can
+  overwrite `vco_current_rate` with zero, and K071 does not preserve the valid
+  value seen later in K070. The result rejects the simple one-line side-effect
+  restoration even though current upstream carries it in a different patch
+  context.
+- If this path continues, preserve a pure recalc callback and initialize
+  `vco_current_rate` once in `dsi_pll_10nm_init()` from a nonzero recalc result,
+  falling back to `min_pll_rate` only when zero. Instrument that assignment before
+  treating it as a fix; do not stack another blind divider change.
+- K071 recovered cleanly to fully booted authorized LineageOS via ACM
+  `reboot -f`; nothing was flashed. The patch was reverted and a clean
+  `Image.gz dtbs` rebuild completed; clean `Image.gz` sha256
+  `95575b5f2fe87133a936c1ca8355011c39f97dc98d8524016771137babae610a`.
+- Class: `source-backed interaction test`, **rejected as implemented**.

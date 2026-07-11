@@ -241,3 +241,21 @@ K069's hardcoded `/2` override and all K070 logging.
 K070 showed black/off, then recovered cleanly to fully booted authorized
 LineageOS. Its instrumentation is preserved under `out/`, reverted from source,
 and the clean kernel rebuilt.
+
+## Follow-up — K071 rejects the recalc side effect
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+K071 restored `pll_10nm->vco_current_rate = vco_rate` in recalc on top of the
+parent-enable control. It made the clock failure substantially worse: four PLL
+lock failures, one byte0 RCG update failure, 31 vblank timeouts, and a final DSI0
+clock hierarchy entirely at 0 Hz. Lance observed black/off.
+
+Do not retain K071. The likely issue is that a later recalc while PLL registers
+are inaccessible/unprepared writes zero back into the shared state. The next
+bounded candidate, if pursued, is an explicit one-time nonzero initialization in
+`dsi_pll_10nm_init()` while keeping recalc pure, with logging to prove the seeded
+value and subsequent prepares. K071 recovered cleanly to LineageOS, was reverted,
+and the clean kernel rebuilt.
