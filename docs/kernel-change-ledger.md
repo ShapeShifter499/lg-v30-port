@@ -3411,3 +3411,42 @@ Date: 2026-07-11
   `Image.gz dtbs` rebuild completed; clean `Image.gz` sha256
   `95575b5f2fe87133a936c1ca8355011c39f97dc98d8524016771137babae610a`.
 - Class: `source-backed interaction test`, **rejected as implemented**.
+
+### K072 — init-only nonzero VCO seed: PLL LOCKS, panel still dark (RCG-didn't-update is the remaining wall)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+Built on Aurel's clean tip b549c9f5b (NO K068 parent-enable). Change: in
+`dsi_pll_10nm_init()`, capture `dsi_pll_10nm_vco_recalc_rate()` once and store
+it into `vco_current_rate` when in [min,max], else fall back to min_pll_rate;
+recalc kept pure (no K071 side-effect). Plus bounded logs (init seed, prepare
+entry vco, lock result). Root cause it fixes: the stock `if (!recalc) seed=min`
+DISCARDS a valid nonzero readback because the imported pure recalc no longer
+stores it — leaving vco_current_rate=0 → set_rate(0) → -110.
+
+Artifacts: patch `out/20260711-ember-k072-init-vco-seed.patch`; image
+`out/boot-joan-20260711-ember-k072-init-vco-seed.img` sha256
+`57d7d3cd58a0edc0c8cccf89027dbfbbe4038f9bf0111e7e049a2efe1eb2157a`; dmesg
+`out/k072-live-dmesg-2026-07-11.txt`; serial `out/k072-serial-20260711T193513Z.log`.
+
+RESULTS (RAM boot, Lance present + approved, recovered to LOS):
+- `K072 init: recalc=684431762 seed=1000000000 (fallback)` — init readback was
+  below min (684 MHz), so fallback 1 GHz used; the point is it is NONZERO.
+- `K072 prepare entry: vco_current_rate=1368884480` then
+  `K072 lock result: rc=0` — **PLL LOCKS, 0 lock failures** (K070 -110, K071 x4).
+- **0 vblank timeouts** (K071 had 31). fb0 registered
+  (`msm_dpu ... [drm] fb0: msmdrmfb`), DPU bound c994000.dsi.
+- Panel: **still fully black/off** (Lance visual).
+- Remaining wall: 4x `byte0_clk_src: rcg didn't update its configuration`
+  (clk-rcg2.c:136) during `dsi_link_clk_set_rate_6g`. The MMCC byte/pixel RCGs
+  do not latch → DSI link byte/pixel clocks wrong → panel gets no valid signal.
+
+KEY INSIGHT: K068's `CLK_OPS_PARENT_ENABLE` is exactly what made these
+RCG-didn't-update warnings DISAPPEAR (Aurel K068), but K068 alone had the
+vco=0 PLL failure that K072 now fixes. **The two are complementary.**
+NEXT CANDIDATE K073 = K068 parent-enable + K072 init seed together: should
+give PLL lock (K072) AND RCG latch (K068). Class: K072 = debug-only as-is
+(instrumentation); the init-seed core is upstream-shaped once proven. Kernel
+reverted to clean b549c9f5b, patch preserved. Nothing pushed.
