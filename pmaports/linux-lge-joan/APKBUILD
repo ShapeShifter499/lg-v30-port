@@ -21,6 +21,8 @@ makedepends="
 	bison
 	findutils
 	flex
+	elfutils-dev
+	zlib-dev
 	linux-headers
 	openssl-dev
 	pahole
