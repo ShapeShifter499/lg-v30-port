@@ -8,6 +8,9 @@ pull requests, to both halves of this project:
   defconfig — anything that moves the LG V30 (`joan`) toward booting
   mainline/postmarketOS with working peripherals (current wishlist: UFS
   storage, display/DSC, touchscreen, wifi WCN3990/ath10k-SNOC, BT hci_qca).
+- **postmarketOS port** — [`ShapeShifter499/pmaports-lge-joan`](https://github.com/ShapeShifter499/pmaports-lge-joan),
+  PRs against branch **`device-lge-joan`** (a pmaports fork; shaped to
+  become the upstream pmaports MR).
 - **Harness/docs** — this repo. Tooling, initramfs, documentation,
   evidence. New findings should update `docs/kernel-change-ledger.md`
   (see its entry format) so claims stay tied to evidence.

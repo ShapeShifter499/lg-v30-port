@@ -3,9 +3,14 @@
 Project home for humans and AI agents alike. Anyone picking up a work parcel
 starts here — this file is the single source of truth for state and
 conventions. **Contributions are welcome via GitHub pull requests and issues**
-on this repo and on the kernel repo
-([`linux-lg-v30-joan`](https://github.com/ShapeShifter499/linux-lg-v30-joan),
-branch `joan/latest-clean-test`) — see [CONTRIBUTING.md](CONTRIBUTING.md).
+on the project repos — see [CONTRIBUTING.md](CONTRIBUTING.md):
+
+- this repo — harness, docs, evidence;
+- [`linux-lg-v30-joan`](https://github.com/ShapeShifter499/linux-lg-v30-joan)
+  (branch `joan/latest-clean-test`) — the kernel;
+- [`pmaports-lge-joan`](https://github.com/ShapeShifter499/pmaports-lge-joan)
+  (branch `device-lge-joan`) — the postmarketOS device port, kept as a
+  pmaports fork so it can become the upstream pmaports merge request.
 (Historical docs under `docs/` also mention an internal tracker and an
 "internal mirror" used by the original maintainers' agents; those are not
 publicly accessible and nothing essential lives only there.)
