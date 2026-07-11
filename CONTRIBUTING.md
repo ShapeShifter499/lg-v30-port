@@ -41,7 +41,10 @@ duplicated.
 5. **No untested "should work" device claims.** State what was actually
    run and observed. If you have no device, say so — build-tested-only
    PRs are still useful and will be device-tested by a maintainer.
-6. **Device testing safety** (maintainers/testers with hardware): read the
+6. **Track dependencies.** If your work installs a host package or
+   downloads an external source, record it in `docs/dependency-tracker.md`
+   in the same change (see that file's rules).
+7. **Device testing safety** (maintainers/testers with hardware): read the
    safety contract in `scripts/tethered-test.sh` before touching a phone.
    Never `fastboot getvar` on LG aboot, enter fastboot only via
    `adb reboot bootloader`, one fastboot client at a time, RAM-only

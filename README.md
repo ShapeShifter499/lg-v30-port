@@ -122,6 +122,9 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
 - **Project history / attribution index**: when a session materially changes the
   project, update `docs/project-history-and-attribution.md` so future agents can
   see who did what and when without reconstructing the entire ledger.
+- **Dependency tracking**: any host package install or external source
+  download made for this project gets a row in `docs/dependency-tracker.md`
+  in the same session, with attribution. Cleanup/removal gets a row too.
 - **Kernel change tracking**: every kernel-impacting change must also be entered
   in `docs/kernel-change-ledger.md` before handoff, whether it is a final
   upstreamable commit, bringup-only patch, debug oracle, or rejected experiment.
