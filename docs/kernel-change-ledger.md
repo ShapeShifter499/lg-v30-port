@@ -3313,3 +3313,56 @@ Date: 2026-07-11
   behavioral fix, instrument VCO prepare plus handoff save/restore to record the
   requested VCO, cached divider, live `PLL_OUTDIV_RATE`, `CLK_CFG0`, and
   `CLK_CFG1` in exact order.
+
+### K070 — instrumentation finds zero initial VCO rate, not a bad saved divider
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+- K070 retained the K069 control only to instrument the exact 10nm PLL ordering.
+  It logged VCO rate, live/saved `PLL_OUTDIV_RATE`, `CLK_CFG0`, and `CLK_CFG1`
+  during initial handoff save, every VCO prepare/lock poll, and restore.
+- RAM-only image:
+  `out/boot-joan-20260711-aurel-k070-pll-order-instrumentation.img`, sha256
+  `e5bf730b50559ae790ab127b3d1c8bafdf86c69ddc9aa62c01b639153c2b387f`.
+  Exact debug patch:
+  `out/20260711-aurel-k070-pll-order-instrumentation.patch`, sha256
+  `b548040e10ec74ca306c44f229743b3dfdb2eeced019a7f09dbf06aa2437ca99`.
+- The approved RAM-only boot completed normally and mainline USB appeared.
+  Transcript `out/k070-pll-order-instrumentation-ramboot-20260711T1852Z.log`,
+  sha256 `c91580fc710470c339c15d671dad211c463b1fc6654d68ccaedc07211d221bee`.
+  Lance observed the screen as **completely black/off**.
+- Dmesg `out/k070-live-dmesg-2026-07-11.txt`, sha256
+  `b27c6e5b252f70b8683fe7a31d3c363b7ed615a19b03cd7d8239921799e8103d`,
+  resolves the ordering question:
+  - bootloader handoff state is already correct: outdiv `0x1` (`/2`), bit
+    divider `0x1`, pixel divider `0x3`, and pixel mux `0x1`;
+  - `vco_current_rate` is nevertheless **zero** at initial save and the first
+    parent-enable prepares;
+  - one zero-rate prepare reaches lock with inherited state, but the next enters
+    with VCO zero and fails lock (`-110`) even after K069 forces `/2`;
+  - handoff restore correctly reapplies `/2`, bit 1, pixel 3, mux 1;
+  - after normal rate propagation sets VCO to ~1.3688845 GHz, all logged PLL lock
+    polls succeed with `/2`.
+- Live clock diagnostics:
+  `out/k070-live-display-diag-2026-07-11.txt`, sha256
+  `6c9ae15e2ca08206841030d3ed6d1538c09bd495a5fb0cdf932ad7303044bb7f`.
+- Root cause is an interaction between two changes. Local/public-reference commit
+  `707f3fc86f6a` corrected the VCO math and removed the recalc callback's
+  `vco_current_rate` assignment. Upstream commit
+  `8a48e35becb214743214f5504e726c3ec131cd6d` (`drm/msm/dsi/dsi_phy_10nm: Fix
+  missing initial VCO rate`) added the initial recalc call specifically so
+  handoff restore would not use VCO zero; that upstream call relies on recalc
+  storing the result. Combining both patches leaves the member zero and exposes
+  the failure as soon as K068 parent-enables the PLL.
+- Current upstream source again assigns `vco_current_rate = vco_rate` in the
+  10nm recalc path. The smallest K071 discriminator is therefore the one-line
+  restored assignment on top of K068's parent-enable control, with no hardcoded
+  output-divider override.
+- K070 recovered cleanly to fully booted authorized LineageOS. Nothing was
+  flashed. Instrumentation was reverted and a clean `Image.gz dtbs` rebuild
+  completed; clean `Image.gz` sha256
+  `5d10ff584fcccf70a05642124053ec48e382eed07b4d543b279b44b17f01ba9c`.
+- Class: `diagnostic instrumentation`, **rejected from production source**;
+  result identifies a source-backed one-line fix candidate for K071.

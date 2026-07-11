@@ -42,6 +42,7 @@ Rules:
 | 2026-07-11 | `msm8998-mainline/linux` public reference @ `2b7263ccccbdafba3e8696349d9a3e9b115c6dd8` (clock commits `878adc31071b` and `707f3fc86f6a`) | `https://gitlab.com/msm8998-mainline/linux.git` | `/tmp/msm8998-mainline-linux-ref` (filtered/sparse reference clone) | compare known MSM8998 MMCC/DSI clock fixes after K062; preserve the exact 10nm VCO fix and original author | Aurel |
 | 2026-07-11 | MSM8998 DSI regulator mapping | mainline `drivers/gpu/drm/msm/dsi/dsi_cfg.c`, downstream `msm8998-mdss.dtsi`, and public working MSM8998 OnePlus DTS | source trees already listed in this tracker | prove joan's controller `vdd` rail maps to PM8998 L1 while `vdda` maps to L2; basis for K067 | Aurel |
 | 2026-07-11 | MSM8998 DSI PLL pre-lock output-divider ordering | downstream `drivers/clk/msm/mdss/mdss-dsi-pll-8998.c` compared with mainline `drivers/gpu/drm/msm/dsi/phy/dsi_phy_10nm.c` | source trees already listed in this tracker | explain K068's stale `/4` state and select the next bounded diagnostic; no downstream code copied | Aurel |
+| 2026-07-11 | upstream 10nm DSI initial VCO-rate fix `8a48e35becb214743214f5504e726c3ec131cd6d` | `https://github.com/torvalds/linux/commit/8a48e35becb214743214f5504e726c3ec131cd6d` / linked lore and Patchwork discussion | read-only network reference; current upstream raw source compared, no new checkout | explain K070's zero initial `vco_current_rate` and its interaction with local/public-reference VCO formula fix | Aurel |
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-fable-5

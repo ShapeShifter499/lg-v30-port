@@ -168,6 +168,11 @@ When opening a public PR or patch series, include:
   K068 control. The phone still showed black, PLL lock still failed once, and the
   final live tree returned to `/4`. The hardcoded override is rejected debug
   evidence; instrument the overwrite sequence before designing a generic fix.
+- K070 instrumentation proved saved divider state is already correct and isolated
+  the early failure to `vco_current_rate=0`. The zero comes from interaction
+  between the public-reference VCO formula patch and upstream initial-rate fix
+  `8a48e35becb2`. Instrumentation is debug-only; the one-line state assignment
+  candidate should be evaluated independently before any public disposition.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 
@@ -201,6 +206,7 @@ change.
 | 10nm DSI VCO formula | exact public `msm8998-mainline/linux` commit `707f3fc86f6a` | AngeloGioacchino Del Regno `<angelogioacchino.delregno@somainline.org>` | GPL-2.0 | exact patch-id preserved in local commit `5306416d2`; original author/date retained; K065 rate correction verified |
 | joan DSI controller VDD supply | mainline `dsi_cfg.c` regulator declaration + downstream `msm8998-mdss.dtsi` PM8998 L1/L2 mapping + public MSM8998 OnePlus DTS | Qualcomm/LGE plus public MSM8998 board reference; Aurel/Lance one-line board mapping | BSD-3-Clause for joan DTS; sources used as hardware mapping evidence | local commit `b549c9f5b`; K067 removed dummy-regulator fallback; physical result unobserved |
 | MSM8998 DSI PLL pre-lock output-divider ordering | downstream `drivers/clk/msm/mdss/mdss-dsi-pll-8998.c::dsi_pll_enable()` compared with mainline `drivers/gpu/drm/msm/dsi/phy/dsi_phy_10nm.c::dsi_pll_10nm_vco_prepare()` | Qualcomm/LGE downstream behavior used as diagnostic evidence; no downstream code copied yet | GPL-2.0 | K068 exposed the ordering failure; next experiment must remain debug-only until a generic implementation is justified |
+| 10nm DSI initial VCO-rate fix | upstream Linux commit `8a48e35becb214743214f5504e726c3ec131cd6d` by Krzysztof Kozlowski plus current upstream `dsi_phy_10nm.c` | upstream Linux / Krzysztof Kozlowski; reviewed/merged by Dmitry Baryshkov | GPL-2.0 | K070 proves the local VCO formula patch removed state that this upstream initialization path relies on; basis for K071 one-line candidate |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
 | initramfs busybox (test harness) | Alpine `busybox-static` package | busybox project / Alpine | GPL-2.0 | test-only, not shipped in kernel |
 

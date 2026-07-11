@@ -150,9 +150,11 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   PLL with stale divider state and causes lock/clock-balance failures. Downstream
   Linux 4.4 explicitly programs the PLL output divider before locking it. K069
   tested a narrow `/2` pre-lock override, but the final tree returned to `/4`
-  and the panel remained black. The next step is register-order instrumentation,
-  not another blind clock override.
-- Phone is recovered to fully booted authorized LineageOS. Every K060-K069 test
+  and the panel remained black. K070 instrumentation then found the real early
+  failure: correct saved divider state but `vco_current_rate=0`, caused by an
+  interaction between the VCO formula patch and upstream initial-rate handling.
+  K071 is the one-line state-assignment discriminator.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K070 test
   was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
   documentation are local/unpushed.
 

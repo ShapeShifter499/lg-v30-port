@@ -218,3 +218,26 @@ Next should be instrumentation, not another blind override: log the requested
 VCO, cached divider, live output-divider register, `CLK_CFG0`, and `CLK_CFG1` in
 VCO prepare and handoff save/restore. That will identify exactly where `/2` is
 lost before attempting a generic fix.
+
+## Follow-up — K070 identifies the zero-rate interaction
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes:gpt-5.6-sol
+Date: 2026-07-11
+
+K070 captured the complete sequence. Joan's saved bootloader divider state is
+already correct (`/2`, bit 1, pixel 3, mux 1). The failing early parent-enable
+prepare instead receives `vco_current_rate=0`; the second zero-rate prepare fails
+PLL lock. Once normal propagation sets VCO to ~1.3688845 GHz, every logged lock
+poll succeeds with `/2`.
+
+This is a patch interaction. The public-reference VCO formula fix removed the
+recalc callback's state assignment, while upstream commit `8a48e35becb2`
+subsequently added an initial recalc call that relies on that assignment to avoid
+zero-rate restore. Current upstream source contains the assignment. K071 should
+restore exactly that one line on top of K068's parent-enable control and drop
+K069's hardcoded `/2` override and all K070 logging.
+
+K070 showed black/off, then recovered cleanly to fully booted authorized
+LineageOS. Its instrumentation is preserved under `out/`, reverted from source,
+and the clean kernel rebuilt.
