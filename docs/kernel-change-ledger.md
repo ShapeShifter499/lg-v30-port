@@ -3450,3 +3450,36 @@ NEXT CANDIDATE K073 = K068 parent-enable + K072 init seed together: should
 give PLL lock (K072) AND RCG latch (K068). Class: K072 = debug-only as-is
 (instrumentation); the init-seed core is upstream-shaped once proven. Kernel
 reverted to clean b549c9f5b, patch preserved. Nothing pushed.
+
+### K073/K074 — parent-enable hangs; working-reference NOCACHE config staged (K074 UNTESTED)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+- K073 = K068 parent-enable + K072 seed. RAM-booted (Lance present/approved).
+  Panel BLACK (Lance visual). Userspace unreachable for dmesg; ramoops did NOT
+  survive the Power+VolDown hard reset (pulled stale #75 g86fbeea5b, not K073).
+  Conclusion: CLK_OPS_PARENT_ENABLE on byte0/pclk0 deadlocks once the PLL can
+  actually lock (its forced parent-prepare re-enters the PLL lock under clk
+  locks). Reject the parent-enable approach.
+- ROOT-CAUSE REFERENCE (dependency-tracker): the WORKING msm8998-mainline port
+  (/tmp/msm8998-mainline-linux-ref) uses on byte0_clk_src AND pclk0_clk_src:
+  `.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE` — NOT parent-enable.
+  Our stock 7.2 tree has plain CLK_SET_RATE_PARENT. That NOCACHE flag is the
+  proven-config difference.
+- CAPTURE FIX (initramfs, all future display tests): removed the sleep-15
+  mass_storage UDC re-bind that re-enumerated ACM+network and broke every
+  post-~15s dmesg pull this session. Init now serves dmesg on tcp/9600 and
+  clk/regulator diag on tcp/9601 persistently, no re-bind. New ramdisk
+  `out/initramfs-bringup-v2.cpio.gz`.
+- K074 (STAGED, UNTESTED — awaiting Lance boot approval): clean b549c9f5b +
+  K072 vco seed + CLK_GET_RATE_NOCACHE on byte0/pclk0 (working-ref config,
+  no parent-enable) + v2 capture init. Patch
+  `out/20260711-ember-k074-k072seed-plus-nocache.patch`; image
+  `out/boot-joan-20260711-ember-k074-nocache.img` sha256
+  `d31ae627b5bb...` (full hash beside image). Kernel tree reverted clean.
+- Status of the display: NOT working. Best-founded next test = K074. If K074
+  still black WITH clean dmesg, inspect: byte0/pclk0 live rates + RCG-update,
+  panel prepare (regulator enable + DSI cmd ACK), then compare enable ORDER
+  against the working ref's dsi_host clock sequence.

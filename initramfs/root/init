@@ -67,37 +67,31 @@ telnetd -l /bin/sh
     sleep 2
 done) &
 
-# --- diagnostic dump over a mass-storage LUN (survives broken
-# --- network/serial): write ground truth to a file, re-bind the
-# --- gadget with a mass_storage function backed by it.
+# --- Stable diagnostic servers. Do NOT re-bind the gadget: unbinding
+# --- the UDC re-enumerates ACM+network and breaks host-side capture.
+# --- Instead serve fresh dumps over the network on fixed ports; each
+# --- connection re-dumps and the loop re-listens for the whole boot.
 mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null
-sleep 15
-D=/dev/diag.bin
-{
-    echo "===WDT===";        cat /tmp/wdt.log
-    echo "===VERSION===";    cat /proc/version
-    echo "===CMDLINE===";    cat /proc/cmdline
-    echo "===UDC===";        ls /sys/class/udc
-    echo "===GADGETNET===";  echo "$NET"; ip addr
-    echo "===INTERRUPTS==="; cat /proc/interrupts
-    echo "===CLK===";        cat /sys/kernel/debug/clk/clk_summary
-    echo "===REGULATOR===";  cat /sys/kernel/debug/regulator/regulator_summary
-    echo "===DMESG===";      dmesg
-    echo "===END==="
-} > $D 2>&1
-# pad to a 512-byte multiple for the LUN
-sz=$(wc -c < $D); pad=$(( (512 - sz % 512) % 512 ))
-[ $pad -gt 0 ] && dd if=/dev/zero bs=1 count=$pad >> $D 2>/dev/null
-if mkdir $G/functions/mass_storage.0 2>/dev/null; then
-    echo $D > $G/functions/mass_storage.0/lun.0/file
-    echo 1 > $G/functions/mass_storage.0/lun.0/ro 2>/dev/null
-    ln -s $G/functions/mass_storage.0 $G/configs/c.1/
-    # re-bind so the new function enumerates
-    echo '' > $G/UDC
-    sleep 2
-    UDC=$(ls /sys/class/udc 2>/dev/null | head -n1)
-    [ -n "$UDC" ] && echo "$UDC" > $G/UDC
-fi
+
+# Port 9600: dmesg on demand (most important; served first, never
+# blocked by a potentially-hanging debugfs clock read).
+(while :; do dmesg > /tmp/dmesg.txt 2>&1; nc -l -p 9600 < /tmp/dmesg.txt; done) &
+
+# Port 9601: fuller diag (clk/regulator/interrupts). Reading
+# clk_summary can hang if a display clock is wedged, so this is a
+# separate server that must never block the dmesg one above.
+(while :; do
+    {
+        echo "===VERSION===";    cat /proc/version
+        echo "===CMDLINE===";    cat /proc/cmdline
+        echo "===GADGETNET===";  echo "$NET"; ip addr
+        echo "===INTERRUPTS==="; cat /proc/interrupts
+        echo "===CLK===";        cat /sys/kernel/debug/clk/clk_summary
+        echo "===REGULATOR===";  cat /sys/kernel/debug/regulator/regulator_summary
+        echo "===END==="
+    } > /tmp/diag.txt 2>&1
+    nc -l -p 9601 < /tmp/diag.txt
+done) &
 
 # Self-recover: reboot after 15 min unless /keep is touched (via a
 # live shell), so a dead-end boot never needs the power button.
