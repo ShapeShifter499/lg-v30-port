@@ -3688,3 +3688,38 @@ TE handling, and DSC config are the ground-truth reference for what our
 panel bringup is missing. Also Aurel's ranked follow-ups: DCS readback/BTA
 probe, TE wiring audit (downstream external TE on TLMM 10 vs mainline
 mdp_vsync_e).
+
+### K079 — edk2-style framebuffer inherit: black (2 fixable blockers found)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+edk2/Windows on joan use NO panel init — Silicon/QC/.../QcomPkg.dsc.inc sets
+`PcdMipiFrameBufferAddress|0x9d400000` (= our cont_splash_mem) and inherit
+the ABL-lit display. K079 tried the Linux equivalent: simple-framebuffer
+node @0x9d400000 (1440x2880, a8r8g8b8, stride 5760), &mdss disabled so the
+native driver can't tear it down, cmdline clk_ignore_unused pd_ignore_unused.
+Patch out/20260711-ember-k079-simplefb-inherit.patch; image
+out/boot-joan-20260711-ember-k079-simplefb-inherit.img sha256 67744915e9bc…;
+dmesg out/k079-dmesg-2026-07-11.txt.
+
+RESULT: fully black (Lance visual) — not even a frozen ABL image. TWO
+blockers, both fixable:
+1. `simple-framebuffer ...failed with error -22` — the node's `reg` points
+   into a no-map reserved region; simpledrm can't claim no-map memory that
+   way. FIX: use `memory-region = <&cont_splash_mem>` instead of reg (the
+   framebuffer binding supports it), or reserve the FB with a mappable
+   carveout.
+2. Panel lost power: the GPIO panel rails (vddio TLMM92, vpnl TLMM69) and
+   likely MMSS/DSI regulators get disabled at regulator_init_complete as
+   "unused" (clk_ignore_unused does NOT cover regulators), driving the
+   GPIOs low and cutting panel power. FIX: mark the whole display-chain
+   regulators `regulator-always-on` for the inherit build.
+
+So the inherit path is viable but needs: (a) memory-region FB binding, (b)
+always-on display regulators. Note: even fixed, a DSI CMD-mode panel may not
+show CPU writes unless ABL leaves the DPU auto-kicking frames — edk2's live
+UEFI implies it does, but unproven for our fastboot-boot handoff.
+
+Kernel reverted clean b549c9f5b; K078 (clocks) + K079 patches preserved.
