@@ -177,6 +177,21 @@ When opening a public PR or patch series, include:
   clock tree to 0 Hz, with repeated PLL-lock/vblank failures. It is rejected.
   Any follow-up must keep recalc pure and test an explicit nonzero init-time seed
   rather than copying current-upstream side effects out of their patch context.
+- K072's one-time initial VCO seed is a plausible source correction but must be
+  separated from instrumentation and reviewed against the current upstream PHY
+  initialization contract before publication.
+- K076 identified a real MSM8998 clock-topology gap: mainline parents the
+  byte-interface branch directly to `byte0_clk_src`, so the required half-rate
+  interface request rewrites the shared PHY output divider. Downstream models a
+  dedicated divider at `0x237c` (byte0) and `0x2380` (byte1). A clean mainline
+  representation of those divider clocks is a candidate for review after a
+  one-variable device test verifies both source and interface rates.
+- K077's skipped `byte_intf_clk` rate call is rejected debug-only evidence. It
+  fixed the main link rates but left the interface clock wrong and did not light
+  the panel; it must never appear in a public branch.
+- `accum_err=0` from the SW43402 write-only init helpers is not panel ACK or
+  readback evidence. Any public display-support claim still requires correct
+  clock topology, a validated panel communication path, and visible output.
 - Debug commits and saved experiment patches are valuable evidence but should be
   kept off a clean public PR branch.
 

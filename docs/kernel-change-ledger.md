@@ -3633,4 +3633,20 @@ Artifacts and hashes:
 - interrupted runner transcript `out/k077-ramboot-20260711T214307Z.log`;
 - manifest `out/k077-hashes.txt`.
 
-Kernel experiment tree remains dirty and uncommitted; nothing was pushed.
+At K077 evidence-capture time the kernel experiment tree remained dirty and
+uncommitted; nothing was pushed.
+
+### Post-K077 finalization — experiment reverted, handoff ready
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-11
+
+The complete dirty kernel diff was byte-compared with
+`out/20260711-aurel-k077-skip-byteintf-rate.patch` (SHA-256
+`e853b9aa5ee00fd99375559a1b44830d6ceed32b5357cd132b10fc06aee6bd2e`),
+then all five experimental source files were restored. The kernel tree is clean
+at `b549c9f5b32a42dfa4a100d33df804e8ed042287`, and the saved patch passes
+`git apply --check` against that baseline. `sha256sum -c out/k077-hashes.txt`
+passed for all seven recorded K077 artifacts. Current handoff:
+`docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.

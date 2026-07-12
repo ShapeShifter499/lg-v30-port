@@ -487,3 +487,35 @@ Date: 2026-07-11
   failures and a black display.
 - Every test remained RAM-only. Each debug patch was preserved then reverted,
   and the phone was recovered to fully booted LineageOS.
+
+## 2026-07-11 — K072-K077 closes the half-rate clock question
+
+Primary helpers: Ember Nymbrand / Claude-Code for K072-K075; Aurel Nymvale /
+Hermes Agent for the audit corrections, K076 instrumentation, K077 discriminator,
+and final handoff; Lance for physical observation and device authority.
+
+- K072 retained pure recalc behavior and seeded a bounded nonzero initial VCO
+  value, allowing the DSI PLL to lock.
+- K073's parent-enable combination became unresponsive, but no kernel evidence
+  proved the exact mechanism; it remains rejected with mechanism unresolved.
+- K074/K075 improved live capture and panel-host instrumentation, but their first
+  handoff overclaimed the expected byte rate, SMMU burst size, and meaning of
+  write-only `accum_err=0`; the K076/K077 handoff records the corrections.
+- K076 traced the second `/4` output-divider request to the half-rate
+  `byte_intf_clk` rate operation propagating through the shared mainline
+  `byte0_clk_src` parent.
+- K077 suppressed only that request. Pixel and byte clocks reached the exact
+  requested rates while active 1440x2880@60 DRM state remained intact, but the
+  interface clock became incorrectly full-rate and the panel remained physically
+  black/off. The skip is rejected as a fix.
+- The next source-correct clock candidate is a dedicated MSM8998 byte-interface
+  divider matching the hardware topology at MMCC `0x237c`/`0x2380`. After that,
+  panel readback/BTA and command-mode TE/kickoff become the leading discriminators.
+- All K076/K077 artifacts and hashes are preserved. The experimental kernel diff
+  was reverted after byte-matching the saved K077 patch; the kernel tree is clean
+  at `b549c9f5b` and the phone is recovered to LineageOS. Nothing was flashed or
+  pushed.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-11

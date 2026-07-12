@@ -26,7 +26,8 @@ partition.
 Full background: `docs/recon-2026-07-04.md`.
 Project history / attribution index: `docs/project-history-and-attribution.md`.
 Current Aurel → Ember display handoff:
-`docs/ember-handoff-2026-07-11-aurel-k068-k071-display.md`.
+`docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
+The earlier K068-K071 and Ember K072-K075 handoffs remain historical context.
 
 ## Repos and paths (the original maintainers' local layout)
 
@@ -139,26 +140,32 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
 ## Current status (2026-07-11)
 
 - **Latest checkpoint:** mainline reaches USB userspace, UFS/microSD, postmarketOS
-  headless operation, and DRM/fb0. M1-M3 are done; built-in display M4 remains
-  in progress. See `docs/aurel-handoff-2026-07-11-m4-display-next.md`.
+  headless operation, and active DRM/fb0 at 1440x2880@60. M1-M3 are done;
+  built-in display M4 remains in progress and physically black/off. See
+  `docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
 - K062's MSM8998 MDSS identity-domain policy removed the fatal display-SMMU
   handoff gate. K065 fixed the 10nm DSI VCO factor-of-two calculation, and K067
   added the real DSI VDD rail. DRM now maps a fresh framebuffer IOVA and active
   DMA0 latches it, ruling out stale boot-splash addressing as the leading
   post-DRM failure.
-- The remaining evidenced display blocker is the DSI PLL output-divider/MMCC
-  pclk0/byte0 RCG programming or takeover sequence. K068 confirmed a black/off
-  screen: parent-enabling the RCGs removes their update warnings but prepares the
-  PLL with stale divider state and causes lock/clock-balance failures. Downstream
-  Linux 4.4 explicitly programs the PLL output divider before locking it. K069
-  tested a narrow `/2` pre-lock override, but the final tree returned to `/4`
-  and the panel remained black. K070 instrumentation then found the real early
-  failure: correct saved divider state but `vco_current_rate=0`, caused by an
-  interaction between the VCO formula patch and upstream initial-rate handling.
-  K071 tested the one-line recalc state assignment, but it was worse: the final
-  DSI0 clock hierarchy collapsed to 0 Hz with repeated PLL failures. A future
-  test must keep recalc pure and seed a nonzero initial VCO value explicitly.
-- Phone is recovered to fully booted authorized LineageOS. Every K060-K071 test
+- K076 proved the late `/4` PLL output-divider rewrite is caused by the
+  half-rate `byte_intf_clk` request propagating through mainline's shared
+  `byte0_clk_src` parent. K077 suppressed that one request as a discriminator:
+  the main pixel/byte clocks became correct and DRM remained active, but the
+  interface clock was then incorrectly full-rate and the panel remained
+  physically black/off. The source-correct next clock change is to model the
+  dedicated MSM8998 byte-interface `/2` divider at MMCC register `0x237c`
+  (and byte1 at `0x2380`), not to retain K077's skip. Full-rate DSI clocks alone
+  are therefore insufficient; after the divider is represented correctly,
+  investigate panel readback/BTA and command-mode TE/kickoff behavior.
+- Historical path: K068 confirmed a black/off screen; parent-enabling the RCGs
+  removes their update warnings but prepares the PLL with stale divider state
+  and causes lock/clock-balance failures. K069's narrow `/2` pre-lock override
+  did not persist. K070 found correct saved divider state but
+  `vco_current_rate=0`. K071's recalc state assignment was worse and collapsed
+  the final DSI0 clock hierarchy to 0 Hz. K072's one-time seed later restored
+  PLL locking without that global recalc mutation.
+- Phone is recovered to fully booted authorized LineageOS. Every K060-K077 test
   was RAM-only `fastboot boot`; no partition was flashed. Kernel commits and
   documentation are local/unpushed.
 
