@@ -25,8 +25,8 @@ partition.
 
 Full background: `docs/recon-2026-07-04.md`.
 Project history / attribution index: `docs/project-history-and-attribution.md`.
-Current Aurel → Ember display handoff:
-`docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
+Current display handoff (both paths): `docs/ember-handoff-2026-07-11-k078-k079-display-two-paths.md`.
+Prior Aurel K076/K077 handoff: `docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
 The earlier K068-K071 and Ember K072-K075 handoffs remain historical context.
 
 ## Repos and paths (the original maintainers' local layout)
