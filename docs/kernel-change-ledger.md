@@ -3650,3 +3650,41 @@ at `b549c9f5b32a42dfa4a100d33df804e8ed042287`, and the saved patch passes
 `git apply --check` against that baseline. `sha256sum -c out/k077-hashes.txt`
 passed for all seven recorded K077 artifacts. Current handoff:
 `docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
+
+### K078 — byte-interface divider: DSI clocks now FULL-RATE and correct (source-correct fix)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-11
+
+Implements Aurel's K076/K077 recommendation: model msm8998's dedicated
+byte-interface hardware divider instead of parenting mdss_byte*_intf_clk
+straight to byte*_clk_src. Added mdss_byte0/1_intf_div_clk (clk_regmap_div,
+reg 0x237c/0x2380, width 2, parent byte0/1_clk_src, CLK_GET_RATE_NOCACHE),
+reparented the intf branches to them, +2 binding IDs (146/147). Modeled
+verbatim on mainline mmcc-sdm660.c. Register 0x237c confirmed for msm8998
+from downstream msm-clocks-hwio-8998.h (MMSS_MDSS_BYTE0_INTF_DIV=0x0237C).
+Patch out/20260711-ember-k078-byte-intf-divider.patch; image
+out/boot-joan-20260711-ember-k078-byte-intf-divider.img sha256
+7aeeec0d0a8c75ceddffd1fc810d2e2361422c1b930c193fa185f67505c0ef05;
+evidence out/k078-clk-2026-07-11.txt + out/k078-dmesg-2026-07-11.txt.
+
+VERIFIED (live clk_summary, one variable on clean b549c9f5b):
+- dsi0_pll_out_div_clk = 684.442 MHz (/2)  [was 342 MHz (/4)]
+- byte0_clk_src        = 85.555 MHz         [was 42.78 — now FULL RATE]
+- pclk0_clk_src        = 114.074 MHz        [was 57 — now FULL RATE]
+- mdss_byte0_intf_clk  = 42.778 MHz via the dedicated /2 divider (correct)
+- 0 PLL-lock failures, 0 vblank timeouts, fb0 up, DPU bound c994000.dsi.
+- rcg-didn't-update down 4->2; 10 bounded splash SMMU faults remain.
+- Panel STILL BLACK (Lance visual). Confirms Aurel K077: correct main +
+  interface clocks are necessary but NOT sufficient for visible output.
+- This is a clean, upstreamable fix (fixes a real mainline msm8998 mmcc bug
+  affecting every 8998 DSI board) — keep it as a commit regardless.
+
+NEXT: panel-side. Lance's lead — mine edk2-msm8998 (local
+~/vibe-coding-projects/coding/edk2-msm8998), which boots Windows on joan
+with a WORKING SW43402 display: its DSI/panel init sequence, command-mode/
+TE handling, and DSC config are the ground-truth reference for what our
+panel bringup is missing. Also Aurel's ranked follow-ups: DCS readback/BTA
+probe, TE wiring audit (downstream external TE on TLMM 10 vs mainline
+mdp_vsync_e).
