@@ -3940,3 +3940,35 @@ manual blank cycle.
 
 fbcon first-blit race is now the TOP M4-polish item — pmOS needs the
 console visible with zero bench intervention.
+
+### 2026-07-19 (cont.) — K087 instrumentation verdict + UNATTENDED pmOS boot-to-login
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+K087 (instrumented boot, reverted after): dirtyfb EXONERATED —
+needs_dirtyfb=1 on every commit and "dirtyfb flushing" continuously
+from t+1.74s. Damage flushes DO commit at boot. Live test on pmOS:
+text written to /dev/tty1 appears instantly (post-re-init session).
+
+REAL ROOT CAUSE (correlation across all boots): the pclk0
+"rcg didn't update its configuration" WARN fires ×2 on EVERY first
+enable and NEVER on re-inits; first session shows nothing (even
+all-pixels-on with DBV=0xFF confirmed latched), re-init session works
+fully. The RCG hardware never latches pixel-clock config in session 1
+(clk_summary bookkeeping lies) → no pixel stream despite healthy
+command path. Same territory as K068 (CLK_OPS_PARENT_ENABLE deadlock)
+and K074 (NOCACHE-alone insufficient). Kernel fix = NEXT SESSION's
+deep work; candidate directions: parent-PLL-running ordering in
+dsi_link_clk_set_rate_6g, shared-RCG parking, or post-enable re-latch.
+
+WORKAROUND (installed, verified): /etc/local.d/display-kick.start on
+the pmOS SD rootfs (OpenRC local service) — one fb0 blank/unblank at
+boot end. RESULT: full unattended fastboot-boot → OpenRC → display
+kicks itself → BOOT LOG + LOGIN PROMPT VISIBLE, zero intervention
+(Lance eyewitness ~12:05). rc-service local status = started, sshd up.
+
+pmOS on joan is now: power → visible login console. Next: RCG latch
+root-cause (obsoletes display-kick), laf-slot flash for cable-free
+boots, M5 wifi/BT.
