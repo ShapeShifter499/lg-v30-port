@@ -3791,3 +3791,127 @@ configs — keep saving one per build.
 
 Build: full rebuild (config restore) of Image.gz + dtbs on K078+K080
 committed tree + K081 applied. Image hash recorded below when packaged.
+
+### K080/K081 build COMPLETE + test image packaged (2026-07-19, post disk-cleanup)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Resumed after Lance freed disk (96% → 86%, 63G free). Pre-build checks:
+tree HEAD 4661cb86b (K080) on K078 3c9bab7f6; only dirty file =
+panel-lg-sw43402.c, diff verified byte-identical to
+out/20260719-ember-k081-dcs-readback-probe.patch; .config still the
+restored K068 snapshot (arm64, all Path A options =y), snapshotted as
+out/config-20260719-ember-k080-k081-te-retest.
+
+Build: make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j4 Image.gz dtbs
+— clean, zero warnings. joan DTB verified to contain K080 (gpio10 →
+mdp_vsync_a, 2 mA, pull-down in mdss-te-default-state; panel
+qcom,te-source = "mdp_vsync_p").
+
+Packaged via make-testimage.sh → out/boot-joan-mainline.img (16531456 B).
+  Image.gz sha256: e401fda22c7d1696f77cc5b0626d93076e3d10a988aafa62c316a1a6e5a58a3e
+  boot.img sha256: fa9f7441fecb7013cb95d88ff8d4e1a7935bdb1627d4a2a2e300a98999f9a63a
+
+NEXT: one tethered `fastboot boot out/boot-joan-mainline.img` with Lance.
+Read K081 probes in dmesg (telnet 172.16.42.1 after usb-if gets
+172.16.42.2/24): clean 0x0A/0x0F readbacks (~0x9C after display-on) =
+panel alive → remaining blocker is frame kickoff, K080 is the candidate
+fix; -ETIMEDOUT = panel not ACKing → init/reset/power problem, pivot to
+power-sequencing (or inherit path). No flashing this round.
+
+### K080/K081 TETHERED TEST RESULT (2026-07-19) — PANEL INIT CONFIRMED WORKING; pipeline likely fully alive, showing black
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Boot: fastboot boot OKAY (send 0.376s, boot 5.095s), gadget up t+4s
+("V30 mainline bring-up" 18d1:4e26). Ran 15:03 (my /keep touch over
+ttyACM0 did not land — first serial write before port settled; VERIFY
+with ls next time), ended by initramfs 15-min sysrq-b failsafe.
+Logs: out/tethered-test-k080-k081-te-retest-20260719T172232Z.log (boot
+dmesg), *-dmesg2-172552Z.log (t+~220s), out/diag-k080-k081-172357Z.txt
+(clk/regulator).
+
+FINDINGS, in evidence order:
+1. **K081 ANSWER = PANEL ACKS EVERYTHING.** post-sleep-out
+   get_power_mode=0x98; post-display-on 0x9C (=BSTON|NORON|DISON|SLPOUT,
+   the exact predicted value) + get_diagnostic=0x00. Init/reset/power
+   chain is SOLVED. Reproducible: full blank/unblank cycle re-ran init
+   with identical readbacks at t+249s.
+2. **Boot-time WARN ×2: "pclk0_clk_src: rcg didn't update its
+   configuration"** (clk-rcg2.c:136 update_config) during
+   dsi_link_clk_set_rate_6g ← msm_dsi_host_power_on, both from the
+   fbcon-takeover modeset (deferred_probe kworker + fbcon_init paths).
+   BUT: did NOT re-fire on the t+249s unblank modeset, and clk_summary
+   shows pclk0 chain latched+enabled at 114073706 Hz (byte0 85.5M,
+   intf_div 42.8M — K078 values all correct). Reads as a transient
+   first-configure race (PLL not yet spinning), not a standing blocker.
+3. **Frame kickoff APPEARS TO WORK (⇒ K080 TE fix likely CONFIRMED).**
+   The unblank enable-commit completed with NO pp_done timeout (cmd-mode
+   commit blocks on pp_tx_done, which needs TE routed correctly); the
+   only dpu error was the benign disabled-encoder wait on the blank
+   path. MDSS irq counters climb continuously (6103→6922 over ~60s,
+   dsi_isr 943→1060) with zero error spam. Phone is most plausibly
+   rendering a zeroed framebuffer = true black on OLED.
+4. **fbcon CANNOT DRAW: "fb0: sys_imageblit/sys_fillrect: framebuffer
+   is not in virtual address space"** — no vmap for the fbdev buffer, so
+   no Tux/console text ever hits the screen. BUT /dev/fb0 write path
+   WORKS: dd urandom 4MB → RC=0, ~26MB/s (should paint noise on top ~¼
+   of screen; Lance observation pending at reboot). → fbcon vmap issue
+   is now a THE candidate last-mile blocker for visible output.
+5. /sys/class/backlight/ EMPTY — brightness only via panel init DCS (or
+   not set at all). If dd noise was NOT visible despite frame
+   completion, prime suspects = brightness/DBV never programmed, or DSC
+   mismatch garbling to black.
+6. Known-tolerated: 2 TZ SMMU deferred-probe timeouts, unchanged.
+
+NEXT (ranked): (a) re-boot image + repeat dd-noise test w/ eyes on
+screen — visible noise = M4 pipeline DONE except fbcon vmap + init
+polish; (b) if invisible: audit sw43402 init for brightness (DCS 0x51
+/ DBV) + DSC PPS vs downstream; (c) fix fbdev vmap (likely
+CONFIG/msm_fbdev GEM vmap path) so fbcon works; (d) chase boot-time
+pclk0 RCG first-configure race (cosmetic if (a) succeeds).
+
+Ops notes: fastboot MUST run as root (sudo -n; sg-adbusers client hung
+LG aboot at "Sending" — wedge cleared by Lance via menu restart, no
+harm). android-udev installed + kumo02 → adbusers (announced). First
+attempt stuck 3min before kill; retry per runner pattern (90s cap,
+single client) worked instantly.
+
+### K082-K084 (2026-07-19, same session) — FIRST LIGHT: white screen from mainline; brightness gate found
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Iteration chain after the K081 "panel ACKs / still black" result:
+- K082: 2-byte DBV 0x1FF post-display-on → readback 0x0000, black. (Also:
+  serial echo-storm incident — host-side tty echo fed the phone shell its
+  own prompt; noise dd never ran. New tool scratchpad/serial-exec.py:
+  raw termios, no echo, drain-before-write, sentinel-bracketed output.)
+- K083: 1-byte DBV 0xFF (downstream bklt_dcs truncates to uchar) →
+  readback still 0x00, black. Conclusion: DBV writes were being GATED.
+- K084 discriminator: WRCTRLD 0x53=0x2C (std BCTRL|DD|BL) BEFORE 1-byte
+  DBV 0xFF + status battery + GET_SCANLINE ×2 + DCS 0x23 ALL PIXELS ON.
+  RESULTS: **0x52 readback = 0xFF — BCTRL bit was the gate all along**
+  (downstream init's 53=0x07 uses LG-custom bits; Android fixes it up
+  post-boot on stock). **Scanline moving (2815→1097) = panel actively
+  scanning.** Boot: thin horizontal lines flickered (uninit GRAM at full
+  brightness = FIRST MAINLINE PHOTONS) then black (DPU's zeroed frames —
+  correct rendering!). fb0 blank/unblank re-init → **FULL WHITE SCREEN**
+  (all-pixels-on active) — Lance eyewitness 2026-07-19 ~11:15.
+  M4 EMISSION PATH = CONFIRMED WORKING END TO END.
+- Also learned: /dev/fb0 writes don't reach the panel (no fbdev
+  dirty/flush path — GRAM keeps self-refreshing old content); a
+  blank/unblank modeset forces the push. Same root cause family as the
+  fbcon no-vmap issue.
+- K085 (building): drop the 0x23 override → panel shows real frame
+  content; noise test closes the last unproven link (data path).
+
+Remaining for real M4 close-out: fbdev vmap/damage fix (fbcon +
+/dev/fb0), proper backlight device exposing DBV (53=0x2C + 51 default
+in init as interim), DSC content verification, boot-time pclk0 RCG
+first-configure WARN (cosmetic).
