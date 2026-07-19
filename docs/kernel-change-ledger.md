@@ -3983,3 +3983,34 @@ update_config retry under CMD_ROOT_EN did not latch (WARN ×2 persists)
 → source PLL confirmed dead at first set_rate, not root gating. Patch
 in out/ (FAILED suffix). Next: PLL-enable-before-set_rate ordering in
 msm_dsi_host_power_on (see handoff ember-handoff-2026-07-19-aurel-first-light-k088.md).
+
+### K089-K092 (2026-07-19 evening) — RCG latch + brightness settle SOLVED & COMMITTED; session-1 content path = last gremlin
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+- K089 enable-before-set_rate: FAIL — PLL can't lock at reset rate
+  ("DSI PLL(0) lock failed", power_on aborts). Conclusive.
+- K090 NOCACHE + post-enable re-latch: WORKS (hw-true 114M/85.5M in
+  session 1; WARNs pre-enable only). NOTE: the "panic" seen on K088/K090
+  kicks was fbcon DISPLAYING WARN BACKTRACES — no panic ever occurred;
+  my NOCACHE-bus-fault theory was wrong (system ran 100s+ fine).
+- K091 rate-nudge relatch: FAIL — nudge propagates via SET_RATE_PARENT
+  into the LOCKED PLL → -EINVAL. Conclusive.
+- K092 = K090 relatch + 20ms DBV settle: ALL session-1 indicators green
+  first time ever (dbv=0xff, diag=0x40, clocks latched, no errors).
+  COMMITTED: `bff40d20b` (panel settle) + `6fa34eb57` (dsi re-latch +
+  mmcc CLK_GET_RATE_NOCACHE on byte0/1+pclk0/1), pushed. Probes rebased
+  → out/20260719-ember-k093-dcs-readback-probe-rebased2.patch (applied).
+- REMAINING (the last one): session-1 FRAME CONTENT still dark — noise
+  dd + dirtyfb flush shows nothing in session 1 (lines-glitch at init
+  proves emission live), same fb shows text after one blank/unblank.
+  All clock/brightness/panel state now session-identical → suspect DSI
+  ctrl/DPU register state programmed BEFORE the re-latch (timing/DSC
+  engine setup), or DPU fetch. NEXT: register-diff session 1 vs 2
+  (DSI ctrl + intf/pp/DSC blocks), or move the re-latch earlier /
+  reprogram dsi_timing after it. display-kick workaround still operative
+  and pmOS unattended boot unaffected. Ops: fastboot "Write to device
+  failed" mid-send with gadget appearing = phone left fastboot after a
+  successful boot; treat as success (extension cable slows the ACK).
