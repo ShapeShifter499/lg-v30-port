@@ -21,10 +21,31 @@ and DCO-signed by Lance.
 All kernel commits are authored and DCO-signed by Lance
 (`Signed-off-by: Lance <Gero3977@gmail.com>`). AI assistance is recorded
 per the kernel.org coding-assistant policy with `Assisted-by:` trailers
-naming the actual harness and model that did the work
-(`Claude-Code:claude-fable-5`, `Hermes:gpt-5.5`) — never `Co-Authored-By`,
-never an AI `Signed-off-by`. Docs carry `Written-by:` blocks naming the
-agent that wrote them; prior agents' attributions are never rewritten.
+naming the actual harness and model route that did the work
+(`Claude-Code:claude-fable-5`,
+`Hermes-Agent:openai-codex/gpt-5.6-sol`) — never `Co-Authored-By`, never
+an AI `Signed-off-by`. Docs carry `Written-by:` blocks naming the agent
+that wrote them; prior agents' attributions are never rewritten.
+
+### Historical Hermes Agent trailer normalization
+
+The provider-qualified Hermes Agent convention was adopted on 2026-07-19.
+Earlier Aurel/Hermes-assisted commits and documentation may use shorter or
+persona-bearing forms. Read those historical forms as follows:
+
+- `Hermes:gpt-5.4` means `Hermes-Agent:openai-codex/gpt-5.4`.
+- `Hermes:gpt-5.5` means `Hermes-Agent:openai-codex/gpt-5.5`.
+- `Hermes:gpt-5.6-sol` means
+  `Hermes-Agent:openai-codex/gpt-5.6-sol`.
+- `Aurel Nymvale <Hermes:gpt-5.5>` means
+  `Hermes-Agent:openai-codex/gpt-5.5`.
+- `Aurel Nymvale (Hermes-Agent:openai-codex/gpt-5.6-sol)` means
+  `Hermes-Agent:openai-codex/gpt-5.6-sol`.
+
+These mappings clarify attribution only. Existing commit objects and SHAs
+are intentionally preserved; no historical author, human DCO sign-off,
+content, or assistant-model claim is rewritten. New Hermes Agent-assisted
+commits use `Assisted-by: Hermes-Agent:<provider>/<model>`.
 
 ## Written new for this project
 
