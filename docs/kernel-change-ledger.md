@@ -4034,3 +4034,18 @@ Date: 2026-07-19
   session 1 vs session 2: DSI ctrl regs, PHY/PLL regs, DPU intf/pp/DSC
   blocks (Aurel K070-style readback instrumentation, or devmem in a
   fatter initramfs). display-kick workaround remains operative.
+
+### K095 (2026-07-19 night) — DSI TPG discriminator: DPU EXONERATED; bug = DSI ctrl/PHY HS engine
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+One-shot delayed-work TPG enable at t+8s in session 1 (patch
+out/20260719-ember-k095-tpg-probe.patch, reverted after): pattern
+BLACK despite SW trigger written and cmd-panel GRAM persistence.
+DSI-generated pixels bypass the DPU entirely ⇒ session-1 break is in
+the DSI controller/PHY HS pixel path. Prime suspect: ABL leaves DSI
+ctrl+PHY running; first enable inherits that state (sw_reset
+insufficient), our own disable/enable heals. Full analysis + next
+moves: docs/ember-handoff-2026-07-19-night2-dsi-ctrl-session1.md.
