@@ -4014,3 +4014,23 @@ Date: 2026-07-19
   and pmOS unattended boot unaffected. Ops: fastboot "Write to device
   failed" mid-send with gadget appearing = phone left fastboot after a
   successful boot; treat as success (extension cable slows the ACK).
+
+### K093-K094 (2026-07-19 late) — chvt + cold-rail-cycle discriminators: PANEL FULLY EXONERATED
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+- chvt 2/1 in session 1 (fbcon redraw via dirtyfb, no modeset): still
+  black (weak — atomic may dedup, but consistent).
+- K094: forced true rail cycle (vddio/vpnl off 80ms) before first init
+  to clear ABL-leftover panel state: probes all green (0x9C/0x40/0xff)
+  and STILL BLACK. Panel-side theories now ALL eliminated: power state,
+  init acceptance, brightness, emission (init glitch visible), TE.
+  Patch saved out/20260719-ember-k094-cold-rail-cycle-FAILED.patch,
+  reverted; k093 probe patch re-applied (tree = 6fa34eb57 + probes).
+- CONCLUSION: session-1 blocker is DPU/DSI/PHY enable-state (programmed
+  once vs re-programmed after a full disable). NEXT = register-diff of
+  session 1 vs session 2: DSI ctrl regs, PHY/PLL regs, DPU intf/pp/DSC
+  blocks (Aurel K070-style readback instrumentation, or devmem in a
+  fatter initramfs). display-kick workaround remains operative.
