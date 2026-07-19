@@ -3723,3 +3723,71 @@ show CPU writes unless ABL leaves the DPU auto-kicking frames — edk2's live
 UEFI implies it does, but unproven for our fastboot-boot handoff.
 
 Kernel reverted clean b549c9f5b; K078 (clocks) + K079 patches preserved.
+
+### K078-commit + K080 — TE wiring fix: te-source mdp_vsync_p + GPIO 10 mdp_vsync_a mux (UNTESTED, built)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Session pickup after 8 days idle; no interim work found (Deck #43 latest
+comment = Aurel 2026-07-12 K077 wrap-up; harness repo unchanged).
+
+1. K078 is now kernel commit `3c9bab7f6` ("clk: qcom: mmcc-msm8998: model
+   the DSI byte-interface dividers") on joan/latest-clean-test, exactly the
+   saved patch (out/20260711-ember-k078-byte-intf-divider.patch), per the
+   standing handoff recommendation.
+
+2. K080 = kernel commit `4661cb86b` ("arm64: dts: qcom: msm8998-lge-joan:
+   fix panel TE wiring") — implements Aurel's ranked follow-up #2 (TE audit),
+   which the K077/K078 evidence makes the top black-panel suspect for a
+   CMD-mode panel with correct clocks. Ground truth mined from downstream
+   (android_kernel_lge_msm8998):
+   - joan-common-panel.dtsi: qcom,platform-te-gpio = <&tlmm 10 0>;
+     qcom,mdss-dsi-te-pin-select = <1> (downstream doc: 1 = "TE through TE
+     gpio pin").
+   - joan-common-pinctrl.dtsi mdss_te_active/suspend: gpio10 muxed
+     function "mdp_vsync_a", 2 mA, pull-down.
+   - Downstream SDE defines MDP_VSYNC_SEL (0x414) but NEVER writes it →
+     vsync source select = reset default 0. Mainline dpu maps source 0 =
+     DPU_VSYNC_SOURCE_GPIO_0 = "mdp_vsync_p" (dpu_kms.c dpu_vsync_sources).
+   - Mainline joan DTS had "mdp_vsync_e" (= select 2) and NO mux for the TE
+     pin at all — DPU listening on the wrong vsync input, signal never
+     routed off the pad. Both wrong.
+   Fix follows the sdm845-lg-judyln / google-blueline pattern: tlmm state
+   mdss_te_default (gpio10, mdp_vsync_a, 2 mA, pull-down) referenced from
+   the panel node, qcom,te-source = "mdp_vsync_p". gpio10 is NOT in the
+   TZ-reserved ranges (<0 4> <49 4> <81 4>) — safe to touch.
+
+### K081 — DCS readback probe (bringup instrumentation, patch-only)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Aurel's ranked follow-up #1: bounded BTA readbacks in sw43402_prepare to
+distinguish "panel ACKs commands" from "host write success" (accum_err only
+proves the latter). Two probe points, dev_info only, never touch accum_err:
+- post-exit-sleep-mode: MIPI_DCS_GET_POWER_MODE (0x0A)
+- post-set-display-on: 0x0A + MIPI_DCS_GET_DIAGNOSTIC_RESULT (0x0F)
+Interpretation: clean 1-byte reads with sane bits (e.g. 0x9C after
+display-on = BSTON|NORON|DISON|SLPOUT) = panel alive + init accepted → the
+remaining blocker is frame kickoff (TE), exactly what K080 fixes. read
+failure (-ETIMEDOUT etc.) = panel not ACKing → init/reset/power problem,
+TE fix alone won't light it.
+Patch out/20260719-ember-k081-dcs-readback-probe.patch — instrumentation,
+NOT committed (debug discipline).
+
+INCIDENT (recoverable, recorded): first build attempt ran `make dtbs`
+without ARCH=arm64 → x86 oldconfig pass clobbered the tree .config (EOF
+answers). The pre-K080 bringup .config was lost (scratchpad backup caught
+the already-damaged file). RESTORED from harness snapshot
+out/config-20260711-aurel-k068-parent-enable-retest (arm64, ARCH_QCOM/
+DRM_MSM/DRM_PANEL_LG_SW43402/SCSI_UFS_QCOM/QMP_UFS/LLCC/OCMEM all =y,
+matches the Path A build spec); olddefconfig accepted it unchanged. Lesson
+already on file: always ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-.
+NOTE: config snapshots in out/ are the only durable record of build
+configs — keep saving one per build.
+
+Build: full rebuild (config restore) of Image.gz + dtbs on K078+K080
+committed tree + K081 applied. Image hash recorded below when packaged.
