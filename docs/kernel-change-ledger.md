@@ -3972,3 +3972,14 @@ kicks itself → BOOT LOG + LOGIN PROMPT VISIBLE, zero intervention
 pmOS on joan is now: power → visible login console. Next: RCG latch
 root-cause (obsoletes display-kick), laf-slot flash for cable-free
 boots, M5 wifi/BT.
+
+### K088 (2026-07-19) — RCG force-root-enable retry: FAILED, tree reverted
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+update_config retry under CMD_ROOT_EN did not latch (WARN ×2 persists)
+→ source PLL confirmed dead at first set_rate, not root gating. Patch
+in out/ (FAILED suffix). Next: PLL-enable-before-set_rate ordering in
+msm_dsi_host_power_on (see handoff ember-handoff-2026-07-19-aurel-first-light-k088.md).
