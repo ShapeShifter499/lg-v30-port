@@ -3915,3 +3915,28 @@ Remaining for real M4 close-out: fbdev vmap/damage fix (fbcon +
 /dev/fb0), proper backlight device exposing DBV (53=0x2C + 51 default
 in init as interim), DSC content verification, boot-time pclk0 RCG
 first-configure WARN (cosmetic).
+
+### 2026-07-19 — postmarketOS BOOTS TO VISIBLE LOGIN PROMPT on the joan panel
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-19
+
+Rebuilt the M3 pmOS boot image with the first-light kernel: unpacked
+out/boot-joan-pmos-ramdiskfix.img (scratch unpack-bootimg.py), kept
+pmOS ramdisk + cmdline (UUIDs match the existing SD rootfs), swapped
+in Image.gz-dtb @ 2b466d2f7+k086 probes → out/boot-joan-pmos-display.img
+(sha256 4cad3f2a…, kernel 15.6 MB, ramdisk_offset 0x02000000).
+
+fastboot boot → pmOS edge up, ssh OK, uname = 7.2.0-rc2-g2b466d2f744d
+#103. Screen blank at boot (fbcon FIRST-BLIT RACE strikes again — no
+userspace forced a redraw), one ssh'd `echo 4/0 > fb0/blank` cycle →
+FULL BOOT LOG + "Welcome to postmarketOS / lge-joan login:" prompt
+VISIBLE ON THE PANEL. Photo: NC Talk/Shared_AI_agents_files/
+20260719_114559.jpg (Lance). Nits seen on-screen: mmc0 "tuning
+execution failed: -5" (SDR104 tuning grumble, non-fatal), wireless
+interface absent (= M5), benign dpu disabled-encoder ERROR from the
+manual blank cycle.
+
+fbcon first-blit race is now the TOP M4-polish item — pmOS needs the
+console visible with zero bench intervention.
