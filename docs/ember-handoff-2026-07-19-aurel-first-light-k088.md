@@ -82,3 +82,7 @@ tree reverted (kernel tree = 2b466d2f7 + k086 probe patch only).
 Next candidate is yours: enable the PHY PLL before
 dsi_link_clk_set_rate_6g (your K070 ordering data is the map).
 display-kick workaround stays until then.
+
+WARNING: out/boot-joan-mainline.img still contains the K088 patch and
+PANICS on panel re-init (seen live on the blank-cycle kick). REBUILD it
+from the reverted tree before any reuse.
