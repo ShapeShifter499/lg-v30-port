@@ -4425,3 +4425,65 @@ STATE: phone still up in pmOS on the control image. Kernel tree clean at
 out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch — touch remains
 UNTESTED, and re-testing it is now cheap (DTB-only rebuild) and should
 be judged over ssh.
+
+### K102d (2026-07-20) — CORRECTION: touch DTS IS the cause; K102c's "panel is unreliable" is WITHDRAWN
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+Lance, who was watching the physical device: "it never booted with that
+message on screen." The "any key to shutdown" screen is a GENUINE
+failure indicator. K102c claimed the opposite. **K102c's panel-message
+finding is WITHDRAWN.**
+
+**How I got it wrong:** Lance's message "crash, 'any key to shutdown' —
+I said reboot before but the message is shutdown" was him CORRECTING the
+wording of the earlier touch-image failure. I read it as a new crash
+report about the control image, which was in flight at that moment.
+From that single misreading I inferred the control had crashed, then
+inferred a clean-tree regression (K102b), then — on finding the control
+actually running — inferred that the panel message must be unreliable
+(K102c). Two wrong conclusions from one misread message. The device
+owner's direct observation outranks my log inference; I should have
+asked which boot he meant.
+
+**CORRECTED SEQUENCE (uptime-verified):**
+  1. BOOT 1 = boot-joan-pmos-touch.img → **FAILED**, "any key to
+     shutdown" on panel. Lance rebooted.
+  2. Attempt 2 = control image, but fastboot hit the aboot wedge my
+     `timeout` kill caused (Protocol error). Never transferred. Lance
+     returned the phone to LOS.
+  3. BOOT 3 = boot-joan-pmos-A-control.img → **BOOTED CLEANLY, no
+     message.** fastboot `Booting OKAY` at host 05:30:15; phone
+     /proc/uptime 630 s at host 05:40:43 ⇒ boot at 05:30:13, continuous
+     since, no reboot. Live DT lacks i2c@c179000, confirming it is the
+     control (touch reverted) image.
+
+**⇒ THE K102 TOUCH DTS IS THE CAUSE OF THE BOOT FAILURE.** My original
+K102 hypothesis was right; K102b's exoneration of touch was wrong and is
+also withdrawn. The clean tree at 16e3950bf is fine — it is running now.
+
+**STILL VALID from K102c: the clean-tree display regression PASSES.**
+That result was measured directly on the live control-image system and
+does not depend on any of the above reasoning: 0 "replaying rcg config
+at enable", 0 "rcg didn't update its configuration", 0 display errors,
+`[drm] Initialized msm 1.13.0`, /dev/fb0 at 1440x2880, 2 WARNs (the
+known cosmetic clk-branch one). Evidence:
+out/k102b-clean-tree-regression-dmesg.log. K097's contamination caveat
+stays retired; K092 was not load-bearing.
+
+**NEXT (touch debug, now correctly scoped):** the fault is inside
+out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch. Bisect it, DTB
+only (seconds per rebuild), judged over ssh:
+  a. i2c5 enabled + touchscreen node, but `status = "disabled"` on the
+     node — isolates bus enable from the child.
+  b. node enabled, pinctrl-0 removed — `input-enable` in
+     touch_int_default is deprecated/possibly unhandled and is my top
+     suspect.
+  c. node enabled without the two GPIO fixed-regulators.
+  d. node enabled with the interrupt removed (polling) — tests whether
+     TLMM 125 is TZ-owned; our gpio-reserved-ranges list is empirical,
+     NOT exhaustive, and an XPU violation resets the SoC abruptly.
+SERIAL FIRST if any of these is ambiguous — we still have zero fault
+text from the failing boot (pstore empty, no SYSTEM_LAST_KMSG).
