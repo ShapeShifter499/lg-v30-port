@@ -4159,3 +4159,97 @@ Date: 2026-07-20
   survives the hang). GPU DTS work saved
   out/20260720-ember-k099-k100-gpu-enable-UNCOMMITTED.patch (keep for
   resume; do NOT commit — enables a wedging path).
+
+### K102 (2026-07-20) — CORRECTIONS to K099/K101 claims + touch bringup begins
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+Append-only corrections to my own earlier entries. Historical text above
+is left intact per handoff policy; where the two disagree, THIS entry is
+current. Prompted by Lance asking what the zap shader actually is and
+whether the phone's firmware vintage skewed it.
+
+**C1. "signed zap is address-locked" (K099) is FALSE.** The a540_zap
+LOAD segment carries QCOM_MDT_RELOCATABLE (bit 27; p_flags=0x08000007,
+read directly out of a540_zap.mdt), and mdt_loader.c explicitly
+relocates such segments to whatever mem_phys it is handed. The blob does
+NOT require 0x95c00000. Therefore the K099 memory-map surgery — moving
+gpu_mem 0x95600000 -> 0x95c00000, extending reserved@95215000
+0x3eb000 -> 0x4eb000, shrinking reserved@95800000 0x500000 -> 0x400000 —
+rests on a false premise. That churn is now itself a WEDGE SUSPECT and
+is the cheapest untried one-variable experiment: restore gpu_mem to
+0x95600000 and re-run the first-register-read discriminator. The comment
+carrying this wrong claim is still in
+out/20260720-ember-k099-k100-gpu-enable-UNCOMMITTED.patch; fix it before
+that patch is ever committed.
+
+**C2. "zap AUTHENTICATED" (K099) overclaims what was observed.** PAS
+returning 0 means TZ accepted the SIGNATURE. It does not mean secure
+mode was released. a5xx_gpu.c (~l.975) documents the failure we are
+almost certainly hitting: if the zap path is wrong, "access to the
+RBBM_SECVID_TRUST_CNTL register will be blocked and a permissions
+violation will soon follow". After auth the driver pushes
+CP_SET_SECURE_MODE through the ringbuffer and waits on a5xx_idle(); a
+GPU still owned by TZ hangs the bus there rather than erroring. This
+reframes "gpucc/SMMUs/firmware/zap-auth/GDSCs/clocks all healthy" — zap
+health was assumed, never measured. The instrumented dump must prove
+secure-mode release, not just auth return code.
+
+**C3. Firmware vintage is NOT the wedge (checked, read-only, via adb).**
+ro.vendor.build.fingerprint reads LG joan:8.0.0/OPR1.170623.026, but
+that is a LOS-preserved OEM string, not evidence of flashed firmware
+(ro.vendor.build.id = TQ1A.230105.001.A2 shows LOS rebuilt /vendor in
+Jan 2023). The tz/xbl/abl versions CANNOT be determined from the OS
+side: LOS strips the LG version props and /proc/cmdline carries no
+bootloader version. It does not matter — the zap we pulled is the one
+the RUNNING system uses against the RUNNING tz, and
+/sys/class/kgsl/kgsl-3d0/gpu_model = Adreno540v2 proves that pair drives
+the GPU under Android. Self-consistency is what matters and it is
+demonstrated. DO NOT "upgrade to Pie" to chase this: reflashing rewrites
+tz/xbl/abl/rpm/hyp (Lance's hard no-touch set), can disturb laf (our
+pmOS boot slot), and would invalidate K097, which is specifically a fix
+for how THIS abl hands off a live display pipeline.
+
+**C4. "Interconnect ruled out" (K101) is too broad.** Proven: no
+actionable mainline ICC provider exists for msm8998, so the usual
+`interconnects = ...` property cannot be added with the current tree.
+NOT proven: that the BIMC/NoC path is innocent in the bus wedge.
+
+**C5. 6fa34eb57 does not contain its claimed DSI post-enable re-latch.**
+git show --name-status lists only mmcc-msm8998.c; dsi_host.c is
+untouched and the live DSI host still has no second link_clk_set_rate()
+after enable. Cause was two unisolated Ember sessions mutating one
+worktree (full causality in
+out/reconstructed-20260720-ember-k092-k101/). Not an ancestor of the
+current clean line and must not be presented upstream as a verified
+fix. Credit to Aurel for catching this during the dropoff reconstruction.
+
+**K102 work — TOUCH (GUI track, GPU-independent):**
+- joan DTS had NO touch node at all; touch was unimplemented, not
+  misconfigured.
+- Identified from the running LOS phone (read-only, adb root):
+  controller = stm_ftm4@49 on i2c@c179000 = mainline blsp1_i2c5,
+  downstream driver lge_touch, compatible "stm,ftm4".
+  irq = TLMM 125 level-low, reset = TLMM 89, vdd = TLMM 85,
+  vio = TLMM 86, ta_detect = TLMM 91 (not wired up yet).
+  max_x/max_y = 0x59f/0xb3f => 1440x2880, matches the panel.
+  max_id = 10 fingers, max_pressure = 255, hw/sw reset delay = 10 ms.
+  fw_image = touch/joan/L0S59P1_1_11.ftb (.ftb = ST FingerTipS binary).
+- Mainline has no "stm,ftm4"; it has stmfts ("st,stmfts"), which speaks
+  the same FingerTipS command set (0x80 READ_INFO / 0x85 READ_ONE_EVENT
+  / 0xa0 SYSTEM_RESET / 0x91 SLEEP_OUT). stmfts loads NO firmware — the
+  controller keeps its own in flash, downstream only pushes .ftb for
+  updates — so a bare probe is a legitimate first try.
+- Added: blsp1_i2c5 enabled + touchscreen@49 "st,stmfts" node, two
+  GPIO-load-switch fixed regulators (touch_avdd TLMM 85 /
+  touch_vdd TLMM 86), touch_int/touch_reset pinctrl states, and
+  CONFIG_TOUCHSCREEN_STMFTS=y. DTB builds clean, node verified in
+  decompiled DTB (interrupts <0x7d 0x08>).
+- UNVERIFIED and flagged in the DTS comment: the mapping of downstream
+  vdd-gpio/vio-gpio onto stmfts's avdd/vdd is inferred from usual
+  FingerTipS wiring, and the rail voltages are nominal descriptors only
+  (these are GPIO load switches, not programmable regulators).
+- ZERO wedge risk: an i2c touch probe cannot hang the SoC. Test rides
+  along with the next normal display boot.
