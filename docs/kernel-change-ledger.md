@@ -4366,3 +4366,62 @@ environment is still sane. Other live candidates:
 Touch work preserved at
 out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch (kernel tree left
 CLEAN at 16e3950bf).
+
+### K102c (2026-07-20) — RETRACTION + THE CLEAN-TREE DISPLAY REGRESSION PASSES
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+**RETRACT K102b's leading hypothesis. The clean tree boots fine.**
+Lance reported the phone was still in pmOS. It is: usb-net came up
+(enp0s29u1u5), ssh works, and uname reports
+`7.2.0-rc2-g16e3950bf913-dirty #1 SMP PREEMPT Mon Jul 20 05:01:42 PDT
+2026` — i.e. the CONTROL image, built from the CLEAN tree at 16e3950bf.
+Live DT confirms which image: `/proc/device-tree/soc/i2c@c179000` is
+ABSENT, so this is boot-joan-pmos-A-control.img (touch DTS reverted).
+There is NO clean-tree regression. K102b's "the clean stack may not
+boot" is withdrawn.
+
+**ROOT CAUSE OF THE FALSE ALARM: the on-screen "any key to shutdown"
+message is NOT a reliable crash indicator on this device.** The control
+image displayed it and booted through to a fully working pmOS anyway.
+Given the long-standing fbcon first-blit/damage problems on this panel,
+on-glass text can be stale or misleading. **Judge boots over ssh/usb-net,
+not by looking at the panel.** It follows that BOOT 1 (the touch image)
+may also have booted fine — that is now UNKNOWN, not "crashed", and
+K102/K102b's crash framing for it is unproven.
+
+**CLEAN-TREE DISPLAY REGRESSION: PASS.** This is the test Aurel required
+before any publication-grade claim about K097, and it was run on the
+committed stack with NEITHER K092's clk-rcg replay hook NOR K093's panel
+probes compiled in. Evidence saved to
+out/k102b-clean-tree-regression-dmesg.log (514 lines). With a positive
+control on the grep pipeline (matched "Linux version": 1):
+  - "replaying rcg config at enable"        : 0 lines
+  - "rcg didn't update its configuration"   : 0 lines
+  - display-subsystem error/fail/timeout    : 0 lines
+  - `[drm] Initialized msm 1.13.0 for c901000.display-controller`
+  - `msm_dpu c901000.display-controller: [drm] fb0: msmdrmfb frame
+    buffer device`, /dev/fb0 present at 1440x2880
+  - total WARNING/BUG count: 2, the visible one being the known cosmetic
+    clk-branch.c:87 clk_branch_toggle (gcc_*_clkref stuck-at-on).
+⇒ **The MDSS BCR reset (K097) alone makes the first RCG update latch
+correctly. K092 was NOT load-bearing.** The contamination caveat on K097
+is retired; the pushed stack is independently verified for boot + DRM
+bring-up. NOT yet verified visually this boot (no eyes on glass) — the
+dmesg evidence covers clock/DRM/fb, not photons.
+
+**METHOD FAILURE WORTH RECORDING:** my first pass at this used `sudo
+dmesg` over a non-tty ssh. sudo failed ("a terminal is required"), the
+greps returned empty, and the `||` fallback printed "ABSENT (good)" for
+every marker — a false PASS. Caught only by adding a positive control.
+dmesg_restrict is 0 here so plain `dmesg` works. Never let an empty
+result stand in for a negative finding without proving the channel
+works first (cf. the ramoops/busybox lesson).
+
+STATE: phone still up in pmOS on the control image. Kernel tree clean at
+16e3950bf. Touch patch preserved at
+out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch — touch remains
+UNTESTED, and re-testing it is now cheap (DTB-only rebuild) and should
+be judged over ssh.
