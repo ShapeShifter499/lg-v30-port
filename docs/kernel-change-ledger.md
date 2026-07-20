@@ -4253,3 +4253,46 @@ fix. Credit to Aurel for catching this during the dropoff reconstruction.
   (these are GPIO load switches, not programmable regulators).
 - ZERO wedge risk: an i2c touch probe cannot hang the SoC. Test rides
   along with the next normal display boot.
+
+### K102 RESULT (2026-07-20) — touch image PANICS at boot; cause unknown, no capture
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+- Packaged out/boot-joan-pmos-touch.img (sha256 c64a74a053eb1f38…,
+  kernel sha efc5613de789…, ramdisk sha 32ae5cfca76d…) via the new
+  make-pmos-image.sh. `fastboot boot` → device showed "any key to
+  reboot"; Lance keyed it, phone recovered into LOS cleanly. NO DAMAGE.
+- **PACKAGING EXONERATED:** unpack_bootimg headers of the new image vs
+  the known-good boot-joan-pmos-display.img are IDENTICAL except
+  kernel_size (15593253 vs 15589982); ramdisk is byte-identical
+  (sha 32ae5cfca76d…, same UUIDs/cmdline). So the regression is the
+  kernel/DTB delta, not the repackaging.
+- **NO PANIC CAPTURED.** /sys/fs/pstore empty and no SYSTEM_LAST_KMSG in
+  /data/system/dropbox after the reboot (consistent with the earlier
+  finding that ramoops does not survive this reset path). No serial
+  adapter attached at the time, so blsp2_uart1 was unavailable. We are
+  flying blind on the actual fault — do NOT guess-and-reboot.
+- Delta under suspicion = K102 touch support ONLY (saved to
+  out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch): blsp1_i2c5
+  enabled + touchscreen@49 "st,stmfts", two GPIO-load-switch fixed
+  regulators (TLMM 85 avdd / 86 vdd), touch_int (gpio125) +
+  touch_reset (gpio89) pinctrl states, CONFIG_TOUCHSCREEN_STMFTS=y.
+  Kernel tree otherwise clean at 16e3950bf.
+- NEXT, in this order (each isolates ONE thing):
+  1. Attach serial and capture. Without a fault message every further
+     boot is a coin flip. This is the blocker, not the DTS.
+  2. Bisect the change cheaply: (a) DTS node in, driver OFF
+     (CONFIG_TOUCHSCREEN_STMFTS=n) — if it still panics the fault is in
+     the DT/pinctrl/regulator path, not stmfts probe; (b) driver on,
+     node removed — should boot, confirms baseline.
+  3. Specific suspects to examine while doing so: `input-enable` in
+     touch_int_default (deprecated/possibly unhandled in this pinctrl
+     version); TZ ownership of TLMM 125/89/85/86 (our
+     gpio-reserved-ranges = <0 4>,<49 4>,<81 4> was derived
+     empirically, is NOT exhaustive, and an XPU violation on a
+     TZ-owned pin resets the SoC exactly this abruptly).
+- REMINDER: the clean-tree display regression (retiring the K092/K093
+  contamination on K097) did NOT get tested — it was riding on this same
+  boot. Still outstanding.
