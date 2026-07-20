@@ -4049,3 +4049,34 @@ the DSI controller/PHY HS pixel path. Prime suspect: ABL leaves DSI
 ctrl+PHY running; first enable inherits that state (sw_reset
 insufficient), our own disable/enable heals. Full analysis + next
 moves: docs/ember-handoff-2026-07-19-night2-dsi-ctrl-session1.md.
+
+### K096-K097 (2026-07-20 session) — ROOT CAUSE FIXED: MDSS BCR reset at probe. M4 DISPLAY COMPLETE 🎉
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+- K096 (DSI host+PHY cycle at first pre_enable): still black — no
+  single-block cycle heals ⇒ cross-block inherited bootloader state
+  (continuous-splash handoff). Patch behavior reverted.
+- **K097 = THE FIX: `resets = <&mmcc MDSS_BCR>` on &mdss in the joan
+  DTS** — msm_mdss_reset() pulses the whole display complex to cold
+  silicon at probe (20ms assert), shedding ABL's live splash pipeline.
+  Commit `3395103aa`, pushed. VERIFIED: gadget image cold boot →
+  penguins + fbcon console, zero intervention; the boot-time RCG WARNs
+  are GONE too (clean silicon latches first try — 6fa34eb57's re-latch
+  is now defensive rather than load-bearing). Remaining boot WARN =
+  gcc_rx1_usb2_clkref (USB, pre-existing, unrelated).
+- **pmOS FINAL VALIDATION: display-kick RENAMED to .disabled on the SD
+  (not deleted), boot-joan-pmos-display.img rebuilt with the fixed
+  DTB → full cold pmOS boot VISIBLE end-to-end (penguins, OpenRC,
+  login prompt, blinking cursor, no crash) with NO workaround.**
+  Lance eyewitness 2026-07-20.
+
+M4 DISPLAY = DONE. Polish queue: proper backlight device (replace
+hardcoded DBV 0xff), FBINFO_VIRTFB flag, fbcon font choice, decide
+whether to keep 6fa34eb57 re-latch (harmless, defensive). Upstream
+candidates now: K078 dividers, K080 TE, 2b466d2f7+bff40d20b panel
+brightness, 3395103aa BCR reset (cleanest one — same pattern other
+boards use msm_mdss_reset for). NEXT MILESTONES: laf flash
+(cable-free pmOS boot), M5 wifi/BT.
