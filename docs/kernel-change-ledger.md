@@ -4124,3 +4124,38 @@ Lance priority: GUI + touch before laf/M5.
   stmfts, downstream msm8998-joan-touch-stm-ftm4.dtsi) is GPU-
   independent; Phosh-on-llvmpipe is a fallback GUI while GPU work
   continues.
+
+### K101 (2026-07-20 night) — GDSC-always-on test: WEDGES; GPU blocker is deeper. Interconnect ruled out (no 8998 provider)
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+- K101: forced gpu_cx + gpu_gx GDSCs ALWAYS_ON in gpucc-msm8998.c to
+  rule out GDSC power-sequencing. STILL WEDGES on first GPU register
+  read ⇒ GDSC sequencing is NOT the blocker. Reverted (hack).
+- Interconnect angle CHECKED + RULED OUT: 8996's working GPU node has
+  `interconnects = <&bimc MASTER_GRAPHICS_3D ...>`; ours lacks it — but
+  mainline msm8998.dtsi has NO interconnect provider node at all and no
+  msm8998 ICC driver exists (only QCOM_ICC_BWMON=m). Can't be added;
+  BIMC GPU path is instead clocked via GCC_BIMC_GFX/GPU_BIMC_GFX ("mem"/
+  "mem_iface", both present + enabled). Not the blocker we can touch.
+- Clock names verified COMPLETE vs a5xx driver needs: our node has
+  core(GFX3D)/iface/rbbmtimer/mem/mem_iface/rbcpr — nothing missing.
+- STATE: register-access wedge (full SoC bus hang, not a timeout) with
+  gpucc/SMMUs/firmware/zap-auth/GDSCs/clocks all healthy. Remaining
+  hypotheses ALL require live instrumentation the wedge itself denies:
+  (a) gfx3d RCG/gpupll0 never latches (pclk0-disease cousin — but can't
+  read clk_summary post-wedge); (b) GX rail needs CPR/higher V under
+  load (vddcx still dummy — no msm8998 CPR in mainline either); (c)
+  a540 GMU-less power-on sequence gap in mainline a5xx (never exercised
+  — no mainline board enables 8998 adreno). This is MULTI-SESSION
+  research, not a one-flag fix; each attempt costs a physical
+  Power+VolDown recovery.
+- RECOMMENDATION: pause GPU; pursue TOUCH (stmfts, GPU-independent) and/
+  or Phosh-on-llvmpipe for the GUI milestone. Resume GPU with Aurel +
+  proper pre-wedge instrumentation (dump gfx3d/gpupll0 + GDSC regs at
+  the LAST safe point before the register poke, over serial, so state
+  survives the hang). GPU DTS work saved
+  out/20260720-ember-k099-k100-gpu-enable-UNCOMMITTED.patch (keep for
+  resume; do NOT commit — enables a wedging path).
