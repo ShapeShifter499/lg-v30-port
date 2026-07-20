@@ -4080,3 +4080,47 @@ candidates now: K078 dividers, K080 TE, 2b466d2f7+bff40d20b panel
 brightness, 3395103aa BCR reset (cleanest one — same pattern other
 boards use msm_mdss_reset for). NEXT MILESTONES: laf flash
 (cable-free pmOS boot), M5 wifi/BT.
+
+### K098-K100 (2026-07-20 night) — GPU bringup arc: gpucc + both SMMUs healed, zap AUTHENTICATED, firmware complete; blocker = GPU power-up wedges SoC
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+Lance priority: GUI + touch before laf/M5.
+- K098: CONFIG_MSM_GPUCC_8998=y (was unset — root cause of BOTH ancient
+  SMMU deferred-probe failures). Result: adreno + cd00000 SMMUs probe
+  clean, zero deferred-probe timeouts. Config snapshot out/config-
+  20260720-ember-k098-gpucc. Display fix regression-checked (visible
+  boot; the on-screen "panic" = the single cosmetic gcc_rx1_usb2_clkref
+  WARN backtrace, system alive).
+- Firmware secured: a540_zap.mdt/.b00-.b02/.elf pulled from LOS
+  /system/vendor/firmware (adb root; THE files LOS itself used on this
+  unit — signature age concern addressed: same-era TZ, proven chain);
+  a530_pm4/a530_pfp from linux-firmware-qcom (host pkg installed,
+  announced); a540_gpmu.fw2 pulled from LOS system partition mounted RO
+  from the gadget shell (nc over usb-net). All in firmware/zap/ +
+  initramfs /lib/firmware/qcom/ (zap must be under qcom/ — bare-root
+  path fails with -2).
+- K099: joan DTS — gpu_mem MOVED 0x95600000→0x95c00000 (LG pil_ipa_gpu;
+  signed zap is address-locked), reserved@95215000 extended 0x3eb000→
+  0x4eb000 (covers vacated hole), reserved@95800000 shrunk 0x500000→
+  0x400000 (no overlap), &adreno_gpu enabled + zap-shader node.
+  RESULT: adreno probes/binds, all 4 firmware files load, **zap
+  accepted by TZ (no SCM errors)** — but reading debugfs dri/0/gpu
+  (first real GPU wakeup) HARD-WEDGES the SoC (net+serial dead, needs
+  Power+VolDown). 
+- K100: pm8005_s1 floor 524mV→988mV + vdd-supply=<&pm8005_s1> on gpu
+  node (binds — "supply vdd not found" gone): STILL WEDGES. Voltage
+  exonerated (at least as sole cause).
+- NEXT SUSPECTS (next session / Aurel): (1) gpucc GFX3D RCG/PLL chain
+  never latched-verified (same disease class as the pclk0 saga — check
+  gpucc PLL programming vs downstream); (2) a540-specific init the
+  mainline a5xx driver lacks (downstream ISENSE/LM/limits sequences);
+  (3) vddcx still dummy. Compare msm8996 a530 (works upstream) enable
+  path vs ours step by step. NOTE upstream msm8998 adreno node has
+  never been enabled by any mainline board — pioneering territory.
+- Parallel next-session option: touch bringup (STM FTM4 vs mainline
+  stmfts, downstream msm8998-joan-touch-stm-ftm4.dtsi) is GPU-
+  independent; Phosh-on-llvmpipe is a fallback GUI while GPU work
+  continues.
