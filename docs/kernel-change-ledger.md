@@ -4296,3 +4296,73 @@ Date: 2026-07-20
 - REMINDER: the clean-tree display regression (retiring the K092/K093
   contamination on K097) did NOT get tested — it was riding on this same
   boot. Still outstanding.
+
+### K102b (2026-07-20) — CONTROL ALSO PANICS: suspicion moves to the CLEAN TREE, not touch
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-20
+
+Two bounded RAM boots, both crashed. Phone recovered fine both times,
+no flashing, no damage.
+
+- BOOT 1 = out/boot-joan-pmos-touch.img (K102 touch DTS + stmfts=y).
+  CRASHED.
+- BOOT 2 = out/boot-joan-pmos-A-control.img (touch DTS REVERTED to
+  16e3950bf, stmfts still =y, same ramdisk). **ALSO CRASHED.**
+  ⇒ **THE TOUCH CHANGE IS NOT THE CAUSE.** K102's DTS is exonerated as
+  the trigger (it may still be wrong, but it is not what breaks boot).
+- On-screen message is **"any key to shutdown"** (Lance corrected an
+  earlier mis-report of "reboot").
+- **fastboot reported `Sending OKAY [0.589s]` / `Booting OKAY [5.093s]`**
+  ⇒ aboot ACCEPTED the image and jumped to the kernel. The failure is
+  KERNEL-SIDE (or very early kernel), NOT bootloader rejection and NOT
+  an image-format problem.
+- Packaging exonerated again: unpack_bootimg headers match the
+  known-good reference except kernel_size (ref 15589982, control
+  15592399 — both well under the 16 MiB aboot ramdisk-offset
+  threshold); ramdisk byte-identical (sha 32ae5cfca76d…).
+
+**LEADING HYPOTHESIS — this may be the clean-tree regression Aurel
+demanded we test.** The known-good out/boot-joan-pmos-display.img was
+built from the CONTAMINATED tree (2b466d2f7 + K086 probes, with K092's
+uncommitted clk-rcg replay hook and K093's panel probes compiled in).
+Both of tonight's images were built from the CLEAN tree at 16e3950bf
+with neither. If the clean committed stack genuinely cannot boot, then
+K097's display win cannot be credited to the pushed commits alone and
+K092 was load-bearing after all — which would contradict the K097 dmesg
+reading (no "replaying rcg config at enable" line appeared there).
+
+**DO NOT TREAT THAT AS ESTABLISHED.** The decisive control was NOT run:
+we never re-booted the known-good reference image tonight to prove the
+environment is still sane. Other live candidates:
+  - config delta, not source delta: Aurel's cleanup restored a pre-GPU
+    .config (CONFIG_MSM_GPUCC_8998=n) and I added
+    CONFIG_TOUCHSCREEN_STMFTS=y. Neither has been isolated.
+  - SD/rootfs state, or something else environmental.
+
+**NEXT SESSION, IN THIS ORDER:**
+  1. Boot out/boot-joan-pmos-display.img (known-good, sha
+     5a4eb091e307f56d…). If it boots ⇒ clean-tree regression is REAL and
+     is now the top priority. If it ALSO fails ⇒ environment changed and
+     every result from 2026-07-20 evening is suspect.
+  2. ATTACH SERIAL FIRST for anything beyond that. Three crashes with
+     zero fault text is the actual blocker. pstore/ramoops captured
+     NOTHING (empty /sys/fs/pstore, no SYSTEM_LAST_KMSG in
+     /data/system/dropbox) on this reset path.
+  3. Then bisect config vs source on the clean tree.
+
+**OPS LESSONS (both self-inflicted tonight):**
+  - NEVER wrap `fastboot boot` in `timeout`. Killing the client
+    mid-transfer wedges LG aboot at "Sending" (cost us one recovery).
+    Run it backgrounded instead so nothing can kill it mid-send.
+  - `pgrep -f` / `pkill -f` self-match: a pattern that appears in the
+    polling command's own argv matches itself. Hit this twice tonight —
+    once idling a chained job, once killing my own shell. Use `pgrep -x`
+    (exact name) or the harness task notifications instead.
+  - adb needed root after the device re-enumerated (kumo02's adbusers
+    membership is not active in this shell session).
+
+Touch work preserved at
+out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch (kernel tree left
+CLEAN at 16e3950bf).
