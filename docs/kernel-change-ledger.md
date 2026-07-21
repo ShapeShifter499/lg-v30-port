@@ -4487,3 +4487,114 @@ only (seconds per rebuild), judged over ssh:
      NOT exhaustive, and an XPU violation resets the SoC abruptly.
 SERIAL FIRST if any of these is ambiguous — we still have zero fault
 text from the failing boot (pstore empty, no SYSTEM_LAST_KMSG).
+
+### K103 (2026-07-21) — `input-enable` deletion restores boot; touch probe still fails
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Provider/preset: `moa/oops-all-chatgpt-all-max`
+Aggregator/acting model: `openai-codex:gpt-5.6-sol[reasoning=max]`
+Reference routes: 2 × `openai-codex:gpt-5.6-sol[reasoning=max]`
+Async delegation used for K103: none
+Date: 2026-07-21
+
+**Class/disposition:** bringup-local, diagnostic-only. The touch node is not an
+upstream candidate as tested because `stmfts_probe()` still fails and no touch
+input device registers. The canonical kernel tree was not modified.
+
+**Controlled source/artifact boundary:**
+
+- clean kernel checkpoint:
+  `16e3950bf9135070bd042ffc84e50e6ca7ebf468`;
+- logical touched source path in the saved patches:
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`;
+- K102 parent image:
+  `out/boot-joan-pmos-touch.img`
+  (`c64a74a053eb1f38ca83f98d801562526a7f7f8623013d1e1026df64f897177a`);
+- K103 image:
+  `out/boot-joan-pmos-k103-touch-no-input-enable.img`
+  (`ae1bb3541f666cfb4ca2c8ef58eb9d3866d99a2302e7dc9785cf65b59aa67dc0`);
+- K103 source-built DTB:
+  `914f9f660bd81f7026a475c07eef77087733b6c1ea140c56319c7cf43fba0594`;
+- clean-to-K103 patch:
+  `out/k103-aurel-touch-no-input-enable-20260721/20260721-aurel-k103-touch-no-input-enable-from-clean.patch`
+  (`c06e27ed3da6213d54c0ad862147a8e0ce0775d914d389e8d68be7b47bb22bb7`);
+- K102-to-K103 patch:
+  `out/k103-aurel-touch-no-input-enable-20260721/20260721-aurel-k103-k102-to-k103-touch-no-input-enable.patch`
+  (`dcf9670469191d53ccd5c02f5cc39bb0d1f8b0edf59ef54eb8f130162099e750`).
+
+The clean control DTB and archived K102 DTB reproduced exactly. Two independent
+K103 builds reproduced the same source-built DTB. Both patch routes passed
+`git apply --check`, and normalized DT comparison found exactly one semantic
+change:
+
+```diff
+-				input-enable;
+```
+
+K103 retained K102's compressed/decompressed kernel, ramdisk, command line,
+load addresses, and other Android header fields. Only the appended-DTB-derived
+kernel size and regenerated Android image ID changed. The parent packager
+round-tripped byte-for-byte. The earlier semantically equivalent `fdtput`
+prototype did not byte-reproduce from source and is preserved under explicit
+`SUPERSEDED-*` do-not-use names.
+
+**Single RAM-only run (`K103-20260721T163429Z`):** Lance confirmed physical
+presence, expected pmOS microSD, known-good LineageOS, and recovery readiness.
+One active `fastboot boot` client ran with no host timeout wrapper and no retry:
+
+```text
+Sending 'boot.img' (25796 KB)  OKAY [0.588s]
+Booting                       OKAY [5.100s]
+Finished. Total time: 5.702s
+FASTBOOT_BOOT_RC=0
+```
+
+pmOS USB `18d1:d001` appeared. SSH confirmed root source `/dev/mmcblk0p2`,
+boot ID `49cb55ea-194e-44fa-aa7e-3a5c1eec7c24`, and kernel identity
+`7.2.0-rc2-g16e3950bf913-dirty`. The `-dirty` suffix is baked into the earlier
+kernel artifact; the canonical kernel worktree remained clean at `16e3950bf`.
+Live DT inspection proved the tested `touch-int-default-state` lacked
+`input-enable`.
+
+**K103 boot discriminator: PASS.** In this controlled K102-to-K103 pair,
+deleting `input-enable` was sufficient to eliminate the observed K102 boot
+failure and reach continuous pmOS userspace. This one-way run does not prove
+the low-level failure mechanism, and K102 was not replayed for replication in
+this session.
+
+**K103 touch enablement: FAIL / unresolved.** The I2C/OF device at `0-0049`
+was instantiated and `stmfts_probe()` ran, but probe returned `-110`, unwound,
+and no `stmfts` input device registered. Do not call this a successful bind.
+Mainline `stmfts.c` has an explicit `-ETIMEDOUT` command-completion wait, but
+I2C, regulator, IRQ, or other lower layers may propagate the same errno. The
+exact command and stage remain unproven without instrumentation.
+
+A later snapshot showed `touch_vdd` and `touch_avdd` disabled and no IRQ 125
+listing. It was taken after failed-probe unwind and does not prove rail or IRQ
+state during probe. Joan downstream's four-byte `B6 00 28 80` reset and polled
+`0x85` event flow differ materially from mainline, but protocol mismatch,
+power/reset sequencing, and IRQ behavior remain hypotheses rather than proven
+causes or fixes. The device clock was unset and reported 1969; host UTC,
+uptime, and boot ID establish chronology.
+
+**Recovery/safety:** a graceful pmOS reboot returned the phone to authorized
+LineageOS (`18d1:4ee7`, known ADB serial, `sys.boot_completed=1`). Nothing was
+flashed. No second K103 run, `pmbootstrap`, push, or public write occurred.
+K101 remains quarantined.
+
+**Evidence:** successor handoff
+`docs/aurel-handoff-2026-07-21-k103-input-enable-discriminator.md`; finalized
+bundle `out/k103-aurel-touch-no-input-enable-20260721/`; final manifest
+`K103-FINAL-SHA256SUMS-20260721T163429Z` (46 verified entries):
+
+- manifest SHA-256:
+  `2823bd3c81ddf20a63c153327584d56d63fab77c3ae1a4a87026396acd4bfcc2`;
+- verification transcript SHA-256:
+  `610363a9b9a6b6c08b37bd1db5bb365b61d8a891655426a89f02eb756ebb0eea`.
+
+**Next diagnostic — document only, not run:** prepare a uniquely identified
+K104 instrumentation-only build. Log regulator/reset stages, every STMFTS
+command byte and I2C return, completion-wait boundaries, IRQ-handler entry, and
+raw event bytes. Do not combine protocol adaptation, IRQ changes, and DT
+changes in one experiment.

@@ -137,6 +137,26 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   `docs/public-upstreaming-plan.md`: clean topic commits, detailed rationale,
   verification evidence, no debug-only leftovers, and required trailers.
 
+## Latest status (2026-07-21)
+
+- **K103 boot discriminator: PASS.** A source-reproducible K102 derivative that
+  deletes only `touch-int-default-state/input-enable` completed one RAM-only,
+  no-timeout, no-retry `fastboot boot` and reached continuous postmarketOS
+  userspace from the microSD. In this controlled pair, the deletion was
+  sufficient to eliminate the observed K102 boot failure; the low-level
+  mechanism is not yet proven.
+- **Touch enablement: FAIL / unresolved.** The ST FingerTipS I2C/OF device was
+  instantiated and `stmfts_probe()` ran, but returned `-110`, unwound, and
+  registered no touch input device. The next step is an instrumentation-only
+  K104, not a combined protocol/IRQ/DT guess.
+- Full source/image provenance, transport evidence, inference boundaries, and
+  recovery state are in
+  [`docs/aurel-handoff-2026-07-21-k103-input-enable-discriminator.md`](docs/aurel-handoff-2026-07-21-k103-input-enable-discriminator.md).
+- The phone was gracefully recovered to fully booted authorized LineageOS.
+  Nothing was flashed or pushed. Do not rerun K103; K101 remains quarantined.
+
+The status below is retained as the 2026-07-11 historical snapshot.
+
 ## Current status (2026-07-11)
 
 - **Latest checkpoint:** mainline reaches USB userspace, UFS/microSD, postmarketOS

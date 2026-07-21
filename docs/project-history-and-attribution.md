@@ -519,3 +519,39 @@ and final handoff; Lance for physical observation and device authority.
 Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
+
+## 2026-07-21 — K102/K103 touch boot discriminator
+
+Primary helpers: Ember Nymbrand / Claude-Code for K102 and its corrected
+continuity record; Aurel Nymvale / Hermes Agent for the read-only continuity
+audit, source-reproducible K103 discriminator, single device run, and final
+handoff; Lance for physical observation, device authority, and recovery gate.
+
+- K102 added the Joan ST FingerTipS node and produced the observed boot failure.
+  Its final corrected account is K102d; the intermediate K102b/K102c
+  interpretations remain withdrawn history.
+- K103 inherited K102 and deleted exactly one normalized DT property,
+  `touch-int-default-state/input-enable`. Clean-control, K102, and K103 DTBs
+  were independently reproduced; both Git patch routes and image/header
+  provenance gates passed.
+- One RAM-only, unwrapped, no-retry K103 boot completed cleanly, reached pmOS
+  from `/dev/mmcblk0p2`, and proved the property absent in the live DT. In this
+  controlled pair, the deletion was sufficient to eliminate the observed K102
+  boot failure; this was not a replicated K102/K103 A/B/A sequence and does not
+  establish the low-level mechanism.
+- Touch remains nonfunctional. The I2C/OF client was instantiated and
+  `stmfts_probe()` ran, but returned `-110`, unwound, and registered no touch
+  input device. The exact timeout stage is unproven.
+- The next diagnostic is instrumentation-only: capture regulator/reset stages,
+  command opcodes and I2C returns, completion waits, IRQ entry, and raw event
+  bytes before changing protocol, IRQ configuration, or DT again.
+- The phone gracefully returned to authorized LineageOS. Nothing was flashed or
+  pushed. K101 remains quarantined.
+
+Successor handoff:
+`docs/aurel-handoff-2026-07-21-k103-input-enable-discriminator.md`.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Provider/preset: moa/oops-all-chatgpt-all-max
+Date: 2026-07-21
