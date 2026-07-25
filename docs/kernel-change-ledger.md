@@ -5090,3 +5090,89 @@ register write).
 
 **Evidence:** `out/k107-ember-int-enable-20260725/` — device dmesg, clean-to-K107
 patch. Nothing flashed. K101 remains quarantined.
+
+### K108 (2026-07-25) — coordinate and field decode corrected; M4 TOUCH COMPLETE
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k108-coord-decode.img`, SHA-256
+`d192c0475855e7498e5e98385b8ea790cb9e7396634ca97d83dad4a5b250b54f`. DTB
+unchanged from K104. Built nym-skyforge (26 s), booted nym-nest.
+
+**Problem from K107:** touch worked but reported X up to 3616 and Y up to 2964,
+against DT `touchscreen-size-x = 1440` / `-y = 2880`. The two axes overshot by
+different factors (~2.5x and ~1.03x), which ruled out a simple scale error and
+pointed at the bit-unpacking.
+
+**Cause:** mainline and joan's FTM4 pack the contact event differently.
+
+```
+mainline    x = event[1] | ((event[2] & 0x0f) << 8)
+            y = (event[2] >> 4) | (event[3] << 4)
+
+downstream  x = (data[1] << 4) | ((data[3] & 0xf0) >> 4)
+            y = (data[2] << 4) | (data[3] & 0x0f)
+```
+
+Mainline treats byte 2 as shared between the X MSB and the Y LSB. Downstream
+uses byte 3 to hold BOTH low nibbles, with bytes 1 and 2 as the X and Y high
+bytes. Decoding the captured contact `05 20 48 c4 3b 0a 32 39` both ways:
+mainline gives 2080/3140 (out of range), downstream gives 524/1156 (in range).
+
+The trailing fields differ too. Downstream reads `data[4]` as pressure,
+`data[5]` as orientation, `data[6]` as width and `data[7]` as height; mainline
+reads them as major/minor/orientation/area, so all four were misassigned.
+
+**Change:** adopt downstream's unpacking and field order in
+`stmfts_report_contact_event()`.
+
+**RESULT: VERIFIED ON HARDWARE.** Lance tapped the four corners, swiped
+corner-to-corner and used two fingers, while raw `/dev/input/event3` was
+captured (4792 event records, 115008 bytes):
+
+```
+X: 782 samples  min=28  max=1426   (declared 0..1440)
+Y: 820 samples  min=16  max=2872   (declared 0..2880)
+MT slots seen: [0, 1]
+tracking IDs:  0..11
+```
+
+Both axes now sit just inside the declared maxima — consistent with fingertips
+near but not exactly at the physical edge — with no overflow and no range
+compression. Two-finger multitouch reports on separate slots and contacts are
+tracked across lifts.
+
+**M4 TOUCH IS COMPLETE.** Full working delta from clean `16e3950bf`:
+
+1. **K103** — delete `input-enable` from `touch-int-default-state` (restores boot).
+2. **K104** — `bias-disable` -> `bias-pull-up` on gpio125 (INT line usable; this
+   was downstream's *suspend* state being applied as our active state).
+3. **K107** — downstream reset frame `B6 00 28 80`, poll `READ_ONE_EVENT`
+   (0x85) for CONTROLLER_READY, then write register 0x002C with `INT_ENABLE`
+   (0x48). The last of these is the root-cause fix: mainline never enables
+   controller-side interrupt generation, so the controller emitted its
+   unconditional power-on ready event and then went silent forever.
+4. **K108** — correct the contact-event bit layout and field order.
+
+**Remaining, in priority order:**
+
+1. **Upstreamability.** These changes are joan/FTM4-specific and are NOT in a
+   mainline-acceptable form as written. K104's DT fix is cleanly upstreamable on
+   its own. K107 and K108 change `stmfts` behaviour for all users of that driver
+   and need proper structuring — a variant/quirk flag, per-compatible ops, or a
+   separate driver. This is a design decision, not a bug fix, and should be
+   scoped with Lance before any submission.
+2. **Recurring controller error** `0f ba d0 00 c0 de` -> `error code:
+   0x0dec00d0ba` (payload spells BADC0DE), interleaved with `11` and `16 c1`
+   events roughly every 25-30 s. Touch is unaffected. Downstream has explicit
+   flash-corruption handling in `fts_wait_for_ready()` and ships firmware
+   `touch/joan/L0S59P1_1_11.ftb`. Not investigated.
+3. `read_system_info` parses `chip 0x0`; the 0x80 register layout likely also
+   differs. Cosmetic — nothing depends on it yet.
+4. The instrumentation (K10x `dev_info` tracepoints) must be stripped or
+   demoted before any upstream submission.
+
+**Evidence:** `out/k108-ember-coord-decode-20260725/` — clean-to-K108 patch and
+the raw captured touch-event dump. Nothing flashed. K101 remains quarantined.
