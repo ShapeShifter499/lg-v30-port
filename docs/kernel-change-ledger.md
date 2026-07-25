@@ -5430,3 +5430,58 @@ series still needs tidying before submission — commits `eb360a8e7` and
 `e24710303` introduce `st,ftm4` which `1fd88a1fc` then renames, which should
 be squashed rather than published as-is. Full series exported to
 `out/k111-ember-chipid-identity-20260725/joan-touch-fts3670-series.patch`.
+
+### K112 (2026-07-25) — touch series squashed and merged into `joan/latest-clean-test`
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+The five-commit `joan/touch-ftm4` branch contained rename churn — two commits
+introduced `st,ftm4` which a later one renamed to `st,fts3670` — which should
+not be published as a sequence. Rebuilt as four commits from `16e3950bf` on
+`joan/touch-fts3670`, then fast-forwarded into `joan/latest-clean-test`.
+
+**Clean series, upstream-ordered (independent fix, binding, driver, DTS):**
+
+```
+a62b4c3a3  Input: stmfts - fix error code formatting and rate-limit the warning
+78e4ec57b  dt-bindings: input: touchscreen: st,stmfts: add st,fts3670 compatible
+8baf1a854  Input: stmfts - add support for the FTS3670 variant
+323451cb6  arm64: dts: qcom: msm8998-lge-joan: add touchscreen
+```
+
+All four SSH-signed. `joan/latest-clean-test` is now at `323451cb6`.
+
+**Integrity check — the important part.** The squash was verified by tree
+hash, not by inspection:
+
+```
+verified HEAD tree (booted, hardware-tested)  4a9667cf4153f45352eae82157ad560c9c95291a
+squashed series tree                          4a9667cf4153f45352eae82157ad560c9c95291a
+merged joan/latest-clean-test tree            4a9667cf4153f45352eae82157ad560c9c95291a
+```
+
+Byte-identical. The code now on the main branch is exactly the code that was
+booted and verified on hardware in K108-K111; the rewrite changed only
+history, not content.
+
+Splitting the error-format fix from the variant work required reconstructing
+an intermediate `stmfts.c` (base plus only that hunk) rather than hunk-level
+staging, which is why the tree check matters — it is the only thing that
+proves the reconstruction was faithful.
+
+**Retained, NOT deleted, pending Lance's decision:**
+
+- branch `joan/touch-ftm4` at `1fd88a1fc` — the original pre-squash history;
+- tag `k112-verified` at `1fd88a1fc` — safety anchor on the hardware-tested
+  commit.
+
+Both are redundant now that the tree equality is proven, but they are the only
+record of the original sequence and are left in place under the standing
+never-delete-without-approval rule.
+
+**Not pushed.** `ghfork` still points at the old pre-cleanup line (see Aurel's
+2026-07-20 reconstruction); publishing the kernel branch needs a deliberate
+decision about the remote branch name and whether the old line is replaced.
+The harness repo `ghpub` is current.
