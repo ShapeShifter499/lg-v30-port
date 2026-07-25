@@ -5364,3 +5364,69 @@ eb360a8e7  dt-bindings: input: touchscreen: st,stmfts: add st,ftm4 compatible
 
 Not pushed — `ghfork` still points at the old pre-cleanup line and publishing
 needs a deliberate decision about branch naming.
+
+### K111 (2026-07-25) — chip identity read from hardware: `0x3670`; compatible renamed `st,fts3670`
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+**Purpose:** K109 left the compatible as `st,ftm4`, named after the vendor
+*driver family* rather than silicon, which is the weakest part of the series
+for upstream. `stmfts_read_system_info()` also reported `chip 0x0`, a value
+never actually read from the device. Both are resolved by reading the real
+identity.
+
+**How the vendor obtains identity** (neither uses `STMFTS_READ_INFO`):
+
+- chip ID: register read `B6 00 04`, 7 bytes; `fts_read_chip_id()` validates
+  `val[1] == FTS_ID0 (0x36)` and `val[2] == FTS_ID1 (0x70)`;
+- versions: `FLUSHBUFFER` (0xa1) then `RELEASEINFO` (0xaa), then poll
+  `READ_ONE_EVENT` (0x85) for events `0x14` (internal) and `0x15` (external).
+
+**Read from Lance's hardware:**
+
+```
+K111: chipid rc 2 raw 00 36 70 01 00 04 21 -> ID 3670
+K111: ev 14 01 03 21 04 01 00 00  -> INTERNAL fw 2104 config 0001
+K111: ev 15 01 0b 00 00 00 00 00  -> EXTERNAL main 010b build 0 major 1 minor 11
+K111: ev 1b ff 00 38 35 00 15 00
+K111: ev 1c 56 36 47 50 da 1d 00     (ASCII "V6GP", meaning unknown)
+```
+
+**Chip ID is `0x3670`**, matching the vendor's expected `FTS_ID0`/`FTS_ID1`
+pair. Reported firmware major 1 / minor 11 matches the vendor firmware image
+`touch/joan/L0S59P1_1_11.ftb`, corroborating the whole read path rather than
+one register.
+
+**First attempt returned nothing** — the poll broke on an empty FIFO because
+the threaded IRQ handler had already drained the release-info events. The
+vendor disables sensing and the interrupt across this sequence for exactly
+that reason; adding the same hold-off (and restoring state afterwards) made
+the events visible. Recorded because the failure looked like "the command
+did nothing" when in fact the data was being consumed by our own handler.
+
+**Changes:** compatible renamed `st,ftm4` -> `st,fts3670` across driver,
+binding and DTS; variant flags and helpers renamed to match;
+`stmfts_read_system_info()` routes to a variant identity path.
+
+**Verified on device:** driver binds via the new compatible, input device
+registers, and sysfs now reports
+
+```
+chip_id = 0x3670   chip_version = 1   fw_ver = 8452   config_version = 1
+```
+
+where it previously published `chip_id = 0x0`. The bogus-zero defect affects
+the generic path on any part that lacks `STMFTS_READ_INFO`, not only joan.
+
+**Naming caveat, stated plainly:** `0x3670` is proven; the *string*
+`fts3670` is a convention built on it. ST's marketing name for this part is
+unconfirmed and no datasheet was found. This is a much stronger basis than
+`ftm4` (a driver-family label) but is not the same as a documented part name.
+
+**Kernel branch `joan/touch-ftm4`** now carries five signed commits. The
+series still needs tidying before submission — commits `eb360a8e7` and
+`e24710303` introduce `st,ftm4` which `1fd88a1fc` then renames, which should
+be squashed rather than published as-is. Full series exported to
+`out/k111-ember-chipid-identity-20260725/joan-touch-fts3670-series.patch`.
