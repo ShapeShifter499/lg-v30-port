@@ -5313,3 +5313,54 @@ occurrence across K107, K108 and K109. If the log noise is ever worth
 addressing upstream, the honest change is to rate-limit or demote the warning
 for unrecognised subcodes — matching downstream — not to claim the code is
 decoded.
+
+### K110 (2026-07-25) — error-code format bug fixed; warning rate-limited; measured as costing no power
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k110-errfmt.img`, SHA-256
+`3d20d441badde5779bbcc9cfb16b95e2ae9ab71b5f1b86d9c331084d4966e232`.
+
+**Power question answered by measurement, not reasoning.** Over a 457 s boot:
+7 error events total (t=4.5, 4.9, 5.0, 10.3, 10.36, 10.41, 272.1) with a
+**262-second idle gap containing none**, and IRQ 71 at 600 counts dominated by
+real touch traffic. The error is a consequence of a wake, never a cause;
+nothing wakes the controller spuriously. **No power cost.**
+
+**A real bug found while investigating.** `stmfts_parse_events()` printed the
+error payload with `%x` per byte, which drops leading zeroes and concatenates
+what remains. The true payload `00 de c0 00 d0 ba` rendered as `0x0dec00d0ba`
+— two digits short, not obviously wrong, and useless for identifying an error.
+Fixed with `%02x`; the value now renders `0x00dec000d0ba`. This bug is not
+joan-specific and affects every stmfts user.
+
+The warning is additionally `dev_warn_ratelimited()`, since some variants emit
+an unrecognised status byte on every wake.
+
+**Verified on device:** format correct, driver binds, input device registers,
+touch functional. **The rate-limiter did NOT engage** — 6 lines spread over
+~6 s of boot is below the threshold. It is insurance against a worse-behaving
+part, not a fix for observed spam; the log volume was only ever conspicuous
+because we were watching during active testing.
+
+Kernel commit `1834cdd79` on branch `joan/touch-ftm4`, SSH-signed.
+
+#### Kernel-side history now exists
+
+The touch work had until now lived only as an uncommitted diff in a detached
+worktree. It is committed to `linux-mainline-v30` branch `joan/touch-ftm4`,
+based on the clean checkpoint `16e3950bf`, split upstream-style and all
+SSH-signed. Aurel's `joan/latest-clean-test` was NOT touched:
+
+```
+1834cdd79  Input: stmfts - fix error code formatting and rate-limit the warning
+0a37ce703  arm64: dts: qcom: msm8998-lge-joan: add touchscreen
+e24710303  Input: stmfts - add support for the FTM4 variant
+eb360a8e7  dt-bindings: input: touchscreen: st,stmfts: add st,ftm4 compatible
+16e3950bf  (clean checkpoint)
+```
+
+Not pushed — `ghfork` still points at the old pre-cleanup line and publishing
+needs a deliberate decision about branch naming.
