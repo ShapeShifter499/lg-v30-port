@@ -5485,3 +5485,69 @@ never-delete-without-approval rule.
 2026-07-20 reconstruction); publishing the kernel branch needs a deliberate
 decision about the remote branch name and whether the old line is replaced.
 The harness repo `ghpub` is current.
+
+### K113 (2026-07-25) — single public kernel branch established at `ghfork/joan/latest-clean-test`
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+Authorised-by: Lance — "one upstream branch that contains a history of all our
+edits and changes done for the public facing side", choice of method delegated.
+
+**Decision: `--force-with-lease` onto the existing branch name**, rather than
+publishing under a new name or opening a PR.
+
+**Why not a PR.** `github.com/ShapeShifter499/linux-lg-v30-joan` is standalone
+(no parent), has no CI and no external reviewer, and kernel upstreaming uses
+`git send-email` rather than pull requests, so a PR buys nothing here. Worse,
+the branches diverged at `bff40d20b`, so merging would have created a merge
+commit pulling `6fa34eb57` and `3395103aa` back in — reintroducing the exact
+commit the clean line was rebuilt to exclude, and leaving two commits claiming
+the same MDSS reset.
+
+**Why replacing the old line was safe and correct.** `6fa34eb57`'s subject
+claims a DSI post-enable re-latch that the commit does not contain
+(`dsi_host.c` untouched; MMCC NOCACHE flags only) — a split-brain artifact per
+Aurel's 2026-07-20 reconstruction. Leaving it published would keep a commit
+whose message misrepresents its contents in the permanent public record. The
+substantive work it was supposed to carry exists in the clean line as
+`16e3950bf`.
+
+Verified before pushing that nothing would be lost:
+
+```
+archive/joan-latest-clean-test-pre-cleanup-20260720  3395103aa
+ghfork/joan/latest-clean-test (pre-push)             3395103aa   -> identical
+```
+
+The pre-cleanup line is preserved locally in full. `--force-with-lease` was
+pinned to the expected value `3395103aa`; plain `--force` was not used.
+
+**Published result** — 21 commits, one coherent public history:
+
+```
+323451cb6  arm64: dts: qcom: msm8998-lge-joan: add touchscreen
+8baf1a854  Input: stmfts - add support for the FTS3670 variant
+78e4ec57b  dt-bindings: ... add st,fts3670 compatible
+a62b4c3a3  Input: stmfts - fix error code formatting and rate-limit
+16e3950bf  arm64: dts: qcom: msm8998-lge-joan: reset MDSS at probe
+bff40d20b  drm/panel/lg-sw43402: let the panel settle before latching
+2b466d2f7  drm/panel/lg-sw43402: enable brightness control after display-on
+4661cb86b  arm64: dts: qcom: msm8998-lge-joan: fix panel TE wiring
+3c9bab7f6  clk: qcom: mmcc-msm8998: model the DSI byte-interface dividers
+b549c9f5b  arm64: dts: qcom: msm8998-lge-joan: Add DSI VDD supply
+5306416d2  drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation
+7ff461605  iommu/arm-smmu-qcom: Add MSM8998 MDSS identity domain
+...
+```
+
+Confirmed via the GitHub API that the remote tip is `323451cb6` and that
+`6fa34eb57` is no longer an ancestor of the published branch.
+
+**Note:** only the four touch commits are SSH-signed; the earlier display work
+predates the signing key being available on this host and is unsigned. That is
+a historical fact, not something to retro-fix — re-signing would rewrite
+history a second time to cosmetic effect.
+
+**Retained locally, not deleted:** `archive/joan-latest-clean-test-pre-cleanup-20260720`,
+`joan/touch-ftm4` (pre-squash), `joan/touch-fts3670`, tag `k112-verified`.
