@@ -5977,3 +5977,93 @@ now. `greetd` also remains out of the default runlevel.
 
 Note that K100's earlier "988 mV did not help" conclusion was reached on a
 stack with **no firmware loaded**, so it does not rule the voltage fix out.
+
+### K117 addendum (2026-07-25) — desk analysis of the resume failure; two of my own suspects withdrawn
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+No device operations — Lance away; analysis only.
+
+**joan is the ONLY msm8998 board in mainline that enables the GPU.** Checked
+all twelve `msm8998-*.dts`: asus-novago, fxtec-pro1, hp-envy-x2,
+lenovo-miix-630, mtp, oneplus-cheeseburger, oneplus-dumpling, sony-yoshino
+(lilac/maple/poplar), xiaomi-sagit — none enable `adreno_gpu`. There is no
+working reference to copy. Anything we do here is first-of-its-kind, which
+also means no upstream user would regress if we get it wrong.
+
+#### WITHDRAWN: "vddcx not found" is not a defect
+
+`msm_gpu.c` requests both supplies optionally:
+
+```c
+gpu->gpu_cx = devm_regulator_get(&pdev->dev, "vddcx");
+if (IS_ERR(gpu->gpu_cx))
+	gpu->gpu_cx = NULL;
+```
+
+A missing `vddcx` is handled; the "using dummy regulator" line comes from the
+regulator core, not the driver. On msm8998 CX/MX are **power domains**
+(`power-domains = <&rpmpd RPMPD_VDDMX>`), which is exactly why they are not
+wired as supplies. **K114/K117 listing this as a blocker was wrong.**
+
+#### WITHDRAWN: "raise VDD_GFX to ~988 mV" has no evidential basis
+
+Downstream `msm8998-gpu.dtsi` power levels carry **no voltages at all**:
+
+```
+pwrlevel@0 650 MHz  bus 12      pwrlevel@4 251 MHz  bus 4
+pwrlevel@1 504 MHz  bus 11      pwrlevel@5 171 MHz  bus 3
+pwrlevel@2 403 MHz  bus 10      pwrlevel@6  27 MHz  bus 0
+pwrlevel@3 332 MHz  bus 7
+```
+
+Only `qcom,gpu-freq` and bus votes. VDD_GFX on msm8998 is **closed-loop CPR3**,
+decided by hardware at runtime and never expressed in DT, so there is no static
+table to copy. The 988 mV figure from K100 was a guess, and repeating it would
+be guessing again.
+
+Also relevant: the driver **never sets a voltage**. `enable_pwrrail()` only
+calls `regulator_enable()` on `vdd`/`vddcx`. The rail therefore sits wherever
+the DT constraints and hardware default leave it (observed 752000 uV), and
+`opp-level` in mainline's table drives the **VDDMX power domain**, not GFX.
+
+#### NEW LEAD — the GPU power domains, not the rail
+
+From the K114 pre-touch dump:
+
+```
+gpu_gx   off-0     (child of gpu_cx)
+gpu_cx   off-0
+```
+
+Both GPU GDSCs are off while suspended, which is correct — but resume must
+bring up `gpu_cx` then `gpu_gx`. `gcc_gpu_cfg_ahb_clk` is enabled, so the
+register *bus* is clocked while the block behind it is unpowered. A write to
+`REG_A5XX_GPMU_RBCCU_POWER_CNTL` against a powered-down GX domain fits the
+observed bus hang better than an under-volted-but-powered rail does.
+
+Note K101 already tried forcing both GDSCs `ALWAYS_ON` and it did not help —
+but **that was on a stack where firmware never loaded**, so like K100 it is not
+evidence about the current state.
+
+#### ALSO: the GPU has no OPP table and no interconnect
+
+The dump shows OPP entries only for display and genpd providers — **no
+`5000000.gpu` entry**. The interconnect summary is **empty**, while every
+downstream power level carries a `qcom,bus-freq` vote. On this SoC the GPU's
+BIMC/bus path is unrepresented in mainline, consistent with the July finding
+that there is no actionable 8998 ICC provider.
+
+#### REVISED NEXT STEPS (ordered, one variable each)
+
+1. **Instrument `a5xx_pm_resume` to log GDSC/genpd state immediately before the
+   first `gpu_write`.** Cheap, and distinguishes "domain never came up" from
+   "domain up but block unresponsive". This is now the highest-value test.
+2. Re-test K101's GDSC ALWAYS_ON **on the firmware-loading stack**, since its
+   original result is void.
+3. Only then consider voltage, and only with a rationale better than a guess.
+4. The missing GPU OPP table and absent interconnect are likely to matter for
+   anything beyond the minimum power level, but are not the immediate blocker.
+
+Standing safety: `WLR_RENDERER=pixman` in `/etc/environment` keeps a normal
+session off the GPU; `greetd` stays out of the default runlevel.
