@@ -5591,3 +5591,67 @@ never-delete rule, which was the right default at the time but became reflex
 once the underlying reason expired. Preservation decisions should be
 re-examined when the thing they protect against has been resolved, rather
 than inherited indefinitely.
+
+### PINNED (2026-07-25) — boot-time `clk_disable_unused` WARN on `gcc_rx1_usb2_clkref_clk`
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Priority: deferred until display, Phosh and GPU are working — **unless it is
+found to cause any of them to fail**, per Lance 2026-07-25.
+
+**Symptom, as seen on the panel during boot:** looks like a crash, boot
+continues to the login prompt.
+
+```
+[1.801280] clk: Disabling unused clocks
+[1.802248] ------------[ cut here ]------------
+[1.802341] gcc_rx1_usb2_clkref_clk status stuck at 'on'
+[1.802442] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x164/0x190
+           <register dump + Call trace>
+[1.805711] ---[ end trace 0000000000000000 ]---
+```
+
+It is a `WARN()`, not an oops or panic. `WARN` prints an identical register
+dump and call trace to a real crash, which is why it reads as one; the only
+textual difference is `WARNING` rather than `BUG`/`Oops`, and that boot
+continues.
+
+**CORRECTION — an earlier claim in this session was wrong.** I first said this
+was "a reference clock for a secondary USB2 PHY we don't use", inferred from
+the name `rx1_usb2` without checking. That is false. `msm8998.dtsi` declares:
+
+```dts
+qusb2phy: phy@c012000 {
+	clocks = <&gcc GCC_USB_PHY_CFG_AHB2PHY_CLK>,
+		 <&gcc GCC_RX1_USB2_CLKREF_CLK>;
+	clock-names = "cfg_ahb", "ref";
+};
+```
+
+It is the **reference clock of the USB2 PHY joan actually uses** — the one
+carrying the gadget network and every SSH session in this project. There is
+only one USB controller in mainline's msm8998 dtsi (`usb3: usb@a8f8800`), and
+joan runs it USB2-only with the USB3 PHY dropped.
+
+**Mechanism.** `clk_disable_unused` (a `late_initcall`) gates clocks that are
+on in hardware but have no *enabled* consumer; a DT reference does not count,
+only an actual `clk_prepare_enable()`. At t=1.80 the USB gadget has not been
+brought up — that happens later, from userspace in the initramfs — so nothing
+has claimed the clock. LG's bootloader left it running, Linux tried to tidy it
+away, the halt bit never cleared, and the poll gave up after 200 us.
+
+**The gating FAILING is what keeps USB working.** Had the hardware complied,
+the PHY would have lost its reference clock mid-boot.
+
+**Do NOT "fix" this by marking the branch non-gateable.** That was my first
+suggestion and it is wrong — it would silence a warning about a clock that is
+genuinely required. The real options are to leave it (harmless, and an honest
+report of bootloader state) or to have the PHY claim its clocks earlier so the
+clock is never considered orphaned.
+
+**Same family as the display problem:** LG's bootloader hands over with
+hardware already running, and mainline's cold-start assumption does not hold.
+That is precisely what the `MDSS_BCR` reset in K097 exists to handle.
+
+**Watch condition:** if display, Phosh or GPU bring-up fails in a way that
+touches USB, clocks or PHY reference state, revisit this first.
