@@ -5655,3 +5655,79 @@ That is precisely what the `MDSS_BCR` reset in K097 exists to handle.
 
 **Watch condition:** if display, Phosh or GPU bring-up fails in a way that
 touches USB, clocks or PHY reference state, revisit this first.
+
+### M6 (2026-07-25) — PHOSH RUNNING: graphical session on mainline, software-rendered
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+**A real graphical session is up on the device**, verified by Lance on glass:
+lock screen, swipe-to-unlock gesture, password prompt. Touch drives the UI, so
+the full path evdev -> libinput -> wlroots -> Phosh works, not merely the
+driver layer proven in K108.
+
+**No reflash was needed.** The existing pmOS edge rootfs took the UI in place:
+`apk add postmarketos-ui-phosh` (723 packages) over a temporary NAT through
+nym-nest. `postmarketos-ui-console` was swapped out. pmbootstrap chroots were
+never recreated and the SD card was never rewritten.
+
+**Five distinct blockers, each diagnosed rather than guessed:**
+
+1. **`mesa-dri-gallium` was not installed.** Only the Mesa API libraries were
+   present; no DRI drivers at all. Installing it provides `swrast_dri.so`
+   (llvmpipe) **and** `msm_dri.so` (freedreno, needed later for Adreno).
+   The joan device package declares no GPU/mesa dependency — arguably a gap in
+   `device-lge-joan` worth fixing upstream in pmaports.
+2. **No seat.** `elogind` service stopped and `seatd` absent, so libseat had
+   neither backend; `phoc` failed with "No backend was able to open a seat".
+   Fixed by installing `seatd`, adding it to the default runlevel, and putting
+   `greetd`/`user` in the `seat` group. udev tagging was already correct
+   (`card0` carries `master-of-seat`).
+3. **Mesa loaded freedreno on a GPU-less device.** Because the DRM driver is
+   named `msm`, Mesa selects `msm_dri.so` and calls `fd_pipe_new2`/`get_param`,
+   which fail with `-6 (No such device or address)` — dmesg confirms
+   `msm_dpu: no GPU device was found`. **`LIBGL_ALWAYS_SOFTWARE=1` does NOT
+   help**, because the GBM/EGL device is still `msm`. The fix is
+   **`WLR_RENDERER=pixman`**, a pure-CPU 2D renderer that bypasses EGL/GL
+   entirely. This is the key finding for any GPU-less msm device.
+4. **The `phrog` greeter starts, paints, then exits without creating a
+   session** (`greetd: check_children: greeter exited without creating a
+   session`). Bypassed with greetd `[initial_session]` auto-login into
+   `phosh-session`. **Unresolved — a real bug.**
+5. **`/run/user/10000` was never created**, because greetd's PAM stack is not
+   invoking `pam_elogind`. Created by hand for now. `gnome-session` reports the
+   same root cause: "Could not get session path for session. Check that logind
+   is properly installed and pam_systemd is getting used at login."
+
+**Performance:** slow, as expected. llvmpipe rasterises 1440x2880 (4.1 MP)
+entirely on a 2017 CPU with no acceleration. This quantifies the value of the
+Adreno 540 work rather than leaving it hypothetical.
+
+#### TWO NEW BUGS FOUND (pinned)
+
+**A. `pm8941_pwrkey` exposes no `EV_KEY`.** `evtest` reports only
+`Event type 0 (EV_SYN)` for the power key. There is therefore **no hardware
+wake button**: once the compositor DPMS-blanks the panel
+(`card0-DSI-1: enabled=disabled dpms=Off`) nothing can wake it, and touch does
+not qualify as a wake source. The display itself is fine — a compositor
+restart re-modesets it to `dpms=On`. This is a DTS/driver issue on our side,
+not a display fault.
+
+**B. No logind session.** Breaks `/run/user` creation, idle/wake policy and
+session tracking together. Same root cause as blocker 5.
+
+**Workaround applied:** system-wide dconf defaults in
+`/etc/dconf/db/local.d/00-no-blank` set `idle-delay=0`, `lock-enabled=false`
+and both power `sleep-inactive-*-type='nothing'`, so the panel never blanks.
+Per-session `gsettings` did NOT survive a session restart; the dconf system db
+does.
+
+**NOT persistent yet.** The session was launched by hand and `/run/user/10000`
+created manually. A clean boot will not reach Phosh until greetd PAM/elogind
+is fixed. The session is proven, not productionised.
+
+**Next:** Adreno 540 (K098-K101 arc — hard-wedged the SoC on first GPU
+register read, needs the instrumented approach), then battery/charging
+(`CHARGER_QCOM_SMB2` plus a DTS enable; the `pmi8998_charger` node already
+exists in `pmi8998.dtsi`), then the power-key and logind bugs above.
