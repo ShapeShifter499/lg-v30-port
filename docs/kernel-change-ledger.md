@@ -5267,3 +5267,49 @@ patch, and a decision on whether this belongs in `stmfts` at all versus a
 distinct driver. That is a design conversation, not a code change.
 
 **Evidence:** `out/k109-ember-variant-refactor-20260725/`.
+
+#### K109 addendum (2026-07-25) — the `0x0dec00d0ba` error event is BENIGN; downgraded from open defect
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+
+Recurring `stmfts 0-0049: error code: 0x0dec00d0ba` was carried as an open item
+from K107. It is now understood and **closed as benign**.
+
+The raw event is `0f ba d0 00 c0 de 00 00`: `EVENTID_ERROR` (0x0f) with subcode
+`0xba`. Mainline's warning prints bytes 6..1 unpadded, which is why the value
+renders as `0x0dec00d0ba` rather than showing the byte order plainly.
+
+**It is not periodic — it is sleep/wake correlated.** Mainline deliberately
+sleeps the controller at the end of `stmfts_power_on()`:
+
+```c
+/* At this point no one is using the touchscreen
+ * and I don't really care about the return value */
+(void)i2c_smbus_write_byte(sdata->client, STMFTS_SLEEP_IN);
+```
+
+Each wake then emits the triplet `11` (`SLEEP_OUT_CONTROLLER_READY`) ->
+`16 c1` (`STATUS`) -> `0f ba ...` (`ERROR`). Timestamps confirm this: a cluster
+at t=9.8-9.98 during boot settling, then nothing until t=86 and t=124, which
+are precisely when Lance was touching the panel — the t=124.189 error follows
+touch events at t=124.16-124.18.
+
+**Downstream ignores the same event.** `ftm4_ts.c` decodes only subcodes `0x03`
+(`EVENTID_ERROR_FLASH_CORRUPTION`), `0x08` (auto-tune failure, mutual vs self
+per `data[2]`) and `0x09` (detect SYNC failure). Subcode `0xba` falls through to
+a bare `break`. Android therefore observes the identical event and logs nothing.
+The difference between "LineageOS is fine" and "mainline spams errors" is
+logging verbosity alone, not behaviour.
+
+**What is NOT established:** the meaning of subcode `0xba`. It appears in no
+downstream header, and the payload `ba d0 00 c0 de` reads as a magic marker
+rather than a structured code, suggesting an unspecified internal condition.
+Determining it properly would need ST documentation we do not have. No meaning
+is invented here.
+
+**Disposition:** benign. Touch has functioned correctly through every
+occurrence across K107, K108 and K109. If the log noise is ever worth
+addressing upstream, the honest change is to rate-limit or demote the warning
+for unrecognised subcodes — matching downstream — not to claim the code is
+decoded.
