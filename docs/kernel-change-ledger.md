@@ -4897,3 +4897,83 @@ logs plus the successful nym-nest run.
 Nothing was flashed. K101 remains quarantined. The sealed K103 bundle was not
 altered. The phone was left in the RAM-booted pmOS image; it returns to
 LineageOS on a power cycle.
+
+### K105 (2026-07-25) — skipping SYSTEM_RESET does not help: mainline's single-byte command protocol is incompatible with joan's FTM4
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+**Class/disposition:** bringup-local, diagnostic. Executed from nym-nest
+(EHCI), transport clean: `Sending OKAY [0.596s]`, `Booting OKAY [5.096s]`.
+DTB unchanged from K104, so `bias-pull-up` is retained and this is a
+single-variable driver-only test. Image
+`out/boot-joan-pmos-k105-skip-sysreset.img`, SHA-256
+`6bd550c99529298065fd73b0211168c9a1cab894f579ecd9f38c80c5ebecbdc8`.
+Incremental rebuild: 26 s, 2 files.
+
+**Change:** in `stmfts_configure()`, skip `STMFTS_SYSTEM_RESET` (0xa0) and
+issue `STMFTS_SLEEP_OUT` (0x91) first. Instrumentation retagged K104 -> K105.
+
+**Result: NEGATIVE. `SLEEP_OUT` is also unanswered.**
+
+```
+[1.179675] K105: read_system_info ret 0, chip 0x0 fw 0x100
+[1.179859] K105: irq 71 entered
+[1.186486] K105: events 10 00 00 00 00 01 00 00
+[1.239093] K105: skipping system reset 0xa0
+[1.239255] K105: cmd 0x91 write ret 0
+[1.239271] K105: cmd 0x91 wait enter
+[2.271216] K105: cmd 0x91 wait exit, 0 left
+[2.271277] K105: configure ret -110
+```
+
+Exactly one `irq 71 entered` in the whole boot, as in K104. No touch input
+device registered (`/proc/bus/input/devices` shows only pwrkey, resin,
+Volume up).
+
+**This eliminates the "only 0xa0 is wrong" hypothesis from the K104 entry.**
+The controller answers no mainline command.
+
+**ROOT CAUSE ESTABLISHED — command frame width.** Splitting the observed
+behaviour by direction:
+
+- **reads WORK:** `stmfts_read_system_info()` (`i2c_smbus_read_i2c_block_data`,
+  reg 0x80, 8 bytes) returns 0; `stmfts_read_events()` (`i2c_transfer`, write
+  `STMFTS_READ_ALL_EVENT` then block-read) returns a well-formed event.
+- **the event FORMAT matches mainline:** `10 00 00 00 00 01 00 00`, and 0x10 is
+  `STMFTS_EV_CONTROLLER_READY` in mainline's own enum.
+- **single-byte commands are IGNORED:** both 0xa0 and 0x91 return 0 from
+  `i2c_smbus_write_byte()` (so the bus transfer itself succeeds) and produce no
+  event, no IRQ, no response.
+
+Downstream (`drivers/input/touchscreen/stm/ftm4_pdc.c`) writes **multi-byte
+command frames** via `fts_write_reg(info, buf, len)` — e.g.
+`{0xB0,0x03,0x60,0xFB}` (4), `{0xA7,0x01,0x00}` (3), `{0xB2,0x00,0x62,0x02}`
+(4), `{0xD0,0x00,0x00,0xD0,0x00,0x00}` (6). Mainline `stmfts_command()` sends a
+single byte. The controller discards incomplete frames, which reproduces every
+observation exactly.
+
+Corroborating: `read_system_info` succeeds but parses `chip 0x0`. The 0x80
+register layout also differs from mainline's expectation, independent of the
+command-width problem.
+
+**Conclusion: mainline `stmfts` is not a compatible driver for joan's FTM4 as
+written.** The electrical/DT layer (rails, reset, I2C, INT/IRQ) is correct and
+finished as of K104. What remains is a protocol implementation, not a DT or
+wiring fix.
+
+**Active downstream driver** for this panel is LGE's
+`drivers/input/touchscreen/lge/stm/touch_ftm4.c` (DTS `compatible = "stm,ftm4"`,
+node `stm_ftm4@49`); ST's own `ftm4_fts@49` node is `status = "disabled"`.
+
+**K106 direction (scoping, not yet decided):** extend `stmfts` with multi-byte
+command writes and the FTM4 register map, or write a joan-specific driver
+modelled on downstream. Either is materially larger than K102-K105 and should
+be scoped with Lance before implementation. Do NOT continue single-variable DT
+experiments; that layer is done.
+
+**Evidence:** `out/k105-ember-skip-sysreset-20260725/` — device dmesg (526
+lines), transport log, clean-to-K105 patch, manifest
+`K105-SHA256SUMS-20260725`. Nothing flashed. K101 remains quarantined. Phone
+left in RAM-booted pmOS; returns to LineageOS on power cycle.
