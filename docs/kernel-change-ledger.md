@@ -5731,3 +5731,110 @@ is fixed. The session is proven, not productionised.
 register read, needs the instrumented approach), then battery/charging
 (`CHARGER_QCOM_SMB2` plus a DTS enable; the `pmi8998_charger` node already
 exists in `pmi8998.dtsi`), then the power-key and logind bugs above.
+
+### K114 (2026-07-25) — GPU enabled safely; wedge trigger identified; firmware never loads
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k114-gpu-diag.img`, SHA-256
+`3966e6857aa623000da7b48eaf787bd14758df07a88ff4693ee73ff64d5e57de`.
+`CONFIG_MSM_GPUCC_8998=y` (was unset). Config snapshot
+`out/config-20260725-ember-pre-k114-snapshot` taken before the change.
+
+**Approach deliberately different from K098-K101**, which each changed a
+variable then hit the wedge to see what happened. K114 enables the GPU but
+gathers state from **userspace, before anything touches it** — reading only
+CCF/sysfs/genpd, never `/sys/kernel/debug/dri/*/gpu`. The data therefore
+survives, because it is written to disk before any wedge is possible.
+
+#### Memory map: K099's layout was RIGHT, its justification was WRONG
+
+Confirmed against downstream `msm8998.dtsi`:
+
+```
+pil_slpi_mem     0x94D00000 + 0x00F00000  -> ends 0x95C00000
+pil_ipa_gpu_mem  0x95C00000 + 0x00100000
+mainline gpu_mem 0x95600000               -> INSIDE LG's SLPI
+```
+
+Moving `gpu_mem` to `0x95C00000` is **necessary** — the clean tree's own
+comment warns that letting the allocator hand out firmware-owned pages there
+causes an instant silent XPU reset. The K099 comment's claim that "the
+LG-signed a540_zap is address-locked" is false (the blob is
+`QCOM_MDT_RELOCATABLE`), but that false claim did not produce a wrong layout.
+An earlier note in this session calling the memory churn a wedge suspect is
+**withdrawn**. Re-applied with corrected rationale.
+
+#### FINDING 1 — the GPU can be present safely; RESUMING it is what wedges
+
+First K114 boot died after **34 seconds**. Cause: `greetd` now auto-starts, the
+compositor opens DRM/GBM, Mesa sees an `msm` device that *now has a GPU*, loads
+`msm_dri.so` (freedreno) and triggers a runtime resume ->
+`a5xx_pm_resume` -> `gpu_write` -> wedge.
+
+With `greetd` removed from the default runlevel, the same image ran **90+
+seconds with no wedge**. So enabling the GPU in DT is safe; the wedge requires
+something to actually resume it. That also means the newly-working Phosh
+session becomes an automatic wedge trigger the moment the GPU is enabled.
+
+#### FINDING 2 — firmware is requested 6 seconds before the rootfs exists
+
+```
+t=1.310s  Direct firmware load for qcom/a530_pm4.fw failed with error -2
+t=2.148s  Run /init as init process        (initramfs)
+t=7.394s  EXT4-fs (mmcblk0p2): mounted     (SD rootfs)
+```
+
+Firmware was installed to `/lib/firmware/qcom/` on the **rootfs**, but adreno
+requests it during early probe while still in the **initramfs**. The July note
+"zap must live under `qcom/` in the initramfs" is exactly this; installing to
+the rootfs does not satisfy it. `firmware_class.path` is
+`/lib/firmware/postmarketos`.
+
+**Consequence: no GPU firmware ever loaded, so no normal init ran at all.**
+Every previous GPU attempt is suspect on the same grounds.
+
+#### FINDING 3 — every GPU clock is OFF and the rail is under-volted
+
+```
+gfx3d_clk            enable=0  rate=19,200,000   (XO — never reparented to gpupll0)
+rbbmtimer_clk        enable=0  rate=19,200,000
+rbcpr_clk            enable=0  rate=19,200,000
+gcc_bimc_gfx_clk     enable=0
+gcc_gpu_bimc_gfx_clk enable=0
+gpupll0              enable=0  rate=513,999,902  (configured, not running)
+gcc_gpu_cfg_ahb_clk  enable=1                    (register bus only)
+
+pm8005_s1 (VDD_GFX): enabled, 752000 uV, users=1
+adreno: "supply vddcx not found, using dummy regulator"
+bound as "ops a3xx_ops"
+```
+
+Only the config/AHB bus is clocked. **This is the predicted unclocked-slave
+hang**: `msm_gpu_pm_resume()` returns success, then
+`gpu_write(REG_A5XX_GPMU_RBCCU_POWER_CNTL, 0x778000)` — the first register
+touch on the a540 path — reaches a block whose core clock is off, the AHB
+transaction never completes, and the bus hangs, taking the SoC with it.
+The rail at 752 mV sits between the 524 mV parking hack and the ~988 mV the
+GPU needs; `vddcx` is a dummy regulator.
+
+**Not established:** whether the clocks stay off *because* firmware loading
+failed and init aborted, or independently. Finding 2 must be fixed before
+Finding 3 can be attributed. Do not change clock or regulator wiring until the
+firmware loads.
+
+#### NEXT
+
+1. **Get the firmware into the initramfs.** The pmOS ramdisk is reused
+   byte-for-byte by `make-pmos-image.sh` to preserve rootfs UUIDs, so this
+   needs either a regenerated pmOS initramfs (postmarketos-mkinitfs) carrying
+   `qcom/a5[34]0*`, or deferred/nowait firmware loading in the driver.
+2. Re-run this same pre-touch diagnostic with firmware present and compare
+   clock/rail state. Only then consider triggering a resume.
+3. Keep `greetd` disabled whenever the GPU is enabled, or every boot wedges.
+
+**Evidence:** `out/k114-ember-gpu-diagnostic-20260725/` — full pre-touch dump,
+the dump script, and the K114 patch. Nothing flashed. Phone recovered to
+LineageOS cleanly after the 34 s wedge; no manual intervention was needed.
