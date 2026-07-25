@@ -5922,3 +5922,58 @@ that is now fixed while the regulator half is not.
 
 **Evidence:** `out/k116-ember-gpu-firmware-20260725/`, plus
 `make-pmos-image-fw.sh` in the repo root.
+
+### K117 (2026-07-25) — GPU resume STILL wedges with firmware loaded: the regulator half is confirmed as the remaining cause
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Same image as K116 (`1345c824…`). Deliberate test, requested by Lance, of
+whether the K115/K116 firmware fix was sufficient to survive a GPU resume.
+
+**Method note — the first attempt was not a test.** Launching `phosh-session`
+appeared to succeed with the GPU present and no wedge, but the log showed
+`Loading WLR_RENDERER option: pixman` / `Creating pixman renderer`: the
+`WLR_RENDERER=pixman` line written into `/etc/environment` during the M6 work
+was still in force, so Mesa never touched the GPU. The apparent success was
+the software renderer. Re-run with `env -u WLR_RENDERER`.
+
+**RESULT: wedge.** Lance observed the Phosh spinner, then the device reset to
+LineageOS. pmOS had been up ~362 s on pixman and died at the moment the
+GPU-renderer session started. Recovered to LineageOS unaided, adb authorised,
+no physical intervention — as in K114.
+
+**Interpretation.** K115/K116 fixed the *clock* half of the K114 diagnosis:
+`gfx3d_clk` is reparented onto `gpupll0`, firmware loads, runtime-PM reports
+`suspended`, `renderD128` exists. That was **not sufficient**. The remaining
+K114 findings are therefore promoted from "outstanding" to **the active
+cause**:
+
+1. `adreno 5000000.gpu: supply vddcx not found, using dummy regulator` — a
+   rail the driver expects is not wired in DT, so it is silently faked.
+2. `pm8005_s1` (VDD_GFX) sits at **752000 uV**, the old parking-hack floor,
+   against roughly 988 mV needed under load. `regulator-min-microvolt` is
+   still `524000` and the `regulator-always-on` hack is still present.
+
+`a5xx_pm_resume()` calls `msm_gpu_pm_resume()`, which succeeds, then writes
+`REG_A5XX_GPMU_RBCCU_POWER_CNTL`. With the rail under-volted and `vddcx`
+dummied, that write reaches a block that cannot respond, the AHB transaction
+never completes, and the bus hang takes the SoC down.
+
+**Safety net that held:** `WLR_RENDERER=pixman` in `/etc/environment` means a
+normal session still comes up software-rendered and does NOT touch the GPU.
+Leave it in place — it is what makes a GPU-enabled kernel usable at all right
+now. `greetd` also remains out of the default runlevel.
+
+**NEXT — the regulator work, one variable at a time:**
+
+1. Wire `vddcx` properly rather than letting it fall back to a dummy.
+2. Raise the `pm8005_s1` floor from 524000 and drop `regulator-always-on` now
+   that a real consumer exists (`vdd-supply` on the GPU node).
+3. Only then retry a resume. Do not change both at once — K100 already tested
+   988 mV alone, before firmware worked, and that result is not evidence about
+   the current stack.
+
+Note that K100's earlier "988 mV did not help" conclusion was reached on a
+stack with **no firmware loaded**, so it does not rule the voltage fix out.
