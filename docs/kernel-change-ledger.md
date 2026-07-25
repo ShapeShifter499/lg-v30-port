@@ -5205,3 +5205,65 @@ IDs incrementing across lifts rather than being reused within a contact. That
 is the behaviour that fails first when a contact decode is subtly wrong, so it
 materially strengthens the K108 verification beyond the earlier two-finger
 result.
+
+### K109 (2026-07-25) — restructure K107/K108 as a per-compatible variant; behaviour verified unchanged
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k109-refactor.img`, SHA-256
+`d41eeb4055dab8eb485400b67af453989900156bbe00ec232ca3f2e9adf49bf6`.
+
+**Motivation.** K107 and K108 worked but altered `stmfts` behaviour for every
+user of the driver, carried 22 diagnostic `dev_info` statements, and built
+register frames from bare magic numbers. None of that is acceptable in tree.
+
+**Changes.**
+
+- New `struct stmfts_variant` with `ftm4_bringup` and `ftm4_contact_layout`,
+  selected by compatible via `device_get_match_data()`; `st,stmfts` keeps a
+  zeroed variant so **stock parts behave exactly as before**.
+- New compatible `st,ftm4` added to `stmfts_of_match[]` and to
+  `Documentation/devicetree/bindings/input/touchscreen/st,stmfts.yaml`
+  (`compatible` widened from `const` to an `enum`). joan's DTS updated.
+- Named constants for the register protocol (`STMFTS_WRITE_REG`,
+  `STMFTS_REG_SYSTEM_RESET`, `STMFTS_SYSTEM_RESET_VALUE`,
+  `STMFTS_REG_INT_CTRL`, `STMFTS_INT_ENABLE`, `STMFTS_READ_ONE_EVENT`,
+  `STMFTS_FTM4_READY_RETRIES`) replacing inline magic.
+- `stmfts_write_reg(sdata, reg, value)` helper; `stmfts_ftm4_wait_ready()`;
+  `stmfts_ftm4_bringup()` replacing the ad-hoc K107 function.
+- `stmfts_configure()` selects bringup by variant, retaining the original
+  single-byte `STMFTS_SYSTEM_RESET` path for stock parts.
+- `stmfts_report_contact_event()` branches on `ftm4_contact_layout`, with the
+  original mainline unpacking preserved unchanged in the else branch.
+- All 22 diagnostic statements removed.
+
+**Verification on hardware** (raw `/dev/input/event3`, 2845 records):
+
+```
+                 X range      Y range      slots    peak
+K108 (raw)       55..1373     195..2877    0..9     10
+K109 (variant)   32..1429     16..2874     0..2      3
+```
+
+Both axes remain inside the declared 1440x2880 and multitouch still tracks
+across slots. The lower peak reflects Lance using three fingers in this pass
+rather than ten; it does not re-establish the 10-point ceiling, which stands
+on the K108 addendum.
+
+**Two defects caught during the refactor, recorded because both were the
+result of trusting a check that did not check anything:**
+
+- variant instances were initially defined *after* `probe()` referenced them
+  (caught by an ordering assertion and independently by the compiler);
+- the first instrumentation-stripping pass used a regex that silently missed
+  multi-line `dev_info` calls, and had to be redone statement-aware.
+
+**Still NOT submission-ready.** `st,ftm4` is an invented compatible string.
+A real submission needs agreement on naming, evidence about which ST parts
+actually share this protocol rather than "joan needs it", a separate binding
+patch, and a decision on whether this belongs in `stmfts` at all versus a
+distinct driver. That is a design conversation, not a code change.
+
+**Evidence:** `out/k109-ember-variant-refactor-20260725/`.
