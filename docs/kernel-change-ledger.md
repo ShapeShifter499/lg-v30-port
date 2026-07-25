@@ -4977,3 +4977,116 @@ experiments; that layer is done.
 lines), transport log, clean-to-K105 patch, manifest
 `K105-SHA256SUMS-20260725`. Nothing flashed. K101 remains quarantined. Phone
 left in RAM-booted pmOS; returns to LineageOS on power cycle.
+
+### K106 (2026-07-25) — downstream 4-byte reset frame IS answered; polling retrieves the response
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k106-downstream-reset.img`, SHA-256
+`6326084e56f9b4a830a99a1c3ad6c69048e5a0ab8247488ae8e8d8c2d59a5910`. DTB
+unchanged from K104. Built on nym-skyforge (26 s incremental), booted from
+nym-nest.
+
+**Change:** replace the first `stmfts_command()` in `stmfts_configure()` with
+downstream's system reset — a 4-byte frame `B6 00 28 80` written via raw
+`i2c_transfer` — followed by polling `READ_ONE_EVENT` (0x85), mirroring
+downstream `fts_systemreset()` + `fts_wait_for_ready()`.
+
+**Result: the frame is answered.**
+
+```
+K106: reset frame B6 00 28 80 -> i2c_transfer 1
+K106: poll 0: event 10 00 00 00 00 01 00 00
+K106: CONTROLLER_READY via POLL
+K106: downstream reset+poll ret 0
+K106: cmd 0x91 write ret 0        <- reverts to mainline single-byte
+K106: cmd 0x91 wait exit, 0 left  <- still fails
+```
+
+**Caveat raised at the time and RESOLVED in K107:** the polled event was
+byte-identical to one the IRQ handler had already read, so it could have been a
+stale FIFO entry. K107's pre-reset poll returned
+`00 00 00 00 00 00 00 00` — an empty FIFO — proving the K106 response genuine.
+
+**Correction to the K105 entry's framing.** "Multi-byte vs single-byte" is NOT
+the distinction. Downstream's `fts_command()` writes a *single* byte
+(`fts_write_reg(info, &regAdd, 1)`), and SENSEON/SENSEOFF (0x93/0x92) are
+single-byte commands. The `0xB6` frames are *register writes*
+(`B6 <addr_hi> <addr_lo> <value>`), not commands. K106 conflated the two; K107
+identifies the real cause.
+
+### K107 (2026-07-25) — ROOT CAUSE AND FIX: controller-side interrupt generation was never enabled. TOUCHSCREEN WORKS.
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Image `out/boot-joan-pmos-k107-int-enable.img`, SHA-256
+`09b967190986c3a5321197def1233deb1f7c930e3a0e2a1695ff194f14be0942`. DTB
+unchanged from K104 (`bias-pull-up` retained).
+
+**Change (one hypothesis):** after the downstream reset and ready-poll, write
+register 0x002C with `INT_ENABLE` (0x48) via the frame `B6 00 2C 48`,
+mirroring downstream `fts_interrupt_set(info, INT_ENABLE)` which
+`ftm4_ts.c` issues after `fts_systemreset()` + `fts_wait_for_ready()`.
+
+**Mainline never performs this write.** It calls host-side `enable_irq()` only.
+The controller therefore emits its unconditional power-on CONTROLLER_READY and
+then never raises INT again — which is exactly the "exactly one IRQ per boot"
+signature seen in K104, K105 and K106.
+
+**RESULT: COMPLETE SUCCESS.**
+
+```
+K107: PRE-reset poll rc 2 event 00 00 00 00 00 00 00 00   (FIFO empty)
+K107: reset frame B6 00 28 80 -> i2c_transfer 1
+K107: poll 0: event 10 00 00 00 00 01 00 00
+K107: CONTROLLER_READY via POLL
+K107: INT_ENABLE B6 00 2C 48 -> 1
+K107: cmd 0x91 write ret 0 / wait exit, 249 left   (SLEEP_OUT, event 11)
+K107: cmd 0xa3 wait exit, 248 left                 (MS_CX_TUNING, event 16 a1 03)
+K107: cmd 0xa4 wait exit, 142 left                 (SS_CX_TUNING, event 16 a2 04)
+K107: cmd 0xa2 wait exit, 205 left                 (FULL_FORCE_CAL, event 16 a2 10)
+K107: configure ret 0
+input: stmfts as /devices/platform/soc@0/c179000.i2c/i2c-0/0-0049/input/input2
+```
+
+Every command that timed out in K104/K105 is answered within a few hundred
+jiffies once interrupt generation is enabled. `stmfts_configure()` returns 0,
+probe completes, and the input device registers.
+
+**Touch verified on hardware with Lance operating the panel.** `/dev/input/event3`
+delivers structured multitouch: `ABS_MT_TRACKING_ID`, `ABS_MT_POSITION_X/Y`,
+`ABS_MT_TOUCH_MAJOR/MINOR`, `ABS_MT_PRESSURE`, `ABS_MT_ORIENTATION`, framed by
+`SYN_REPORT`. Kernel side shows `events 05 ...` = `STMFTS_EV_MULTI_TOUCH_MOTION`.
+Device capabilities: `PROP=2` (INPUT_PROP_DIRECT), `EV=b`, multitouch ABS mask.
+
+**M4 touch is functionally achieved.** The full working delta from clean
+`16e3950bf` is: K103 (drop `input-enable`) + K104 (`bias-pull-up` on the touch
+INT pin) + K107 (downstream reset frame, ready-poll, and the 0x002C INT_ENABLE
+register write).
+
+**Open items, in priority order:**
+
+1. **Coordinate range mismatch (K108).** Reported X reaches 3616 and Y 2964,
+   against DT `touchscreen-size-x = 1440` / `-y = 2880` (downstream declares
+   `max_x = 1439`, `max_y = 2879`). X is roughly 2.5x and Y roughly 1.03x the
+   declared maxima, and the differing factors suggest the bit-unpacking in
+   `stmfts_report_contact_event()` is wrong for this variant rather than a
+   simple scale. Compare against downstream's coordinate decode before
+   changing axis ranges.
+2. **Recurring controller error event** `0f ba d0 00 c0 de` -> `error code:
+   0x0dec00d0ba`. The payload spells BADC0DE, a firmware error marker. Touch
+   functions despite it. Downstream has explicit flash-corruption handling in
+   `fts_wait_for_ready()` and ships firmware `touch/joan/L0S59P1_1_11.ftb`.
+   Not yet investigated.
+3. `read_system_info` still parses `chip 0x0`; the 0x80 register layout likely
+   differs from mainline's expectation. Cosmetic so far.
+4. Upstreamability: the K107 changes are joan/FTM4-specific and are NOT in a
+   form suitable for mainline `stmfts` as written. Structuring this properly
+   (quirk flag, variant ops, or a separate driver) is an open design question.
+
+**Evidence:** `out/k107-ember-int-enable-20260725/` — device dmesg, clean-to-K107
+patch. Nothing flashed. K101 remains quarantined.
