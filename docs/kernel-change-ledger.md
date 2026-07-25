@@ -4598,3 +4598,302 @@ K104 instrumentation-only build. Log regulator/reset stages, every STMFTS
 command byte and I2C return, completion-wait boundaries, IRQ-handler entry, and
 raw event bytes. Do not combine protocol adaptation, IRQ changes, and DT
 changes in one experiment.
+
+### K104 (2026-07-25) — touch INT `bias-pull-up` + probe instrumentation: BUILD VERIFIED, DEVICE RUN BLOCKED by xHCI/aboot transport
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+Host: nym-skyforge (new build host; first LG V30 work performed there)
+
+**Class/disposition:** bringup-local, diagnostic. K104 was built and packaged but
+**never executed on the device** — two RAM-boot attempts failed in USB transport
+before aboot ever parsed the image. **No claim is made here about touch
+behaviour.** The `-110` from K103 remains unresolved.
+
+#### Host migration: toolchain equivalence PROVEN before any new work
+
+All LG V30 work moved from nym-nest to nym-skyforge. Before building anything
+new, Aurel's K103 DTB was reproduced from his saved clean-to-K103 patch on the
+new host:
+
+- reproduced DTB SHA-256:
+  `914f9f660bd81f7026a475c07eef77087733b6c1ea140c56319c7cf43fba0594`
+- **byte-identical to Aurel's K103 DTB.** The new host's toolchain
+  (`aarch64-linux-gnu-gcc 16.1.0`, in-tree DTC 1.7.2) is therefore equivalent,
+  and any later difference is attributable to the change under test, not the
+  machine.
+
+Restored-checkpoint verification also passed: kernel HEAD `16e3950bf`, `.config`
+SHA-256 `b071ec63…`, pmaports `25f24b1d26`, downstream `c022ed5767`, `out/`
+622 files, and the sealed K103 bundle re-verified 46/46 against its own manifest
+with matching detached manifest and transcript hashes.
+
+Build performance on the new host, for planning: full cold `Image.gz` 7m41s;
+single-driver-file incremental rebuild **25 s**; single-DTB target **0.8 s**
+(`make qcom/msm8998-lge-joan.dtb`, versus 8.4 s for the whole `dtbs` target —
+use the explicit target for DTB-only bisect spins). ccache was installed and
+measured: **no benefit** (1.6% hit rate, 617 s vs 618 s) because kbuild's own
+incremental logic already covers this workflow. Do not expect ccache to help.
+
+#### Change under test — ONE functional variable
+
+Built on the K103 source state (clean `16e3950bf` + Aurel's clean-to-K103 patch),
+with exactly one functional change plus log-only instrumentation:
+
+1. **`touch-int-default-state`: `bias-disable` → `bias-pull-up`** (gpio125).
+
+2. **Log-only instrumentation** in `drivers/input/touchscreen/stmfts.c`
+   (13 `K104:` tracepoints, `dev_info` only, no behavioural change), covering the
+   five stages Aurel specified: regulator-enable return, reset-GPIO pulse
+   begin/end, `stmfts_read_system_info()` return plus chip/fw id, `enable_irq()`,
+   every `stmfts_command()` opcode with its I2C write return and
+   completion-wait entry/exit (including jiffies remaining), IRQ-handler entry,
+   and the first 8 raw event bytes read by `stmfts_read_events()`.
+
+**Rationale for the bias change — downstream evidence, not speculation.**
+Joan's downstream pinctrl
+(`arch/arm64/boot/dts/lge/msm8998-joan/msm8998-joan-common/msm8998-joan-common-pinctrl.dtsi`)
+defines two states for gpio125:
+
+- `ts_ftm4_int_active`: drive-strength 2, **`bias-pull-up`**
+- `ts_ftm4_int_suspend`: drive-strength 2, **`bias-disable`**
+
+K102/K103 used `bias-disable` — i.e. downstream's **suspend** configuration was
+being applied as our default/active state. With `interrupts = <125
+IRQ_TYPE_LEVEL_LOW>` and no pull-up, the INT line has no defined idle level.
+`stmfts_command()` (stmfts.c) writes the opcode over I2C and then blocks on
+`wait_for_completion_timeout(&sdata->cmd_done, 1000 ms)`; that completion is
+signalled **only** from the threaded IRQ handler via `complete()` in
+`stmfts_parse_events()`. An INT line that never cleanly asserts therefore yields
+exactly `-ETIMEDOUT` (`-110`) at probe. This is a hypothesis consistent with all
+observed K103 data, not a proven cause — it is untested on hardware.
+
+Timing consistent with the above, from the K103 dmesg: `stmfts_power_on()` has
+140 ms of fixed sleeps (20 + 20 + 50 + 50) before the first `stmfts_command()`,
+and probe failed at t=2.2725 s, consistent with a single 1000 ms
+completion-timeout beginning from a ~1.13 s probe entry. Also unproven: whether
+the failing call is the first `stmfts_command(STMFTS_SYSTEM_RESET)` in
+`stmfts_configure()` or an earlier I2C-layer `-110` from
+`stmfts_read_system_info()`. Distinguishing these is precisely what the
+instrumentation exists to do.
+
+**Two further downstream mismatches were identified and deliberately NOT changed**
+(one variable per experiment):
+
+- reset gpio89 drive-strength: ours 2, downstream `ts_ftm4_reset_active` 6;
+- the rail-enable pins (`vdd-gpio` TLMM 85, `vio-gpio` TLMM 86) have no pinctrl
+  node on our side, where downstream muxes them via
+  `ts_ftm4_vdd_en_active`/`ts_ftm4_vio_en_active`.
+
+#### Artifacts
+
+- worktree (isolated, canonical trees untouched):
+  `~/vibe-coding-projects/coding/linux-mainline-v30-ember-k104`, detached at
+  `16e3950bf`;
+- K104 DTB SHA-256:
+  `62ebe79be00d414fb6fc6d13c4c18abf7e9f176fa4d0cae0f1ca412f2c6456ff`
+  (differs from the K103 control `914f9f66…` as expected);
+- K104 image: `out/boot-joan-pmos-k104-touch-bias-pullup.img`, SHA-256
+  `38fe94b58ce2acae17a3a2f57dde8310814c7a5afb79c4e228a1da65665ed9d7`;
+- packaged via `make-pmos-image.sh` from reference `out/boot-joan-pmos-touch.img`
+  (`c64a74a0…`); **ramdisk SHA-256 `32ae5cfca76d…` is byte-identical to K103's**,
+  so the pmos_boot_uuid/pmos_root_uuid cmdline still matches the SD rootfs;
+- K101 (`494a7cfa…`) remains quarantined and was not booted.
+
+#### DEVICE RUN BLOCKED — USB transport, reproducible
+
+Two RAM-only attempts, both with `adb reboot bootloader` entry, a single
+fastboot client, no `timeout` wrapper, and no auto-retry. Both failed
+identically:
+
+```
+Sending 'boot.img' (25796 KB)   FAILED (Status read failed (No such device))
+```
+
+Observed behaviour, corrected by Lance's direct observation: the fastboot client
+does **not** fail on its own. It **hangs indefinitely in uninterruptible sleep
+(`STAT D`)** at the `Sending` stage and is released only by a physical
+bootloader restart, at which point it reports the error above. Attempt 1 ran
+122 s before intervention; attempt 2 ran ~130 s.
+
+Evidence against a cable/physical fault:
+
+- **zero xHCI errors** in `dmesg` for the entire uptime, both attempts;
+- **no USB disconnect event** logged during either transfer — the device stayed
+  enumerated as `18d1:d00d`; the only disconnects logged were Lance's manual
+  restarts;
+- the same cable and the same procedure worked on nym-nest for K103.
+
+Attempt 2 additionally ran `adb kill-server` before the transfer (to remove any
+USB-handle contention from the adb server's scanning thread) and pinned
+`power/control=on` on the device port. **Neither changed the outcome**, so
+adb contention and USB autosuspend are both effectively excluded. (Note: the
+root-hub autosuspend pin silently did not apply — a `[ -w ]` test evaluated as
+the invoking user rather than root — so root-hub autosuspend is untested.)
+
+**Leading hypothesis: host USB controller generation.** nym-nest, where this
+procedure is proven, is a 2011 Sandy Bridge Chromebox with native **EHCI**.
+nym-skyforge exposes **xHCI on every root hub** (Bus 001/003/005 at 480M, Bus
+002/004/006 at 10000M); there is no EHCI path. LG's aboot USB stack hanging
+mid-bulk-transfer against xHCI, with no host-side error, is consistent with all
+observations. **Unproven** — a different-port test and a USB 2.0 hub test are
+the outstanding single-variable experiments.
+
+**Operational consequence for this project: every future `fastboot`/flash
+operation from nym-skyforge is affected, not just K104.** If the port/hub tests
+fail, the workable split is to build on nym-skyforge (10.9× faster) and perform
+device transport from nym-nest, whose EHCI is proven with this phone.
+
+#### Method corrections recorded for future sessions
+
+- I asserted the phone "recovered by itself" from a USB disconnect event; Lance
+  had in fact restarted it manually. This repeats the K102d lesson exactly —
+  **the device owner's direct observation outranks log inference; ask which
+  event was human action.**
+- I ran `fastboot devices` while a `fastboot boot` transfer was in flight,
+  violating the one-client rule from this project's standing safety notes. It
+  did not cause the failure (the wedge preceded it) but must not recur.
+- A `| sed` pipe swallowed fastboot's progress output on attempt 1, hiding how
+  far the transfer got. Write transport output unbuffered to a file.
+
+#### Next
+
+1. Single-variable transport tests, in order: different root hub (Bus 003/005),
+   then a USB 2.0 hub inline. Do not combine.
+2. If transport is still blocked, execute K104 from nym-nest unchanged — the
+   image is built, hashed, and does not need rebuilding.
+3. On a successful K104 boot, read `K104:` lines from dmesg and classify: touch
+   input device registered (bias was the fix) versus `-110` with a named failing
+   stage (K105 targets that stage only).
+4. K101 stays quarantined. Do not alter the sealed K103 evidence bundle.
+
+### K104 RESULT (2026-07-25) — transport resolved via EHCI host; `bias-pull-up` FIXES the IRQ path; failure moves to command protocol
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+This supersedes the "DEVICE RUN BLOCKED" disposition in the K104 entry above.
+K104 **was** executed, from nym-nest.
+
+#### Transport: root cause CONFIRMED as host USB controller generation
+
+The identical image, cable, phone and procedure that hung indefinitely three
+times on nym-skyforge completed immediately from nym-nest:
+
+```
+Sending 'boot.img' (25796 KB)   OKAY [  0.593s]
+Booting                          OKAY [  5.096s]
+Finished. Total time: 5.703s
+```
+
+pmOS gadget `18d1:d001` appeared after 10 s; SSH to `172.16.42.1` succeeded via
+`~/.ssh/id_pi_migration` (which exists only on nym-nest).
+
+- nym-skyforge: 3 USB controllers, **all xHCI** (`lspci`: AMD 500-series XHCI +
+  2 × Renoir/Cezanne USB 3.1); **zero EHCI** — no `ehci-pci` devices, no ehci
+  modules. AMD dropped EHCI silicon years ago; a port labelled "USB 2.0" on this
+  board is a speed-limited xHCI port, **not** a separate controller. No port
+  change on this host can help.
+- nym-nest: `ehci-pci/3p` × 2, **EHCI only**.
+
+**Standing operational rule for this project: build on nym-skyforge (full kernel
+7m41s, driver-file incremental 25 s, single DTB 0.8 s), perform ALL fastboot /
+flash transport from nym-nest.** Attempting fastboot from nym-skyforge hangs the
+client indefinitely in uninterruptible sleep at `Sending`, requiring a physical
+bootloader restart. This affects every future flash, not only K104.
+
+#### Instrumented probe result — device dmesg
+
+```
+[1.101276] K104: regulators enabled, ret 0
+[1.127739] K104: reset pulse begin
+[1.208140] K104: reset pulse done
+[1.209005] K104: read_system_info ret 0, chip 0x0 fw 0x100
+[1.209030] K104: enabling irq 71
+[1.209086] K104: irq 71 entered
+[1.215042] K104: events 10 00 00 00 00 01 00 00
+[1.263963] K104: configure enter
+[1.264183] K104: cmd 0xa0 write ret 0
+[1.264202] K104: cmd 0xa0 wait enter
+[2.272019] K104: cmd 0xa0 wait exit, 0 left
+[2.272081] K104: configure ret -110
+[2.272496] probe with driver stmfts failed with error -110
+```
+
+#### `bias-pull-up`: HYPOTHESIS VALIDATED at the IRQ layer
+
+**The INT line now works.** IRQ 71 fires 56 µs after `enable_irq()`, and the
+controller returns a well-formed event. In K103 there was no evidence of any IRQ
+activity. Rails enable cleanly, the reset pulse completes, and
+`stmfts_read_system_info()` returns 0 — so the I2C bus, address `0x49`, and both
+GPIO-backed rails are all functional. Deleting `input-enable` (K103) plus
+restoring downstream's active-state `bias-pull-up` (K104) makes the whole
+electrical/DT layer correct.
+
+**Touch still does not register.** `/proc/bus/input/devices` lists only
+`pm8941_pwrkey`, `pm8941_resin`, and `Volume up`. Do not describe K104 as a
+successful touch bind.
+
+#### The new failure — precisely located, two compounding causes
+
+**(1) Completion-ordering race.** The event at t=1.215042 is
+`10 …` = `STMFTS_EV_CONTROLLER_READY` (0x10, verified against the enum in
+`drivers/input/touchscreen/stmfts.c`). `stmfts_parse_events()` calls
+`complete(&sdata->cmd_done)` for that event. But `stmfts_configure()` does not
+issue its first command until t=1.263963, and `stmfts_command()`'s first action
+is `reinit_completion()` — which **discards the completion that already fired
+49 ms earlier**. It then waits 1000 ms for an event that has already been
+consumed.
+
+**(2) The controller never answers `0xa0`.** There is exactly **one**
+`irq 71 entered` in the entire boot. After `STMFTS_SYSTEM_RESET` (0xa0) is
+written (`write ret 0`, so the I2C transfer itself succeeded), INT is never
+asserted again. Even without the race, no completion would arrive. The wait
+exits with `0 left` at t=2.272019, i.e. the full 1008 ms.
+
+Cause (2) is the substantive one and **supports the downstream-protocol
+hypothesis Aurel recorded at K103**: joan's downstream FTM4 flow uses a
+four-byte `B6 00 28 80` reset and polls `0x85` events, not mainline's
+single-byte `0xa0`. The controller appears to ignore `0xa0` entirely.
+
+**Corroborating evidence:** `read_system_info` returned success but parsed
+`chip 0x0`. A genuine FingerTipS reports a non-zero chip ID, so the
+`STMFTS_READ_INFO` (0x80) response layout probably also differs from mainline's
+expectation. This is independent of the reset-command question and points at the
+same divergence. Unproven: neither has been checked byte-for-byte against
+downstream.
+
+#### Layer status
+
+- rails / reset / I2C: working;
+- INT line / IRQ delivery: **working (fixed by K104)**;
+- command protocol: **mismatched** — mainline `stmfts` command set vs joan FTM4.
+
+#### K105 candidates — one variable each, cheapest first
+
+1. **Skip `STMFTS_SYSTEM_RESET` in `stmfts_configure()`** and issue
+   `STMFTS_SLEEP_OUT` (0x91) first. The *hardware* reset already produced
+   `CONTROLLER_READY`, so a software reset may be redundant here. If SLEEP_OUT
+   is answered, only `0xa0` is wrong and the rest of the command set is usable.
+   DTB-unchanged, driver-only: 25 s rebuild.
+2. Implement downstream's `B6 00 28 80` reset and `0x85` event polling.
+3. Compare the `READ_INFO` (0x80) response layout against downstream to explain
+   `chip 0x0`.
+
+Do not combine these. Note also that fixing the completion race alone
+(e.g. not discarding an already-signalled ready event) would not by itself
+produce a working probe, because no second IRQ arrives.
+
+#### Evidence
+
+`out/k104-ember-touch-bias-pullup-20260725/` (10-entry manifest
+`K104-SHA256SUMS-20260725`), including the 523-line device dmesg
+`k104-device-dmesg-20260725.log`, the clean-to-K104 patch, the built DTB
+(`62ebe79b…`), the config snapshot, and all three failed nym-skyforge transport
+logs plus the successful nym-nest run.
+
+Nothing was flashed. K101 remains quarantined. The sealed K103 bundle was not
+altered. The phone was left in the RAM-booted pmOS image; it returns to
+LineageOS on a power cycle.
