@@ -5176,3 +5176,32 @@ tracked across lifts.
 
 **Evidence:** `out/k108-ember-coord-decode-20260725/` — clean-to-K108 patch and
 the raw captured touch-event dump. Nothing flashed. K101 remains quarantined.
+
+#### K108 addendum (2026-07-25) — 10-point multitouch verified under real contact
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+
+Second hardware capture, Lance placing five fingers then both hands
+(25578 event records, 613872 bytes, `k108-10point-events-raw-od.txt`):
+
+```
+distinct MT slots used    : [0,1,2,3,4,5,6,7,8,9]
+PEAK simultaneous contacts: 10
+
+contacts-per-frame histogram
+   1: 154    2: 167    3: 220    4: 462    5: 2252
+   6:  94    7:  11    8: 462    9: 554   10: 1468
+```
+
+All ten slots carried real contacts and 10-finger frames were sustained across
+1468 sync reports, so this is the actual hardware ceiling rather than an
+inferred one — matching both mainline's `STMFTS_MAX_FINGERS` (10) and
+downstream's `max_id = <10>`. The small 6- and 7-finger counts are the
+transition as the second hand lands, not a struggle at the limit.
+
+Slot allocation and release track correctly under maximum load, with tracking
+IDs incrementing across lifts rather than being reused within a contact. That
+is the behaviour that fails first when a contact decode is subtly wrong, so it
+materially strengthens the K108 verification beyond the earlier two-finger
+result.
