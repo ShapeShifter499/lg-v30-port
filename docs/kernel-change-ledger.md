@@ -5838,3 +5838,87 @@ firmware loads.
 **Evidence:** `out/k114-ember-gpu-diagnostic-20260725/` — full pre-touch dump,
 the dump script, and the K114 patch. Nothing flashed. Phone recovered to
 LineageOS cleanly after the 34 s wedge; no manual intervention was needed.
+
+### K115/K116 (2026-07-25) — GPU firmware loads; Adreno 540 initialises cleanly
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-25
+
+Images: `out/boot-joan-pmos-k115-gpu-fw.img`
+(`e03b54e83040455a00de26d8f9199c7b4abcb1dad83c75f0c0a2418b1be5fb8d`) and
+`out/boot-joan-pmos-k116-zapfix.img`
+(`1345c8241ae731d6dc770944304704c3b1b726df418be54ed2739dfe0125d097`).
+
+#### K115 — firmware into the initramfs
+
+K114 established that adreno requests firmware at t=1.31s while the SD rootfs
+does not mount until t=7.39s, so rootfs-installed firmware can never be found.
+New `make-pmos-image-fw.sh` unpacks the reference ramdisk, injects
+`a530_pm4.fw`, `a530_pfp.fw`, `a540_gpmu.fw2` and `a540_zap.*` under
+`lib/firmware/qcom`, repacks, and rebuilds the boot image — **carrying the
+reference cmdline over verbatim**, so `pmos_boot_uuid`/`pmos_root_uuid` still
+match the card.
+
+Integrity was verified rather than assumed: 330 -> 339 cpio entries (8 files +
+1 directory), **zero** original entries missing. The compressed ramdisk got
+*smaller* (10816877 -> 10461577) purely because `gzip -9` beats the original's
+settings; uncompressed it grew (26073420 -> 26158080). Files land in
+`usr/lib/firmware/qcom` because `lib -> usr/lib` is a symlink in the
+initramfs — the same place the pre-existing `regulatory.db` lives, so
+`/lib/firmware/qcom/...` resolves correctly.
+
+Result: `a530_pm4.fw`, `a530_pfp.fw` and `a540_gpmu.fw2` all loaded. Zap still
+failed with `-2`.
+
+#### K116 — the zap firmware-name needed its extension
+
+`zap_shader_load_mdt()` reads the `firmware-name` property and passes it to
+`request_firmware_direct()` **verbatim** — nothing is appended. Our DTS said
+`firmware-name = "qcom/a540_zap"`; every other board in tree names a complete
+file (`a623_zap.mbn`, `a663_zap.mbn`, `a530_zap.mbn`). We ship split MDT
+firmware, not a combined `.mbn`, so the correct value is
+**`"qcom/a540_zap.mdt"`** — `mdt_loader` then does
+`sprintf(seg_name + strlen(fw_name) - 3, "b%02d", segment)`, rewriting `mdt`
+to `b00`/`b01`/`b02`, which matches the files we have exactly.
+
+#### RESULT — the GPU initialises
+
+```
+                        K114 (before)          K116 (now)
+zap shader              *ERROR* unable to load  loads clean
+gpu hw init             failed: -2              no failure
+"no GPU device found"   present                 gone
+gfx3d_clk parent        XO, 19,200,000          gpupll0 -> 27,000,000
+runtime_status          unsupported             suspended
+/dev/dri/renderD128     -                       present
+```
+
+`gfx3d_clk` is now **reparented onto `gpupll0`** rather than parked on the
+crystal, and runtime-PM reports `suspended` rather than `unsupported`: the
+driver owns a working clock/power chain and is deliberately holding the GPU
+idle. Clocks reading `enable=0` is correct in that state — healthy idle, not
+the broken condition of K114. Booted 60s+ with no wedge.
+
+**Every GPU attempt before K115 ran without firmware**, so K098-K101's
+conclusions rest on an incomplete stack and should not be treated as evidence
+about GPU behaviour.
+
+#### Still outstanding before a resume is attempted
+
+1. **`adreno: supply vddcx not found, using dummy regulator`** — a rail the
+   driver expects is not wired in DT.
+2. **`pm8005_s1` sits at 752000 uV**, still the parking-hack floor; the GPU
+   needs roughly 988 mV under load. The `regulator-always-on` hack and the
+   524000 floor were both left untouched in K114-K116 deliberately, to keep
+   one variable at a time.
+3. `greetd` must stay out of the default runlevel while the GPU is enabled, or
+   the compositor resumes the GPU at boot and wedges (K114 Finding 1). It is
+   currently disabled, which is why the device boots to a text login.
+
+**Do not attempt a deliberate GPU resume until 1 and 2 are addressed** — the
+K114 diagnosis was an unclocked/under-volted slave hang, and the clock half of
+that is now fixed while the regulator half is not.
+
+**Evidence:** `out/k116-ember-gpu-firmware-20260725/`, plus
+`make-pmos-image-fw.sh` in the repo root.
