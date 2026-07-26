@@ -6898,3 +6898,86 @@ k134_boot_ib, k135_zap_first, k136_no_secure_switch.
 
 All boots RAM-only; LineageOS untouched; K101 quarantined. Session ended here
 on Lance's budget call (usage credits), with the discriminator queued.
+
+---
+
+### K139–K140 (2026-07-26, final pass) — mapping-age rule REFUTED by paired test; kernel-ring IBs execute with positive proof; userspace IBs still hang; preempt-wrapper theory REFUTED
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-26
+
+#### K139 — the paired discriminator, and it flipped the story again
+
+Two BOs, identical flags (WC, RW) and identical PKT4-scratch content; BO0
+mapped at stage 3 (before CP start), BO1 at stage 6 (after); both IB'd
+back-to-back at stage 6 with distinct markers:
+
+```
+K139: BO0 mapped at 1016000 (BEFORE CP start)
+K139: BO1 mapped at 1017000 (AFTER CP start)
+K139: IB from BO0 (pre-CP-start map): EXECUTED scratch3=0139aa06
+K139: IB from BO1 (post-CP-start map): EXECUTED scratch3=0139bb06
+```
+
+**Both executed, with register-readback proof.** The "GPU only sees
+pre-CP-start mappings" invariant from K134–K138 is DEAD. Post-CP-start
+mappings are fine. IB fetch is fine. The full test matrix:
+
+| BO | mapped | flags | content | path | result |
+|---|---|---|---|---|---|
+| gpmufw | stage 3 | RO | PKT4 | ring-direct | EXEC |
+| K134 r1/r2 | stage 6 | RW | PKT7 NOP | ring-direct | HUNG |
+| K137 | stage 6 | RO | PKT7 NOP | ring-direct | HUNG |
+| K138 | stage 6 | RO | PKT4 | ring-direct | HUNG |
+| K139 BO0 | stage 3 | RW | PKT4 | ring-direct | EXEC |
+| K139 BO1 | stage 6 | RW | PKT4 | ring-direct | EXEC |
+| userspace | runtime | RW | PKT7 or PKT4 | a5xx_submit | HUNG |
+
+Unresolved wrinkle inside the kernel-side rows: K138 (RO+PKT4) hung where
+K139-BO1 (RW+PKT4) executed — RO-mapped-late and PKT7 content each correlate
+with kernel-side hangs, but those cells were measured in different boots, so
+treat them as leads, not conclusions.
+
+#### Userspace PKT4 follow-up (no reboot, same kernel)
+
+msmprobe's IB switched from 8×PKT7-NOP to 4×PKT4(CP_SCRATCH_REG(3), marker)
+(0x480B7B81): **still does not signal.** Content does not save the userspace
+path even though the identical content executes from a kernel-written IB in
+the same boot. The discriminator is the SUBMIT PATH, not the buffer.
+
+#### K140 — preempt-wrapper theory, REFUTED
+
+Theory: with k131's nr_rings=1, a5xx_preempt_init() never runs, so
+preempt_iova[] is 0, yet a5xx_submit() still wraps every userspace submit in
+CP_PREEMPT_ENABLE_GLOBAL / CONTEXT_SWITCH_SAVE_ADDR=0 / CP_YIELD_ENABLE 0x02
+— checkpointing into iova 0 on the first IB. Elegant, explained the
+VBIF_BUSY signature, and gating all preemption packets on nr_rings > 1
+changed **nothing**: fence accepted, never signalled, delayed death as
+before. The wrapper packets are exonerated (the K140 gate is kept — emitting
+a null save address is still wrong on principle, it is just not this bug).
+
+#### Where this leaves the hunt (for next session)
+
+Kernel-written ring + IB submissions execute with positive proof; the
+identical IB submitted through msm_gpu_submit/a5xx_submit does not. The
+remaining delta between the two paths, in probability order:
+
+1. What a5xx_flush vs msm_gpu_submit's kick differ in (wptr update path,
+   whereami/rptr-shadow interaction with k131's single ring).
+2. The fence/seqno tail (CACHE_FLUSH_TS + CP_EVENT_WRITE) interacting with a
+   CP that executed the IB but cannot deliver the retire interrupt — note
+   K131's empty submit DID signal, so the tail works without an IB; test an
+   IB submit whose completion is read via scratch/memptr polling instead of
+   the fence IRQ to split "IB never ran" from "IB ran, completion lost".
+3. Submit-time BO pinning/fence attachment details msm does that the bare
+   ring test skips.
+
+Cheapest next instrument: in a5xx_submit, log ring wptr before/after and
+have the IB write a scratch marker (kernel-side, one boot): if scratch
+advances while the fence never signals, the entire remaining bug is
+completion delivery, not execution.
+
+Status: renderer creation works (K127 baseline); ring-direct IB execution
+proven (K139); userspace submit path still fails somewhere between kick and
+retire. Session closed on budget.
