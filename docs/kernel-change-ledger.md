@@ -6220,3 +6220,94 @@ The `power-domains` fix is independently correct and worth carrying regardless
 of what the clock investigation finds; it is also a plausible upstream patch
 for `msm8998.dtsi` in its own right, though it should be proposed against the
 SoC dtsi rather than kept as a board-level override.
+
+### K120/K121 (2026-07-26) — THE WEDGE IS FIXED: first GPU register write survives
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-26
+
+Images: `out/boot-joan-pmos-k120-oppcap.img`
+(`90e8b459f17fec2a912254f4fb84f5bf2cf65dbc7504de9b8a397d04df27f652`, probe
+armed) and `out/boot-joan-pmos-k121-live.img`
+(`766fc54fccc058d33e514e6496e8ceef7b227ffc7dce3a7709bceaac404c8a2c`, probe
+default OFF — the real write executes).
+
+#### K120 — cap the OPP table
+
+`msm_gpu`'s `enable_clk()` sets the core clock to `gpu->fast_rate` — the
+**highest** OPP — on every resume, before any register access:
+
+```c
+if (gpu->core_clk && gpu->fast_rate)
+	dev_pm_opp_set_rate(&gpu->pdev->dev, gpu->fast_rate);
+```
+
+Mainline's msm8998 table tops out at **710000097 Hz (TURBO)**, which is above
+downstream's 650 MHz maximum, and VDD_GFX sits at ~752 mV with no CPR to raise
+it. Requesting turbo on a low-SVS voltage is not survivable.
+
+joan's DTS now deletes every OPP above MIN_SVS, leaving `opp-257000000`.
+Probe-armed boot confirmed `core rate=257000024` (was `710000097`) with
+`gpu_gx`/`gpu_cx` both `on`.
+
+**This reframes the whole voltage question.** The rail and the frequency were
+the same problem seen from two ends: 752 mV is perfectly reasonable for
+MIN_SVS and hopeless for TURBO. The correct fix is lowering the frequency to
+meet the rail, not guessing a voltage to raise it to — which is what K100 tried
+and why it could not have worked.
+
+#### K121 — RESULT: the write survives
+
+Probe default flipped to off so `gpu_write(REG_A5XX_GPMU_RBCCU_POWER_CNTL,
+0x778000)` actually executes.
+
+```
+*** SURVIVED — no wedge ***     uptime 72 s
+
+[1.362931] loaded qcom/a530_pm4.fw
+[1.363337] loaded qcom/a530_pfp.fw
+[1.363654] loaded qcom/a540_gpmu.fw2
+```
+
+**All previous errors are gone**: no `Couldn't power up the GPU: -5`, no zap
+failure, no `gpu hw init failed`. The register access that hard-wedged the SoC
+on every attempt since 2026-07-20 now completes normally.
+
+#### The three necessary changes (none sufficient alone)
+
+1. **K115/K116** — GPU firmware into the *initramfs* (requested at t=1.3s,
+   rootfs mounts at t=7.4s) and `firmware-name = "qcom/a540_zap.mdt"` with the
+   extension, since `request_firmware_direct()` takes the string verbatim.
+2. **K119** — `power-domains = <&gpucc GPU_GX_GDSC>` instead of
+   `<&rpmpd RPMPD_VDDMX>`. Likely a **mainline defect in `msm8998.dtsi`**; the
+   binding allows one power-domain and every other Adreno 5xx supplies the GX
+   GDSC. No msm8998 board in mainline enables the GPU, so nothing exercised it.
+3. **K120** — cap the OPP so the resume-time frequency matches the rail.
+
+#### Method note
+
+The decisive tool was the **K118 probe**: log state, then abort before the
+fatal write. It converted an unobservable hard wedge into a cheap, repeatable
+measurement and made K119/K120 safe to iterate on. Kept as
+`module_param_named(k118_probe, …, 0600)`, default off; set to 1 to re-arm.
+One caveat learned: disarming it at *runtime* is useless because
+`adreno_load_gpu` has already failed at boot and does not retry — the default
+must be flipped and the kernel rebuilt.
+
+#### NOT yet established
+
+- The GPU has **not rendered anything**. Surviving the power-up sequence is
+  not the same as working 3D. `devfreq 5000000.gpu: Couldn't update frequency
+  transition information` still appears and is unexplained.
+- Capping at MIN_SVS means any success will be at **257 MHz**, roughly a third
+  of downstream's 650 MHz. Raising it needs a real voltage/CPR story.
+- `greetd` remains disabled and `WLR_RENDERER=pixman` remains set; neither has
+  been re-tested against a working GPU yet.
+
+#### NEXT
+
+1. Re-test a compositor with the GPU live — remove `WLR_RENDERER=pixman` and
+   see whether Mesa/freedreno renders.
+2. Investigate the devfreq warning.
+3. Only then consider raising the OPP cap.
