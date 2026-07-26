@@ -6311,3 +6311,65 @@ must be flipped and the kernel rebuilt.
    see whether Mesa/freedreno renders.
 2. Investigate the devfreq warning.
 3. Only then consider raising the OPP cap.
+
+### K122 (2026-07-26) — power-up is fixed, RENDERING still wedges; failure has moved later in init
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-26
+
+Same image as K121 (`766fc54f…`, probe default off).
+
+**Two now-separate results:**
+
+- **Power-up: FIXED.** The K121 boot ran **6304 s (1 h 45 m)** with the GPU
+  powered, firmware loaded, GDSCs on and the first `gpu_write` completed. Stable
+  under ordinary use.
+- **Rendering: STILL WEDGES.** Launching Phosh with `WLR_RENDERER` unset (so
+  wlroots picks GLES2 and Mesa loads freedreno) killed the SoC. Lance observed
+  the crash and the return to LineageOS; USB timeline confirms the disconnect
+  lands exactly at the render attempt. Recovered unaided, as before.
+
+So the earlier fixes genuinely solved the *power/clock topology*, and a
+**second, later failure** exists in the GPU init path — it was simply
+unreachable before, because the first register write killed the SoC first.
+
+**A weston-based probe attempted first was inconclusive** and is not evidence:
+`weston --backend=drm` failed with
+`Failed to load module: /usr/lib/libweston-14/drm-backend.so: No such file or
+directory` — the DRM backend package is not installed. The GPU stayed
+`suspended`; nothing was tested. Only the Phosh run exercised the GPU.
+
+#### Where the next failure most likely is
+
+`a5xx_pm_resume()` now completes. What follows on first use is `a5xx_hw_init()`
+-> zap shader / secure-mode transition -> ringbuffer setup. The July note on
+this is directly on point and still unfalsified:
+
+> PAS auth returning 0 only means TZ accepted the signature — it does NOT mean
+> secure mode was released. After auth the driver submits `CP_SET_SECURE_MODE`
+> through the ringbuffer and waits on `a5xx_idle()`; a still-secure GPU there
+> hangs the bus rather than erroring.
+
+`a5xx_gpu.c` (~line 975) predicts exactly this symptom: guess wrong and
+"access to the RBBM_SECVID_TRUST_CNTL register will be blocked and a
+permissions violation will soon follow… you are about to crash horribly."
+
+#### NEXT — extend the same technique that worked
+
+The K118 log-then-abort probe is what made K119/K120 tractable. Apply it again,
+deeper:
+
+1. Add staged probes through `a5xx_hw_init()`: before/after zap load, before
+   `CP_SET_SECURE_MODE` submission, before `a5xx_idle()`, logging GPU state at
+   each boundary and aborting at a selectable stage (extend the existing module
+   param to an int stage number rather than a bool).
+2. That converts the render wedge into the same cheap repeatable measurement,
+   and should localise the failure to a single step.
+3. Do NOT change zap/secure-mode handling speculatively first — the whole
+   reason K115-K121 worked was measuring before changing.
+
+**Standing state:** `WLR_RENDERER=pixman` in `/etc/environment` and `greetd`
+disabled both remain correct and necessary — a normal session must not touch
+the GPU until this second failure is fixed. The device is fully usable in that
+configuration (M6 Phosh, software-rendered).
