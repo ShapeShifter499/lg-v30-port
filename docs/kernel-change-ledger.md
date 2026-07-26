@@ -6148,3 +6148,75 @@ which is a DT/driver-plumbing problem, not an electrical one.
    automatic.
 
 **Evidence:** `out/k118-ember-resume-probe-20260726/`.
+
+### K119 (2026-07-26) — GX GDSC attached: power domains now come up; clocks still have no rate
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-26
+
+Image `out/boot-joan-pmos-k119-gxgdsc.img`
+(`3f9531c7047e8be09bbee5b26631e48ef58992eeab4e5511e75bd0d1970bffe4`).
+K118 probe still armed, so the boot is SoC-safe.
+
+**Change (one variable):** override the GPU's power-domain in joan's DTS.
+
+```dts
+power-domains = <&gpucc GPU_GX_GDSC>;   /* was &rpmpd RPMPD_VDDMX */
+```
+
+**Rationale — likely a mainline defect in `msm8998.dtsi`.** The adreno binding
+allows `power-domains: maxItems: 1`. Every other Adreno 5xx in tree puts the
+GX GDSC there (msm8996: `power-domains = <&mmcc GPU_GX_GDSC>`). msm8998 instead
+supplies `<&rpmpd RPMPD_VDDMX>` — the RPM *voltage* domain used for
+`opp-level` — so the GPUCC `gpu_gx`/`gpu_cx` GDSCs have no consumer and are
+never switched on. No msm8998 board in mainline enables the GPU, so nothing
+exercised this path.
+
+#### RESULT — power domains fixed
+
+```
+                K118 (before)     K119 (after)
+gpu_gx          off-0             on   performance 48
+gpu_cx          off-0             on   performance 48
+```
+
+`gpu_gx` brings its parent `gpu_cx` up as expected, and both report a
+performance state, so OPP level propagation works through the GDSC path too.
+
+#### NOT fixed — clocks still have no rate
+
+```
+clk[0] iface       rate=0            <- register bus, unchanged
+clk[1] rbbmtimer   rate=19200000
+clk[2] mem         rate=0
+clk[3] mem_iface   rate=0
+clk[4] rbcpr       rate=19200000
+clk[5] core        rate=710000097    <- still TURBO
+vdd enabled=1 uV=752000
+```
+
+**This disproves a guess made in the K118 entry**, which suggested the zero
+clock rates were probably a consequence of the domains being off and should be
+re-measured after fixing them. They are not: the domains are on and the rates
+are unchanged. `iface`, `mem` and `mem_iface` are therefore an **independent**
+fault, not a cascade.
+
+Writing a register with `iface` (`GCC_GPU_CFG_AHB_CLK`) at rate 0 remains
+sufficient on its own to hang the AHB bus, so the wedge is still expected if
+the probe is disarmed. Do not disarm it yet.
+
+#### NEXT (one variable each)
+
+1. **`iface`/`mem`/`mem_iface` rate 0.** These are GCC branch clocks
+   (`GCC_GPU_CFG_AHB_CLK`, `GCC_BIMC_GFX_CLK`, `GCC_GPU_BIMC_GFX_CLK`). A
+   branch clock reporting 0 usually means its parent supplies no rate.
+   Investigate the parent chain in `gcc-msm8998.c` before changing anything.
+2. **`core` at 710000097 Hz** — mainline's TURBO OPP, above downstream's
+   650 MHz maximum. Cap the OPP table for bring-up.
+3. Only disarm the probe (`a5xx.k118_probe=0`) once `iface` has a real rate.
+
+The `power-domains` fix is independently correct and worth carrying regardless
+of what the clock investigation finds; it is also a plausible upstream patch
+for `msm8998.dtsi` in its own right, though it should be proposed against the
+SoC dtsi rather than kept as a board-level override.
