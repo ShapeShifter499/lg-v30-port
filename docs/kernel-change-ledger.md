@@ -6612,3 +6612,71 @@ session did not have and did not attempt to obtain.
 
 Nothing was flashed — every boot this session was `fastboot boot` (RAM only),
 and the phone returns to LineageOS on a power cycle. K101 remains quarantined.
+
+#### K127 addendum (same day) — the failure is the KMS scanout path, and UBWC config is NOT the mismatch
+
+Two follow-ups that narrow the remaining modeset failure.
+
+**1. UBWC config is consistent. Hypothesis refuted from source, zero device time.**
+
+I suspected the msm8998 MDSS entry, because `msm_mdss.c` has
+
+```c
+static const struct msm_mdss_data data_76k8 = { .reg_bus_bw = 76800, };
+{ .compatible = "qcom,msm8998-mdss", .data = &data_76k8 },
+```
+
+with no UBWC fields at all, and `msm_mdss_setup_ubwc_*` computes
+`HIGHEST_BANK_BIT(data->highest_bank_bit - 13)` — which would underflow if that
+were the source. **It is not.** UBWC config comes from
+`qcom_ubwc_config_get_data()`, keyed on the *root* compatible, and
+`drivers/soc/qcom/ubwc_config.c` has a proper `msm8998_data`:
+
+| value | GPU reports (K125) | `msm8998_data` |
+|---|---|---|
+| `highest_bank_bit` | `0xf` = 15 | 15 |
+| `ubwc_swizzle` | `0x7` | `LVL1\|LVL2\|LVL3` = 7 |
+| enc/dec version | — | `UBWC_1_0` / `UBWC_1_0` |
+
+They match exactly, because both sides read the same `qcom_ubwc_cfg_data`.
+`CONFIG_QCOM_UBWC_CONFIG=y`, and joan's root compatible is `qcom,msm8998`.
+`data_76k8` carrying only `reg_bus_bw` is correct by design, not an omission.
+The DPU also lists `DRM_FORMAT_MOD_QCOM_COMPRESSED` (`dpu_plane.c:92`, checked
+at `:1789`). **A UBWC config mismatch is excluded**, which retroactively
+explains why `FD_MESA_DEBUG=noubwc` and `WLR_DRM_NO_MODIFIERS=1` changed
+nothing.
+
+**2. The GPU draw path is fine; the KMS path is what dies.**
+
+`phoc -S` alone never reached modeset, so the first real draw had never been
+tested in isolation. The headless backend renders on the GPU while never
+touching KMS:
+
+```
+WLR_BACKENDS=headless WLR_HEADLESS_OUTPUTS=1 WLR_RENDERER=gles2
+  [backend/headless/backend.c:60] Creating headless backend
+  [render/gles2/renderer.c:538]   Creating GLES2 renderer
+  [render/gles2/renderer.c:541]   GL renderer: FD540
+  -> ran 25 s, ALIVE at uptime 110.10
+```
+
+versus the DRM backend, which dies ~300 ms after
+`Modesetting with 1440x2880 @ 60.000 Hz`.
+
+**The first attempt at this was a false pass and is recorded as non-evidence:**
+it produced only `Terminated`, two lines, because `G_MESSAGES_DEBUG` was unset,
+so phoc logged nothing and "survived" without demonstrably doing anything. Only
+the re-run with logging on is evidence. Same failure mode as the K125 `pipe=1`
+run — a probe that survives while doing nothing looks exactly like success.
+
+**Careful scoping of the claim:** "created a GLES2 renderer and stayed up for
+25 s with no KMS" is what was measured. That is not the same as proving frames
+were drawn, so do not upgrade this to "the GPU draw path is verified" without
+counting submits.
+
+So the remaining bug is the DPU scanning out a freedreno/GBM buffer, with UBWC
+config already ruled consistent. Next candidates: whether `dpu_plane` programs
+tiled fetch for the modifier wlroots actually selects, and whether the buffer is
+mapped correctly into the *display* address space (pixman's dumb buffers take
+the same route and work, so this is about layout/fetch programming rather than
+mapping per se).
