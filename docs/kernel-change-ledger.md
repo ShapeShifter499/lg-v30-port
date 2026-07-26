@@ -6067,3 +6067,84 @@ that there is no actionable 8998 ICC provider.
 
 Standing safety: `WLR_RENDERER=pixman` in `/etc/environment` keeps a normal
 session off the GPU; `greetd` stays out of the default runlevel.
+
+### K118 (2026-07-26) — instrumented resume: GPU is neither powered nor clocked when the driver writes to it
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-26
+
+Image `out/boot-joan-pmos-k118-resume-probe.img`
+(`c02c7a7196becb7577bf4fe7e4daff6ad2f9558ba9b4a37b16e655a5740af47e`).
+
+**Method — the key idea: log, then ABORT before the fatal write.** Previous
+attempts drove into the hang and lost the evidence with the SoC.
+`a5xx_pm_resume()` was instrumented to dump clock/regulator state immediately
+before `gpu_write(REG_A5XX_GPMU_RBCCU_POWER_CNTL, …)` and then return `-EIO`,
+gated by a module param (`a5xx.k118_probe`, default on). The system stays up,
+so `genpd` can also be inspected from userspace afterwards.
+
+**It worked.** `adreno_load_gpu` failed cleanly with `-5`, uptime continued
+past 43 s, no wedge, no recovery needed.
+
+#### CAPTURED STATE — immediately before the first register write
+
+```
+clk[0] iface       rate=0            <- GCC_GPU_CFG_AHB_CLK: the REGISTER BUS
+clk[1] rbbmtimer   rate=19200000
+clk[2] mem         rate=0            <- GCC_BIMC_GFX_CLK
+clk[3] mem_iface   rate=0            <- GCC_GPU_BIMC_GFX_CLK
+clk[4] rbcpr       rate=19200000
+clk[5] core        rate=710000097    <- TURBO OPP
+vdd enabled=1 uV=752000
+gpu_cx = present
+
+genpd after the attempt:  gpu_gx off-0   gpu_cx off-0
+```
+
+**`msm_gpu_pm_resume()` returns success while the GPU is neither powered nor
+clocked.** Four independent problems, any one sufficient to hang the bus:
+
+1. **Both GPUCC power domains remain `off`.** `gpu_cx` and `gpu_gx` never come
+   up across the resume.
+2. **The register-interface clock has no rate.** `iface`
+   (`GCC_GPU_CFG_AHB_CLK`) reads 0 — the driver is about to perform a register
+   write over an unclocked bus. This alone is the classic unclocked-slave hang.
+3. **Both BIMC GFX clocks read 0** — no memory path.
+4. **`core` is requested at 710000097 Hz**, mainline's TURBO OPP, which is
+   *above downstream's 650 MHz maximum* (`msm8998-gpu.dtsi` pwrlevel@0), at
+   752 mV.
+
+#### PROBABLE ROOT CAUSE
+
+`msm8998.dtsi` gives the GPU only `power-domains = <&rpmpd RPMPD_VDDMX>` — the
+RPM *voltage* domain used for `opp-level`. Nothing attaches the GPUCC
+`gpu_gx` / `gpu_cx` GDSCs, so they are never switched on, and the clocks that
+depend on them never produce a rate. The GDSCs exist (they appear in
+`pm_genpd_summary` as `gpu_gx`, child of `gpu_cx`) but have no consumer.
+
+This also explains why K101's "force both GDSCs ALWAYS_ON" was directionally
+right even though it did not fix things — that was tried on a stack with no
+firmware, and without addressing the clock rates or the turbo OPP.
+
+#### WHAT THIS RETIRES
+
+Voltage is **not** the leading suspect and was never evidenced (see the K117
+addendum: downstream carries no GPU voltage table because VDD_GFX is
+closed-loop CPR3). The zap shader is loaded and fine. `vddcx` is optional and
+correctly absent. The remaining problem is **power-domain and clock topology**,
+which is a DT/driver-plumbing problem, not an electrical one.
+
+#### NEXT (one variable each)
+
+1. Attach the GPU to the GPUCC GX/CX GDSCs so the domains actually power up,
+   and confirm `gpu_cx`/`gpu_gx` report `on` before the first register write.
+2. Establish why `iface`/`mem`/`mem_iface` have no rate — likely a consequence
+   of (1), so re-measure after it rather than changing both.
+3. Cap the OPP below downstream's 650 MHz maximum; starting at the
+   27 MHz/171 MHz levels would be more honest for bring-up than TURBO.
+4. Keep the K118 probe available — `a5xx.k118_probe=0` re-arms the real write
+   once the state above looks correct, so the wedge is opt-in rather than
+   automatic.
+
+**Evidence:** `out/k118-ember-resume-probe-20260726/`.
