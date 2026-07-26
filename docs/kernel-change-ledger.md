@@ -6814,3 +6814,87 @@ bits and downstream's a540 start sequence line by line.
 Standing state: pixman + greetd-disabled unchanged. All boots RAM-only.
 K101 quarantined. LineageOS untouched (system partition mounted read-only
 once, to extract firmware).
+
+---
+
+### K134–K138 (2026-07-26, late session) — THE RULE FOUND: GPU accesses succeed only on mappings created BEFORE the CP starts; IB fetch itself is PROVEN GOOD (gpmufw); secure-switch, BO flags, and packet-content hypotheses all refuted
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-26
+
+#### K134 — boot-time IB experiment, three rounds
+
+Round 1: a kernel BO of 8×CP_NOP (pkt7 0x70900000), INDIRECT_BUFFER'd at the
+end of hw_init: **HUNG** — "IB fetch broken per se". PFD (no-prefetch, 0x37)
+vs PFE: **both hang** — not burst-length. ME_INIT ordinals: decoded
+downstream's `_set_ordinals` — byte-identical to mainline's 8 dwords for a540
+(patch≠0 ⇒ zero workarounds both sides). HWCG value diff vs downstream
+`a540_hwcg_regs`: only the two GPMU entries mainline also writes. VBIF list:
+identical. SECVID/TSB: zeroed identically. `RBBM_STATUS C00003C1` decoded
+properly against a5xx.xml: GPU_BUSY_IGN_AHB | _CP | VBIF_BUSY | _HYST |
+CP_BUSY_IGN_HYST | CP_BUSY | HI_BUSY — **PFP and ME both IDLE, VBIF stuck
+busy**: an AXI read that never completes, engines idle-waiting.
+
+#### The false linchpin, caught and then re-proven true
+
+`a5xx_gpmu_init()` loads GPMU microcode via **CP_INDIRECT_BUFFER_PFE** at
+stage 5, and no GPMU error ever printed — apparent proof an IB executes at
+boot. Flagged the hole myself: `gpmu_dwords == 0` returns early with no
+error, and BABEFACE could be retained state from the LineageOS warm boot.
+Closed it with the GEM debugfs table (root): **`gpmufw` BO exists, 12288
+bytes, iova 0x1013000, mapped** — the fw2 parse succeeded, the IB was
+submitted, its a5xx_idle passed. The GPMU IB genuinely executes. **IB fetch
+per se is NOT broken.**
+
+#### Refuted this session, one variable per boot
+
+1. **K135 zap-before-ME** (downstream's a5xx_rb_start order, zap PAS auth
+   while ME_HALT still set): auth ret=0, IBs still hang.
+2. **K136 skip CP_SET_SECURE_MODE entirely** + IB tests bracketing the switch
+   point: the PRE-switch IB also hangs → the secure-mode transition was never
+   the discriminator. (This killed the elegant "switch breaks fetch" theory
+   the same hour it was born.)
+3. **MSM_BO_GPU_READONLY** (gpmufw's one structural mapping difference): no
+   change.
+4. **PKT4-only IB content** (gpmufw is pure TYPE4; wrote CP_SCRATCH_REG(3)
+   markers for positive readback): hangs, scratch3 stays 0.
+
+#### The surviving invariant — sharp, and consistent with every experiment
+
+- Mapped BEFORE CP start (stage ≤3): ring0 (RW, RB-fetch reads), memptrs
+  (RW, CP fence WRITES), pm4fw/pfpfw, **gpmufw (RO, IB-FETCH reads)** — all
+  GPU-accessible.
+- Mapped AFTER CP start: K134 BO (stage 6, kernel, WC, RO or RW, any content),
+  every userspace BO — **no GPU access has ever succeeded; reads stall the
+  VBIF; no SMMU context fault is ever raised.**
+
+K132 (TLBIALL after every map) not helping argues against simple TLB/negative
+caching, pointing at frozen or shadowed translation state: PTE updates made
+after some early event (ME start is the current boundary candidate) never
+become visible to the GPU-side walker. Note msm8998 downstream runs this SMMU
+with `qcom,hyp_secure_alloc` — hyp/TZ involvement in the GPU SMMU on this
+platform is documented, and mainline drives it as a plain arm-smmu-v2.
+
+#### NEXT (first thing, one boot): split alloc from submit
+
+Allocate the K134 BO at stage 3 (before ME start), submit its IB at stage 6.
+- EXECUTES → "map-before-CP-start" rule confirmed clean → the hunt becomes
+  SMMU pagetable-visibility (io-pgtable dma_sync on this non-coherent walker,
+  qcom TLBI quirks, hyp shadowing), with a known-good/known-bad mapping pair
+  to diff at the PTE level (root + debugfs available).
+- HANGS → the rule is wrong and the discriminator is the allocation slot/iova
+  itself; diff the two mappings' PTEs directly.
+
+Status of the goal: renderer creation on FD540 works (K127); one real fence
+signal achieved (K131, empty submit — ring-only); actual cmdstream execution
+remains blocked by the mapping-visibility defect above. GPU rendering is not
+yet functional; the blocker is now a single, precisely-stated invariant.
+
+Params accumulated (all msm.*, all default-off, documented in code):
+k118_probe, k123_stage, k124_pm, k127_no_suspend, k128_no_ubwc_scanout,
+k130_no_powercycle, k130_no_crash_capture, k131_no_preempt, k132_tlbi_on_map,
+k134_boot_ib, k135_zap_first, k136_no_secure_switch.
+
+All boots RAM-only; LineageOS untouched; K101 quarantined. Session ended here
+on Lance's budget call (usage credits), with the discriminator queued.
