@@ -6680,3 +6680,137 @@ tiled fetch for the modifier wlroots actually selects, and whether the buffer is
 mapped correctly into the *display* address space (pixman's dumb buffers take
 the same route and work, so this is about layout/fetch programming rather than
 mapping per se).
+
+---
+
+### K128–K133 (2026-07-26) — first PROVEN GPU execution (fence signalled); preemption breaks all submits; IB1 fetch hangs independent of mapping, cache, TLB, GPMU, and ucode; recovery localised as the SoC-killer
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-fable-5
+Date: 2026-07-26
+Host: build on nym-skyforge, transport from nym-nest (standing rule)
+
+Model note: this session switched harness models mid-day; entries above this
+one were written under claude-opus-5, this one and later under claude-fable-5.
+Earlier trailers are accurate records of what ran at their write time and are
+not rewritten.
+
+#### Root access recovered from our own docs
+
+The device user password (`147147`) and the exact sudo recipe were in
+`docs/ember-handoff-2026-07-11-m4-smmu-next.md` all along. Root on the RAM-booted
+pmOS was never missing. Used for: clean reboots to LineageOS (`sudo reboot`
+instead of asking Lance to power-cycle) and mounting the LG system partition.
+
+#### K128 — UBWC-scanout refusal: hw_rev MEASURED, hypothesis REFUTED
+
+`MDSS_HW_VERSION = 0x30000001` (3.0.0.1), measured, confirming msm8998 falls
+through `msm_mdss_enable()`'s `>= 4.0.0` UBWC ladder and never programs any
+UBWC parameters, while `dpu_plane_format_mod_supported()` still advertises
+`DRM_FORMAT_MOD_QCOM_COMPRESSED` (`ubwc_enc_version = UBWC_1_0` ≠ 0).
+`msm.k128_no_ubwc_scanout=1` refuses the compressed modifier kernel-side,
+forcing genuine LINEAR negotiation (stronger than `WLR_DRM_NO_MODIFIERS`,
+which only drops to legacy ADDFB while Mesa may still tile). Result:
+**identical death at the same modeset.** Buffer layout is exonerated.
+
+#### The pivot: fdinfo showed the "GPU rendering works" claim was hollow
+
+`drm-engine-gpu: 0 ns` after 11+ s of "surviving" headless GLES2 — phoc
+created the FD540 renderer but **never submitted**. Until today, no GPU submit
+had ever demonstrably completed on this device. The K127-era claim is
+downgraded accordingly: renderer/context creation worked; execution did not.
+
+#### K125 extension — GEM_SUBMIT + WAIT_FENCE reproducer
+
+`tools/msmprobe.c` now does: empty submit (no IB — the CP still executes the
+ring tail: CACHE_FLUSH_TS fence write + interrupt), then a submit with one
+8×CP_NOP IB in an `MSM_BO_WC` buffer. Units verified against
+`msm_gem_submit.c` (`size/4` → dwords).
+
+#### First real GPU error lines ever captured, and the chain decoded
+
+```
+gpu fault ring 0 fence ffffff01 status C00003C1 rb 002e/004f ib1 0000000001075000/0000
+recover_worker: hangcheck recover!  offending task: msmprobe
+```
+
+- `fence ffffff01` is `fctx->last_fence` (CPU-side; seed is 0xffffff00) — NOT a
+  memory readback. Corrected mid-analysis before it took root.
+- **The silent SoC deaths are the RECOVERY path, not the fault**:
+  `adreno_recover()` calls `gpu->funcs->pm_suspend/pm_resume` DIRECTLY,
+  bypassing runtime-PM refcounting, so the K127 hold cannot protect it — that
+  pair is the fatal GX collapse-restore. Confirmed in code and then by
+  bracketing (below).
+
+#### K130 — survivable recovery (two gates, both needed)
+
+`msm.k130_no_powercycle=1` skips the suspend/resume pair in `adreno_recover()`;
+first test still died BEFORE reaching it → second gate
+`msm.k130_no_crash_capture=1` skips `msm_gpu_crashstate_capture()` (register
+dump of a just-faulted GPU wedges the bus). With both, the fault prints, the
+probe process survives, and `memptrs fence readback=ffffff01` (a REAL memory
+readback this time) proves the CP wrote the empty submit's fence to memory.
+The SoC still dies seconds later from post-fault fallout — K130 extends the
+observation window, it does not make faults harmless.
+
+#### K131 — PREEMPTION was the submit-breaker
+
+`PRIORITIES = 0xc` = 4 rings: a5xx preemption was active, wrapping every
+userspace submit in CP_CONTEXT_SWITCH machinery that boot-time hw_init ring
+streams never use. `msm.k131_no_preempt=1` forces `nr_rings = 1`. Result:
+
+```
+GEM_SUBMIT (empty)  →  WAIT_FENCE rc=0   GPU EXECUTED AND SIGNALLED
+```
+
+**First proven end-to-end GPU execution on this device** — CP consumed the
+ring, wrote the fence to memory, raised the retire interrupt. GPMU was back ON
+for this run, independently re-confirming K124's GPMU exoneration.
+
+#### The remaining wedge: IB1 fetch, and four refuted hypotheses
+
+The 8×CP_NOP IB submit still hangs the CP (`C00003C1`, IB1_BASE loaded,
+rptr frozen short of wptr). Refuted one variable at a time:
+
+1. **CPU cache dirt** — cmdstream moved MSM_BO_CACHED → MSM_BO_WC: no change.
+2. **Stale TLB / negative walk-cache** — K132 `msm.k132_tlbi_on_map=1` does
+   `iommu_flush_iotlb_all()` after every map: no change. (Also note the
+   failing IB iova 0x1013000 is ADJACENT to working boot mappings ~0x1000000+,
+   same 2 MB granule — the mapping layer was never the discriminator.)
+3. **GPMU** — off entirely (mask 7): no change.
+4. **CP ucode version** — LG ships NEWER ucode than linux-firmware
+   (pm4 0x5ff066 vs 0x5ff063; pfp 0x5ff112 vs 0x5ff08a — and PFP is the IB
+   fetch engine, so this was the best-looking suspect). Extracted from the LG
+   system partition (`/system/vendor/firmware`, via sudo mount of /dev/sda22
+   read-only; adb pull is SELinux-blocked), saved to `firmware/lg-vendor/`
+   (UNTRACKED pending the same licensing review as the rest), injected via
+   `FWSRC2`. **No change.** Both ucode versions behave identically.
+
+Also excluded by inspection: SECVID/TSB content-protection ranges (zeroed
+identically to downstream), submit size units, 64-bit ADDR_MODE consistency.
+
+What works vs not, measured:
+- CP fetches + executes RING contents (boot streams AND userspace ring tails)
+- CP writes memory (fence readback proves it)
+- CP hangs on any INDIRECT_BUFFER fetch — regardless of buffer flags, mapping
+  age, TLB state, GPMU state, or ucode version
+
+#### msm8996 comparison worth recording
+
+msm8996's GPU SMMU is `"qcom,adreno-smmu"` (adreno impl, CB0 guarantees);
+msm8998's is plain `"qcom,smmu-v2"` — and with no upstream board enabling this
+GPU, the 8998-GPU-on-plain-smmu path is exactly as unexercised as the GX
+collapse path was. No SMMU context faults are ever raised, so if translation
+is involved it stalls rather than faults.
+
+#### Next (K134, queued)
+
+Boot-time IB experiment: at the end of `a5xx_hw_init()`, emit an
+INDIRECT_BUFFER into a kernel BO of 8 NOPs allocated at init, then a5xx_idle.
+Executes → IB mechanism fine, the discriminator is post-boot state after all.
+Hangs → IB fetch is broken per se on this part/config, focus on CP enable
+bits and downstream's a540 start sequence line by line.
+
+Standing state: pixman + greetd-disabled unchanged. All boots RAM-only.
+K101 quarantined. LineageOS untouched (system partition mounted read-only
+once, to extract firmware).
