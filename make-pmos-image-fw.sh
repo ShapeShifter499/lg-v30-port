@@ -27,6 +27,12 @@ unpack_bootimg --boot_img "$REF" --out "$WORK" > "$WORK/header.txt"
 CMDLINE="$(sed -n 's/^command line args: //p' "$WORK/header.txt")"
 [[ -n "$CMDLINE" ]] || { echo "could not read cmdline" >&2; exit 1; }
 
+# Appended verbatim after the reference cmdline, so pmos_boot_uuid/pmos_root_uuid
+# are untouched. Used to set module params on a device we have no root on.
+if [[ -n "${EXTRA_CMDLINE:-}" ]]; then
+    CMDLINE="$CMDLINE $EXTRA_CMDLINE"
+fi
+
 mkdir -p "$WORK/rd"
 ( cd "$WORK/rd" && zcat "$WORK/ramdisk" | cpio -idm --quiet )
 

@@ -6373,3 +6373,242 @@ deeper:
 disabled both remain correct and necessary — a normal session must not touch
 the GPU until this second failure is fixed. The device is fully usable in that
 configuration (M6 Phosh, software-rendered).
+
+---
+
+### K123–K127 (2026-07-26) — GPU RENDERING REACHED: `GL renderer: FD540`, OpenGL ES 3.1 on freedreno; root cause of the render wedge was **GX power-collapse restore**, not rendering
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-26
+Host: build on nym-skyforge, all fastboot transport from nym-nest (standing rule)
+
+**Headline:** Mesa's freedreno driver now creates a hardware GLES2 renderer on
+joan — `GL vendor: freedreno`, `GL renderer: FD540`, `Using OpenGL ES 3.1 Mesa
+26.1.1`, GBM allocator on `/dev/dri/card0`, high-priority EGL context. The SoC
+survives. The remaining failure has moved to the **first KMS modeset with a
+GPU-rendered buffer**, which is a display-side problem, not a GPU one.
+
+#### The K122 hypothesis was WRONG, and cheaply so
+
+K122 said to add staged probes through `a5xx_hw_init()` because the zap /
+`CP_SET_SECURE_MODE` transition was the suspected wedge. K123 did exactly that
+(module param `msm.k123_stage`, abort-before-stage-N, 8 named stages, latching
+to stage 1 after an abort so submit retries do not re-run the step under test).
+
+The very first boot refuted the premise:
+
+```
+K123: reached stage 1 (hw_init entry)      t=1.369
+K123: reached stage 2 (adreno_hw_init)     ...
+K123: reached stage 6 (zap_shader_init)    t=1.370
+K123: reached stage 7 (CP_SET_SECURE_MODE) t=1.398   <- zap load took 28ms, OK
+K123: reached stage 8 (preempt_start)
+K123: hw_init completed all stages
+```
+
+`a5xx_hw_init()` completes **every** stage at boot, including the zap shader
+load and the secure-mode exit. Nothing in hw_init was ever broken. The staged
+walk cost one boot and removed the entire hypothesis.
+
+**Note the module-param prefix:** `CONFIG_DRM_MSM=y`, so these are `msm.*`
+(`msm.k123_stage`), not `a5xx.*`. Earlier ledger entries saying
+`a5xx.k118_probe` are wrong on that point.
+
+#### Instrumentation that made this session work
+
+The device resets hard enough that on-disk dmesg is lost, so **everything was
+streamed off-box per-line over the USB gadget link** — bytes that already
+reached nym-nest survive the target dying. Three concurrent streams: device
+`dmesg -w`, a 4–5 Hz heartbeat (uptime + GPU `cur_freq` + every regulator's
+microvolts), and the compositor's stderr. Each piped through
+`while IFS= read -r l; do printf '%s\n' "$l"; done` so no line waits in a 4 KB
+block buffer.
+
+A pixman control run was done **first**, to prove the capture channel worked
+before trusting its silence (569 lines captured, phoc launched and exited
+cleanly). Positive-control the instrument, then use it.
+
+**Method failure to not repeat:** one `phosh-session` run wrote its log to
+`/tmp` *on the device*. The SoC reset destroyed exactly the evidence the run
+existed to collect. A streaming harness already existed and should have been
+used. Never write diagnostic output to the tmpfs of a box you expect to die.
+
+#### What the failure signature actually said
+
+With `WLR_RENDERER` unset (GLES2), three independent streams agreed:
+
+| stream | last data | content |
+|---|---|---|
+| heartbeat | uptime 717.19 | all rails rock-steady, GX at 752 mV, then stops dead |
+| dmesg | uptime 671.98 | routine mmc tuning — **zero** GPU lines, no oops/fault/hang |
+| phoc | 0 lines | died before the message pixman printed in under a second |
+
+No kernel output at all. A GPU fault, an oops, or a hang report would all have
+printed. A silent instantaneous SoC reset is a firmware/hardware-level event.
+
+#### Hypotheses tested and EXCLUDED, one variable each
+
+1. **SP/TP inter-frame power collapse** (`a5xx_pc_init`). The GPMU collapses
+   shader-pipe power *between frames* — dormant at idle, engages the moment
+   rendering starts, acts with no kernel involvement. Perfect profile fit.
+   Added `msm.k124_pm` bitmask (1=lm_setup 2=pc_init 4=gpmu_init 8=lm_enable).
+   Booted with `msm.k124_pm=2`: **still died.** Excluded.
+2. **UBWC / tiled scanout.** `WLR_DRM_NO_MODIFIERS=1`: still died. But this
+   test was run *before* K127 and was therefore **invalid** — the crash then
+   happened at EGL init, long before a buffer modifier could matter. Retested
+   after K127 (`WLR_DRM_NO_MODIFIERS=1`, and separately
+   `FD_MESA_DEBUG=noubwc`): both still die, now at the modeset. Weakened but
+   not conclusively excluded, since neither flag is a guarantee of a linear
+   layout.
+3. **SMMU / unmapped access.** `platform 5000000.gpu: Adding to iommu group 0`,
+   adreno SMMU probes clean with 48-bit VA. The GPU SMMU is plain
+   `qcom,msm8998-smmu-v2`, **not** `qcom,adreno-smmu`, so there are no
+   per-process pagetables and no TTBR-switching path to blame.
+4. **Undervolt.** GX rail `pm8005_s1` sits at 752 mV, which for a540 at
+   257 MHz is between SVS+ and NOM — generous, not marginal. Weak explanation.
+
+#### K125 — the reproducer that cracked it
+
+Rather than keep bisecting a whole compositor, a static aarch64 prober walked
+the DRM ioctls Mesa issues during screen creation, announcing each **before**
+issuing it and pausing 120 ms so the line cleared the link first.
+
+First run was a **false pass** and said so out loud: every `GET_PARAM` returned
+`EINVAL` because the probe passed `pipe = 1`. `MSM_PIPE_3D0` is `0x10`. The
+`rc=`/`errno=` in every line is what exposed it — an instrument that reports
+its own return codes catches its own bugs. Corrected (`pipe=0x10`,
+`MSM_BO_CACHED=0x00010000`) and re-run:
+
+```
+GET_PARAM 0x01 GPU_ID     = 0x21c        rc=0
+GET_PARAM 0x03 CHIP_ID    = 0x5040001    rc=0     (a540 v1)
+GET_PARAM 0x02 GMEM_SIZE  = 0x100000     rc=0     (1 MB)
+GET_PARAM 0x0a SUSPENDS   = 0x1          rc=0     <- GPU already collapsed once
+GET_PARAM 0x10 HIGHEST_BANK_BIT = 0xf    rc=0
+ABOUT TO: GET_PARAM 0x05 TIMESTAMP  <-- reads GPU regs
+                                                  <- SoC dead here, every time
+```
+
+**`MSM_PARAM_TIMESTAMP` is the only param that touches a GPU register, and it
+is 100% fatal.** A ~30 s, root-free, compositor-free reproducer.
+
+#### Root cause: the first GX collapse-then-restore cycle
+
+`adreno_get_param()` handles TIMESTAMP as:
+
+```c
+pm_runtime_get_sync(&gpu->pdev->dev);
+*value = adreno_gpu->funcs->get_timestamp(gpu);   /* bare gpu_read64 */
+pm_runtime_put_autosuspend(&gpu->pdev->dev);
+```
+
+`gpucc-msm8998.c` defines `gpu_gx_gdsc` with
+`CLAMP_IO | SW_RESET | AON_RESET | NO_RET_PERIPH` and `.resets = { GPU_GX_BCR }`
+— so **every GDSC power-on hardware-resets the GX block.**
+
+K126 therefore added `msm_gpu_hw_init()` (under `gpu->lock`) to that path,
+reasoning that the reset leaves the GPU in post-reset secure mode and a bare
+register read is a permissions violation. **That reasoning was refuted by
+measurement:** the K126 boot still died, and `hw_init` ran only **once**, so the
+fix never executed. There is also no second `K118` block — and K118 prints at
+the top of `a5xx_pm_resume`. The death is therefore *inside*
+`pm_runtime_get_sync()`, in genpd's GX GDSC power-on or the very start of
+resume, **before the driver reads any register at all.**
+
+K126 is kept as defensive hardening, since that path genuinely ignores the
+`needs_hw_init` that `msm_gpu_pm_resume()` sets, but it is **not** the fix and
+must not be described as one.
+
+Relevant: `a5xx_pm_suspend()` resets the VBIF before collapse only for
+a510/a530, with the comment *"the others will tend to lock up"*. The a540
+collapse path has never been exercised on hardware. Upstream msm8998 has the
+GPU `status = "disabled"` and **no board enables it**, so this is genuinely new
+ground, and upstream's choice of `power-domains = <&rpmpd RPMPD_VDDMX>` is
+itself unfinished.
+
+#### K127 — the workaround that unblocked rendering
+
+`msm.k127_no_suspend=1` holds one unbalanced `pm_runtime_get_noresume()` after
+`pm_runtime_enable()` in `adreno_load_gpu()`, so the usage count never reaches
+zero, the GPU never autosuspends, and the broken restore is never reached.
+
+Result — the K125 prober survived **every** step, including TIMESTAMP,
+`SUBMITQUEUE_NEW`, `GEM_NEW`, and `GEM_INFO GET_IOVA` (`iova=0x1078000`). Then:
+
+```
+[util/env.c:25]                Loading WLR_RENDERER option: gles2
+[render/egl.c:376]             EGL driver name: msm
+[render/egl.c:449]             Obtained high priority context
+[render/gles2/renderer.c:538]  Creating GLES2 renderer
+[render/gles2/renderer.c:539]  Using OpenGL ES 3.1 Mesa 26.1.1
+[render/gles2/renderer.c:540]  GL vendor: freedreno
+[render/gles2/renderer.c:541]  GL renderer: FD540
+[render/allocator/gbm.c:188]   Created GBM allocator with backend drm
+```
+
+`phoc` reached full steady state (cursor theme, idle-inhibit) and was still
+running when the timeout killed it. **This is a workaround, not a fix** — it
+costs idle power and deliberately isolates the collapse defect so rendering
+could be brought up independently of it.
+
+**Honest limit on the evidence:** devfreq `trans_stat` showing 119164 ms is
+residency at the only OPP, not busy time, and does **not** prove submits. The
+proof of hardware GL is the freedreno/FD540 renderer string, the GLES 3.1
+context, and the GBM allocator on the DRM node.
+
+#### Where the failure is now
+
+`phosh-session` with GLES2 dies reproducibly a few hundred ms after:
+
+```
+connector DSI-1: Requesting modeset
+connector DSI-1: Modesetting with 1440x2880 @ 60.000 Hz
+```
+
+So: the DPU scanning out a freedreno/GBM buffer. pixman's dumb buffers scan out
+fine, which is exactly why the software path always worked. This is a
+**display-side** problem now, not a GPU one.
+
+#### Also measured, worth fixing separately
+
+- **`K124: lm_setup mvolts=0 rate=257000000`.** `a540_lm_setup()` passes
+  `_get_mvolts(gpu->fast_rate)` to the GPMU's AGC, and that is
+  `dev_pm_opp_get_voltage(opp)/1000`. Our OPP table carries **no
+  `opp-microvolt`**, so the GPU's autonomous power controller is configured
+  with **0 mV** for its active power level. Measured, not inferred.
+- **The MX voltage vote is orphaned.** Upstream puts `rpmpd RPMPD_VDDMX` in the
+  single `power-domains` slot and every OPP carries
+  `opp-level = <RPM_SMD_LEVEL_*>` as a performance-state vote *to that domain*.
+  K121 repointed `power-domains` at `<&gpucc GPU_GX_GDSC>` — necessary to power
+  the GPU — which silently orphaned those votes, because a GDSC genpd has no
+  performance states. The msm driver has **no** multi-power-domain support (no
+  `power-domain-names`, no `dev_pm_domain_attach_list`), so both cannot be
+  attached without driver work.
+- `cur_freq=27000000` vs `target_freq=257000000` is **not** a bug — it is msm's
+  deliberate idle rate (`msm_gpu.c`, `dev_pm_opp_set_rate(dev, 27000000)`).
+  Puzzle closed.
+- `pm8005_s1` is effectively unmanaged: `regulator-always-on`, a 524000–1100000
+  range, no `opp-microvolt` to scale it, and the driver requests `"vddcx"`
+  (dummy) and never `"vdd"`.
+
+#### Next, cheapest first
+
+1. Attack the modeset failure directly. The GPU side is no longer the blocker.
+   Compare the DPU's UBWC/`highest_bank_bit` catalog values for msm8998 against
+   the `HIGHEST_BANK_BIT=0xf` / `UBWC_SWIZZLE=0x7` the GPU reports, and check
+   whether the DPU is being handed a tiled buffer it is programmed to read as
+   something else. Stream the log; do not write it on the device.
+2. Fix the GX collapse properly so K127 can be dropped. Suspect the missing
+   pre-collapse VBIF quiesce on the a540 path.
+3. Give the OPP an `opp-microvolt` so the AGC stops being told 0 mV.
+4. Only then raise the 257 MHz OPP cap, and only with a voltage story.
+
+**Standing state unchanged and still correct:** `WLR_RENDERER=pixman` in
+`/etc/environment` and `greetd` disabled. Both `/etc/greetd/config.toml`
+entries also pin pixman. A normal session must not touch the GPU until the
+modeset failure is fixed. Changing those needs root on the device, which this
+session did not have and did not attempt to obtain.
+
+Nothing was flashed — every boot this session was `fastboot boot` (RAM only),
+and the phone returns to LineageOS on a power cycle. K101 remains quarantined.
