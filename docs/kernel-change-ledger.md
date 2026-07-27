@@ -6981,3 +6981,105 @@ completion delivery, not execution.
 Status: renderer creation works (K127 baseline); ring-direct IB execution
 proven (K139); userspace submit path still fails somewhere between kick and
 retire. Session closed on budget.
+
+---
+
+### K141–K143 (2026-07-27) — ROOT CAUSE FOUND: GCC_GPU_BIMC_GFX_SRC_CLK. GPU rendering works; Phosh runs on freedreno
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-27
+
+#### The answer
+
+`clk_disable_unused()` switches off **GCC_GPU_BIMC_GFX_SRC_CLK** at
+late_initcall. That clock gates the GPU's path to BIMC, no mainline driver
+claims it, and without it every GPU memory access stalls the VBIF forever.
+Adding it to the msm8998 GPU node fixes the entire wedge that has blocked
+this port since July.
+
+It explains every symptom we have collected, including ones we explained
+away individually:
+
+- `RBBM_STATUS C00003C1` = VBIF_BUSY with PFP and ME idle: an AXI read that
+  never returns.
+- **No SMMU context fault, ever**: the transaction never reaches the SMMU.
+- Works at boot, fails later: hw_init runs at ~1.4 s, `clk_disable_unused`
+  runs after it.
+- The GPU looks perfectly healthy at rest (`RBBM_STATUS 0x00000001`,
+  core_clk at 257 MHz) right up until it is asked to fetch anything.
+
+#### How it was found, and what it invalidates
+
+K141 instrumented `a5xx_submit`. The first submit of the boot faulted before
+the CP consumed a single packet — **and so did an IB-less submit**, whose
+entire ring contribution is a scratch write, a CACHE_FLUSH_TS and a yield.
+If nothing is consumed, no packet can be to blame. That killed the whole
+"submit path" framing in one measurement.
+
+K142 tested the alternative directly: repeat the K139 ring-direct IB —
+proven to execute at boot — from a delayed work, with no submit path
+involved. It **HUNG at t=48 s**, then a 3-second sweep bracketed the
+transition: **EXECUTED inside hw_init at 1.4 s, HUNG at 4.5 s.** Booting
+with `clk_ignore_unused` made all 6 sweep iterations pass; diffing
+`clk_summary` between the two boots left exactly two candidates, and adding
+`GCC_GPU_BIMC_GFX_SRC_CLK` alone fixed it (13+ consecutive passes).
+
+**Corrections to earlier entries — these were wrong, and were wrong in ways
+that kept the hunt pointed at the wrong subsystem:**
+
+1. **"Userspace submits never signal, kernel ring-direct works" was not a
+   property of the submit path.** It was elapsed time. Kernel tests ran
+   inside hw_init (before the clock died); userspace tests ran seconds
+   later (after). Same for the K134–K138 "mapping age" invariant.
+2. **`drm-engine-gpu` = 0 is not evidence of anything on a5xx.**
+   `a5xx_submit` never writes `rbmemptr_stats` (a6xx does, in 8 places), so
+   the counter is structurally always zero whether the GPU works or not.
+   The "no GPU submit had ever completed" conclusion rested on it.
+3. **K131's "first fence signal ever" was probably recovery, not
+   completion.** Measured this session: a submit that faults still reports
+   SIGNALLED to `WAIT_FENCE`, because `recover_worker` force-retires it.
+   Any fence claim not cross-checked against dmesg for `gpu fault` /
+   `hangcheck recover` is unsafe.
+4. **The ledger's `0x480B7B81` for `PKT4(CP_SCRATCH_REG(3), 1)` is wrong.**
+   `PM4_PARITY` is a nibble-fold indexed into 0x9669, not plain bit parity;
+   the correct encoding is `0x400B7B01`. The previous session's userspace
+   prober emitted the malformed value, so its "userspace PKT4 IB still
+   hangs" result was measuring a packet the CP rejects outright.
+5. `CP_SCRATCH_REG` writes are **not legal from an unprivileged IB** — the
+   CP rejects them with `CP | opcode error`. Useful in kernel ring tests,
+   never in a userspace cmdstream.
+
+#### Verified working
+
+- Userspace submit, clean boot, corrected PKT7 NOP cmdstream: fence matched
+  seqno in **5 ms**, `scratch2` = seqno (the CP walked past the IB),
+  `IB1 = 0x01016000` (our buffer), status idle, **no fault, no hangcheck,
+  no recovery** in dmesg.
+- **Phosh runs on the GPU**: `EGL driver name: msm`, `GL vendor: freedreno`,
+  `GL renderer: FD540`, `OpenGL ES 3.1 Mesa 26.1.1`, `connector DSI-1:
+  Modesetting with 1440x2880 @ 60.000 Hz` — and it does **not** die 300 ms
+  later, which is where it always died before.
+- Ring fences under load: 1828 -> 2390 in 18 s, submitted and retired in
+  lockstep (30-70 submits/s), one sample catching `rbbm-status 0xef0093c3`
+  (GPU busy) mid-render. 2978 submits retired, zero faults.
+
+#### Second, unrelated bug fixed on the way
+
+`msm_ioctl_gem_submit()` reads `to_msm_vm(ctx->vm)->unusable` before the
+lazily-created VM exists, so a GEM_SUBMIT issued as a context's first
+VM-touching ioctl NULL-derefs the kernel (oops captured). Unprivileged
+local DoS via any render node. Routed through `msm_context_vm()`.
+
+#### Still owed (none of it blocks rendering)
+
+- `msm.k127_no_suspend=1` is still required: the GX collapse/restore defect
+  (K123-K127) is untouched by this. Now worth re-testing, since every
+  earlier power-management experiment ran against a GPU whose memory path
+  was already dead.
+- Same for the other gates (`k130_*`, `k131_no_preempt`) — all were tuned
+  against the broken baseline and should be re-validated one at a time.
+- `mem_src` clock-name and the `gpu.yaml` binding (now at its 7-clock
+  maxItems limit) need review before the DTS patch goes upstream.
+- `a540_lm_setup()` still programs the AGC with 0 mV; devfreq still polls a
+  faulted GPU into a synchronous external abort (`msm.k142_no_devfreq=1`).
