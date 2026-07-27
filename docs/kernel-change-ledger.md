@@ -7083,3 +7083,83 @@ local DoS via any render node. Routed through `msm_context_vm()`.
   maxItems limit) need review before the DTS patch goes upstream.
 - `a540_lm_setup()` still programs the AGC with 0 mV; devfreq still polls a
   faulted GPU into a synchronous external abort (`msm.k142_no_devfreq=1`).
+
+---
+
+### K144–K159 (2026-07-27, later) — display finalization: flicker fixed, brightness control NOT solved
+
+Written-by: Ember Nymbrand (agent-ember)
+Agent-harness: Claude-Code:claude-opus-5
+Date: 2026-07-27
+
+#### Fixed
+
+**The flicker had two independent causes, both now removed.**
+
+1. **Ring-stall hitching (`fe92141f8`).** `a5xx_submit()` ended with
+   `a5xx_flush(ring, false)` on the reasoning that "a WHERE_AM_I packet is not
+   needed after a YIELD". That holds only while preemption is configured,
+   because the yield is what refreshes the rptr shadow. With `nr_rings == 1`
+   nothing updated it -- the periodic refresh is gated on `(ibs % 32) == 0`,
+   which a one-IB frame never reaches -- so the driver's idea of free ring
+   space drifted until every submit blocked in `adreno_wait_ring` for ~7 s.
+   Measured: shadow 760 dwords behind a wptr of 5520 while every fence had
+   retired. After: `rptr == wptr` at rest, zero ring timeouts. **This affects
+   any a5xx with one ring, including a510 -- upstreamable.**
+
+2. **Panel dimming engine (`ee5f9cfb1`).** WRCTRLD bit 3 (DD) runs the panel's
+   smooth-dimming engine and is visible as a continuous pulse. Clearing it
+   gives a steady image. Confirmed on glass: "Flicker free, looks better".
+
+**Workarounds retired.** Re-tested every bring-up gate now that the clock
+defect is fixed. With `msm.k127_no_suspend=1` **alone**, the session runs clean
+with preemption ON (4 rings), UBWC override OFF, GPU recovery and crash capture
+ON, zero faults. All-defaults still dies, so GX power collapse remains the one
+genuine kernel defect. `CONFIG_QCOM_SOCINFO=y` added.
+
+**Seat-attached session.** Brightness needs a seat0 session because GNOME sets
+it through logind, which refuses a seatless one. Four traps, all silent, are
+documented in `docs/device-session-setup.md`; with them fixed, autologin
+reaches `Seat=seat0` and `SetBrightness` returns rc=0.
+
+#### NOT fixed: runtime brightness control
+
+**Do not trust the intermediate claim that this worked.** It was made on one
+unprompted "noticeably darker" report and then falsified by controlled blind
+testing (set one value, ask, repeat). **Every visual result on this device must
+be taken that way** -- it is the only reason the wrong conclusion was caught.
+
+What is now established by measurement:
+
+- **DBV is ONE byte, not nine bits.** `qcom,mdss-dsi-bl-max-level = <511>` is
+  the *userspace brightness scale*; the blmap it feeds tops out at **239** and
+  downstream writes WRDISBV with `DTYPE_DCS_WRITE1`, a single parameter. Three
+  passes were built on misreading that one property. The original bring-up's
+  single-byte `0xff` was therefore full scale, not half.
+- **The DBV register accepts and holds the value exactly**: writing 239 gives
+  `52h = ef ef`, writing 52 gives `52h = 34 34`. Writes reach the panel.
+- **Commands must go out in LP.** A high-speed WRDISBV is transmitted without
+  error and silently ignored -- stepping 239..30 in HS changed nothing.
+- **`54h` reads `0x00` unconditionally**, even immediately after writing
+  WRCTRLD in the same transfer sequence. Treat it as an unsupported read, not
+  as evidence about BCTRL; it misled two passes.
+- **Neither DD nor byte width unlocks it.** `0x24` and `0x2c`, one-byte and
+  two-byte, all produce a correct 52h readback and no change in emitted light.
+- **Rapid writes corrupt the panel.** Dragging the slider bursts LP commands
+  into in-flight compressed frames and desyncs the DSC decoder: garbage, then
+  freeze. Discrete writes never reproduced it. The panel does not self-recover
+  and a compositor restart is not enough -- fbcon keeps the CRTC enabled so the
+  panel is never unprepared. **Only a reboot re-inits it.**
+- DBV values 4..26 are outside the blmap and corrupt the image.
+
+**Next lead, untested:** the init blob sets `55h = 0x0c` (WRCABC, content
+adaptive brightness) plus vendor commands `0xb2`, `0xd4`, `0xce`. If CABC or
+one of those pins the emitted level, DBV would be stored and ignored exactly as
+observed. Try clearing `55h` first; it is one build. Verify with the 52h
+readback and blind visual steps, never by eye alone.
+
+#### Also noted
+
+`mmc0: tuning execution failed: -5` began appearing on the SD rootfs (SDR104).
+Harmless so far; if it worsens it will look like random I/O corruption rather
+than a display or GPU fault.
