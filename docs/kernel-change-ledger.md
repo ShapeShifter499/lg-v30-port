@@ -7163,3 +7163,35 @@ readback and blind visual steps, never by eye alone.
 `mmc0: tuning execution failed: -5` began appearing on the SD rootfs (SDR104).
 Harmless so far; if it worsens it will look like random I/O corruption rather
 than a display or GPU fault.
+
+#### K160 addendum — CABC refuted; DBV acts as a gate, not a level
+
+`55h` was set to 0x00 (CABC off, verified by `56h = 0x00` readback) with
+single-byte DBV and WRCTRLD 0x2c. Swinging DBV 239 -> 52 -> 239, with the
+register confirmed holding each value exactly (`52h` = `ef ef` / `34 34` /
+`ef ef`), produced **no visible change**. Content-adaptive brightness is not
+what pins the level. Refuted.
+
+The sharpest remaining observation: the panel **does** respond to DBV at the
+extreme -- the slider's minimum maps to DBV 3 and the display goes dark -- but
+not to anything in between. DBV behaves as an on/off gate while the emitted
+level is set somewhere else.
+
+**Strongest untested lead for next session:** there is a joan-specific panel
+file downstream, `drivers/video/fbdev/msm/lge/joan/lge_mdss_dsi_panel_joan.c`,
+alongside `lge_mdss_dsi_panel.c` and `lge_mdss_fb.c` (the blmap consumers).
+Note also that joan's panel node declares **no**
+`qcom,mdss-dsi-bl-pmic-control-type`, so the generic `bl_ctrl_dcs` path may not
+even be what drives this panel. Read the joan file first and find what it
+actually writes for a brightness change -- the answer is very likely a vendor
+register rather than WRDISBV alone.
+
+Two operational facts to carry forward:
+
+- Rapid writes remain fatal. A slider drag wrote DBV 188 then 239 32 ms apart
+  and the panel went dark and stayed dark; only a reboot recovers it. Any
+  future backlight must be rate-limited or serialised against frame kickoff
+  before it is exposed to userspace.
+- Test visually by blind step-and-ask -- set one value, ask brighter or darker,
+  repeat. That protocol is what caught a wrong "it works" conclusion this
+  session, twice.
