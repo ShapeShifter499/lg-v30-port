@@ -2,3 +2,8 @@ out/
 initramfs/bin/
 *.apk
 backups/
+
+# Qualcomm GPU microcode pulled off the device. Proprietary; redistributing it
+# from here is not ours to do. Fetch it from linux-firmware (qcom/a530_pm4.fw,
+# qcom/a530_pfp.fw) or extract it from the vendor image instead.
+firmware/lg-vendor/
