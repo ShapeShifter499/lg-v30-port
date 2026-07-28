@@ -137,7 +137,26 @@ marked *no-device* are fully doable without the phone. P0 and P5 are complete
   `docs/public-upstreaming-plan.md`: clean topic commits, detailed rationale,
   verification evidence, no debug-only leftovers, and required trailers.
 
-## Latest status (2026-07-21)
+## Latest status (2026-07-28)
+
+- **K178 built-in brightness slider: PASS (RAM boot).** The corrected candidate
+  retains the clean `72a8deb11` 6..251 mapping and modeset guard, excludes the
+  rejected DBV-parameter experiment, serializes DPU kickoff against panel DCS
+  transfers, and disables per-update diagnostic readbacks by default.
+- Lance slowly and rapidly exercised the built-in postmarketOS/phosh slider
+  while the compositor animated. Brightness tracked mostly in line with the
+  slider; the UI stayed responsive with no garbage frames, blackouts, freezes,
+  or reboot. All 180 rapid-monitor samples stayed in pmOS, and no DSI-link or
+  DPU-kickoff timeout appeared.
+- K178 also restores the still-required `msm.k127_no_suspend=1`; it does not fix
+  the separate a540 GX power-collapse/restore defect. The test was RAM-only and
+  nothing was flashed. Full evidence is in
+  `out/boot-joan-k178-slider-gate-k127.test-result.txt` and
+  `docs/ember-handoff-2026-07-28-slider-serialisation.md`.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes Agent:openai-codex:gpt-5.6-sol
+Date: 2026-07-28
 
 - **K103 boot discriminator: PASS.** A source-reproducible K102 derivative that
   deletes only `touch-int-default-state/input-enable` completed one RAM-only,

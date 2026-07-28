@@ -555,3 +555,37 @@ Written-by: Aurel Nymvale (agent-aurel)
 Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
 Provider/preset: moa/oops-all-chatgpt-all-max
 Date: 2026-07-21
+
+## 2026-07-28 — K178 built-in brightness-slider fix
+
+Primary helpers: Ember Nymbrand for the brightness baseline, manual-value
+experiments, and initial serialisation work; Aurel Nymvale for the regression
+audit, corrected DPU/DSI exclusion, packaging correction, K178 build, and
+evidence capture; Lance for physical observation and device authority.
+
+- Audit found that K174/K175/K177 omitted the still-required
+  `msm.k127_no_suspend=1`, confounding their greetd/phosh startup resets with
+  the known a540 GX power-collapse defect.
+- K178 restarted from clean `72a8deb11`, retained its 6..251 mapping and
+  disabled-encoder guard, excluded `15d1ea453`, serialized DPU frame kickoff
+  against DSI DCS transfers, and disabled per-update diagnostic reads.
+- Signed source head `88f68643ad397b5c5cae8ce034793bc579ce1420`
+  passed strict checkpatch and full build verification. The RAM image inherited
+  the stable K172 ramdisk/cmdline with K127.
+- One authorized RAM boot reached pmOS and stayed healthy beyond 1,839 s.
+  Lance slowly and rapidly moved the built-in phosh slider while animation was
+  active: UI responsive, brightness tracked mostly in line, no garbage frames,
+  blackouts, freezes, or reboot.
+- All 180 rapid-monitor samples stayed in pmOS; sampled brightness spanned
+  9..251 with matching requested/actual values. No DSI-link or DPU-kickoff
+  timeout appeared.
+- This passes the aggregate K178 GUI-slider acceptance criterion. The separate
+  a540 power-collapse defect remains hidden by K127, and normal reboot recovery
+  is still pending. Nothing was flashed.
+
+Primary result:
+`out/boot-joan-k178-slider-gate-k127.test-result.txt`.
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes Agent:openai-codex:gpt-5.6-sol
+Date: 2026-07-28

@@ -14,6 +14,145 @@ narrative version, including what was tried and rejected.
 this image. The slider was never reached, so the fix itself is still untested;
 what is now known is that the patch breaks the boot.
 
+## Aurel follow-up — panel-only bisect complete; capped variant pending
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes Agent:openai-codex:gpt-5.6-sol
+Date: 2026-07-28
+
+The cheap bisect below was completed. **k175 (`15d1ea453303` alone, without
+`b64896e7e`) reproduced the failure:** pmOS enumerated at 06:39:52, USB dropped
+at 06:40:21 (~29 s), and LineageOS appeared at 06:40:38. Its image is
+`out/boot-joan-k175-panel-only.img`, SHA-256
+`bbfc965d2e03bf7c793c67c932f40795a3eac0a5d684bf152172c030a25cf820`.
+This clears the DSI serialisation commit as a necessary cause and moves the
+boot regression into the panel commit/runtime interaction.
+
+A same-morning **k172-noarb control stayed alive for about 24 minutes** and was
+then intentionally moved to the bootloader. The GUI and SSH were usable. That
+controls for the device and pmOS rootfs. Lance also reports Ember confirmed
+manual DBV values 6 through 255 worked on glass; the GUI slider was the action
+that froze the UI. The evidence therefore does not establish that raw value
+255 is electrically invalid.
+
+**k176 is prepared but untested.** It has the exact k175 kernel and ramdisk,
+with only `panel_lg_sw43402.sw43402_dbv_max=251` appended to the cmdline:
+`out/boot-joan-k176-max251-cmdline.img`, SHA-256
+`a0257dede6d2f10dc1632a2e83e4c7472fcd5b9227fcc78f61fcd9f29908fd10`.
+Unpack/cmp verification confirmed kernel and ramdisk identity. Multiple USB
+transfers stalled before `Booting`; k176 never ran and must not be classified.
+The phone recovered to verified LineageOS 20.0 / Android 13 without flashing.
+
+Safety correction: do not use an automatic retry loop for the next test. Start
+from a fresh bootloader/USB enumeration and issue one direct RAM-only
+`fastboot boot`. If transfer stalls, recover instead of retrying against that
+aboot session.
+
+## Aurel audit correction — k172/k175 was not a controlled kernel-only pair
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes Agent:openai-codex:gpt-5.6-sol
+Date: 2026-07-28
+
+The panel-causal inference above was too strong. The archived boot images show
+that the surviving and failing images did not have equivalent command lines:
+
+- stable `boot-joan-pmos-k172-noarb.img` includes
+  `msm.k127_no_suspend=1`;
+- Ember's floor6 and max255 manual-brightness images also include that gate;
+- `boot-joan-k174.img`, k175, and k177 omit it.
+
+The running ledger already says this gate remains required: with
+`msm.k127_no_suspend=1` alone the session runs clean, while all-defaults still
+dies because the a540 GX collapse/restore path remains broken. The short-lived
+images all disconnected when greetd/phosh began GPU rendering, matching that
+known failure window.
+
+Therefore k175 proves only that `b64896e7e` is not required for the short-lived
+configuration. It does **not** isolate `15d1ea453` against the known-stable
+k172 packaging, and the claim that 15d is the startup-reset cause is withdrawn
+pending a genuinely controlled image.
+
+Rejected k177 evidence:
+
+- source: `fd0336640b4f`, descended from both `15d1ea453` and `b64896e7e`;
+- image SHA-256:
+  `40a759ac73554e6d5eb351140e3f03566bc11e565359291625242e44d44d1a90`;
+- transfer completed cleanly: send 0.591 s, boot 5.098 s;
+- pmOS USB appeared at 15:42:43 UTC and disconnected at 15:43:21 UTC;
+- LineageOS USB appeared at 15:43:38 UTC;
+- k177 omitted `msm.k127_no_suspend=1`, never reached the slider test, and is
+  not evidence for or against its DSI link gate.
+
+k177 also removed the disabled-encoder guard retained by `72a8deb11`; that was
+untested speculation and is rejected. The corrected v3 source starts at clean
+`72a8deb11`, retains that guard, omits `15d1ea453`, defaults the diagnostic
+readbacks off, and adds only the acquire/release link gate. Its boot image must
+inherit the known-stable k172 ramdisk and command line, including
+`msm.k127_no_suspend=1`.
+
+That corrected candidate is now built and staged, but not yet device-tested:
+
+- branch: `joan/slider-link-gate-v3`, clean head
+  `88f68643ad397b5c5cae8ce034793bc579ce1420`;
+- signed gate commit: `e5d4d381a7aca76cc7628feaccb6a6235f29b7ac`;
+- signed readback-default commit:
+  `88f68643ad397b5c5cae8ce034793bc579ce1420`;
+- release: `7.2.0-rc2-g88f68643ad39`;
+- image: `out/boot-joan-k178-slider-gate-k127.img`, SHA-256
+  `5f7d2ea14dcd3f64d737638c8cf710bb41ec3cb47782c1a0ab411e0efad98d37`;
+- ramdisk: byte-identical to stable k172;
+- command line: byte-preserved from k172 and contains
+  `msm.k127_no_suspend=1`;
+- one-shot runner: `/tmp/k178-ramboot-once.sh` on nym-nest, SHA-256
+  `a75374827c266595a23bd1a65181b25d55fe767783edf287875063073c2b97e9`;
+- manifest SHA-256:
+  `cc8465b639646f125d85e4d4d539aeac8bbdab70b93b0fbeed8a1fdc1cd18285`.
+
+Status: build, strict checkpatch, signature, unpack, embedded-release, source,
+remote-hash, ramdisk, header, and K127-cmdline checks pass. Slider result is
+still unknown until an explicitly authorized RAM-only boot.
+
+## Aurel K178 device result — GUI slider PASS
+
+Written-by: Aurel Nymvale (agent-aurel)
+Agent-harness: Hermes Agent:openai-codex:gpt-5.6-sol
+Date: 2026-07-28
+
+The unknown status above is superseded by one authorized RAM-only K178 test.
+Nothing was flashed.
+
+- fastboot send: 0.590 s; boot: 5.095 s;
+- pmOS USB appeared after 8 s;
+- live release: `7.2.0-rc2-g88f68643ad39`;
+- K127 was present in `/proc/cmdline` and dmesg confirmed its runtime-PM hold;
+- the same boot reached at least 1,839.67 s uptime with continuous USB/SSH;
+- Lance moved the built-in slider slowly and then rapidly across most of its
+  range while the UI animated;
+- Lance reported responsive UI, no garbage frames, no blackouts, no freezes,
+  and brightness mostly in line with the slider;
+- all 180 rapid-monitor samples remained in pmOS;
+- sampled brightness values were 9, 14, 20, 41, 44, 61, 137, and 251, with
+  `actual_brightness` matching every requested sample;
+- no DSI-link acquisition timeout, DPU kickoff timeout, panic, oops, watchdog,
+  or new display error appeared after the stress test.
+
+**Verdict: PASS for the original GUI-slider acceptance criterion.** K178 allows
+slow and rapid use of the built-in pmOS/phosh brightness slider without DSC
+corruption, UI freeze, panel blackout, or reboot in this RAM-booted
+configuration.
+
+This validates the aggregate K178 construction. It does not independently
+prove whether the exclusion gate or removal of diagnostic reads is strictly
+necessary, and it does not solve the separate a540 collapse defect hidden by
+K127. Normal reboot recovery to installed LineageOS remains pending explicit
+authorization.
+
+Result artifact:
+`out/boot-joan-k178-slider-gate-k127.test-result.txt`, SHA-256
+`5f9240f8653795bf2d1e8a0d98ae4100a5fcb5996dbac363de2f9c597a224796`.
+Raw evidence is under `out/evidence/k178-slider-gate-k127/`.
+
 ## The regression — read this first
 
 `dmesg` on nym-nest, after a clean `RAMBOOT_OK` (send 0.592 s, boot 5.094 s):
