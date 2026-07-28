@@ -7195,3 +7195,74 @@ Two operational facts to carry forward:
 - Test visually by blind step-and-ask -- set one value, ask brighter or darker,
   repeat. That protocol is what caught a wrong "it works" conclusion this
   session, twice.
+
+### K173/K174 — serialise DCS against frame kickoff (the slider-drag corruption)
+
+Closes the "rapid writes remain fatal" item K160 left open. That entry
+proposed rate-limiting; rate-limiting was tried this session, did not work
+(the screen went black), and was the wrong layer anyway. The fix is
+serialisation, as K160's own second option guessed.
+
+**Cause.** A command-mode panel carries pixels and DCS over one DSI link.
+`msm_dsi_manager_cmd_xfer()` starts a transfer with no knowledge that the DPU
+has the link for a frame. The collision truncates the frame, and DSC 1.1 turns
+a truncated frame into whole-screen garbage that persists until a full
+repaint. Dragging the brightness slider reproduces it every time, because it
+emits a stream of WRDISBV while the compositor animates the slider.
+
+**First attempt, reverted (863a30a79).** Called
+`dpu_encoder_wait_for_tx_complete()` from the DSI thread. That froze the
+compositor with a fence stuck mid-commit. The wait was fine; the bookkeeping
+around it was not. `_dpu_encoder_phys_cmd_wait_for_idle()` runs frame-done
+recovery on timeout and clears `pp_timeout_report_cnt` on success — both are
+the display thread's state, and a second caller either triggers recovery
+against a healthy commit or clears a counter the display thread is using.
+
+**Landed (b64896e7e).** `dpu_encoder_wait_for_link_idle()` is an observer
+only: bare `wait_event_timeout()` on `pending_kickoff_wq` /
+`pending_kickoff_cnt`, no recovery, no counter writes, no logging. Safe for
+any number of waiters because `wait_event_timeout()` does not consume the
+wakeup. Capped at 50 ms; on timeout the command is sent anyway, since a late
+brightness update beats a dropped one. Skipped while `!dpu_enc->enabled` —
+that guard is what removed the 58 `*ERROR*` lines an earlier version produced
+during modeset. Reached through an optional `msm_kms_funcs` op so non-DPU msm
+targets are untouched.
+
+**Also in this image (15d1ea453).** DBV ceiling 251 -> 255, and both endpoints
+are now module parameters (`sw43402_dbv_min`, `sw43402_dbv_max`). 251 was
+where `lge,blmap_v1` stopped, not a hardware limit; `lge,blmap-ex` reaches
+255 and the top of the range is visibly different on glass. Range is now
+6..255 against LG's 30..251.
+
+**Status: built and staged, NOT yet verified on device.** The slider has not
+been dragged against this kernel. Do not record the corruption as fixed until
+it has been.
+
+#### Operational note — flashing joan, and a trap worth writing down
+
+pmOS on joan is **RAM-booted only** (`fastboot boot`); the boot partition
+holds LineageOS. So any reboot, crash, or aboot timeout drops the phone back
+to LineageOS, and a "pmOS is gone" symptom usually means exactly that and
+nothing worse.
+
+The address orientation bites every time: **the phone is 172.16.42.1**, the
+host is 172.16.42.2. Key `id_pi_migration` on nym-nest, user `user`.
+
+Reaching the bootloader from pmOS: busybox `reboot` cannot pass a mode string,
+so use the syscall directly —
+`python3 -c 'import ctypes,os; ctypes.CDLL(None).syscall(142, 0xfee1dead, 0x28121969, 0xA1B2C3D4, b"bootloader")'`
+(arm64 `__NR_reboot` = 142). `/sys/class/reboot-mode/qcom-pon/reboot_modes`
+confirms `bootloader recovery`. From LineageOS just use `adb reboot bootloader`.
+
+**On joan, fastboot mode looks like the LG logo.** A phone "stuck at the LG
+logo" that still enumerates `18d1:d00d` is in the bootloader and fine. Check
+`lsusb` before concluding a kernel hung — this session nearly misread a host
+side transfer failure as a bad kernel.
+
+aboot's fastboot endpoint wedges if it sits idle, and a stalled transfer
+leaves it enumerating while refusing to be claimed: `fastboot devices` still
+lists it but every real command says `< waiting for any device >`. Recovery is
+a forced power cycle (Power + Vol Down, ~10-15 s). `/tmp/ramboot-joan.sh` on
+nym-nest exists to avoid the state — it starts the transfer the instant
+fastboot answers and retries from a fresh bootloader entry, never against a
+wedged one.
