@@ -7234,9 +7234,27 @@ where `lge,blmap_v1` stopped, not a hardware limit; `lge,blmap-ex` reaches
 255 and the top of the range is visibly different on glass. Range is now
 6..255 against LG's 30..251.
 
-**Status: built and staged, NOT yet verified on device.** The slider has not
-been dragged against this kernel. Do not record the corruption as fixed until
-it has been.
+**Status: REGRESSES. Boots pmOS, then dies ~25 s in.** The slider was never
+reached, so the serialisation fix is still untested; what is established is
+that this image does not survive.
+
+Evidence, host dmesg after a clean transfer (send 0.592 s, boot 5.094 s):
+the pmOS gadget enumerates (`Product: LG V30`, `SerialNumber: postmarketOS`,
+`cdc_ncm` registered), then `USB disconnect` 25 s later, then `18d1:4ee7` --
+LineageOS. k172 stayed up indefinitely, so this is the patch.
+
+25 s is about when greetd/phosh starts the display session, which is the first
+point DCS traffic flows with `dpu_enc->enabled` true -- i.e. the first point
+`dsi_mgr_wait_for_link_idle()` waits rather than returning early. Prime
+suspect. Check whether `msm_dsi_manager_cmd_xfer()` is reachable from the
+commit path itself: a DCS write issued while the display thread holds
+`pending_kickoff_cnt` makes the helper block the very thread that would
+decrement it. The 50 ms cap should turn that into a stall rather than a hang,
+so a hard reset points at the watchdog firing on accumulated stalls -- panel
+init alone sends a long DCS burst, and 50 ms apiece is seconds of enable.
+
+Cheap bisect: the two commits are independent. Boot `15d1ea453` alone (panel
+only, no DSI change) to separate them in a single test.
 
 #### Operational note — flashing joan, and a trap worth writing down
 
