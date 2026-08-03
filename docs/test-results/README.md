@@ -68,3 +68,9 @@ This pattern is intentionally generic. Future hardware/device projects should co
 - Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 - Date: 2026-08-03
 - Update-scope: Closure workflow and A182/A183/A184 backfill.
+
+## Publication and readback
+
+The A182/A183/A184 packets were published in commit
+`3251c9558477aa7be81367f73642bf1170f420e4` (github.com/ShapeShifter499/lg-v30-port,
+master, 2026-08-03), verified remotely, and mirrored to shared Deck card 43.
