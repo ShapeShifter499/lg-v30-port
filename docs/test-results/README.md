@@ -26,7 +26,7 @@
 | A181 | 2026-08-02 | Display/GPU experiment required coordinated recovery; obsolete K127 path was superseded. | Never boot K127. See `../kernel-change-ledger.md` (A181 section). |
 | [A182](A182-2026-08-02.md) | 2026-08-02 | Display/DRM and direct FD540/freedreno passed; touch failed because STMFTS was disabled. | Do not replay A182; A183 is the minimal config correction. |
 | [A183](A183-2026-08-03.md) | 2026-08-03 | Touch, display/DRM, owner interaction, and direct FD540/freedreno passed. Brightness ABI remained stale at max 251; GPU power/suspend remained open. | Runner consumed; no retry. A184 corrects the exposed maximum host-side. |
-| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Host-only source/object checks passed for 6–255 maximum correction. | Not built or boot-authorized. Finish audit/full build/host qualification before requesting approval. |
+| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Host-qualified: DBV 255 correction built, exact image sealed (`af7d0b18…`); no device test authorized. | A183 runner consumed; A184 needs fresh exact-image approval; do not boot yet. |
 
 ## Closure-packet rule
 
