@@ -26,7 +26,7 @@
 | A181 | 2026-08-02 | Display/GPU experiment required coordinated recovery; obsolete K127 path was superseded. | Never boot K127. See `../kernel-change-ledger.md` (A181 section). |
 | [A182](A182-2026-08-02.md) | 2026-08-02 | Display/DRM and direct FD540/freedreno passed; touch failed because STMFTS was disabled. | Do not replay A182; A183 is the minimal config correction. |
 | [A183](A183-2026-08-03.md) | 2026-08-03 | Touch, display/DRM, owner interaction, and direct FD540/freedreno passed. Brightness ABI remained stale at max 251; GPU power/suspend remained open. | Runner consumed; no retry. A184 corrects the exposed maximum host-side. |
-| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Device-tested once: boot, touch, UI slider, brightness 6–255, FD540 passed; lock passed; **suspend/resume FAILED (reboot to LineageOS)**; recovered cleanly. Authorization consumed. | Suspend is the new blocker; fresh candidate + fresh exact-image approval before any boot. |
+| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Device-tested once: boot, touch, UI slider, brightness 6–255, FD540, lock passed. Real idle gate: blank/lock disabled by earlier `00-no-blank` workaround. Accidental s2idle test FAILED (reboot to LineageOS) — secondary power finding. Recovered cleanly; authorization consumed. | Replace `00-no-blank` with Android-like idle profile, verify blank→lock→wake on fresh candidate; fresh exact-image approval before any boot. |
 
 ## Closure-packet rule
 
