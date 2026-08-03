@@ -26,7 +26,7 @@
 | A181 | 2026-08-02 | Display/GPU experiment required coordinated recovery; obsolete K127 path was superseded. | Never boot K127. See `../kernel-change-ledger.md` (A181 section). |
 | [A182](A182-2026-08-02.md) | 2026-08-02 | Display/DRM and direct FD540/freedreno passed; touch failed because STMFTS was disabled. | Do not replay A182; A183 is the minimal config correction. |
 | [A183](A183-2026-08-03.md) | 2026-08-03 | Touch, display/DRM, owner interaction, and direct FD540/freedreno passed. Brightness ABI remained stale at max 251; GPU power/suspend remained open. | Runner consumed; no retry. A184 corrects the exposed maximum host-side. |
-| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Device-tested once: boot, touch, UI slider, brightness 6–255, FD540, lock passed. Real idle gate: blank/lock disabled by earlier `00-no-blank` workaround. Accidental s2idle test FAILED (reboot to LineageOS) — secondary power finding. Recovered cleanly; authorization consumed. | Remove `00-no-blank` (default to stock pmOS idle), audit for other overrides, verify blank→lock→wake on one fresh boot; fresh exact-image approval required. |
+| [A184](A184-2026-08-03-host-only.md) | 2026-08-03 | Device-tested twice (both authorized, same sealed image): boot/touch/slider/brightness 6–255/FD540/lock passed. Idle gate: removed `00-no-blank`, stock idle → blank → lock → wake → unlock PASSED; transient rainbow artifact on blank/wake (recovered) — panel-polish item. Accidental s2idle FAILED (reboot to LineageOS) — secondary power finding. Recovered cleanly both times. | Panel-polish candidate for the blank/wake artifact; fresh exact-image approval before any boot. |
 
 ## Closure-packet rule
 
