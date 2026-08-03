@@ -37,7 +37,7 @@ A kernel change is not public-ready until all of these are true:
    - what was intentionally left out.
 3. The commit has the required trailers:
    - `Signed-off-by: Lance <Gero3977@gmail.com>`
-   - `Assisted-by: <agent-harness>:<model actually running>`
+   - `Assisted-by: <harness>:<model actually running>`
    - never `Co-Authored-By` for AI assistance.
 4. `docs/kernel-change-ledger.md` has an entry linking the commit to its evidence
    and classifying it as `upstream-candidate`, `bringup-local`, `debug-only`,
@@ -137,7 +137,7 @@ When opening a public PR or patch series, include:
 - K030 (`anoc1_smmu` skip-reset) is an important confirmed debug finding: it
   removes a named TrustZone Config/MM-NoC reset class, but it is **not** public-ready
   code as written. It needs a real upstreamable Qualcomm SMMU representation, not
-  an `ember,debug-skip-reset` property.
+  an `debug-skip-reset` property.
 - K041 rejected late-Linux `simple-framebuffer` as an observability path on joan's
   command-mode panel; do not reintroduce simplefb/fbcon as a public patch unless a
   separate early-display mechanism is proven.
@@ -197,14 +197,12 @@ When opening a public PR or patch series, include:
 
 ## Attribution
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 ---
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Consolidated provenance of borrowed / derived material (Lance directive
@@ -218,12 +216,12 @@ change.
 | anoc1 skip-reset (K030, debug) | concept: downstream `msm-arm-smmu-8998.dtsi` `qcom,skip-init`+`qcom,register-save` | Qualcomm/LGE (concept only; **code is original**) | GPL-2.0 | concept credited in-file comment ✓; needs a real upstream binding before it's shippable |
 | `joan_imem_oracle.c` (debug, reverted) | IMEM offsets + LGE_RB_MAGIC/reason constants from downstream `lge_handle_panic.c` / `reboot_reason.h` | Qualcomm/LGE | GPL-2.0 | debug-only, not for upstream; constants credited in comments |
 | `joan_disp_quiesce.c` (debug, reverted) | DSI/DPU register offsets from mainline `dsi.xml` + `dpu_3_0_msm8998.h` | (same GPL kernel tree — not external) | GPL-2.0 | debug-only |
-| `out/aurel-k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Aurel) | GPL-2.0 | reference only |
-| K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Aurel code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch` and `out/aurel-k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch` sha256 `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`; built image sha256 `bc8099c241dc18865079e4fffce95d13cb9f3885705ae67ac2f570ec3fd85c4f`; device-tested but later superseded by pstore evidence: K042 died in TLMM/GPIO before SMMU; do not publish |
-| K050 TLMM GPIO reserved-ranges candidate | pstore-guided TLMM/GPIO abort isolation: K046/K048/K049 showed protected direction reads on GPIO49/50/81; K050 reserves `<49 4>` and `<81 4>` in addition to existing `<0 4>` | Aurel DTS change is original; source basis is upstream MSM8998 pinctrl layout and pstore fault addresses | BSD-3-Clause for DTS if promoted; currently debug/candidate evidence | saved as `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`; RAM-only K050 survivor, source review still required for `<49 4>` |
-| MSM8998 MDSS identity-domain client | mainline Qualcomm SMMU identity-domain table and same-class MDSS entries | Aurel/Lance change; Qualcomm mainline policy pattern | GPL-2.0 | local commit `7ff461605`; K062 RAM-boot verified, wider review required |
+| `out/k027-public-bullhead-reboot_reason.h` | public AOSP bullhead msm kernel `reboot_reason.h` (reason-code decode) | Google/Qualcomm/LGE (sourced by Hermes Agent) | GPL-2.0 | reference only |
+| K042 SMMU cfg-probe subtraction oracle (debug WIP) | Comparison between mainline `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c::qcom_smmu_cfg_probe()` and downstream `drivers/iommu/arm-smmu.c` / `msm-arm-smmu-8998.dtsi` `qcom,skip-init` policy | Hermes Agent code is original; concept/evidence from upstream Linux + Qualcomm/LGE downstream behavior | GPL-2.0 | saved as `out/k042-smmu-cfgprobe-wip-2026-07-08.patch` and `out/k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch` sha256 `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`; built image sha256 `bc8099c241dc18865079e4fffce95d13cb9f3885705ae67ac2f570ec3fd85c4f`; device-tested but later superseded by pstore evidence: K042 died in TLMM/GPIO before SMMU; do not publish |
+| K050 TLMM GPIO reserved-ranges candidate | pstore-guided TLMM/GPIO abort isolation: K046/K048/K049 showed protected direction reads on GPIO49/50/81; K050 reserves `<49 4>` and `<81 4>` in addition to existing `<0 4>` | Hermes Agent DTS change is original; source basis is upstream MSM8998 pinctrl layout and pstore fault addresses | BSD-3-Clause for DTS if promoted; currently debug/candidate evidence | saved as `out/k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`; RAM-only K050 survivor, source review still required for `<49 4>` |
+| MSM8998 MDSS identity-domain client | mainline Qualcomm SMMU identity-domain table and same-class MDSS entries | Hermes Agent/Lance change; Qualcomm mainline policy pattern | GPL-2.0 | local commit `7ff461605`; K062 RAM-boot verified, wider review required |
 | 10nm DSI VCO formula | exact public `msm8998-mainline/linux` commit `707f3fc86f6a` | AngeloGioacchino Del Regno `<angelogioacchino.delregno@somainline.org>` | GPL-2.0 | exact patch-id preserved in local commit `5306416d2`; original author/date retained; K065 rate correction verified |
-| joan DSI controller VDD supply | mainline `dsi_cfg.c` regulator declaration + downstream `msm8998-mdss.dtsi` PM8998 L1/L2 mapping + public MSM8998 OnePlus DTS | Qualcomm/LGE plus public MSM8998 board reference; Aurel/Lance one-line board mapping | BSD-3-Clause for joan DTS; sources used as hardware mapping evidence | local commit `b549c9f5b`; K067 removed dummy-regulator fallback; physical result unobserved |
+| joan DSI controller VDD supply | mainline `dsi_cfg.c` regulator declaration + downstream `msm8998-mdss.dtsi` PM8998 L1/L2 mapping + public MSM8998 OnePlus DTS | Qualcomm/LGE plus public MSM8998 board reference; Hermes Agent/Lance one-line board mapping | BSD-3-Clause for joan DTS; sources used as hardware mapping evidence | local commit `b549c9f5b`; K067 removed dummy-regulator fallback; physical result unobserved |
 | MSM8998 DSI PLL pre-lock output-divider ordering | downstream `drivers/clk/msm/mdss/mdss-dsi-pll-8998.c::dsi_pll_enable()` compared with mainline `drivers/gpu/drm/msm/dsi/phy/dsi_phy_10nm.c::dsi_pll_10nm_vco_prepare()` | Qualcomm/LGE downstream behavior used as diagnostic evidence; no downstream code copied yet | GPL-2.0 | K068 exposed the ordering failure; next experiment must remain debug-only until a generic implementation is justified |
 | 10nm DSI initial VCO-rate fix | upstream Linux commit `8a48e35becb214743214f5504e726c3ec131cd6d` by Krzysztof Kozlowski plus current upstream `dsi_phy_10nm.c` | upstream Linux / Krzysztof Kozlowski; reviewed/merged by Dmitry Baryshkov | GPL-2.0 | K070 proves the local VCO formula patch removed state that this upstream initialization path relies on; basis for K071 one-line candidate |
 | **PLANNED: `msm8998.c` interconnect provider** | `drivers/interconnect/qcom/sdm660.c` (primary template) + `msm8996.c` + topology/QoS values from downstream `msm8998-bus.dtsi` | **AngeloGioacchino Del Regno** (sdm660, SoMainline/Sony Xperia) + **Yassine Oudjana** (msm8996) + Qualcomm/LGE (values) | GPL-2.0 | not yet written — MUST keep their Copyright lines + SPDX + "based on" note; never present as original |
@@ -232,11 +230,10 @@ change.
 Rule going forward for any new borrowed code: preserve the origin file's
 `Copyright` line(s) and `SPDX-License-Identifier`, add a `based on <file>
 by <author>` note in the header, and keep the kernel.org commit trailers
-(`Signed-off-by: Lance`, `Assisted-by: <agent-harness>:<model>` using the
+(`Signed-off-by: Lance`, `Assisted-by: <harness>:<model>` using the
 actual helper/model, e.g. `Hermes:gpt-5.6-sol` or `Claude-Code:<model>`; never
 `Co-Authored-By`). If any prior add above is missing an author I've marked
 TBD and you know it, please append it.
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11

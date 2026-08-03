@@ -1,7 +1,6 @@
 # SW43402 panel data (joan DV3.1) — parcel P2
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 Source of truth: downstream `dsi-panel-sw43402-dsc-qhd-cmd-dv3_1.dtsi` +

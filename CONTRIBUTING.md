@@ -28,23 +28,33 @@ duplicated.
    and what was intentionally left out.
 2. **Sign your work.** Every commit needs a DCO `Signed-off-by:` from the
    **human** contributor (developercertificate.org). AI assistance is
-   declared with an `Assisted-by: <harness>:<model>` trailer per the
+   declared with an `Assisted-by: <harness>:<provider>/<model>` trailer per the
    [kernel.org coding-assistant policy](https://docs.kernel.org/process/coding-assistants.html)
    — never `Co-Authored-By` for AI, and never an AI `Signed-off-by`.
    Record the harness/model that actually did the work.
 3. **Provenance.** If you borrow code or data, keep its license/SPDX and
    say where it came from (commit body and, for recurring sources,
    `PROVENANCE.md`). Downstream LG/Qualcomm kernel data is GPL-2.0.
-4. **Attribution in docs.** Docs carry `Written-by:` /
-   `Agent-harness:` / `Date:` blocks. Never rewrite someone else's
-   attributed text — append your own dated block beneath.
+4. **AI attribution in public docs.** Use the same kernel.org-style
+   `Assisted-by: <harness>:<provider>/<model>` identity used by the commit,
+   plus the date and update scope where useful. Do not publish local agent
+   persona names or private peer IDs. Persona names may remain in local/private
+   records and the private coordination board.
 5. **No untested "should work" device claims.** State what was actually
    run and observed. If you have no device, say so — build-tested-only
    PRs are still useful and will be device-tested by a maintainer.
-6. **Track dependencies.** If your work installs a host package or
+6. **Close every candidate test.** After each K/A device test or meaningful
+   host-only checkpoint, create a checkmark packet from
+   `docs/templates/candidate-test-closure.md` and update the mandatory
+   `docs/test-results/README.md` index. Record exact identity/hashes,
+   authorization and retry status, scoped pass/fail/open gates, owner-visible
+   observations, decisions, rejected/no-replay paths, raw evidence, and the next
+   safe action. Maintainer/agent work also mirrors the exact result to the shared
+   coordination card and reads GitHub plus that card back before the next test.
+7. **Track dependencies.** If your work installs a host package or
    downloads an external source, record it in `docs/dependency-tracker.md`
    in the same change (see that file's rules).
-7. **Device testing safety** (maintainers/testers with hardware): read the
+8. **Device testing safety** (maintainers/testers with hardware): read the
    safety contract in `scripts/tethered-test.sh` before touching a phone.
    Never `fastboot getvar` on LG aboot, enter fastboot only via
    `adb reboot bootloader`, one fastboot client at a time, RAM-only
@@ -52,8 +62,12 @@ duplicated.
 
 ## Historical note
 
-Docs under `docs/` written before this project went public reference an
-internal tracker and an `internal-mirror:/` artifact share used by the
-original maintainers' agents. Those are not publicly accessible; every
-load-bearing artifact is either in this repo (hashed in the ledger) or
-reproducible from it.
+Docs under `docs/` written before this project went public may reference a
+private coordination tracker or mirror. Those locations are intentionally not
+public. Load-bearing evidence must be either public/reproducible or preserved in
+an approved private store with a recorded digest, scope, and verified readback;
+a writable local file alone is not a durable evidence seal.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-03
+Update-scope: Candidate-closure workflow and public harness/model attribution policy.

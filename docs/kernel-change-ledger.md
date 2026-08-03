@@ -35,6 +35,10 @@ For every kernel-impacting change, add or update a ledger entry before handoff:
    `Public/PR disposition` note: `ready`, `needs cleanup`, `blocked`, or
    `do not publish`, and point to `docs/public-upstreaming-plan.md` for the
    criteria.
+8. After every device test or meaningful host-only candidate checkpoint, create
+   a checkmark closure packet from `docs/templates/candidate-test-closure.md`,
+   add it to `docs/test-results/README.md`, publish the docs commit, mirror the
+   exact verdict/no-replay/next-action block to shared Deck, and read both back.
 
 Safety invariant: all device tests stay RAM-only (`fastboot boot`) unless Lance
 explicitly approves a different action. Never flash or write phone partitions as
@@ -49,8 +53,8 @@ part of a ledger experiment.
 - Latest debug branch: `joan/latest-kernel`, same upstream base plus the
   debug-only breadcrumb commit, currently ending at `88bf16047`.
 - IMEM reset-reason oracle branch: `joan/imem-oracle`, off
-  `joan/latest-clean-test`, one debug-only commit `f0d368d28`. Original Ember
-  image `out/boot-joan-imem-oracle.img` remains preserved, but Aurel K026
+  `joan/latest-clean-test`, one debug-only commit `f0d368d28`. Original Claude Code
+  image `out/boot-joan-imem-oracle.img` remains preserved, but Hermes Agent K026
   repackaged/tested the same kernel commit with the K023 `panic=0` null-init
   classifier as `out/boot-joan-imem-k026.img` (sha256
   `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`).
@@ -177,9 +181,9 @@ part of a ledger experiment.
 ### K006 — SEC_WDOG_DIS / SEC_WDOG_TRIG SCM experiments
 
 - Handles:
-  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-sec-wdog-scm-experiments-2026-07-06.patch`
-  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-qcom-scm-oracle-leftover-2026-07-06.patch`
-  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-scm-retcode-oracle-leftover-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/sec-wdog-scm-experiments-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/qcom-scm-oracle-leftover-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/scm-retcode-oracle-leftover-2026-07-06.patch`
 - Class: `rejected` unless new evidence shows a boot-mode-specific difference.
 - Files experimented with:
   - `drivers/firmware/qcom/qcom_scm.c`
@@ -221,8 +225,8 @@ part of a ledger experiment.
 ### K008 — downstream-style APSS WDT takeover experiments
 
 - Handles:
-  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-downstream-style-wdt-clean-test-2026-07-06.patch`
-  - `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-wdt-en3-test-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/downstream-style-wdt-clean-test-2026-07-06.patch`
+  - `~/vibe-coding-projects/coding/lg-v30-port/out/wdt-en3-test-2026-07-06.patch`
 - Class: `rejected` as a sufficient fix; code is not for upstream.
 - Files experimented with:
   - `drivers/watchdog/qcom-wdt.c`
@@ -260,7 +264,7 @@ part of a ledger experiment.
   - Before reset/replay, old tips were preserved as backup refs, including
     `backup/joan-bringup-debug-before-latest-20260706-052942`.
   - A detached dirty SCM-oracle worktree patch was preserved at
-    `lg-v30-port/out/aurel-test-worktree-scm-oracle-dirty-20260706-052942.patch`
+    `lg-v30-port/out/test-worktree-scm-oracle-dirty-20260706-052942.patch`
     and the test worktree was reset clean to avoid object contamination.
   - `make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j6 Image.gz dtbs`
     succeeded on `joan/latest-kernel`.
@@ -316,7 +320,7 @@ part of a ledger experiment.
   - branch `joan/latest-clean-test` at `0d7df4134` plus command-line-only image variants;
   - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-maxcpus1.img`, sha256 `5bd01b0a987563027abbb968810b1b796201cbffb32e99effa4fc95d672c93e8`;
   - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-cpuidleoff.img`, sha256 `3f4b26656dc1af381128aa211787297ce85808e638287a1c21f7c550b5f9955d`;
-  - saved patch `~/vibe-coding-projects/coding/lg-v30-port/out/aurel-latest-highmem-reserve-test-2026-07-06.patch`;
+  - saved patch `~/vibe-coding-projects/coding/lg-v30-port/out/latest-highmem-reserve-test-2026-07-06.patch`;
   - image `~/vibe-coding-projects/coding/lg-v30-port/out/boot-joan-latest-highmem-reserve.img`, sha256 `c9f4545b790084dd82b139109dc29dffa516f1c3a17620a003db3b6241a886a6`.
 - Class: `rejected` / `debug-only` discriminators.
 - Purpose:
@@ -342,10 +346,10 @@ part of a ledger experiment.
     unless specifically investigating their perturbation.
 - Public/PR disposition: `do not publish`; keep only as negative evidence.
 
-### IMEM reset-reason oracle (Ember 2026-07-06) — original staged artifact; repackaged/tested as K026
+### IMEM reset-reason oracle (Claude Code 2026-07-06) — original staged artifact; repackaged/tested as K026
 
 - Handle: branch `joan/imem-oracle` commit `f0d368d28`; patch
-  `out/ember-imem-oracle-2026-07-06.patch`; image
+  `out/imem-oracle-2026-07-06.patch`; image
   `out/boot-joan-imem-oracle.img`
   (sha256 `8d180d57b91aefae1d4fdbbb88cf138d76711866c7e5e3dcdceebc118fb768c7`).
 - Class: `debug-only`.
@@ -382,7 +386,7 @@ part of a ledger experiment.
 ### K012 — downstream DLOAD-off SCM argument-shape oracle
 
 - Handles:
-  - patch `out/aurel-latest-dload-off-argshape-test-2026-07-06.patch`
+  - patch `out/latest-dload-off-argshape-test-2026-07-06.patch`
     (sha256 `eb285f2d73b2711fa505c0938183954b18ebb125735ae69176e7311fc8f1a5a0`);
   - image `out/boot-joan-latest-dload-off-argshape.img`
     (sha256 `423d0c7f306a0d1617ade6577c8cb012df71cda6d6f8a08ab731dc4e79a26457`,
@@ -421,14 +425,14 @@ part of a ledger experiment.
 ### K013 — downstream QSEE/QSEEOS log-buffer registration oracle
 
 - Handles:
-  - patch `out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`
+  - patch `out/latest-qsee-logbuf-oracle-2026-07-06.patch`
     (sha256 `68b0883cae085712a446475c5ae3bd723defb056ddd28e6babfe18521ce797d3`);
   - image `out/boot-joan-latest-qsee-logbuf.img`
     (sha256 `6a99c6f2c653e21d2cbba2df7ad2d392dbbcc40f0db7fef63efd599d57b7eb93`,
     size `15736832` bytes);
-  - fastboot transcript `out/aurel-qsee-logbuf-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/qsee-logbuf-fastboot-2026-07-06.txt`
     (sha256 `828c8af9af4f8a9aa457d68ea2ae534b44a816fc8b1d05cc9c93d7706d4bc0d4`);
-  - PON evidence `out/aurel-qsee-logbuf-pon-2026-07-06.txt`
+  - PON evidence `out/qsee-logbuf-pon-2026-07-06.txt`
     (sha256 `004d16ae7d4076acce09fdb261860856f80d53fce1edb289539389f60c100115`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-qsee-oracle.img`
     (sha256 `45015e1880a65e7019abfd15de656af8253378323493a41d5563da9637e84320`).
@@ -464,14 +468,14 @@ part of a ledger experiment.
 ### K014 — RPM `rpm_requests` rpmsg reachability timing oracle
 
 - Handles:
-  - patch `out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
+  - patch `out/latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
     (sha256 `a92efaa88f7717d5762fa71bd2d22c84510bf13c4b43a3e22f893bd25bc895f1`);
   - image `out/boot-joan-latest-rpm-rpmsg-oracle.img`
     (sha256 `d7b039b381ad83c61a4e7bfdf3005fa143a8fc5701c90dbf9faf06edfe1bed6b`,
     size `15740928` bytes);
-  - fastboot transcript `out/aurel-rpm-rpmsg-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/rpm-rpmsg-fastboot-2026-07-06.txt`
     (sha256 `3261e8f38e5a3aa1128fbbd4c4a721e181c5ef435ee54cf6d65ea54540e71d79`);
-  - PON evidence `out/aurel-rpm-rpmsg-pon-2026-07-06.txt`
+  - PON evidence `out/rpm-rpmsg-pon-2026-07-06.txt`
     (sha256 `8f01740521da6b31f997ddea02e5352bedb9f3429e88bbe09d8117b04ed139e1`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-rpm-oracle.img`
     (sha256 `c3db2b91473773af0546579e846dc41f85074d750e7407f95917e1d5a7ccb5b3`).
@@ -506,14 +510,14 @@ part of a ledger experiment.
 ### K015 — RPM BOB-mode downstream default-vote oracle
 
 - Handles:
-  - patch `out/aurel-latest-rpm-bob-mode-oracle-2026-07-06.patch`
+  - patch `out/latest-rpm-bob-mode-oracle-2026-07-06.patch`
     (sha256 `eca4d41b1532903e541118e951f9dda4e366fed3b89a2feedd08915386cbd7df`);
   - image `out/boot-joan-latest-rpm-bob-mode.img`
     (sha256 `e7ccb54378f39b84a3497590844d26d504e5cc770040190bab86e5e845f7c1c9`,
     size `15736832` bytes);
-  - fastboot transcript `out/aurel-rpm-bob-mode-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/rpm-bob-mode-fastboot-2026-07-06.txt`
     (sha256 `0f77a5769d905b209821f73f48d4c06926ece06b430003e6dbaede6100d1ff96`);
-  - PON evidence `out/aurel-rpm-bob-mode-pon-2026-07-06.txt`
+  - PON evidence `out/rpm-bob-mode-pon-2026-07-06.txt`
     (sha256 `8b06e8d271ce730f845a07ef79e2f3d6bf0148edd9363f1746c8d91f58cc3779`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-bob-oracle.img`
     (sha256 `9f659917f5b7bfc687a8aef56a64e391ceb2b9958b043490edce298d7af657ab`).
@@ -547,14 +551,14 @@ part of a ledger experiment.
 ### K016 — DT-backed PM8998 L19 downstream default-vote oracle
 
 - Handles:
-  - patch `out/aurel-latest-rpm-l19-always-on-oracle-2026-07-06.patch`
+  - patch `out/latest-rpm-l19-always-on-oracle-2026-07-06.patch`
     (sha256 `41bb06f48df489e454c4d44aab7284e6990ac97367b8b8925e68cc642c95df45`);
   - image `out/boot-joan-latest-rpm-l19-always-on.img`
     (sha256 `84134c0d71c7f7eafae9e6a268c50302238a002b6c11c229baa6b52a6ee96e04`,
     size `15736832` bytes);
-  - fastboot transcript `out/aurel-rpm-l19-always-on-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/rpm-l19-always-on-fastboot-2026-07-06.txt`
     (sha256 `7f5de9a5c9f90f8e1603de7a832ebb7bc0c9b3a6e6bcfb961e421015f408f52a`);
-  - PON evidence `out/aurel-rpm-l19-always-on-pon-2026-07-06.txt`
+  - PON evidence `out/rpm-l19-always-on-pon-2026-07-06.txt`
     (sha256 `325bc47d2dd040f34be1795d29ba642e6e5bcb21618d768f5404e54389e43dac`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-l19-oracle.img`
     (sha256 `69c820614b2e06cdc089717a7971779e35089791f1e058757c9d81cdb65221b3`).
@@ -588,13 +592,13 @@ part of a ledger experiment.
 ### K017 — DT-backed PM/RPM overlay parity oracle
 
 - Handles:
-  - patch `out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`
+  - patch `out/latest-rpm-pm-overlay-oracle-2026-07-06.patch`
     (sha256 `8b6d4480fe54b7ae7300ecb80b8b4091b542adadb57d1dc986851ec72dfb3c3f`);
   - image `out/boot-joan-latest-rpm-pm-overlay.img`
     (sha256 `de729e6eff09e997de15bdfb0fcf29890e86765228d691f5bb1ca1e185806365`, size `15736832` bytes);
-  - fastboot transcript `out/aurel-rpm-pm-overlay-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/rpm-pm-overlay-fastboot-2026-07-06.txt`
     (sha256 `ba6cefd54ace1274932cbd5a02defa52e298bc5ed0003be20afb2ec0f6f72c37`);
-  - PON evidence `out/aurel-rpm-pm-overlay-pon-2026-07-06.txt`
+  - PON evidence `out/rpm-pm-overlay-pon-2026-07-06.txt`
     (sha256 `15054fdb0af310176c769e71dc31d939d7523a64b936d18e9ecf16fcc4072bdb`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-pm-overlay-oracle.img`
     (sha256 `eaddd46a1716f36a31fccfe5d9d94ba3c375b53c0ab70df28ac2fac7dca07554`).
@@ -628,13 +632,13 @@ part of a ledger experiment.
 ### K018 — TCSR DLOAD/restart-cookie oracle
 
 - Handles:
-  - patch `out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
+  - patch `out/latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
     (sha256 `bd4c3fc21b3d10260fe2b7c2ee96291966fdd9b7f43424c97288e876d1e86b97`);
   - image `out/boot-joan-latest-tcsr-dload-cookie.img`
     (sha256 `0ba46735f6f6fac182f3de3f67fe46f5c60c26948be7b1193f7c7147b48645dd`, size `15736832` bytes);
-  - fastboot transcript `out/aurel-tcsr-dload-cookie-fastboot-2026-07-06.txt`
+  - fastboot transcript `out/tcsr-dload-cookie-fastboot-2026-07-06.txt`
     (sha256 `f09b9ded76e826a195d2dc23e356f17953191b2b12b10b5b4f091e66a4d6cdff`);
-  - PON evidence `out/aurel-tcsr-dload-cookie-pon-2026-07-06.txt`
+  - PON evidence `out/tcsr-dload-cookie-pon-2026-07-06.txt`
     (sha256 `279334aa223eb6ad8d1620544830bee37d535f3be07d376cb0a2620e4abfcbe2`);
   - clean post-oracle repack `out/boot-joan-latest-clean-post-tcsr-dload-cookie-oracle.img`
     (sha256 `38351422d5862f87a42edd51765117fc1b6b60892f6e980c58cda6f725d283f8`).
@@ -673,12 +677,12 @@ part of a ledger experiment.
   - `drivers/power/reset/qcom-pon.c`
   - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
 - Artifact:
-  - `out/aurel-latest-pon-s3-oracle-2026-07-06.patch`
+  - `out/latest-pon-s3-oracle-2026-07-06.patch`
   - sha256 `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`
-  - config artifact `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+  - config artifact `out/latest-pon-s3-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
   - image `out/boot-joan-latest-pon-s3-oracle.img`, sha256 `2c83d4782aa60564c840efe5122ebfeb9aa30f8e0aea8bab10fc7d70f6fb2c31`
-  - fastboot transcript `out/aurel-pon-s3-fastboot-2026-07-06.txt`, sha256 `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
-  - PON evidence `out/aurel-pon-s3-pon-2026-07-06.txt`, sha256 `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
+  - fastboot transcript `out/pon-s3-fastboot-2026-07-06.txt`, sha256 `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
+  - PON evidence `out/pon-s3-pon-2026-07-06.txt`, sha256 `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
   - clean rebuilt image `out/boot-joan-latest-clean-post-pon-s3-oracle.img`, sha256 `7d87765d96df926cac538563dcbe1989f8990d9b784b1c0163926f5cb5f0b0ef`
 - Downstream/reference basis:
   - downstream joan PM8998 PON sets `qcom,s3-debounce = <32>` and
@@ -707,12 +711,12 @@ part of a ledger experiment.
   - `drivers/power/reset/qcom-pon.c`
   - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
 - Artifact:
-  - `out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`
+  - `out/latest-pon-reset-seq-oracle-2026-07-06.patch`
   - sha256 `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`
-  - config artifact `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
+  - config artifact `out/latest-pon-reset-seq-oracle-config-2026-07-06.txt`, sha256 `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
   - image `out/boot-joan-latest-pon-reset-seq-oracle.img`, sha256 `a0c0e2b6448981798d5cc5b03a4804504caaedff7705a896a42883d86786ee12`
-  - fastboot transcript `out/aurel-pon-reset-seq-fastboot-2026-07-06.txt`, sha256 `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
-  - PON evidence `out/aurel-pon-reset-seq-pon-2026-07-06.txt`, sha256 `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
+  - fastboot transcript `out/pon-reset-seq-fastboot-2026-07-06.txt`, sha256 `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
+  - PON evidence `out/pon-reset-seq-pon-2026-07-06.txt`, sha256 `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
   - clean rebuilt image `out/boot-joan-latest-clean-post-pon-reset-seq-oracle.img`, sha256 `d543f234ab848f2de12191eca3cf2df2aa87b04711e4665564da93f5cf57f418`
 - Downstream/reference basis:
   - downstream joan PM8998 PON has S3 source/debounce values plus reset child
@@ -763,8 +767,8 @@ part of a ledger experiment.
   - forcing command `0x12` from mainline would be speculative rather than a direct
     downstream-parity test.
 - Artifact:
-  - `out/aurel-kryo-scm-comparison-2026-07-06.txt`
-- Agent-harness: Hermes:gpt-5.5
+  - `out/kryo-scm-comparison-2026-07-06.txt`
+- Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 - Date: 2026-07-06
 
 ### K022 — null-init discriminator (STAGED, not device-tested)
@@ -780,7 +784,7 @@ part of a ledger experiment.
   at 0x17817000 via /dev/mem — round 18 showed EN=0 there PROVOKES an earlier
   reset) and brings up dwc3/PHY. So no result to date observed the phone with
   Linux userspace doing NOTHING. The large reset-timing variance across
-  Aurel's runs (~30s to ~108s host cycle) is itself more consistent with a
+  Hermes Agent's runs (~30s to ~108s host cycle) is itself more consistent with a
   variable-timing userspace trigger than a fixed hw watchdog period.
 - What it tests: boot the clean kernel with an init that touches no hardware,
   no /dev/mem, no gadget, and idles through the whole 0-150s window; only if
@@ -808,13 +812,12 @@ part of a ledger experiment.
   minimal DT) and/or measure whether the reset period is FIXED across runs
   (fixed => hardware/secure watchdog; variable => probe/thermal triggered).
 - Public/PR disposition: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 ### K023 — minimal-DTB firmware-vs-driver discriminator (INCONCLUSIVE: DTB too aggressive)
 
-- Handle: DTS artifact `out/ember-mindtb-K023-2026-07-06.dts`; images
+- Handle: DTS artifact `out/mindtb-K023-2026-07-06.dts`; images
   `out/boot-joan-mindtb-nullinit.img`
   (sha256 `042197d1da8ad03621edb63840cf48776aa73920dff00153804041b97be98eb4`),
   proof-of-life `out/boot-joan-mindtb-pol.img` and
@@ -847,13 +850,12 @@ part of a ledger experiment.
   trigger. Pair each with an immediate-reboot proof-of-life if the result
   is "still resets".
 - Public/PR disposition: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 ### K023b — full-DTB-minus-USB (boot-safe): USB bring-up is NOT the trigger
 
-- Handle: DTS artifact `out/ember-nousb-K023b-2026-07-06.dts`; image
+- Handle: DTS artifact `out/nousb-K023b-2026-07-06.dts`; image
   `out/boot-joan-nousb-k023b.img`
   (sha256 `fd7bb3e3da65b7d0669da15caccc86acb7d5e1453454ffd71564f701240b63de`).
   Kernel tree reverted clean after.
@@ -874,13 +876,12 @@ part of a ledger experiment.
   worked — panic=0 removed the boot-vs-reset confound cleanly. Reuse this
   harness to subtract the next subsystem (candidates below).
 - Public/PR disposition: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 ### K023c — full-DTB-minus-UFS (boot-safe): UFS bring-up is NOT the trigger
 
-- Handle: DTS `out/ember-noufs-K023c-2026-07-06.dts`; image
+- Handle: DTS `out/noufs-K023c-2026-07-06.dts`; image
   `out/boot-joan-noufs-k023c.img`
   (sha256 `45564b83948eead68207cceb259e2de3ef6538f49d775b808d43f05f372c5b52`).
   Kernel tree reverted clean after.
@@ -892,22 +893,21 @@ part of a ledger experiment.
 - Conclusion: kernel UFS host-controller / UFS-PHY bring-up is NOT the ~27s
   reset trigger. Eliminated.
 - Public/PR disposition: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 ### K023d/e — RPM eliminated; capstone: trigger is in the SoC core/firmware
 
 - K023d (RPM): full joan DTS with `&rpm_requests` disabled, panic=0. LOS at
   +47s (real reset) => RPM/regulator bring-up is NOT the trigger.
-  Artifact `out/ember-norpm-K023d-2026-07-06.dts`,
+  Artifact `out/norpm-K023d-2026-07-06.dts`,
   image `out/boot-joan-norpm-k023d.img`
   (sha256 `0153fbb599e8d3979032c2d90d0966dd2ef3041da10be1056a8f67ede121daed`).
 - K023e (CAPSTONE): full joan DTS with ALL removable board peripherals
   disabled at once (usb3, qusb2phy, ufshc, ufsphy, wifi, pm8005_regulators),
   keeping only the un-removable SoC core (clocks, RPM, SCM/PSCI, GIC, timer),
   panic=0. LOS at +31s (real reset). Artifact
-  `out/ember-corestrip-K023e-2026-07-06.dts`,
+  `out/corestrip-K023e-2026-07-06.dts`,
   image `out/boot-joan-corestrip-k023e.img`
   (sha256 `22a6a640c6c3f13f955a709ecc92a3097116fa11d59af4b94fb92d6b723248f3`).
 - CONCLUSION of the subtraction line (K022, K023b/c/d/e): the ~27-31s
@@ -919,8 +919,7 @@ part of a ledger experiment.
 - Timing note: LOS-return times are bimodal (~31 vs ~48s) across otherwise-
   identical runs — unexplained; may be reset-moment or LG-boot bimodality.
 - Class: `debug-only`, both CONCLUSIVE. Public/PR: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 ### K024 — kernel-side APSS watchdog pet: reset PERSISTS => secure/TZ watchdog
@@ -939,7 +938,7 @@ part of a ledger experiment.
 - Conclusion: the ~27-31s PS_HOLD reset is NOT the pettable non-secure APSS
   watchdog. It is a SECURE / TZ-side watchdog (or its pet writes are
   XPU-blocked from non-secure world). Non-secure Linux cannot service it by
-  petting, and (Aurel) SEC_WDOG_DIS SCM is unimplemented (-2). 
+  petting, and (Hermes Agent-assisted) SEC_WDOG_DIS SCM is unimplemented (-2).
 - IMPORTANT nuance (keeps this from being "needs signed TZ, give up"): a
   RAM-booted STOCK LG KERNEL (also unsigned) SURVIVES (rounds 15-16). So
   downstream's KERNEL software keeps this secure watchdog alive via some
@@ -948,18 +947,16 @@ part of a ledger experiment.
   look: downstream `drivers/soc/qcom/watchdog_v2.c` secure-watchdog handling
   and any early SCM/qseecom/tz-app bring-up beyond SEC_WDOG_DIS.
 - Public/PR disposition: `do not publish`.
-- Written-by: Ember Nymbrand (agent-ember)
-- Agent-harness: Claude-Code:claude-fable-5
+- Assisted-by: Claude-Code:claude-fable-5
 - Date: 2026-07-06
 
 
 ### K025 — secure-interface archaeology / watchdog_v2-QSEECOM comparison (NO BOOT ORACLE)
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
-Aurel followed Ember's session-2 handoff by inspecting downstream early
+Hermes Agent followed Claude Code's session-2 handoff by inspecting downstream early
 secure/TZ/SCM paths before spending another boot cycle. Goal: find exactly one
 active downstream-default, early, state-changing secure call that mainline lacks
 and that is safe enough to test as a debug oracle.
@@ -1014,7 +1011,7 @@ Decision:
 
 Artifact:
 
-- `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`
+- `out/secure-interface-archaeology-k025-2026-07-06.txt`
 - sha256 `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`
 
 Next better targets:
@@ -1029,8 +1026,7 @@ Next better targets:
 
 ### K026 — LGE IMEM default restart-reason oracle: reset PERSISTS; returned bootreason is TZ-class 0x6D630309
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 Downstream/mainline comparison:
@@ -1048,11 +1044,11 @@ Oracle:
   than creating a duplicate patch.
 - Rebuilt/repackaged with the K023 `panic=0` null-init classifier so a boot fail
   cannot fake a reset/survival result.
-- Patch artifact: `out/aurel-lge-imem-default-reason-k026-2026-07-06.patch`
+- Patch artifact: `out/lge-imem-default-reason-k026-2026-07-06.patch`
   sha256 `d68baabab6c1b82d0b976b826de49a5aed621747893bf5fe40fa98fba8a89f62`.
 - Boot image: `out/boot-joan-imem-k026.img`
   sha256 `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`.
-- Result artifact: `out/aurel-lge-imem-k026-result-2026-07-06.txt`.
+- Result artifact: `out/lge-imem-k026-result-2026-07-06.txt`.
 
 Device result:
 
@@ -1114,21 +1110,19 @@ path against mainline, especially:
 
 ## Attribution
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
-## Aurel follow-up — K027 decoded as TZ CONF_NOC_ERR; clk/power-retention attempt inconclusive
+## Hermes Agent follow-up — K027 decoded as TZ CONF_NOC_ERR; clk/power-retention attempt inconclusive
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 K026's returned downstream bootreason `0x6D630309` is now decoded using a public
 older LG/QCOM header from the bullhead msm kernel:
 
 - URL: `https://android.googlesource.com/kernel/msm.git/+/android-msm-bullhead-3.10-n-preview-1/include/soc/qcom/lge/reboot_reason.h?format=TEXT`
-- Preserved artifact: `out/aurel-k027-public-bullhead-reboot_reason.h`
+- Preserved artifact: `out/k027-public-bullhead-reboot_reason.h`
 - Header hash: `90e24ee46dfedef922c02a55f492b01af460bbbdae1a1c9c3bd40e4fdb8b0355`
 - Relevant define: `LGE_ERR_TZ_CONF_NOC_ERR = 0x0009`
 
@@ -1150,14 +1144,14 @@ Comparison notes:
 
 Artifacts:
 
-- Result: `out/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`
+- Result: `out/k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`
 - Image: `out/boot-joan-clkpd-k027.img`, sha256
   `60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e`
-- Cmdline artifact: `out/aurel-k027-clkpd-cmdline-2026-07-06.txt`, sha256
+- Cmdline artifact: `out/k027-clkpd-cmdline-2026-07-06.txt`, sha256
   `cd7ec2fb23b86cc00fcd34f433f1bfbfcaee4573f2be24833cadb3588f400ace`
-- Fastboot/attempt log: `out/aurel-k027-clkpd-fastboot-2026-07-06.txt`, sha256
+- Fastboot/attempt log: `out/k027-clkpd-fastboot-2026-07-06.txt`, sha256
   `92fd7bec7355c4cb62978904186e013ec976bd7a3dc6a7225c0a4e455af491df`
-- Passive post-timeout observation: `out/aurel-k027-post-timeout-observe-2026-07-06.txt`,
+- Passive post-timeout observation: `out/k027-post-timeout-observe-2026-07-06.txt`,
   sha256 `bf7dad650ef88d18b97a4e784b6980e33ddf68d523722f68d694d85176adedb1`
 
 Device result:
@@ -1183,8 +1177,7 @@ Interpretation:
 
 ## K028 (prep) — CONF_NOC mechanism identified in source: late unused-clock/genpd sweeps (no device test)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Source-only session; phone absent from USB throughout (no device contact).
@@ -1235,13 +1228,12 @@ the analysis doc before any device test.
 
 ## K027 (valid retry) — REJECTED, and the reset re-labeled itself: MM NoC error, not Config NoC
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Phone physically recovered by Lance (was in LineageOS, adb visible). Valid
 one-client pass, script `$CLAUDE_JOB_DIR/tmp/k027-run.sh`, full log
-`out/ember-k027-valid-retry-2026-07-07.log`:
+`out/k027-valid-retry-2026-07-07.log`:
 
 - Sending OKAY 0.409s, Booting OKAY 5.096s (sudo -n fastboot, adb-entered).
 - Handoff t+12s; LineageOS adb back at t+42s (+30s after handoff).
@@ -1281,17 +1273,16 @@ label and peel the next stratum (SMMU blacklist pass is staged as K029).
 
 ## K028 — RPM disabled (on top of K027) REGRESSES to Config NoC; RPM must stay enabled
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Onion-peel step 2. Built `&rpm_requests { status = "disabled"; }` (K023d
 pattern) on top of K027's DTS+cmdline (full joan DTS otherwise,
-`clk_ignore_unused pd_ignore_unused`). DTS: `out/ember-k028-norpm-clkpd-
+`clk_ignore_unused pd_ignore_unused`). DTS: `out/k028-norpm-clkpd-
 2026-07-07.dts`, DTB via cpp+dtc (kernel Image.gz unchanged, Jul 6 16:39
 build). Image `out/boot-joan-norpmclkpd-k028.img`, sha256
 `068fee7299dcfafa90de5ede5b92f35240b2b5d61497c7a01f28467b246b1ecf`. Runner
-`out/ember-k028-valid-retry-2026-07-07.log`.
+`out/k028-valid-retry-2026-07-07.log`.
 
 Result: **reset persists**, LOS returned t+61s (49s after handoff), PON
 PS_HOLD. Bootreasoncode: **`0x6D630309` (TZ_CONF_NOC_ERR) — back to K026's
@@ -1326,8 +1317,7 @@ are left untouched.
 
 ## K029 — anoc1_smmu disabled (on top of K027) ALSO regresses to Config NoC
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Onion-peel step 3. Built `&anoc1_smmu { status = "disabled"; };` on top of
@@ -1335,11 +1325,11 @@ K027's DTS+cmdline (RPM left enabled per the K028 lesson). Rationale:
 anoc1_smmu is the only SMMU in msm8998.dtsi with zero `iommus=` consumers
 anywhere in the tree AND no `clocks=` property at all, yet defaults to
 `status = "okay"`, so arm-smmu-v2 still probes/touches it every boot.
-DTS: `out/ember-k029-noanoc1-2026-07-07.dts`. Image
+DTS: `out/k029-noanoc1-2026-07-07.dts`. Image
 `out/boot-joan-noanoc1clkpd-k029.img`, sha256
 `72b88d1e079fbc06493b6650216971e23cd3d2b75b1d265fa19e7d40b1edb363`. Kernel
 Image.gz unchanged (Jul 6 16:39 build) — DTS/cmdline-only test. Runner
-`out/ember-k029-valid-retry-2026-07-07.log`.
+`out/k029-valid-retry-2026-07-07.log`.
 
 Result: **reset persists**, LOS returned t+52s (40s after handoff), PON
 PS_HOLD. Bootreasoncode: **`0x6D630309` (TZ_CONF_NOC_ERR) — regressed from
@@ -1369,8 +1359,7 @@ one) rather than disabling the mainline node again.
 
 ## K030 — SMMU skip-reset patch: the specific TZ NoC-fault signature is GONE
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Root-cause lead, not a subtraction test. Downstream
@@ -1384,16 +1373,16 @@ unconditionally clears sGFSR, forces every SMR invalid and every S2CR to
 bypass, and invalidates the TLB on every probed SMMU, every boot.
 
 Added a debug-only kernel patch gating that entire sequence behind a new
-`ember,debug-skip-reset` DT boolean (patch saved to
-`out/ember-k030-skip-smmu-reset-debug.patch`, applied then built into a
+`debug-skip-reset` DT boolean (patch saved to
+`out/k030-skip-smmu-reset-debug.patch`, applied then built into a
 fresh `Image.gz`; `strings vmlinux` confirmed the new warn string before
 testing). DTS: K027's **untouched** baseline (RPM enabled, full DTS
 otherwise, `clk_ignore_unused pd_ignore_unused` retention) with only
-`&anoc1_smmu { ember,debug-skip-reset; };` added — node stays enabled,
-unlike K029. `out/ember-k030-skipreset-2026-07-07.dts`, image
+`&anoc1_smmu { debug-skip-reset; };` added — node stays enabled,
+unlike K029. `out/k030-skipreset-2026-07-07.dts`, image
 `out/boot-joan-skipreset-k030.img`, sha256
 `207bae675b32e4f4598c46df62d746c818753ea7867e0abd63b9c003f546cf43`. Runner
-`out/ember-k030-valid-retry-2026-07-07.log`.
+`out/k030-valid-retry-2026-07-07.log`.
 
 Result: **reset still occurs** (LOS returned t+42s, 30s after handoff — same
 timing as K027, PON still PS_HOLD/Hard-Reset-cold-boot, identical
@@ -1407,7 +1396,7 @@ entirely**:
 - K030 reports `lge.bootreason=NORMAL`, **`hiddenreset=0`**, and
   `androidboot.product.lge.bootreasoncode=0x20` — no `LGE_RB_MAGIC`
   prefix at all. Cross-checked against the preserved public header
-  (`out/aurel-k027-public-bullhead-reboot_reason.h`): `0x20` is
+  (`out/k027-public-bullhead-reboot_reason.h`): `0x20` is
   `UNDEFINED_CRITICAL_ERROR` in the **older, separate** `pon_restart_reason`
   enum (0x00-0x37 range: `TZ_MM_NOC_ERROR=0x2D`, `TZ_CONF_NOC_ERROR=0x30`
   live in this same enum, confirming it's the low-level counterpart of the
@@ -1427,25 +1416,24 @@ fix. Do not report this as solved.
 Next (K031, staged): downstream marks ALL FIVE msm8998 SMMU-v2 instances
 (`anoc1`, `anoc2`, `lpass_q6`, `mmss`, `kgsl`/adreno) with the same
 `qcom,skip-init` + `qcom,register-save` pair — a blanket SoC policy, not
-an anoc1-only quirk. `out/ember-k031-allsmmu-skipreset-2026-07-07.dts` is
-staged (K027 baseline + `ember,debug-skip-reset` on all five nodes) to
+an anoc1-only quirk. `out/k031-allsmmu-skipreset-2026-07-07.dts` is
+staged (K027 baseline + `debug-skip-reset` on all five nodes) to
 test whether extending the same patch removes the residual generic
 reset too.
 
 ## K031 — all-5-SMMU skip-reset: identical to K030, anoc1 alone is sufficient
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Same kernel binary as K030 (patch is generic, keyed off a DT property —
-no rebuild needed). DTS: K027 baseline + `ember,debug-skip-reset` on all
+no rebuild needed). DTS: K027 baseline + `debug-skip-reset` on all
 five msm8998 SMMU-v2 instances (`anoc1_smmu`, `anoc2_smmu`, `adreno_smmu`,
 `lpass_q6_smmu`, `mmss_smmu`), matching downstream's blanket policy.
-`out/ember-k031-allsmmu-skipreset-2026-07-07.dts`, image
+`out/k031-allsmmu-skipreset-2026-07-07.dts`, image
 `out/boot-joan-allsmmuskipreset-k031.img`, sha256
 `a836f695460d93b9be92802bc69db1326b359c1706c3a446519b58b8c518ffdb`.
-Runner `out/ember-k031-valid-retry-2026-07-07.log`.
+Runner `out/k031-valid-retry-2026-07-07.log`.
 
 Result: **reset persists**, LOS returned t+47s (35s after handoff, same
 ballpark as every test in this chain), PON PS_HOLD. Bootreasoncode:
@@ -1462,7 +1450,7 @@ need — a real correctness risk once their drivers actually attach and
 map, which our spin-only classifier ramdisk never exercises — **the
 broader K031 patch is not preferred**. Going forward, treat K030's
 anoc1-only patch as the accepted, safer baseline; do not carry the other
-four `ember,debug-skip-reset` tags forward without a specific reason to
+four `debug-skip-reset` tags forward without a specific reason to
 re-test them.
 
 Standing question after K030/K031: **what produces the residual
@@ -1478,8 +1466,7 @@ from a plain unhandled watchdog.
 
 ## K032 — clk/pd retention is NOT load-bearing; anoc1 skip-reset alone is the real fix
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Same DTB/kernel as K030 (anoc1-only skip-reset), cmdline changed to
@@ -1487,7 +1474,7 @@ Same DTB/kernel as K030 (anoc1-only skip-reset), cmdline changed to
 no `clk_ignore_unused pd_ignore_unused`). Image
 `out/boot-joan-skipreset-defaultcmdline-k032.img`, sha256
 `2d172bdde1fdcbce6fcc18701a696b556d028ea67d8a18eb2781f9c063820d30`.
-Runner `out/ember-k032-valid-retry-2026-07-07.log`.
+Runner `out/k032-valid-retry-2026-07-07.log`.
 
 Result: **identical to K030/K031** — LOS returned t+48s (37s after
 handoff), PON PS_HOLD, bootreasoncode `0x20`
@@ -1503,7 +1490,7 @@ regressed things, which read as "retention matters." It doesn't. The
 real, load-bearing fix the whole time was `anoc1_smmu`'s reset being
 skipped; K032 proves the cmdline flags contribute nothing once that's
 in place. **Confirmed clean baseline going forward: full, otherwise-
-untouched joan DTS + `&anoc1_smmu { ember,debug-skip-reset; };` (the
+untouched joan DTS + `&anoc1_smmu { debug-skip-reset; };` (the
 K030 kernel patch) + plain default cmdline.** No cmdline workaround
 needed.
 
@@ -1518,18 +1505,17 @@ same question K023e answered for the old NoC fault.
 
 ## K033 — capstone re-run on the fixed baseline: residual fault is ALSO core/firmware, not peripheral
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Confirmed clean baseline (K032: full DTS + anoc1_smmu skip-reset + default
 cmdline) plus the K023e capstone peripheral list re-applied verbatim
 (`usb3`, `qusb2phy`, `ufshc`, `ufsphy`, `wifi`, `pm8005_regulators`
 disabled; RPM stays enabled as core scaffolding — same set K023e used
-against the old NoC fault). `out/ember-k033-skipreset-corestrip-
+against the old NoC fault). `out/k033-skipreset-corestrip-
 2026-07-07.dts`, image `out/boot-joan-skipreset-corestrip-k033.img`,
 sha256 `2aae7771a60e8f21cd74ee49dafdd5fd32a142c22059b8b315c08737a85b0342`.
-Runner `out/ember-k033-valid-retry-2026-07-07.log`.
+Runner `out/k033-valid-retry-2026-07-07.log`.
 
 Result: **reset persists**, LOS returned t+56s (44s after handoff, within
 the previously-noted bimodal ~31-58s spread), PON PS_HOLD, bootreasoncode
@@ -1556,11 +1542,10 @@ from K024's kernel-side pet.
 
 ## K035 — IMEM oracle test INCONCLUSIVE: device landed in an unfamiliar stuck state, session paused
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
-Reintroduced Ember's 2026-07-06 IMEM-oracle initcall
+Reintroduced Claude Code's 2026-07-06 IMEM-oracle initcall
 (`drivers/soc/qcom/joan_imem_oracle.c`, originally commit `f0d368d28` on
 branch `joan/imem-oracle`, not present on `joan/latest-clean-test` until
 now) on top of the confirmed K030 baseline (anoc1_smmu skip-reset). The
@@ -1568,14 +1553,14 @@ oracle writes a deliberately distinctive seed (`0x6D6303EE`, chosen to be
 unmistakable against any real LGE subcode) to the IMEM restart-reason
 offset (`0x146bf000 + 0x65c`) from an `early_initcall`, before whatever
 causes the reset. Combined debug patch saved to
-`out/ember-k035-imem-oracle-plus-smmu-debug.patch`. Verified both
+`out/k035-imem-oracle-plus-smmu-debug.patch`. Verified both
 `"joan-imem:"` strings and the K030 SMMU string present in `vmlinux`
 before testing. Image `out/boot-joan-imemoracle-k035.img`, sha256
 `d95be8064b8b09b27f4f9c84a5a3c611ae886ed0de7b773b235fd2961f3bffed`.
 
 `fastboot boot` succeeded normally (`Sending`/`Booting` OKAY, handoff at
 t+11s). But **no LineageOS return within the 300s cap** — the runner
-correctly stopped itself (`out/ember-k035-valid-retry-2026-07-07.log`,
+correctly stopped itself (`out/k035-valid-retry-2026-07-07.log`,
 exit 12) rather than guessing. Immediate passive check found: `adb
 devices` empty, `fastboot devices` empty, but `lsusb` showing a **new,
 unfamiliar USB identity** — `1004:6340 LG Electronics, Inc. LGE Android
@@ -1591,7 +1576,7 @@ nor `fastboot` currently reaches.
 standing safety rules (device work requires Lance physically present;
 avoid guessing against unfamiliar LG modes; the project has already hit
 this exact "phone vanishes from USB mid-test" shape of problem once
-before, during Aurel's original K027 attempt).
+before, during Hermes Agent's original K027 attempt).
 
 Working theory (recorded as a hypothesis, not a conclusion): this is the
 **9th consecutive** RAM-boot-then-abnormal-PS_HOLD-reset cycle this
@@ -1623,7 +1608,7 @@ State at pause:
   `joan_imem_oracle.c` + Makefile line). Deliberately left in place
   (not reverted) so testing can resume immediately once the device
   recovers, rather than losing K035's setup. Full patch saved at
-  `out/ember-k035-imem-oracle-plus-smmu-debug.patch` regardless.
+  `out/k035-imem-oracle-plus-smmu-debug.patch` regardless.
 - Device: unresponsive to `adb`/`fastboot`, `lsusb` shows `1004:6340`.
   **Needs Lance's physical attention** (a normal forced restart is the
   expected, safe recovery — no flashing, no storage write, matches the
@@ -1635,8 +1620,7 @@ State at pause:
 
 ## K035 pause — root cause confirmed: USB 3.0 port undercharging, not boot-loop protection
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Lance identified the actual cause of the K035 pause: the USB 3.0 port the
@@ -1655,15 +1639,14 @@ adequate charging) for extended runs.
 
 ## K035 result (from device photo): MM_NOC fault confirmed still present; IMEM write likely triggered a separate firmware bug
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 K035 (anoc1_smmu skip-reset baseline + IMEM-oracle seed write at
 `0x146bf000+0x65c`) did not return to LineageOS or produce a normal
 Android-property bootreason. Lance photographed the phone's screen and
-uploaded it (`internal-mirror:/20260708_051750.jpg` and
-`...051754.jpg`). It shows LG's **UEFI-level "LGE Crash Handler" screen**
+uploaded it to the private mirror (paths omitted). It shows LG's
+**UEFI-level "LGE Crash Handler" screen**
 — a diagnostic surface never seen before in this project, one level
 below Android/LineageOS entirely (offers "connect USB + QPST raw dump"
 or "Press Volume Down and Hold a Second" to reboot; the device was
@@ -1742,8 +1725,7 @@ source access):**
 
 ## K036 — sibling MMSS-NoC-bridge clocks marked CLK_IS_CRITICAL (built, not yet device-tested)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Concrete, well-precedented next hypothesis for the standing MM NoC
@@ -1764,11 +1746,11 @@ same MMSS NoC bridge hardware block) lack the same protection:
 
 Patch: marks all three `CLK_IS_CRITICAL`, matching the exact,
 already-proven-safe pattern mainline uses for their sibling. Saved to
-`out/ember-k036-mmnoc-critical-clocks.patch`, applied on top of the
+`out/k036-mmnoc-critical-clocks.patch`, applied on top of the
 confirmed K030 anoc1_smmu fix (kernel tree now carries both patches).
 Kernel rebuilds clean (`strings vmlinux` shows the K030 string, no
 `joan-imem` — confirms the K035 revert held). DTB unchanged from the
-K030 baseline (`out/ember-k030-skipreset-2026-07-07.dtb`). Image built:
+K030 baseline (`out/k030-skipreset-2026-07-07.dtb`). Image built:
 `out/boot-joan-mmnoc-critical-k036.img`, sha256
 `f80be59ae31695bcf41425a989721ee09b2e92ec0210d87c417503992ba5e8f3`.
 Cmdline: plain default (`androidboot.hardware=joan panic=0
@@ -1779,7 +1761,7 @@ reuses an existing, upstream-proven mechanism (`CLK_IS_CRITICAL`) on
 clocks in the identical register family as one already fixed for the
 identical documented reason, rather than inventing a new one. If
 confirmed, it may be close to upstream-shaped as-is, unlike the
-`ember,debug-skip-reset` hack from K030 which needs a real binding
+`debug-skip-reset` hack from K030 which needs a real binding
 design before it could ever be proposed upstream.
 
 **Not yet device-tested at time of writing** — Lance is recovering the
@@ -1799,8 +1781,7 @@ follow it.
 
 ## K036 result — REJECTED, sibling MMSS-NoC-bridge clocks are not the cause
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Device-tested with Lance present (phone recovered from K035's crash
@@ -1820,7 +1801,7 @@ observable difference.
 the MM NoC fault. The hypothesis was well-motivated (same register bank,
 same documented RPM-interaction crash class as an already-protected
 sibling) but wrong, or at best incomplete. Reverted from the kernel tree
-(patch remains saved at `out/ember-k036-mmnoc-critical-clocks.patch` for
+(patch remains saved at `out/k036-mmnoc-critical-clocks.patch` for
 reference; do not reapply without new evidence). Kernel tree returns to
 carrying only the confirmed K030 `anoc1_smmu` skip-reset fix.
 
@@ -1842,8 +1823,7 @@ actually triggers MM_NOC specifically.
 
 ## Methodological correction — the whole "unclaimed/sweepable clock" theory class is ruled out for MM NoC
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 K036's rejection prompted a re-check of what evidence actually
@@ -1887,7 +1867,7 @@ pinctrl-msm's TLMM probe (does it reconfigure pin muxing
 unconditionally, potentially clobbering TZ-owned pin config?), the QUP/
 GENI/BLSP serial-controller family (`blsp2_uart1` is enabled; do its
 siblings' probes touch anything unconditionally even when not
-`status = "okay"`?), or a fresh secure/SCM-archaeology pass in Aurel's
+`status = "okay"`?), or a fresh secure/SCM-archaeology pass in Hermes Agent's
 established strength area — genuinely different investigative angles
 rather than more DTS/clock subtraction, which has been pushed about as
 far as reasoning without new device data can take it this session.
@@ -1898,8 +1878,7 @@ passes without a specific reason to believe a candidate is right).
 
 ## Source-only check: pinctrl-msm/TLMM probe does not match the anoc1_smmu pattern
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Quick source check (no device involved) of one candidate raised in the
@@ -1921,8 +1900,7 @@ archaeology pass from the TrustZone side remain the live candidates.
 
 ## Source-only check: QUP/GENI/BLSP family also does not match the anoc1_smmu pattern
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Second and final source-only check of the K036 correction's candidate
@@ -1946,8 +1924,7 @@ Linux-driver subtraction.
 
 ## Community research + K037 (watchdog timeout test) — non-secure watchdog CLEARED as the tunable cause
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-sonnet-4-5
+Assisted-by: Claude-Code:claude-sonnet-4-5
 Date: 2026-07-08
 
 First systematic look at how OTHER msm8998 mainline ports handle this,
@@ -2016,8 +1993,7 @@ tree stays at the confirmed anoc1-only baseline.
 
 ## Scoping: msm8998 interconnect provider feasibility for MM_NOC (source-only)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Scoped whether a mainline msm8998 interconnect (NoC) provider is a feasible
@@ -2079,8 +2055,7 @@ test run yet; this is a strategic fork for Lance to choose.
 
 ## K038 — display-quiesce test: bootloader-left display CLEARED as the MM_NOC cause
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Tested the display-underflow theory (from the interconnect-scoping entry)
@@ -2091,7 +2066,7 @@ enables (INTF_1/DSI0 at mdp+0x6a800, INTF_2/DSI1 at mdp+0x6b000). Offsets
 authoritative (dsi.xml CTRL=0x0; dpu_3_0_msm8998.h INTF bases;
 dpu_hw_intf.c TIMING_ENGINE_EN=0x0). All non-secure display regs; MDSS
 clocks left on by bootloader (MMCC=m) so they're accessible. On the
-confirmed anoc1-fix baseline. Patch `out/ember-k038-disp-quiesce-debug.patch`,
+confirmed anoc1-fix baseline. Patch `out/k038-disp-quiesce-debug.patch`,
 image `out/boot-joan-disp-quiesce-k038.img` sha256
 `7e9b12deda7f4a39d77c9b277acfa18421bda7dd37069272e1da854f1ed573be`.
 
@@ -2130,15 +2105,14 @@ kind of effort than this session's Linux-side subtraction:
 2. **A TZ-side secure handshake mainline omits** — the CoreSight-on-retail
    finding validates that touching/failing-to-service a TZ-owned block on
    this secure SoC causes exactly this class of reset. Needs secure/SCM
-   archaeology (Aurel's domain; prior K025 pass is the starting point).
+   archaeology (Hermes Agent's domain; prior K025 pass is the starting point).
 
 No cheap Linux-side test remains; the next move is a commitment to one of
 these two larger efforts.
 
 ## Interconnect path — recon + ATTRIBUTION plan + honest payoff concerns (source-only)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Scoped writing an msm8998 interconnect (NoC) provider. Findings:
@@ -2164,9 +2138,13 @@ GPL-2.0 upstream drivers, primarily:
   `msm8998-bus.dtsi` (Copyright Qualcomm / LGE).
 Requirements when writing it: keep the original authors' Copyright lines +
 SPDX-License-Identifier GPL-2.0, add a "based on <file> by <author>" note,
-do NOT present it as original work; commit trailers = Signed-off-by: Lance,
-Assisted-by: Claude-Code:claude-fable-5. This is a provenance record per
-kernel.org policy and matters especially if ever upstreamed.
+and do NOT present it as original work. Required commit trailers:
+
+- `Signed-off-by: Lance <Gero3977@gmail.com>`
+- `Assisted-by: Claude-Code:claude-fable-5`
+
+This provenance record follows kernel.org policy and matters especially if ever
+upstreamed.
 
 HONEST PAYOFF CONCERNS (surfaced during recon, before committing to ~1700
 lines):
@@ -2195,8 +2173,7 @@ dead end and we saved the big build.
 
 ## K039 (interconnect small pass) — MMCC=y (MM clock/power management) does NOT change the fault
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 The interconnect QoS programming requires the MMSS clocks/GDSC up (per
@@ -2240,18 +2217,17 @@ sdm660.c/msm8996.c) remains the definitive test, BUT:
 
 Recommendation: this is a genuine fork for Lance. The full provider is a
 days-scale, low-confidence, hard-to-debug-blind effort. The alternative is
-to accept the Linux side is exhausted and take the TZ-side secure route
-(Aurel), where the fault detail actually lives. Recorded for the decision.
+to accept the Linux side is exhausted and take the Hermes Agent-assisted
+TZ-side secure route, where the fault detail actually lives. Recorded for the decision.
 
 ## TZ/SCM pass + K040 — missing secure handshake: scm_restore_sec_cfg for MM SMMU devices
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
-Ember's own TZ/SCM archaeology pass (Lance directed it after both
+Claude Code's own TZ/SCM archaeology pass (Lance directed it after both
 observability upgrades — screen-verbose and serial UART — turned out
-blocked/specialized; see below). Builds on Aurel's K025.
+blocked/specialized; see below). Builds on Hermes Agent's K025.
 
 Observability answers (why this pass instead of getting a log):
 - **Screen verbose (fbcon/simplefb):** BLOCKED by joan's SW43402 panel
@@ -2284,15 +2260,14 @@ device-level secure-config restore.
 
 K040 test: debug initcall (late_initcall) calling
 `qcom_scm_restore_sec_cfg()` for the 7 MM-subsystem device ids on the
-anoc1-fix baseline. Patch `out/ember-k040-scm-restore-sec-cfg-debug.patch`.
+anoc1-fix baseline. Patch `out/k040-scm-restore-sec-cfg-debug.patch`.
 If the MM_NOC fault is because the MM subsystem's secure SMMU config was
 never established from the non-secure side, restoring it via TZ should
 stop the reset. Build in progress; result pending device test.
 
 ## K040 result — scm_restore_sec_cfg for MM devices: negative (but blunted by no observability)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Device-tested. Image `out/boot-joan-scm-restore-k040.img` sha256
@@ -2325,8 +2300,7 @@ binary. Without it, TZ/SCM archaeology can propose but not cleanly confirm.
 
 ## LEAD: edk2-msm8998 UEFI (Renegade Project) — boots joan past 30s, open-source reference
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Lance surfaced the Windows-on-ARM UEFI angle. Investigated:
@@ -2371,8 +2345,7 @@ regardless.
 
 ## edk2 UEFI source read — TWO big findings (passivity + on-screen console is possible)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Cloned edk2-porting/edk2-msm8998 (branch new) to
@@ -2412,8 +2385,7 @@ photographs). If it works, every future test becomes observable.
 
 ## K041 — on-screen console test (simplefb + fbcon + heartbeat), watched on-device
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-08
 
 Testing FINDING 2 from the edk2 read: add a mainline `simple-framebuffer`
@@ -2423,7 +2395,7 @@ ON SCREEN. Heartbeat init prints ">>>> JOAN-ALIVE t=Ns <<<<" to the console
 every 1s so the last count on screen = the reset time.
 
 Config: +CONFIG_FB_SIMPLE (VT/FB/fbcon already =y). DTS:
-`out/ember-k041-simplefb-2026-07-08.dts` (joan + chosen/simple-framebuffer
+`out/k041-simplefb-2026-07-08.dts` (joan + chosen/simple-framebuffer
 + anoc1 fix). Initramfs: `out/initramfs-k041-heartbeat.cpio.gz`. Image
 `out/boot-joan-simplefb-k041.img` sha256
 `b98655d370d7484a9448457aaf2d0822e3ffed231b88249b6cf7e60eed3e1a97`. Cmdline
@@ -2459,13 +2431,12 @@ Reverted config (FB_SIMPLE) + DTS to clean anoc1-only baseline.
 
 ## K042 — MSM8998 Qualcomm SMMU cfg-probe S2CR quirk-probe subtraction (tested, later superseded by pstore)
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-08
 
 Class: `debug-only` / `superseded`; Public/PR disposition: `do not publish`.
 
-Purpose: follow Ember's K041/edk2 conclusion that the remaining reset is more
+Purpose: follow Claude Code's K041/edk2 conclusion that the remaining reset is more
 likely caused by aggressive Linux re-initialization than by a missing positive
 secure-world keepalive. K030 already showed that suppressing mainline's global
 `arm_smmu_device_reset()` on `anoc1_smmu` removes a named TrustZone
@@ -2481,13 +2452,13 @@ and leaving the later SMR readback loop intact.
 Handles/evidence:
 
 - Saved dirty kernel patch:
-  `out/aurel-k042-smmu-cfgprobe-wip-2026-07-08.patch`
+  `out/k042-smmu-cfgprobe-wip-2026-07-08.patch`
 - Final tested/rejected patch copy:
-  `out/aurel-k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch`
+  `out/k042-smmu-cfgprobe-tested-rejected-2026-07-08.patch`
 - Patch sha256 (both copies):
   `e7fe6b0b3f1dd336f5180c92d1ce60da58a91ea1644e2ef5e67ae77c62ed6704`
 - Build log:
-  `out/aurel-k042-build-2026-07-08.log`
+  `out/k042-build-2026-07-08.log`
 - Build log sha256:
   `e81c6d94ecf3124100009838b4405cd92a223bacb23d5972560c91ecef1b7a20`
 - Packaged RAM-only boot image:
@@ -2497,11 +2468,11 @@ Handles/evidence:
 - Packaged cmdline:
   `androidboot.hardware=joan panic=0 ignore_loglevel`
 - Touched files in the saved patch:
-  - `drivers/iommu/arm/arm-smmu/arm-smmu.c` — carries Ember K030 debug
-    `ember,debug-skip-reset` gate in `arm_smmu_device_reset()`;
+  - `drivers/iommu/arm/arm-smmu/arm-smmu.c` — carries Claude Code K030 debug
+    `debug-skip-reset` gate in `arm_smmu_device_reset()`;
   - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts` — adds the K030
-    `&anoc1_smmu { ember,debug-skip-reset; };` baseline property;
-  - `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c` — adds the Aurel K042
+    `&anoc1_smmu { debug-skip-reset; };` baseline property;
+  - `drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c` — adds the Hermes Agent K042
     MSM8998-only skip around the S2CR BYPASS quirk probe.
 - Attribution/provenance: K042 code is original debug instrumentation, but the
   hypothesis is derived from comparing upstream Linux `qcom_smmu_cfg_probe()`
@@ -2524,10 +2495,11 @@ Verification/state at record time:
   - `Image.gz`: `c1571e4e6c4d0282815ff3ebf1901965c904db1a69e161e0a807854386186a77`
   - `msm8998-lge-joan.dtb`: `29ff3d3e31d495e3b0c82205b2362e03d6f875372df8c3af63da2261165fbda5`
   - `vmlinux`: `f496cd27ba8807dcaf0fd81d037ce4ab48e7f0255ea3beca90b0d39b954d3ca5`
-- `strings vmlinux | grep -E 'EMBER K030|AUREL K042'` verified both debug
-  strings are present:
-  - `EMBER K030 DEBUG: skipping global SMMU reset`
-  - `AUREL K042 DEBUG: skipping MSM8998 S2CR bypass quirk probe`
+- `strings vmlinux | grep -E 'K030|K042'` verified both debug
+  markers are present:
+  - `K030 DEBUG: skipping global SMMU reset`
+  - `K042 DEBUG: skipping MSM8998 S2CR bypass quirk probe` (binary marker;
+    non-public prefix omitted)
 - Device test log:
   `out/tethered-test-2026-07-08T173429Z.log`
 - Device test log sha256:
@@ -2556,15 +2528,14 @@ Verification/state at record time:
 - Kernel worktree state after recording: K042/K030 debug source changes reverted;
   artifacts above preserve the exact tested diff.
 
-Conclusion correction (Aurel, 2026-07-08): K042 does **not** rule out the SMMU
+Conclusion correction (Hermes Agent, 2026-07-08): K042 does **not** rule out the SMMU
 cfg-probe write/read. It is superseded by pstore evidence that exposed an
 earlier TLMM/GPIO abort. Do not cite K042 as a valid negative SMMU result.
 
 
 ### K043-K050 — raw-pstore observability and MSM8998 TLMM/GPIO reserved-ranges narrowing
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-08
 
 Class: mixed `debug-only` oracles plus one `unknown`/candidate DTS result;
@@ -2597,19 +2568,19 @@ Test matrix:
 
 | Test | Handle | Change | Result | Evidence |
 |---|---|---|---|---|
-| K043 | `out/aurel-k043-tlmm-disabled-debug-2026-07-08.patch` | DTS debug: `&tlmm { status = "disabled"; }` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181424Z.log` sha256 `def3e144ea58140815a1767e4feb5b6b7f6f9122f674f3fb19b0e7779e5be1b9` |
-| K044 | `out/aurel-k044-msm8998-skip-gpio-init-debug-2026-07-08.patch` | Source debug: skip `msm_gpio_init()` on msm8998 | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181914Z.log` sha256 `6b69bdaac61158b8f43c7ce16701f7d7a201fc9e722965cdc5c909e516fbcf12` |
-| K045 | `out/aurel-k045-msm8998-gpiochip-no-irq-debug-2026-07-08.patch` | Source debug: register gpiochip without TLMM IRQ chip | Early reset; pstore still panicked in `gpiochip_add_data_with_key()` | `out/tethered-test-2026-07-08T182336Z.log` sha256 `80b82ca63e8c154e0b1e3047a7910f9688bc9843d2db0f8e0378b4b586158316` |
-| K046 | `out/aurel-k046-drop-gpio-reserved-ranges-debug-2026-07-08.patch` | DTS debug: remove `gpio-reserved-ranges` | Pstore synchronous external abort in `msm_gpio_get_direction()` at offset `0x531000` = GPIO49 | `out/tethered-test-2026-07-08T182655Z.log` sha256 `5aeb7c9bb4bcd8238757b6dd5fbfa52776c28bae092de0f2dba7fda25c59f590` |
-| K047 | `out/aurel-k047-msm8998-no-get-direction-debug-2026-07-08.patch` | Source debug: set `get_direction = NULL` on msm8998 TLMM | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T183330Z.log` sha256 `e7618f19b8cdc011d8b383f6c921132cd6f8d3c864add79820c312a4b694bc1e` |
-| K048 | `out/aurel-k048-reserve-gpio49-debug-2026-07-08.patch` | DTS debug: reserve `<49 1>` in addition to `<0 4>` | Abort moved to `0x532000` = GPIO50 | `out/tethered-test-2026-07-08T183742Z.log` sha256 `8a4ff5c3257cf5f827f381a899a40f75861d1878512c1d42cec7abbf93689c32` |
-| K049 | `out/aurel-k049-reserve-gpio49-52-debug-2026-07-08.patch` | DTS debug: reserve `<49 4>` | Abort moved to `0x151000` = GPIO81 | `out/tethered-test-2026-07-08T184003Z.log` sha256 `dd9cf4176fe1e31eb10c588670835a785e9f6e77a2485abeceb768e76de5a605` |
-| K050 | `out/aurel-k050-reserve-gpio49-52-81-84-debug-2026-07-08.patch` | DTS debug/candidate: reserve `<49 4>` and `<81 4>` plus existing `<0 4>` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T184221Z.log` sha256 `ed68d29ed4cd5b586f33347db739f1be3655f2c0e1c160f7d07292184f09e138` |
+| K043 | `out/k043-tlmm-disabled-debug-2026-07-08.patch` | DTS debug: `&tlmm { status = "disabled"; }` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181424Z.log` sha256 `def3e144ea58140815a1767e4feb5b6b7f6f9122f674f3fb19b0e7779e5be1b9` |
+| K044 | `out/k044-msm8998-skip-gpio-init-debug-2026-07-08.patch` | Source debug: skip `msm_gpio_init()` on msm8998 | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T181914Z.log` sha256 `6b69bdaac61158b8f43c7ce16701f7d7a201fc9e722965cdc5c909e516fbcf12` |
+| K045 | `out/k045-msm8998-gpiochip-no-irq-debug-2026-07-08.patch` | Source debug: register gpiochip without TLMM IRQ chip | Early reset; pstore still panicked in `gpiochip_add_data_with_key()` | `out/tethered-test-2026-07-08T182336Z.log` sha256 `80b82ca63e8c154e0b1e3047a7910f9688bc9843d2db0f8e0378b4b586158316` |
+| K046 | `out/k046-drop-gpio-reserved-ranges-debug-2026-07-08.patch` | DTS debug: remove `gpio-reserved-ranges` | Pstore synchronous external abort in `msm_gpio_get_direction()` at offset `0x531000` = GPIO49 | `out/tethered-test-2026-07-08T182655Z.log` sha256 `5aeb7c9bb4bcd8238757b6dd5fbfa52776c28bae092de0f2dba7fda25c59f590` |
+| K047 | `out/k047-msm8998-no-get-direction-debug-2026-07-08.patch` | Source debug: set `get_direction = NULL` on msm8998 TLMM | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T183330Z.log` sha256 `e7618f19b8cdc011d8b383f6c921132cd6f8d3c864add79820c312a4b694bc1e` |
+| K048 | `out/k048-reserve-gpio49-debug-2026-07-08.patch` | DTS debug: reserve `<49 1>` in addition to `<0 4>` | Abort moved to `0x532000` = GPIO50 | `out/tethered-test-2026-07-08T183742Z.log` sha256 `8a4ff5c3257cf5f827f381a899a40f75861d1878512c1d42cec7abbf93689c32` |
+| K049 | `out/k049-reserve-gpio49-52-debug-2026-07-08.patch` | DTS debug: reserve `<49 4>` | Abort moved to `0x151000` = GPIO81 | `out/tethered-test-2026-07-08T184003Z.log` sha256 `dd9cf4176fe1e31eb10c588670835a785e9f6e77a2485abeceb768e76de5a605` |
+| K050 | `out/k050-reserve-gpio49-52-81-84-debug-2026-07-08.patch` | DTS debug/candidate: reserve `<49 4>` and `<81 4>` plus existing `<0 4>` | **SURVIVOR** (`t+123s`, 111s after handoff) | `out/tethered-test-2026-07-08T184221Z.log` sha256 `ed68d29ed4cd5b586f33347db739f1be3655f2c0e1c160f7d07292184f09e138` |
 
 Candidate patch:
 
 - Clean candidate artifact:
-  `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`
+  `out/k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`
   sha256 `6a0227897f48940fb488747f0a8d927916816140627af8a62aba289f0a7b601a`.
 - Candidate DTS content:
 
@@ -2656,8 +2627,7 @@ Kernel worktree after this session: clean `joan/latest-clean-test` at
 
 ### K051 — K050 converted to clean commit + RAM-only confirmation (SURVIVOR)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-10
 
 - Source review outcome (handoff follow-ups 1+2): DTS `gpio-reserved-ranges`
@@ -2677,14 +2647,14 @@ Date: 2026-07-10
 - Clean kernel commit: `950cf8554` on `joan/latest-clean-test`
   ("arm64: dts: qcom: msm8998-lge-joan: reserve TZ-protected TLMM GPIO
   ranges"), trailers `Signed-off-by: Lance`, `Assisted-by: Hermes:gpt-5.5`
-  (Aurel's K043-K050 isolation) + `Assisted-by: Claude-Code:claude-fable-5`
+  (Hermes Agent's K043-K050 isolation) + `Assisted-by: Claude-Code:claude-fable-5`
   (review/commit). Branch now ahead of origin/master by 5.
 - Rebuilt incrementally, repackaged with K023b classifier ramdisk, cmdline
   `androidboot.hardware=joan panic=0 ignore_loglevel`:
   `out/boot-joan-k050-clean-950cf8554.img` sha256
   `e33c2b61aa0a95182ee4bf1b44decc394fbce7039b55953833bac186930f2aa2`.
 - Result: **SURVIVOR** — LOS returned at t+124s (111s after handoff),
-  identical window to Aurel's original K050 run.
+  identical window to Hermes Agent's original K050 run.
   Log: `out/tethered-test-2026-07-10T142008Z.log`.
 - Raw pstore read immediately after
   (`out/pstore-partition-2026-07-10T142231Z.{bin,strings.txt,meta.txt}`):
@@ -2701,8 +2671,7 @@ New clean baseline: `joan/latest-clean-test` @ `950cf8554`.
 
 ### K052-K053 — MILESTONE 1: mainline userspace + USB gadget + network + shell
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-10
 
 - K052: gadget-initramfs image from clean baseline `950cf8554`
@@ -2754,8 +2723,7 @@ dd from LOS root. xbl/abl/tz/hyp/rpm/modem remain absolutely no-touch.
 
 ### K054 — M2 STORAGE: UFS + microSD both up; SD ext4 mount+write verified
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - Root cause of K053's dead UFS: NOT the DTS (joan's &ufshc/&ufsphy supplies
@@ -2783,14 +2751,13 @@ Date: 2026-07-11
     clean umount all OK; 179.4G usable.** pmOS rootfs path is proven.
 - Class: `upstream-candidate` (ce78c1369); config change = bringup-local
   (defconfig fragment TBD for the pmOS APKBUILD).
-- M2 (storage) COMPLETE per docs/ember-handoff-2026-07-10-milestone1-pmos-plan.md.
+- M2 (storage) COMPLETE per docs/handoff-2026-07-10-milestone1-pmos-plan.md.
   Next = M3: pmOS rootfs on SD (pmbootstrap image), kernel via fastboot boot,
   later laf-partition flash per owner's boot-slot decision.
 
 ### K055 — M3: postmarketOS image built + written to SD (verified), resize gap found
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - pmbootstrap built + exported a pmOS rootfs for `lge-joan`:
@@ -2821,8 +2788,7 @@ Date: 2026-07-11
 
 ### K056 — first pmOS boot attempt FAILED: boot.img kernel/ramdisk load overlap (diagnosed+fixed, phone wedged pending physical reset)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - Applied resize: `deviceinfo_kernel_cmdline += pmos.force-partition-resize`
@@ -2864,8 +2830,7 @@ Date: 2026-07-11
 
 ### K057 — M3 COMPLETE: postmarketOS boots on joan (SSH over USB, full 200GB root)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - `fastboot boot out/boot-joan-pmos-ramdiskfix.img` (sha `9bdc4a58…`) after
@@ -2873,7 +2838,7 @@ Date: 2026-07-11
   ramdisk_offset 0x02000000 fix was the complete answer.
 - pmOS initramfs gadget enumerated (18d1:d001), ping 172.16.42.1 OK, sshd up:
   `Linux lge-joan 7.2.0-rc2 #2-lge-joan`, "postmarketOS edge", key auth via
-  id_pi_migration.
+  <device-ssh-key>.
 - **First-boot resize worked: / = /dev/mmcblk0p2 at 180.5G** (was 906M in the
   image) — pmos.force-partition-resize did its job on the 200GB SanDisk.
 - Internal UFS (sda, 118.8G LineageOS) visible, unmounted, untouched.
@@ -2884,8 +2849,7 @@ Date: 2026-07-11
 
 ### K058 — M4 begins: SW43402 panel driver + display DTS (builds; on-device blocked on mmss SMMU)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - P2/P3 docs landed first (panel-sw43402.md, display-path.md,
@@ -2908,8 +2872,7 @@ Date: 2026-07-11
 
 ### K059 — M4 diagnostic boot: display chain sound, blocked exactly at mmss SMMU
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - Built a display-enabled bringup image (DRM/DRM_MSM/DPU/DSI + panel forced
@@ -2932,8 +2895,7 @@ Date: 2026-07-11
 
 ### K060 — display dependencies built in; SMMU now probes, but boot resets
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - K059 could not fairly test the module-less display chain: its effective
@@ -2943,7 +2905,7 @@ Date: 2026-07-11
   `CONFIG_DRM_PANEL_LG_SW43402=y`, and built-in backlight support, then rebuilt
   Image.gz + DTBs.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k060-clockctrl-builtins.img`, sha256
+  `out/boot-joan-20260711-k060-clockctrl-builtins.img`, sha256
   `ac6739c33a7dba577a50252ab78090b2d5b8fbbe18d998175f269621d4e39269`.
   Fastboot transcript:
   `out/k060-clockctrl-builtins-ramboot-20260711T144700Z.log`.
@@ -2960,15 +2922,14 @@ Date: 2026-07-11
 
 ### K061 — MMCC-only isolation exposes the first decisive fault
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - Disabled GPUCC again while keeping MMCC, SW43402, and backlight built in.
   This one-variable test separated the display/mmss path from the adreno SMMU
   and GPU clock-controller path.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k061-mmcc-only.img`, sha256
+  `out/boot-joan-20260711-k061-mmcc-only.img`, sha256
   `2e7780ae575ab067aa7724e2e801042cb7e0625569731dac40d53a084577aa6a`.
   The boot reset and LineageOS returned 47 seconds after handoff; transcript:
   `out/k061-mmcc-only-ramboot-20260711T145639Z.log`.
@@ -2989,8 +2950,7 @@ Date: 2026-07-11
 
 ### K062 — MSM8998 MDSS identity-domain fix survives and reaches DRM fb0
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - Added `qcom,msm8998-mdss` to `qcom_smmu_client_of_match[]` in
@@ -2998,7 +2958,7 @@ Date: 2026-07-11
   Qualcomm MDSS policy: DRM display clients start in an identity domain, then
   drm/msm attaches its own paging domain at the controlled takeover point.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k062-msm8998-mdss-identity.img`, sha256
+  `out/boot-joan-20260711-k062-msm8998-mdss-identity.img`, sha256
   `f5b2f95539c8f1fcb6cf41047663c85b0e4007b06effa93fb79a0602a40db7b1`.
   Result: **SURVIVOR** — mainline gadget `18d1:4e26` appeared eight seconds
   after fastboot handoff; transcript:
@@ -3026,8 +2986,7 @@ Date: 2026-07-11
 
 ### K063 — DSI clock parent-enable experiment REJECTED
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - Hypothesis: the MMCC RCG update warnings meant the DSI PLL parent was not
@@ -3035,7 +2994,7 @@ Date: 2026-07-11
   `CLK_OPS_PARENT_ENABLE` to active `byte0_clk_src` and `pclk0_clk_src` on top
   of K062.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k063-dsi-parent-enable.img`, sha256
+  `out/boot-joan-20260711-k063-dsi-parent-enable.img`, sha256
   `f928d549c2465759a7420c20c4cae7ce50b7aee493a8fde4aa24fabd90e3248a`.
   Mainline still survived and enumerated, but Lance confirmed the screen
   remained completely black. Evidence:
@@ -3052,8 +3011,7 @@ Date: 2026-07-11
 
 ### K064 — MSM8998 no-rate-cache clock fix tested: NO CHANGE
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - Source comparison against the public `msm8998-mainline/linux` tree found
@@ -3062,10 +3020,10 @@ Date: 2026-07-11
   rationale matches one plausible K062 failure mode: a VCO shutdown can clear
   frequency setup while CCF's cached rate prevents reprogramming it.
 - RAM-only image (K062 identity fix + that four-clock patch):
-  `out/boot-joan-20260711-aurel-k064-dsi-rate-nocache.img`, sha256
+  `out/boot-joan-20260711-k064-dsi-rate-nocache.img`, sha256
   `1880b11f42d2f30f482f39a589547a36bc2bf8fbb6eea8aa3d0f5e7ccaaa8983`.
   Patch artifact:
-  `out/20260711-aurel-k064-dsi-rate-nocache.patch`, sha256
+  `out/20260711-k064-dsi-rate-nocache.patch`, sha256
   `44ca62d58616b82adde68d645c33ceddf3bb568cbb55ac23377a39b55c5a8366`.
 - After physical recovery from K063, healthy authorized LineageOS ADB was
   reconfirmed and K064 was RAM-booted. Mainline gadget appeared eight seconds
@@ -3085,8 +3043,7 @@ Date: 2026-07-11
 
 ### K065 — 10nm VCO calculation fix doubles VCO correctly, but panel remains black
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - A second public MSM8998 reference commit, `707f3fc86f6a24e9f710887eb028bd8d0df82580`
@@ -3099,10 +3056,10 @@ Date: 2026-07-11
   42,777,639 / 342,221,118 Hz (all 0.5 within rounding). This made the
   reference commit a strong one-variable diagnostic rather than a blind quirk.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k065-10nm-vco-rate.img`, sha256
+  `out/boot-joan-20260711-k065-10nm-vco-rate.img`, sha256
   `cfe1e802c28087ded8c03d8318bd2b28ee930734c69a48fad2d87def54fbb993`.
   Patch artifact:
-  `out/20260711-aurel-k065-10nm-vco-rate.patch`, sha256
+  `out/20260711-k065-10nm-vco-rate.patch`, sha256
   `241d550e563e0691b6e32bfd449530d63b5827bb94b14734b7560138a5fb2d8b`.
 - Mainline survived and the gadget appeared eight seconds after handoff, but
   Lance again observed a completely black/off panel. Transcript:
@@ -3129,15 +3086,14 @@ Date: 2026-07-11
 
 ### K066 — clk_ignore_unused does not clear the clock-programming failure
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - The public MSM8998 issue tracker records that disabling unused clocks can
   blank working OnePlus/F(x)tec displays. Repacked the K065 binary with only
   `clk_ignore_unused` added to the command line; no source or DT change.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k066-vco-clk-ignore-unused.img`, sha256
+  `out/boot-joan-20260711-k066-vco-clk-ignore-unused.img`, sha256
   `8c6100b2842a75b513cf8a79202d23b44df4ae1f04c6e7abfa817cf780f6102f`.
   Mainline survived; transcript:
   `out/k066-vco-clk-ignore-unused-ramboot-20260711T160138Z.log`.
@@ -3152,8 +3108,7 @@ Date: 2026-07-11
 
 ### K067 — real DSI VDD supply removes dummy regulator; physical result unobserved
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - Source audit found K062-K066 consistently logged
@@ -3167,7 +3122,7 @@ Date: 2026-07-11
   `vdd-supply = <&vreg_l1a_0p875>;` to joan's `&mdss_dsi0`.
 - K067 combined that one-line DT correction with K065's exact VCO formula
   fix. RAM-only image:
-  `out/boot-joan-20260711-aurel-k067-dsi-vdd-vco.img`, sha256
+  `out/boot-joan-20260711-k067-dsi-vdd-vco.img`, sha256
   `f5aceb687f12b172f137e21882d8f4b695d7a8c13c0d672a5a24e3c0e1792b52`.
   Full patch artifact sha256
   `2988e0abb4d29e821826c9299d5013dc5b20af90b975b8a7042ce6da03fc80cd`.
@@ -3210,9 +3165,10 @@ Date: 2026-07-11
 
 ### K068 — parent-enable retest clears RCG update warnings but regresses PLL locking
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol-pro (hypothesis, patch, and build)
-Agent-harness: Hermes:gpt-5.6-sol (device test, analysis, and documentation)
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol-pro
+Assistance-scope: hypothesis, patch, and build
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Assistance-scope: device test, analysis, and documentation
 Date: 2026-07-11
 
 - K063 had tested `CLK_OPS_PARENT_ENABLE` before the later VCO-rate and DSI-VDD
@@ -3220,10 +3176,10 @@ Date: 2026-07-11
   K067 baseline to answer one bounded question: were K063's PLL failures only
   consequences of the then-unfixed VCO math or missing real DSI supply?
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k068-parent-enable-retest.img`, sha256
+  `out/boot-joan-20260711-k068-parent-enable-retest.img`, sha256
   `6794ab253be6132d39bdb5b1b13bd6e4bb3ac30963318b4ff553c30d6c0a05f4`.
   Exact debug patch:
-  `out/20260711-aurel-k068-dsi-parent-enable-retest.patch`, sha256
+  `out/20260711-k068-dsi-parent-enable-retest.patch`, sha256
   `8edde358256330c1f9b09cc674b32cdd8f54f36b535a469cf2eb051d7d3919a3`.
 - The first transfer attempt hung in LG aboot at `Sending 'boot.img'` and never
   reached `OKAY`/`Booting`; it is transport-only evidence, not a kernel result.
@@ -3267,8 +3223,7 @@ Date: 2026-07-11
 
 ### K069 — forced pre-lock `/2` output divider does not persist or light the panel
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - K069 kept K068's parent-enable control and added one debug-only MSM8998 action
@@ -3280,10 +3235,10 @@ Date: 2026-07-11
   684,442,248 Hz. `/2` is therefore the intended divider for the corrected
   1,368,884,472-Hz VCO in this mode.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k069-parent-enable-prelock-outdiv.img`, sha256
+  `out/boot-joan-20260711-k069-parent-enable-prelock-outdiv.img`, sha256
   `3d261ef3f3ce055dedbd264e59dac1a8e00ed955be13ccca8b4bd3bc19bff653`.
   Exact debug patch:
-  `out/20260711-aurel-k069-parent-enable-prelock-outdiv.patch`, sha256
+  `out/20260711-k069-parent-enable-prelock-outdiv.patch`, sha256
   `beefd96f87286224f305b9dc69f4b9515f0f7918ad50e029cfac25d3334326cc`.
 - The single approved fastboot command completed normally. Mainline USB appeared
   11 seconds after handoff. Transcript:
@@ -3316,18 +3271,17 @@ Date: 2026-07-11
 
 ### K070 — instrumentation finds zero initial VCO rate, not a bad saved divider
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - K070 retained the K069 control only to instrument the exact 10nm PLL ordering.
   It logged VCO rate, live/saved `PLL_OUTDIV_RATE`, `CLK_CFG0`, and `CLK_CFG1`
   during initial handoff save, every VCO prepare/lock poll, and restore.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k070-pll-order-instrumentation.img`, sha256
+  `out/boot-joan-20260711-k070-pll-order-instrumentation.img`, sha256
   `e5bf730b50559ae790ab127b3d1c8bafdf86c69ddc9aa62c01b639153c2b387f`.
   Exact debug patch:
-  `out/20260711-aurel-k070-pll-order-instrumentation.patch`, sha256
+  `out/20260711-k070-pll-order-instrumentation.patch`, sha256
   `b548040e10ec74ca306c44f229743b3dfdb2eeced019a7f09dbf06aa2437ca99`.
 - The approved RAM-only boot completed normally and mainline USB appeared.
   Transcript `out/k070-pll-order-instrumentation-ramboot-20260711T1852Z.log`,
@@ -3369,8 +3323,7 @@ Date: 2026-07-11
 
 ### K071 — recalc side-effect restoration collapses the live clock tree to zero
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 - K071 dropped K069's hardcoded divider and all K070 instrumentation. It kept
@@ -3378,10 +3331,10 @@ Date: 2026-07-11
   public-reference commit `707f3fc86f6a`:
   `pll_10nm->vco_current_rate = vco_rate` in the 10nm VCO recalc callback.
 - RAM-only image:
-  `out/boot-joan-20260711-aurel-k071-vco-state-parent-enable.img`, sha256
+  `out/boot-joan-20260711-k071-vco-state-parent-enable.img`, sha256
   `0d07f16366da832b3334499e1bbf8a3be9f5c7b02c576684effb489ac7ac2c58`.
   Exact patch:
-  `out/20260711-aurel-k071-vco-state-parent-enable.patch`, sha256
+  `out/20260711-k071-vco-state-parent-enable.patch`, sha256
   `48fbaf902e4f6ccec347b2750235c7e166ec3f828af1605fbfdb933d16d946d5`.
 - The approved RAM-only boot completed normally; mainline USB appeared after
   18 seconds. Transcript:
@@ -3414,11 +3367,10 @@ Date: 2026-07-11
 
 ### K072 — init-only nonzero VCO seed: PLL LOCKS, panel still dark (RCG-didn't-update is the remaining wall)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
-Built on Aurel's clean tip b549c9f5b (NO K068 parent-enable). Change: in
+Built on Hermes Agent's clean tip b549c9f5b (NO K068 parent-enable). Change: in
 `dsi_pll_10nm_init()`, capture `dsi_pll_10nm_vco_recalc_rate()` once and store
 it into `vco_current_rate` when in [min,max], else fall back to min_pll_rate;
 recalc kept pure (no K071 side-effect). Plus bounded logs (init seed, prepare
@@ -3426,8 +3378,8 @@ entry vco, lock result). Root cause it fixes: the stock `if (!recalc) seed=min`
 DISCARDS a valid nonzero readback because the imported pure recalc no longer
 stores it — leaving vco_current_rate=0 → set_rate(0) → -110.
 
-Artifacts: patch `out/20260711-ember-k072-init-vco-seed.patch`; image
-`out/boot-joan-20260711-ember-k072-init-vco-seed.img` sha256
+Artifacts: patch `out/20260711-k072-init-vco-seed.patch`; image
+`out/boot-joan-20260711-k072-init-vco-seed.img` sha256
 `57d7d3cd58a0edc0c8cccf89027dbfbbe4038f9bf0111e7e049a2efe1eb2157a`; dmesg
 `out/k072-live-dmesg-2026-07-11.txt`; serial `out/k072-serial-20260711T193513Z.log`.
 
@@ -3444,7 +3396,7 @@ RESULTS (RAM boot, Lance present + approved, recovered to LOS):
   do not latch → DSI link byte/pixel clocks wrong → panel gets no valid signal.
 
 KEY INSIGHT: K068's `CLK_OPS_PARENT_ENABLE` is exactly what made these
-RCG-didn't-update warnings DISAPPEAR (Aurel K068), but K068 alone had the
+RCG-didn't-update warnings DISAPPEAR (Hermes Agent K068), but K068 alone had the
 vco=0 PLL failure that K072 now fixes. **The two are complementary.**
 NEXT CANDIDATE K073 = K068 parent-enable + K072 init seed together: should
 give PLL lock (K072) AND RCG latch (K068). Class: K072 = debug-only as-is
@@ -3453,8 +3405,7 @@ reverted to clean b549c9f5b, patch preserved. Nothing pushed.
 
 ### K073/K074 — parent-enable hangs; working-reference NOCACHE config staged (K074 UNTESTED)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 - K073 = K068 parent-enable + K072 seed. RAM-booted (Lance present/approved).
@@ -3476,8 +3427,8 @@ Date: 2026-07-11
 - K074 (STAGED, UNTESTED — awaiting Lance boot approval): clean b549c9f5b +
   K072 vco seed + CLK_GET_RATE_NOCACHE on byte0/pclk0 (working-ref config,
   no parent-enable) + v2 capture init. Patch
-  `out/20260711-ember-k074-k072seed-plus-nocache.patch`; image
-  `out/boot-joan-20260711-ember-k074-nocache.img` sha256
+  `out/20260711-k074-k072seed-plus-nocache.patch`; image
+  `out/boot-joan-20260711-k074-nocache.img` sha256
   `d31ae627b5bb...` (full hash beside image). Kernel tree reverted clean.
 - Status of the display: NOT working. Best-founded next test = K074. If K074
   still black WITH clean dmesg, inspect: byte0/pclk0 live rates + RCG-update,
@@ -3486,14 +3437,13 @@ Date: 2026-07-11
 
 ### K074 — NOCACHE config: PLL locks, no hang, but byte clock at HALF rate (out_div /4 not /2) + splash SMMU faults; panel still black
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 Config: clean b549c9f5b + K072 vco seed + CLK_GET_RATE_NOCACHE on
 byte0/pclk0 (working-msm8998-reference config, NOT K068 parent-enable) +
 v2 stable-capture init. RAM-boot, Lance present/approved, recovered to LOS.
-Artifacts: patch `out/20260711-ember-k074-k072seed-plus-nocache.patch`,
+Artifacts: patch `out/20260711-k074-k072seed-plus-nocache.patch`,
 image sha256 `d31ae627b5bb...` (full beside image), dmesg
 `out/k074-live-dmesg-2026-07-11.txt`, clk `out/k074-clk-2026-07-11.txt`.
 
@@ -3509,7 +3459,7 @@ RESULTS:
      1.369 GHz with out_div=/4 (dsi0_pll_out_div_clk=342 MHz). For
      1440x2880 60Hz DSC-8bpp/4-lane the byte clock should be ~2x higher
      (~70 MHz), i.e. out_div should be /2. This is the same /4-vs-/2
-     divider issue Aurel chased in K069/K070. STRONG suspect for black:
+     divider issue Hermes Agent chased in K069/K070. STRONG suspect for black:
      half-rate DSI link => panel gets no valid signal.
   2. Bounded burst of 10x `arm-smmu cd00000.iommu: Unhandled context
      fault iova=0x9d400000` during handoff — that IOVA is our
@@ -3519,7 +3469,7 @@ RESULTS:
      attaches its translating domain for fb0, then the old splash addr
      faults. Bounded (stops after ~10), not a storm.
 
-NEXT (see handoff docs/ember-handoff-2026-07-11-k074-clock-divider.md):
+NEXT (see handoff docs/handoff-2026-07-11-k074-clock-divider.md):
 primary = make the PLL out_div /2 (correct byte/pixel rate) in a way that
 STICKS with K072's seed — the RCG can't latch because the target rate
 math/divider is off, not because the parent is disabled. Compare our
@@ -3528,8 +3478,7 @@ Secondary = the splash handoff fault. Kernel reverted clean; nothing pushed.
 
 ### K075 — panel-prepare instrumentation (BUILT, ready-to-boot, NOT yet tested)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 Base = K074 clock config (K072 seed + CLK_GET_RATE_NOCACHE) + dev_info logs
@@ -3543,8 +3492,8 @@ could not: does the panel init sequence actually reach the panel?
   half-rate byte clock (K074 finding) is the direct cause. accum_err == 0
   but still black => commands went out fine; the problem is DPU scanout /
   command-mode TE kickoff, not the panel init.
-Artifacts: patch `out/20260711-ember-k075-panel-instrumentation.patch`;
-image `out/boot-joan-20260711-ember-k075-panel-instr.img` sha256
+Artifacts: patch `out/20260711-k075-panel-instrumentation.patch`;
+image `out/boot-joan-20260711-k075-panel-instr.img` sha256
 `18f0d9b9675c3a88085208532c0ac290cacfb4ef2226a86216e391a651561bf3` (uses the
 v2 stable-capture initramfs; pull dmesg from tcp/9600). BUILT and packaged,
 kernel tree reverted clean; awaiting a device boot (Lance present/approved).
@@ -3553,8 +3502,7 @@ problem in one shot.
 
 ### K076 — divider writer trace + panel instrumentation (TESTED, black/off)
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 Base = K075/K074 behavior plus filtered instrumentation in the generic divider
@@ -3580,15 +3528,14 @@ propagates through the shared byte source and PHY byte /8 chain, forcing the
 PLL output divider to `/4`. Downstream MSM8998 instead models a dedicated
 byte-interface divider at MMCC register `0x237c`.
 
-Artifacts: `out/boot-joan-20260711-aurel-k076-divider-panel-instrumentation.img`,
-`out/20260711-aurel-k076-divider-panel-instrumentation.patch`,
+Artifacts: `out/boot-joan-20260711-k076-divider-panel-instrumentation.img`,
+`out/20260711-k076-divider-panel-instrumentation.patch`,
 `out/k076-live-dmesg-2026-07-11.txt`, and
 `out/k076-live-serial-diag-2026-07-11.txt`.
 
 ### K077 — skip byte-interface set_rate discriminator (TESTED, rejected as fix)
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 Exactly one behavior changed from K076: `dsi_link_clk_set_rate_6g()` temporarily
@@ -3626,9 +3573,9 @@ that, investigate panel receipt/acceptance and the DSI video/command sequence
 rather than returning to the already-correct active DPU scanout state.
 
 Artifacts and hashes:
-- image `out/boot-joan-20260711-aurel-k077-skip-byteintf-rate.img`, SHA-256
+- image `out/boot-joan-20260711-k077-skip-byteintf-rate.img`, SHA-256
   `5c90e6ed619b909c8643c605d79a9940131630bf851e6533342e67c2d1d68af5`;
-- patch `out/20260711-aurel-k077-skip-byteintf-rate.patch`;
+- patch `out/20260711-k077-skip-byteintf-rate.patch`;
 - recovered serial evidence `out/k077-live-serial-diag-2026-07-11.txt`;
 - interrupted runner transcript `out/k077-ramboot-20260711T214307Z.log`;
 - manifest `out/k077-hashes.txt`.
@@ -3638,34 +3585,32 @@ uncommitted; nothing was pushed.
 
 ### Post-K077 finalization — experiment reverted, handoff ready
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-07-11
 
 The complete dirty kernel diff was byte-compared with
-`out/20260711-aurel-k077-skip-byteintf-rate.patch` (SHA-256
+`out/20260711-k077-skip-byteintf-rate.patch` (SHA-256
 `e853b9aa5ee00fd99375559a1b44830d6ceed32b5357cd132b10fc06aee6bd2e`),
 then all five experimental source files were restored. The kernel tree is clean
 at `b549c9f5b32a42dfa4a100d33df804e8ed042287`, and the saved patch passes
 `git apply --check` against that baseline. `sha256sum -c out/k077-hashes.txt`
 passed for all seven recorded K077 artifacts. Current handoff:
-`docs/ember-handoff-2026-07-11-aurel-k076-k077-display.md`.
+`docs/handoff-2026-07-11-k076-k077-display.md`.
 
 ### K078 — byte-interface divider: DSI clocks now FULL-RATE and correct (source-correct fix)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
-Implements Aurel's K076/K077 recommendation: model msm8998's dedicated
+Implements Hermes Agent's K076/K077 recommendation: model msm8998's dedicated
 byte-interface hardware divider instead of parenting mdss_byte*_intf_clk
 straight to byte*_clk_src. Added mdss_byte0/1_intf_div_clk (clk_regmap_div,
 reg 0x237c/0x2380, width 2, parent byte0/1_clk_src, CLK_GET_RATE_NOCACHE),
 reparented the intf branches to them, +2 binding IDs (146/147). Modeled
 verbatim on mainline mmcc-sdm660.c. Register 0x237c confirmed for msm8998
 from downstream msm-clocks-hwio-8998.h (MMSS_MDSS_BYTE0_INTF_DIV=0x0237C).
-Patch out/20260711-ember-k078-byte-intf-divider.patch; image
-out/boot-joan-20260711-ember-k078-byte-intf-divider.img sha256
+Patch out/20260711-k078-byte-intf-divider.patch; image
+out/boot-joan-20260711-k078-byte-intf-divider.img sha256
 7aeeec0d0a8c75ceddffd1fc810d2e2361422c1b930c193fa185f67505c0ef05;
 evidence out/k078-clk-2026-07-11.txt + out/k078-dmesg-2026-07-11.txt.
 
@@ -3676,7 +3621,7 @@ VERIFIED (live clk_summary, one variable on clean b549c9f5b):
 - mdss_byte0_intf_clk  = 42.778 MHz via the dedicated /2 divider (correct)
 - 0 PLL-lock failures, 0 vblank timeouts, fb0 up, DPU bound c994000.dsi.
 - rcg-didn't-update down 4->2; 10 bounded splash SMMU faults remain.
-- Panel STILL BLACK (Lance visual). Confirms Aurel K077: correct main +
+- Panel STILL BLACK (Lance visual). Confirms Hermes Agent K077: correct main +
   interface clocks are necessary but NOT sufficient for visible output.
 - This is a clean, upstreamable fix (fixes a real mainline msm8998 mmcc bug
   affecting every 8998 DSI board) — keep it as a commit regardless.
@@ -3685,14 +3630,13 @@ NEXT: panel-side. Lance's lead — mine edk2-msm8998 (local
 ~/vibe-coding-projects/coding/edk2-msm8998), which boots Windows on joan
 with a WORKING SW43402 display: its DSI/panel init sequence, command-mode/
 TE handling, and DSC config are the ground-truth reference for what our
-panel bringup is missing. Also Aurel's ranked follow-ups: DCS readback/BTA
+panel bringup is missing. Also Hermes Agent's ranked follow-ups: DCS readback/BTA
 probe, TE wiring audit (downstream external TE on TLMM 10 vs mainline
 mdp_vsync_e).
 
 ### K079 — edk2-style framebuffer inherit: black (2 fixable blockers found)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 edk2/Windows on joan use NO panel init — Silicon/QC/.../QcomPkg.dsc.inc sets
@@ -3700,8 +3644,8 @@ edk2/Windows on joan use NO panel init — Silicon/QC/.../QcomPkg.dsc.inc sets
 the ABL-lit display. K079 tried the Linux equivalent: simple-framebuffer
 node @0x9d400000 (1440x2880, a8r8g8b8, stride 5760), &mdss disabled so the
 native driver can't tear it down, cmdline clk_ignore_unused pd_ignore_unused.
-Patch out/20260711-ember-k079-simplefb-inherit.patch; image
-out/boot-joan-20260711-ember-k079-simplefb-inherit.img sha256 67744915e9bc…;
+Patch out/20260711-k079-simplefb-inherit.patch; image
+out/boot-joan-20260711-k079-simplefb-inherit.img sha256 67744915e9bc…;
 dmesg out/k079-dmesg-2026-07-11.txt.
 
 RESULT: fully black (Lance visual) — not even a frozen ABL image. TWO
@@ -3726,20 +3670,19 @@ Kernel reverted clean b549c9f5b; K078 (clocks) + K079 patches preserved.
 
 ### K078-commit + K080 — TE wiring fix: te-source mdp_vsync_p + GPIO 10 mdp_vsync_a mux (UNTESTED, built)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 Session pickup after 8 days idle; no interim work found (Deck #43 latest
-comment = Aurel 2026-07-12 K077 wrap-up; harness repo unchanged).
+comment = Hermes Agent 2026-07-12 K077 wrap-up; harness repo unchanged).
 
 1. K078 is now kernel commit `3c9bab7f6` ("clk: qcom: mmcc-msm8998: model
    the DSI byte-interface dividers") on joan/latest-clean-test, exactly the
-   saved patch (out/20260711-ember-k078-byte-intf-divider.patch), per the
+   saved patch (out/20260711-k078-byte-intf-divider.patch), per the
    standing handoff recommendation.
 
 2. K080 = kernel commit `4661cb86b` ("arm64: dts: qcom: msm8998-lge-joan:
-   fix panel TE wiring") — implements Aurel's ranked follow-up #2 (TE audit),
+   fix panel TE wiring") — implements Hermes Agent's ranked follow-up #2 (TE audit),
    which the K077/K078 evidence makes the top black-panel suspect for a
    CMD-mode panel with correct clocks. Ground truth mined from downstream
    (android_kernel_lge_msm8998):
@@ -3761,11 +3704,10 @@ comment = Aurel 2026-07-12 K077 wrap-up; harness repo unchanged).
 
 ### K081 — DCS readback probe (bringup instrumentation, patch-only)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
-Aurel's ranked follow-up #1: bounded BTA readbacks in sw43402_prepare to
+Hermes Agent's ranked follow-up #1: bounded BTA readbacks in sw43402_prepare to
 distinguish "panel ACKs commands" from "host write success" (accum_err only
 proves the latter). Two probe points, dev_info only, never touch accum_err:
 - post-exit-sleep-mode: MIPI_DCS_GET_POWER_MODE (0x0A)
@@ -3775,14 +3717,14 @@ display-on = BSTON|NORON|DISON|SLPOUT) = panel alive + init accepted → the
 remaining blocker is frame kickoff (TE), exactly what K080 fixes. read
 failure (-ETIMEDOUT etc.) = panel not ACKing → init/reset/power problem,
 TE fix alone won't light it.
-Patch out/20260719-ember-k081-dcs-readback-probe.patch — instrumentation,
+Patch out/20260719-k081-dcs-readback-probe.patch — instrumentation,
 NOT committed (debug discipline).
 
 INCIDENT (recoverable, recorded): first build attempt ran `make dtbs`
 without ARCH=arm64 → x86 oldconfig pass clobbered the tree .config (EOF
 answers). The pre-K080 bringup .config was lost (scratchpad backup caught
 the already-damaged file). RESTORED from harness snapshot
-out/config-20260711-aurel-k068-parent-enable-retest (arm64, ARCH_QCOM/
+out/config-20260711-k068-parent-enable-retest (arm64, ARCH_QCOM/
 DRM_MSM/DRM_PANEL_LG_SW43402/SCSI_UFS_QCOM/QMP_UFS/LLCC/OCMEM all =y,
 matches the Path A build spec); olddefconfig accepted it unchanged. Lesson
 already on file: always ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-.
@@ -3794,16 +3736,15 @@ committed tree + K081 applied. Image hash recorded below when packaged.
 
 ### K080/K081 build COMPLETE + test image packaged (2026-07-19, post disk-cleanup)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 Resumed after Lance freed disk (96% → 86%, 63G free). Pre-build checks:
 tree HEAD 4661cb86b (K080) on K078 3c9bab7f6; only dirty file =
 panel-lg-sw43402.c, diff verified byte-identical to
-out/20260719-ember-k081-dcs-readback-probe.patch; .config still the
+out/20260719-k081-dcs-readback-probe.patch; .config still the
 restored K068 snapshot (arm64, all Path A options =y), snapshotted as
-out/config-20260719-ember-k080-k081-te-retest.
+out/config-20260719-k080-k081-te-retest.
 
 Build: make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j4 Image.gz dtbs
 — clean, zero warnings. joan DTB verified to contain K080 (gpio10 →
@@ -3823,8 +3764,7 @@ power-sequencing (or inherit path). No flashing this round.
 
 ### K080/K081 TETHERED TEST RESULT (2026-07-19) — PANEL INIT CONFIRMED WORKING; pipeline likely fully alive, showing black
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 Boot: fastboot boot OKAY (send 0.376s, boot 5.095s), gadget up t+4s
@@ -3883,8 +3823,7 @@ single client) worked instantly.
 
 ### K082-K084 (2026-07-19, same session) — FIRST LIGHT: white screen from mainline; brightness gate found
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 Iteration chain after the K081 "panel ACKs / still black" result:
@@ -3918,8 +3857,7 @@ first-configure WARN (cosmetic).
 
 ### 2026-07-19 — postmarketOS BOOTS TO VISIBLE LOGIN PROMPT on the joan panel
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 Rebuilt the M3 pmOS boot image with the first-light kernel: unpacked
@@ -3943,8 +3881,7 @@ console visible with zero bench intervention.
 
 ### 2026-07-19 (cont.) — K087 instrumentation verdict + UNATTENDED pmOS boot-to-login
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 K087 (instrumented boot, reverted after): dirtyfb EXONERATED —
@@ -3975,19 +3912,17 @@ boots, M5 wifi/BT.
 
 ### K088 (2026-07-19) — RCG force-root-enable retry: FAILED, tree reverted
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 update_config retry under CMD_ROOT_EN did not latch (WARN ×2 persists)
 → source PLL confirmed dead at first set_rate, not root gating. Patch
 in out/ (FAILED suffix). Next: PLL-enable-before-set_rate ordering in
-msm_dsi_host_power_on (see handoff ember-handoff-2026-07-19-aurel-first-light-k088.md).
+msm_dsi_host_power_on (see handoff handoff-2026-07-19-first-light-k088.md).
 
 ### K089-K092 (2026-07-19 evening) — RCG latch + brightness settle SOLVED & COMMITTED; session-1 content path = last gremlin
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 - K089 enable-before-set_rate: FAIL — PLL can't lock at reset rate
@@ -4002,7 +3937,7 @@ Date: 2026-07-19
   first time ever (dbv=0xff, diag=0x40, clocks latched, no errors).
   COMMITTED: `bff40d20b` (panel settle) + `6fa34eb57` (dsi re-latch +
   mmcc CLK_GET_RATE_NOCACHE on byte0/1+pclk0/1), pushed. Probes rebased
-  → out/20260719-ember-k093-dcs-readback-probe-rebased2.patch (applied).
+  → out/20260719-k093-dcs-readback-probe-rebased2.patch (applied).
 - REMAINING (the last one): session-1 FRAME CONTENT still dark — noise
   dd + dirtyfb flush shows nothing in session 1 (lines-glitch at init
   proves emission live), same fb shows text after one blank/unblank.
@@ -4017,8 +3952,7 @@ Date: 2026-07-19
 
 ### K093-K094 (2026-07-19 late) — chvt + cold-rail-cycle discriminators: PANEL FULLY EXONERATED
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 - chvt 2/1 in session 1 (fbcon redraw via dirtyfb, no modeset): still
@@ -4027,33 +3961,31 @@ Date: 2026-07-19
   to clear ABL-leftover panel state: probes all green (0x9C/0x40/0xff)
   and STILL BLACK. Panel-side theories now ALL eliminated: power state,
   init acceptance, brightness, emission (init glitch visible), TE.
-  Patch saved out/20260719-ember-k094-cold-rail-cycle-FAILED.patch,
+  Patch saved out/20260719-k094-cold-rail-cycle-FAILED.patch,
   reverted; k093 probe patch re-applied (tree = 6fa34eb57 + probes).
 - CONCLUSION: session-1 blocker is DPU/DSI/PHY enable-state (programmed
   once vs re-programmed after a full disable). NEXT = register-diff of
   session 1 vs session 2: DSI ctrl regs, PHY/PLL regs, DPU intf/pp/DSC
-  blocks (Aurel K070-style readback instrumentation, or devmem in a
+  blocks (Hermes Agent K070-style readback instrumentation, or devmem in a
   fatter initramfs). display-kick workaround remains operative.
 
 ### K095 (2026-07-19 night) — DSI TPG discriminator: DPU EXONERATED; bug = DSI ctrl/PHY HS engine
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-19
 
 One-shot delayed-work TPG enable at t+8s in session 1 (patch
-out/20260719-ember-k095-tpg-probe.patch, reverted after): pattern
+out/20260719-k095-tpg-probe.patch, reverted after): pattern
 BLACK despite SW trigger written and cmd-panel GRAM persistence.
 DSI-generated pixels bypass the DPU entirely ⇒ session-1 break is in
 the DSI controller/PHY HS pixel path. Prime suspect: ABL leaves DSI
 ctrl+PHY running; first enable inherits that state (sw_reset
 insufficient), our own disable/enable heals. Full analysis + next
-moves: docs/ember-handoff-2026-07-19-night2-dsi-ctrl-session1.md.
+moves: docs/handoff-2026-07-19-night2-dsi-ctrl-session1.md.
 
 ### K096-K097 (2026-07-20 session) — ROOT CAUSE FIXED: MDSS BCR reset at probe. M4 DISPLAY COMPLETE 🎉
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 - K096 (DSI host+PHY cycle at first pre_enable): still black — no
@@ -4083,15 +4015,14 @@ boards use msm_mdss_reset for). NEXT MILESTONES: laf flash
 
 ### K098-K100 (2026-07-20 night) — GPU bringup arc: gpucc + both SMMUs healed, zap AUTHENTICATED, firmware complete; blocker = GPU power-up wedges SoC
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 Lance priority: GUI + touch before laf/M5.
 - K098: CONFIG_MSM_GPUCC_8998=y (was unset — root cause of BOTH ancient
   SMMU deferred-probe failures). Result: adreno + cd00000 SMMUs probe
   clean, zero deferred-probe timeouts. Config snapshot out/config-
-  20260720-ember-k098-gpucc. Display fix regression-checked (visible
+  20260720-k098-gpucc. Display fix regression-checked (visible
   boot; the on-screen "panic" = the single cosmetic gcc_rx1_usb2_clkref
   WARN backtrace, system alive).
 - Firmware secured: a540_zap.mdt/.b00-.b02/.elf pulled from LOS
@@ -4113,7 +4044,7 @@ Lance priority: GUI + touch before laf/M5.
 - K100: pm8005_s1 floor 524mV→988mV + vdd-supply=<&pm8005_s1> on gpu
   node (binds — "supply vdd not found" gone): STILL WEDGES. Voltage
   exonerated (at least as sole cause).
-- NEXT SUSPECTS (next session / Aurel): (1) gpucc GFX3D RCG/PLL chain
+- NEXT SUSPECTS (next session / Hermes Agent): (1) gpucc GFX3D RCG/PLL chain
   never latched-verified (same disease class as the pclk0 saga — check
   gpucc PLL programming vs downstream); (2) a540-specific init the
   mainline a5xx driver lacks (downstream ISENSE/LM/limits sequences);
@@ -4127,8 +4058,7 @@ Lance priority: GUI + touch before laf/M5.
 
 ### K101 (2026-07-20 night) — GDSC-always-on test: WEDGES; GPU blocker is deeper. Interconnect ruled out (no 8998 provider)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 - K101: forced gpu_cx + gpu_gx GDSCs ALWAYS_ON in gpucc-msm8998.c to
@@ -4153,17 +4083,16 @@ Date: 2026-07-20
   research, not a one-flag fix; each attempt costs a physical
   Power+VolDown recovery.
 - RECOMMENDATION: pause GPU; pursue TOUCH (stmfts, GPU-independent) and/
-  or Phosh-on-llvmpipe for the GUI milestone. Resume GPU with Aurel +
+  or Phosh-on-llvmpipe for the GUI milestone. Resume GPU with Hermes Agent +
   proper pre-wedge instrumentation (dump gfx3d/gpupll0 + GDSC regs at
   the LAST safe point before the register poke, over serial, so state
   survives the hang). GPU DTS work saved
-  out/20260720-ember-k099-k100-gpu-enable-UNCOMMITTED.patch (keep for
+  out/20260720-k099-k100-gpu-enable-UNCOMMITTED.patch (keep for
   resume; do NOT commit — enables a wedging path).
 
 ### K102 (2026-07-20) — CORRECTIONS to K099/K101 claims + touch bringup begins
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 Append-only corrections to my own earlier entries. Historical text above
@@ -4182,7 +4111,7 @@ rests on a false premise. That churn is now itself a WEDGE SUSPECT and
 is the cheapest untried one-variable experiment: restore gpu_mem to
 0x95600000 and re-run the first-register-read discriminator. The comment
 carrying this wrong claim is still in
-out/20260720-ember-k099-k100-gpu-enable-UNCOMMITTED.patch; fix it before
+out/20260720-k099-k100-gpu-enable-UNCOMMITTED.patch; fix it before
 that patch is ever committed.
 
 **C2. "zap AUTHENTICATED" (K099) overclaims what was observed.** PAS
@@ -4220,11 +4149,11 @@ NOT proven: that the BIMC/NoC path is innocent in the bus wedge.
 **C5. 6fa34eb57 does not contain its claimed DSI post-enable re-latch.**
 git show --name-status lists only mmcc-msm8998.c; dsi_host.c is
 untouched and the live DSI host still has no second link_clk_set_rate()
-after enable. Cause was two unisolated Ember sessions mutating one
+after enable. Cause was two unisolated Claude Code sessions mutating one
 worktree (full causality in
-out/reconstructed-20260720-ember-k092-k101/). Not an ancestor of the
+out/reconstructed-20260720-k092-k101/). Not an ancestor of the
 current clean line and must not be presented upstream as a verified
-fix. Credit to Aurel for catching this during the dropoff reconstruction.
+fix. Credit to Hermes Agent for catching this during the dropoff reconstruction.
 
 **K102 work — TOUCH (GUI track, GPU-independent):**
 - joan DTS had NO touch node at all; touch was unimplemented, not
@@ -4256,8 +4185,7 @@ fix. Credit to Aurel for catching this during the dropoff reconstruction.
 
 ### K102 RESULT (2026-07-20) — touch image PANICS at boot; cause unknown, no capture
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 - Packaged out/boot-joan-pmos-touch.img (sha256 c64a74a053eb1f38…,
@@ -4275,7 +4203,7 @@ Date: 2026-07-20
   adapter attached at the time, so blsp2_uart1 was unavailable. We are
   flying blind on the actual fault — do NOT guess-and-reboot.
 - Delta under suspicion = K102 touch support ONLY (saved to
-  out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch): blsp1_i2c5
+  out/20260720-k102-touch-stmfts-UNCOMMITTED.patch): blsp1_i2c5
   enabled + touchscreen@49 "st,stmfts", two GPIO-load-switch fixed
   regulators (TLMM 85 avdd / 86 vdd), touch_int (gpio125) +
   touch_reset (gpio89) pinctrl states, CONFIG_TOUCHSCREEN_STMFTS=y.
@@ -4299,8 +4227,7 @@ Date: 2026-07-20
 
 ### K102b (2026-07-20) — CONTROL ALSO PANICS: suspicion moves to the CLEAN TREE, not touch
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 Two bounded RAM boots, both crashed. Phone recovered fine both times,
@@ -4323,7 +4250,7 @@ no flashing, no damage.
   15592399 — both well under the 16 MiB aboot ramdisk-offset
   threshold); ramdisk byte-identical (sha 32ae5cfca76d…).
 
-**LEADING HYPOTHESIS — this may be the clean-tree regression Aurel
+**LEADING HYPOTHESIS — this may be the clean-tree regression Hermes Agent
 demanded we test.** The known-good out/boot-joan-pmos-display.img was
 built from the CONTAMINATED tree (2b466d2f7 + K086 probes, with K092's
 uncommitted clk-rcg replay hook and K093's panel probes compiled in).
@@ -4336,7 +4263,7 @@ reading (no "replaying rcg config at enable" line appeared there).
 **DO NOT TREAT THAT AS ESTABLISHED.** The decisive control was NOT run:
 we never re-booted the known-good reference image tonight to prove the
 environment is still sane. Other live candidates:
-  - config delta, not source delta: Aurel's cleanup restored a pre-GPU
+  - config delta, not source delta: Hermes Agent's cleanup restored a pre-GPU
     .config (CONFIG_MSM_GPUCC_8998=n) and I added
     CONFIG_TOUCHSCREEN_STMFTS=y. Neither has been isolated.
   - SD/rootfs state, or something else environmental.
@@ -4364,13 +4291,12 @@ environment is still sane. Other live candidates:
     membership is not active in this shell session).
 
 Touch work preserved at
-out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch (kernel tree left
+out/20260720-k102-touch-stmfts-UNCOMMITTED.patch (kernel tree left
 CLEAN at 16e3950bf).
 
 ### K102c (2026-07-20) — RETRACTION + THE CLEAN-TREE DISPLAY REGRESSION PASSES
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 **RETRACT K102b's leading hypothesis. The clean tree boots fine.**
@@ -4392,7 +4318,7 @@ not by looking at the panel.** It follows that BOOT 1 (the touch image)
 may also have booted fine — that is now UNKNOWN, not "crashed", and
 K102/K102b's crash framing for it is unproven.
 
-**CLEAN-TREE DISPLAY REGRESSION: PASS.** This is the test Aurel required
+**CLEAN-TREE DISPLAY REGRESSION: PASS.** This is the test Hermes Agent required
 before any publication-grade claim about K097, and it was run on the
 committed stack with NEITHER K092's clk-rcg replay hook NOR K093's panel
 probes compiled in. Evidence saved to
@@ -4422,14 +4348,13 @@ works first (cf. the ramoops/busybox lesson).
 
 STATE: phone still up in pmOS on the control image. Kernel tree clean at
 16e3950bf. Touch patch preserved at
-out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch — touch remains
+out/20260720-k102-touch-stmfts-UNCOMMITTED.patch — touch remains
 UNTESTED, and re-testing it is now cheap (DTB-only rebuild) and should
 be judged over ssh.
 
 ### K102d (2026-07-20) — CORRECTION: touch DTS IS the cause; K102c's "panel is unreliable" is WITHDRAWN
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-20
 
 Lance, who was watching the physical device: "it never booted with that
@@ -4474,7 +4399,7 @@ out/k102b-clean-tree-regression-dmesg.log. K097's contamination caveat
 stays retired; K092 was not load-bearing.
 
 **NEXT (touch debug, now correctly scoped):** the fault is inside
-out/20260720-ember-k102-touch-stmfts-UNCOMMITTED.patch. Bisect it, DTB
+out/20260720-k102-touch-stmfts-UNCOMMITTED.patch. Bisect it, DTB
 only (seconds per rebuild), judged over ssh:
   a. i2c5 enabled + touchscreen node, but `status = "disabled"` on the
      node — isolates bus enable from the child.
@@ -4490,8 +4415,7 @@ text from the failing boot (pstore empty, no SYSTEM_LAST_KMSG).
 
 ### K103 (2026-07-21) — `input-enable` deletion restores boot; touch probe still fails
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes-Agent:openai-codex/gpt-5.6-sol
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Provider/preset: `moa/oops-all-chatgpt-all-max`
 Aggregator/acting model: `openai-codex:gpt-5.6-sol[reasoning=max]`
 Reference routes: 2 × `openai-codex:gpt-5.6-sol[reasoning=max]`
@@ -4517,10 +4441,10 @@ input device registers. The canonical kernel tree was not modified.
 - K103 source-built DTB:
   `914f9f660bd81f7026a475c07eef77087733b6c1ea140c56319c7cf43fba0594`;
 - clean-to-K103 patch:
-  `out/k103-aurel-touch-no-input-enable-20260721/20260721-aurel-k103-touch-no-input-enable-from-clean.patch`
+  `out/k103-touch-no-input-enable-20260721/20260721-k103-touch-no-input-enable-from-clean.patch`
   (`c06e27ed3da6213d54c0ad862147a8e0ce0775d914d389e8d68be7b47bb22bb7`);
 - K102-to-K103 patch:
-  `out/k103-aurel-touch-no-input-enable-20260721/20260721-aurel-k103-k102-to-k103-touch-no-input-enable.patch`
+  `out/k103-touch-no-input-enable-20260721/20260721-k103-k102-to-k103-touch-no-input-enable.patch`
   (`dcf9670469191d53ccd5c02f5cc39bb0d1f8b0edf59ef54eb8f130162099e750`).
 
 The clean control DTB and archived K102 DTB reproduced exactly. Two independent
@@ -4584,8 +4508,8 @@ flashed. No second K103 run, `pmbootstrap`, push, or public write occurred.
 K101 remains quarantined.
 
 **Evidence:** successor handoff
-`docs/aurel-handoff-2026-07-21-k103-input-enable-discriminator.md`; finalized
-bundle `out/k103-aurel-touch-no-input-enable-20260721/`; final manifest
+`docs/handoff-2026-07-21-k103-input-enable-discriminator.md`; finalized
+bundle `out/k103-touch-no-input-enable-20260721/`; final manifest
 `K103-FINAL-SHA256SUMS-20260721T163429Z` (46 verified entries):
 
 - manifest SHA-256:
@@ -4601,10 +4525,9 @@ changes in one experiment.
 
 ### K104 (2026-07-25) — touch INT `bias-pull-up` + probe instrumentation: BUILD VERIFIED, DEVICE RUN BLOCKED by xHCI/aboot transport
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
-Host: nym-skyforge (new build host; first LG V30 work performed there)
+Host: <build-host> (new build host; first LG V30 work performed there)
 
 **Class/disposition:** bringup-local, diagnostic. K104 was built and packaged but
 **never executed on the device** — two RAM-boot attempts failed in USB transport
@@ -4613,13 +4536,13 @@ behaviour.** The `-110` from K103 remains unresolved.
 
 #### Host migration: toolchain equivalence PROVEN before any new work
 
-All LG V30 work moved from nym-nest to nym-skyforge. Before building anything
-new, Aurel's K103 DTB was reproduced from his saved clean-to-K103 patch on the
-new host:
+All LG V30 work moved from <usb-host> to <build-host>. Before building anything
+new, the K103 DTB from Hermes Agent-assisted work was reproduced from the saved
+clean-to-K103 patch on the new host:
 
 - reproduced DTB SHA-256:
   `914f9f660bd81f7026a475c07eef77087733b6c1ea140c56319c7cf43fba0594`
-- **byte-identical to Aurel's K103 DTB.** The new host's toolchain
+- **byte-identical to the K103 reference DTB.** The new host's toolchain
   (`aarch64-linux-gnu-gcc 16.1.0`, in-tree DTC 1.7.2) is therefore equivalent,
   and any later difference is attributable to the change under test, not the
   machine.
@@ -4638,14 +4561,14 @@ incremental logic already covers this workflow. Do not expect ccache to help.
 
 #### Change under test — ONE functional variable
 
-Built on the K103 source state (clean `16e3950bf` + Aurel's clean-to-K103 patch),
+Built on the K103 source state (clean `16e3950bf` + Hermes Agent's clean-to-K103 patch),
 with exactly one functional change plus log-only instrumentation:
 
 1. **`touch-int-default-state`: `bias-disable` → `bias-pull-up`** (gpio125).
 
 2. **Log-only instrumentation** in `drivers/input/touchscreen/stmfts.c`
    (13 `K104:` tracepoints, `dev_info` only, no behavioural change), covering the
-   five stages Aurel specified: regulator-enable return, reset-GPIO pulse
+   five stages Hermes Agent specified: regulator-enable return, reset-GPIO pulse
    begin/end, `stmfts_read_system_info()` return plus chip/fw id, `enable_irq()`,
    every `stmfts_command()` opcode with its I2C write return and
    completion-wait entry/exit (including jiffies remaining), IRQ-handler entry,
@@ -4689,7 +4612,7 @@ instrumentation exists to do.
 #### Artifacts
 
 - worktree (isolated, canonical trees untouched):
-  `~/vibe-coding-projects/coding/linux-mainline-v30-ember-k104`, detached at
+  `~/vibe-coding-projects/coding/<historical-k104-worktree>`, detached at
   `16e3950bf`;
 - K104 DTB SHA-256:
   `62ebe79be00d414fb6fc6d13c4c18abf7e9f176fa4d0cae0f1ca412f2c6456ff`
@@ -4723,7 +4646,7 @@ Evidence against a cable/physical fault:
 - **no USB disconnect event** logged during either transfer — the device stayed
   enumerated as `18d1:d00d`; the only disconnects logged were Lance's manual
   restarts;
-- the same cable and the same procedure worked on nym-nest for K103.
+- the same cable and the same procedure worked on <usb-host> for K103.
 
 Attempt 2 additionally ran `adb kill-server` before the transfer (to remove any
 USB-handle contention from the adb server's scanning thread) and pinned
@@ -4732,18 +4655,18 @@ adb contention and USB autosuspend are both effectively excluded. (Note: the
 root-hub autosuspend pin silently did not apply — a `[ -w ]` test evaluated as
 the invoking user rather than root — so root-hub autosuspend is untested.)
 
-**Leading hypothesis: host USB controller generation.** nym-nest, where this
+**Leading hypothesis: host USB controller generation.** <usb-host>, where this
 procedure is proven, is a 2011 Sandy Bridge Chromebox with native **EHCI**.
-nym-skyforge exposes **xHCI on every root hub** (Bus 001/003/005 at 480M, Bus
+<build-host> exposes **xHCI on every root hub** (Bus 001/003/005 at 480M, Bus
 002/004/006 at 10000M); there is no EHCI path. LG's aboot USB stack hanging
 mid-bulk-transfer against xHCI, with no host-side error, is consistent with all
 observations. **Unproven** — a different-port test and a USB 2.0 hub test are
 the outstanding single-variable experiments.
 
 **Operational consequence for this project: every future `fastboot`/flash
-operation from nym-skyforge is affected, not just K104.** If the port/hub tests
-fail, the workable split is to build on nym-skyforge (10.9× faster) and perform
-device transport from nym-nest, whose EHCI is proven with this phone.
+operation from <build-host> is affected, not just K104.** If the port/hub tests
+fail, the workable split is to build on <build-host> (10.9× faster) and perform
+device transport from <usb-host>, whose EHCI is proven with this phone.
 
 #### Method corrections recorded for future sessions
 
@@ -4761,7 +4684,7 @@ device transport from nym-nest, whose EHCI is proven with this phone.
 
 1. Single-variable transport tests, in order: different root hub (Bus 003/005),
    then a USB 2.0 hub inline. Do not combine.
-2. If transport is still blocked, execute K104 from nym-nest unchanged — the
+2. If transport is still blocked, execute K104 from <usb-host> unchanged — the
    image is built, hashed, and does not need rebuilding.
 3. On a successful K104 boot, read `K104:` lines from dmesg and classify: touch
    input device registered (bias was the fix) versus `-110` with a named failing
@@ -4770,17 +4693,16 @@ device transport from nym-nest, whose EHCI is proven with this phone.
 
 ### K104 RESULT (2026-07-25) — transport resolved via EHCI host; `bias-pull-up` FIXES the IRQ path; failure moves to command protocol
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 This supersedes the "DEVICE RUN BLOCKED" disposition in the K104 entry above.
-K104 **was** executed, from nym-nest.
+K104 **was** executed, from <usb-host>.
 
 #### Transport: root cause CONFIRMED as host USB controller generation
 
 The identical image, cable, phone and procedure that hung indefinitely three
-times on nym-skyforge completed immediately from nym-nest:
+times on <build-host> completed immediately from <usb-host>:
 
 ```
 Sending 'boot.img' (25796 KB)   OKAY [  0.593s]
@@ -4789,18 +4711,18 @@ Finished. Total time: 5.703s
 ```
 
 pmOS gadget `18d1:d001` appeared after 10 s; SSH to `172.16.42.1` succeeded via
-`~/.ssh/id_pi_migration` (which exists only on nym-nest).
+`~/.ssh/<device-ssh-key>` (which exists only on <usb-host>).
 
-- nym-skyforge: 3 USB controllers, **all xHCI** (`lspci`: AMD 500-series XHCI +
+- <build-host>: 3 USB controllers, **all xHCI** (`lspci`: AMD 500-series XHCI +
   2 × Renoir/Cezanne USB 3.1); **zero EHCI** — no `ehci-pci` devices, no ehci
   modules. AMD dropped EHCI silicon years ago; a port labelled "USB 2.0" on this
   board is a speed-limited xHCI port, **not** a separate controller. No port
   change on this host can help.
-- nym-nest: `ehci-pci/3p` × 2, **EHCI only**.
+- <usb-host>: `ehci-pci/3p` × 2, **EHCI only**.
 
-**Standing operational rule for this project: build on nym-skyforge (full kernel
+**Standing operational rule for this project: build on <build-host> (full kernel
 7m41s, driver-file incremental 25 s, single DTB 0.8 s), perform ALL fastboot /
-flash transport from nym-nest.** Attempting fastboot from nym-skyforge hangs the
+flash transport from <usb-host>.** Attempting fastboot from <build-host> hangs the
 client indefinitely in uninterruptible sleep at `Sending`, requiring a physical
 bootloader restart. This affects every future flash, not only K104.
 
@@ -4854,7 +4776,7 @@ asserted again. Even without the race, no completion would arrive. The wait
 exits with `0 left` at t=2.272019, i.e. the full 1008 ms.
 
 Cause (2) is the substantive one and **supports the downstream-protocol
-hypothesis Aurel recorded at K103**: joan's downstream FTM4 flow uses a
+hypothesis Hermes Agent recorded at K103**: joan's downstream FTM4 flow uses a
 four-byte `B6 00 28 80` reset and polls `0x85` events, not mainline's
 single-byte `0xa0`. The controller appears to ignore `0xa0` entirely.
 
@@ -4888,11 +4810,11 @@ produce a working probe, because no second IRQ arrives.
 
 #### Evidence
 
-`out/k104-ember-touch-bias-pullup-20260725/` (10-entry manifest
+`out/k104-touch-bias-pullup-20260725/` (10-entry manifest
 `K104-SHA256SUMS-20260725`), including the 523-line device dmesg
 `k104-device-dmesg-20260725.log`, the clean-to-K104 patch, the built DTB
-(`62ebe79b…`), the config snapshot, and all three failed nym-skyforge transport
-logs plus the successful nym-nest run.
+(`62ebe79b…`), the config snapshot, and all three failed <build-host> transport
+logs plus the successful <usb-host> run.
 
 Nothing was flashed. K101 remains quarantined. The sealed K103 bundle was not
 altered. The phone was left in the RAM-booted pmOS image; it returns to
@@ -4900,11 +4822,10 @@ LineageOS on a power cycle.
 
 ### K105 (2026-07-25) — skipping SYSTEM_RESET does not help: mainline's single-byte command protocol is incompatible with joan's FTM4
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
-**Class/disposition:** bringup-local, diagnostic. Executed from nym-nest
+**Class/disposition:** bringup-local, diagnostic. Executed from <usb-host>
 (EHCI), transport clean: `Sending OKAY [0.596s]`, `Booting OKAY [5.096s]`.
 DTB unchanged from K104, so `bias-pull-up` is retained and this is a
 single-variable driver-only test. Image
@@ -4973,21 +4894,20 @@ modelled on downstream. Either is materially larger than K102-K105 and should
 be scoped with Lance before implementation. Do NOT continue single-variable DT
 experiments; that layer is done.
 
-**Evidence:** `out/k105-ember-skip-sysreset-20260725/` — device dmesg (526
+**Evidence:** `out/k105-skip-sysreset-20260725/` — device dmesg (526
 lines), transport log, clean-to-K105 patch, manifest
 `K105-SHA256SUMS-20260725`. Nothing flashed. K101 remains quarantined. Phone
 left in RAM-booted pmOS; returns to LineageOS on power cycle.
 
 ### K106 (2026-07-25) — downstream 4-byte reset frame IS answered; polling retrieves the response
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k106-downstream-reset.img`, SHA-256
 `6326084e56f9b4a830a99a1c3ad6c69048e5a0ab8247488ae8e8d8c2d59a5910`. DTB
-unchanged from K104. Built on nym-skyforge (26 s incremental), booted from
-nym-nest.
+unchanged from K104. Built on <build-host> (26 s incremental), booted from
+<usb-host>.
 
 **Change:** replace the first `stmfts_command()` in `stmfts_configure()` with
 downstream's system reset — a 4-byte frame `B6 00 28 80` written via raw
@@ -5019,8 +4939,7 @@ identifies the real cause.
 
 ### K107 (2026-07-25) — ROOT CAUSE AND FIX: controller-side interrupt generation was never enabled. TOUCHSCREEN WORKS.
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k107-int-enable.img`, SHA-256
@@ -5088,18 +5007,17 @@ register write).
    form suitable for mainline `stmfts` as written. Structuring this properly
    (quirk flag, variant ops, or a separate driver) is an open design question.
 
-**Evidence:** `out/k107-ember-int-enable-20260725/` — device dmesg, clean-to-K107
+**Evidence:** `out/k107-int-enable-20260725/` — device dmesg, clean-to-K107
 patch. Nothing flashed. K101 remains quarantined.
 
 ### K108 (2026-07-25) — coordinate and field decode corrected; M4 TOUCH COMPLETE
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k108-coord-decode.img`, SHA-256
 `d192c0475855e7498e5e98385b8ea790cb9e7396634ca97d83dad4a5b250b54f`. DTB
-unchanged from K104. Built nym-skyforge (26 s), booted nym-nest.
+unchanged from K104. Built <build-host> (26 s), booted <usb-host>.
 
 **Problem from K107:** touch worked but reported X up to 3616 and Y up to 2964,
 against DT `touchscreen-size-x = 1440` / `-y = 2880`. The two axes overshot by
@@ -5174,13 +5092,12 @@ tracked across lifts.
 4. The instrumentation (K10x `dev_info` tracepoints) must be stripped or
    demoted before any upstream submission.
 
-**Evidence:** `out/k108-ember-coord-decode-20260725/` — clean-to-K108 patch and
+**Evidence:** `out/k108-coord-decode-20260725/` — clean-to-K108 patch and
 the raw captured touch-event dump. Nothing flashed. K101 remains quarantined.
 
 #### K108 addendum (2026-07-25) — 10-point multitouch verified under real contact
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 
 Second hardware capture, Lance placing five fingers then both hands
 (25578 event records, 613872 bytes, `k108-10point-events-raw-od.txt`):
@@ -5208,8 +5125,7 @@ result.
 
 ### K109 (2026-07-25) — restructure K107/K108 as a per-compatible variant; behaviour verified unchanged
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k109-refactor.img`, SHA-256
@@ -5266,12 +5182,11 @@ actually share this protocol rather than "joan needs it", a separate binding
 patch, and a decision on whether this belongs in `stmfts` at all versus a
 distinct driver. That is a design conversation, not a code change.
 
-**Evidence:** `out/k109-ember-variant-refactor-20260725/`.
+**Evidence:** `out/k109-variant-refactor-20260725/`.
 
 #### K109 addendum (2026-07-25) — the `0x0dec00d0ba` error event is BENIGN; downgraded from open defect
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 
 Recurring `stmfts 0-0049: error code: 0x0dec00d0ba` was carried as an open item
 from K107. It is now understood and **closed as benign**.
@@ -5316,8 +5231,7 @@ decoded.
 
 ### K110 (2026-07-25) — error-code format bug fixed; warning rate-limited; measured as costing no power
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k110-errfmt.img`, SHA-256
@@ -5352,7 +5266,7 @@ Kernel commit `1834cdd79` on branch `joan/touch-ftm4`, SSH-signed.
 The touch work had until now lived only as an uncommitted diff in a detached
 worktree. It is committed to `linux-mainline-v30` branch `joan/touch-ftm4`,
 based on the clean checkpoint `16e3950bf`, split upstream-style and all
-SSH-signed. Aurel's `joan/latest-clean-test` was NOT touched:
+SSH-signed. Hermes Agent's `joan/latest-clean-test` was NOT touched:
 
 ```
 1834cdd79  Input: stmfts - fix error code formatting and rate-limit the warning
@@ -5367,8 +5281,7 @@ needs a deliberate decision about branch naming.
 
 ### K111 (2026-07-25) — chip identity read from hardware: `0x3670`; compatible renamed `st,fts3670`
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 **Purpose:** K109 left the compatible as `st,ftm4`, named after the vendor
@@ -5429,12 +5342,11 @@ unconfirmed and no datasheet was found. This is a much stronger basis than
 series still needs tidying before submission — commits `eb360a8e7` and
 `e24710303` introduce `st,ftm4` which `1fd88a1fc` then renames, which should
 be squashed rather than published as-is. Full series exported to
-`out/k111-ember-chipid-identity-20260725/joan-touch-fts3670-series.patch`.
+`out/k111-chipid-identity-20260725/joan-touch-fts3670-series.patch`.
 
 ### K112 (2026-07-25) — touch series squashed and merged into `joan/latest-clean-test`
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 The five-commit `joan/touch-ftm4` branch contained rename churn — two commits
@@ -5481,15 +5393,14 @@ Both are redundant now that the tree equality is proven, but they are the only
 record of the original sequence and are left in place under the standing
 never-delete-without-approval rule.
 
-**Not pushed.** `ghfork` still points at the old pre-cleanup line (see Aurel's
+**Not pushed.** `ghfork` still points at the old pre-cleanup line (see Hermes Agent's
 2026-07-20 reconstruction); publishing the kernel branch needs a deliberate
 decision about the remote branch name and whether the old line is replaced.
 The harness repo `ghpub` is current.
 
 ### K113 (2026-07-25) — single public kernel branch established at `ghfork/joan/latest-clean-test`
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 Authorised-by: Lance — "one upstream branch that contains a history of all our
 edits and changes done for the public facing side", choice of method delegated.
@@ -5508,7 +5419,7 @@ the same MDSS reset.
 **Why replacing the old line was safe and correct.** `6fa34eb57`'s subject
 claims a DSI post-enable re-latch that the commit does not contain
 (`dsi_host.c` untouched; MMCC NOCACHE flags only) — a split-brain artifact per
-Aurel's 2026-07-20 reconstruction. Leaving it published would keep a commit
+Hermes Agent's 2026-07-20 reconstruction. Leaving it published would keep a commit
 whose message misrepresents its contents in the permanent public record. The
 substantive work it was supposed to carry exists in the clean line as
 `16e3950bf`.
@@ -5554,14 +5465,13 @@ history a second time to cosmetic effect.
 
 #### K113 addendum (2026-07-25) — `6fa34eb57` audited and confirmed; pre-cleanup archive retired
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 
 Lance asked why the pre-cleanup line was still being preserved. It was being
-kept so Aurel's 2026-07-20 claim about `6fa34eb57` could be independently
+kept so Hermes Agent's 2026-07-20 claim about `6fa34eb57` could be independently
 checked. That audit has now been performed, so the reason no longer holds.
 
-**Aurel's claim is CONFIRMED.** Commit `6fa34eb57`:
+**Hermes Agent's claim is CONFIRMED.** Commit `6fa34eb57`:
 
 ```
 subject : drm/msm/dsi: re-latch byte/pixel rates after enabling link clocks
@@ -5571,7 +5481,7 @@ dsi_host.c : NOT touched
 
 The subject describes a change to the DSI host that the commit does not
 contain. It is an MMCC flag change wearing a DSI re-latch commit message —
-exactly the split-brain artifact Aurel identified, where a background session
+exactly the split-brain artifact Hermes Agent identified, where a background session
 `git checkout --`'d the file and a `str.replace()` with no match-count check
 silently no-op'd.
 
@@ -5594,8 +5504,7 @@ than inherited indefinitely.
 
 ### PINNED (2026-07-25) — boot-time `clk_disable_unused` WARN on `gcc_rx1_usb2_clkref_clk`
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Priority: deferred until display, Phosh and GPU are working — **unless it is
 found to cause any of them to fail**, per Lance 2026-07-25.
 
@@ -5658,8 +5567,7 @@ touches USB, clocks or PHY reference state, revisit this first.
 
 ### M6 (2026-07-25) — PHOSH RUNNING: graphical session on mainline, software-rendered
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 **A real graphical session is up on the device**, verified by Lance on glass:
@@ -5669,7 +5577,7 @@ driver layer proven in K108.
 
 **No reflash was needed.** The existing pmOS edge rootfs took the UI in place:
 `apk add postmarketos-ui-phosh` (723 packages) over a temporary NAT through
-nym-nest. `postmarketos-ui-console` was swapped out. pmbootstrap chroots were
+<usb-host>. `postmarketos-ui-console` was swapped out. pmbootstrap chroots were
 never recreated and the SD card was never rewritten.
 
 **Five distinct blockers, each diagnosed rather than guessed:**
@@ -5734,14 +5642,13 @@ exists in `pmi8998.dtsi`), then the power-key and logind bugs above.
 
 ### K114 (2026-07-25) — GPU enabled safely; wedge trigger identified; firmware never loads
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Image `out/boot-joan-pmos-k114-gpu-diag.img`, SHA-256
 `3966e6857aa623000da7b48eaf787bd14758df07a88ff4693ee73ff64d5e57de`.
 `CONFIG_MSM_GPUCC_8998=y` (was unset). Config snapshot
-`out/config-20260725-ember-pre-k114-snapshot` taken before the change.
+`out/config-20260725-pre-k114-snapshot` taken before the change.
 
 **Approach deliberately different from K098-K101**, which each changed a
 variable then hit the wedge to see what happened. K114 enables the GPU but
@@ -5835,14 +5742,13 @@ firmware loads.
    clock/rail state. Only then consider triggering a resume.
 3. Keep `greetd` disabled whenever the GPU is enabled, or every boot wedges.
 
-**Evidence:** `out/k114-ember-gpu-diagnostic-20260725/` — full pre-touch dump,
+**Evidence:** `out/k114-gpu-diagnostic-20260725/` — full pre-touch dump,
 the dump script, and the K114 patch. Nothing flashed. Phone recovered to
 LineageOS cleanly after the 34 s wedge; no manual intervention was needed.
 
 ### K115/K116 (2026-07-25) — GPU firmware loads; Adreno 540 initialises cleanly
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Images: `out/boot-joan-pmos-k115-gpu-fw.img`
@@ -5920,13 +5826,12 @@ about GPU behaviour.
 K114 diagnosis was an unclocked/under-volted slave hang, and the clock half of
 that is now fixed while the regulator half is not.
 
-**Evidence:** `out/k116-ember-gpu-firmware-20260725/`, plus
+**Evidence:** `out/k116-gpu-firmware-20260725/`, plus
 `make-pmos-image-fw.sh` in the repo root.
 
 ### K117 (2026-07-25) — GPU resume STILL wedges with firmware loaded: the regulator half is confirmed as the remaining cause
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-25
 
 Same image as K116 (`1345c824…`). Deliberate test, requested by Lance, of
@@ -5980,8 +5885,7 @@ stack with **no firmware loaded**, so it does not rule the voltage fix out.
 
 ### K117 addendum (2026-07-25) — desk analysis of the resume failure; two of my own suspects withdrawn
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 No device operations — Lance away; analysis only.
 
 **joan is the ONLY msm8998 board in mainline that enables the GPU.** Checked
@@ -6070,8 +5974,7 @@ session off the GPU; `greetd` stays out of the default runlevel.
 
 ### K118 (2026-07-26) — instrumented resume: GPU is neither powered nor clocked when the driver writes to it
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-26
 
 Image `out/boot-joan-pmos-k118-resume-probe.img`
@@ -6147,12 +6050,11 @@ which is a DT/driver-plumbing problem, not an electrical one.
    once the state above looks correct, so the wedge is opt-in rather than
    automatic.
 
-**Evidence:** `out/k118-ember-resume-probe-20260726/`.
+**Evidence:** `out/k118-resume-probe-20260726/`.
 
 ### K119 (2026-07-26) — GX GDSC attached: power domains now come up; clocks still have no rate
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-26
 
 Image `out/boot-joan-pmos-k119-gxgdsc.img`
@@ -6223,8 +6125,7 @@ SoC dtsi rather than kept as a board-level override.
 
 ### K120/K121 (2026-07-26) — THE WEDGE IS FIXED: first GPU register write survives
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-26
 
 Images: `out/boot-joan-pmos-k120-oppcap.img`
@@ -6314,8 +6215,7 @@ must be flipped and the kernel rebuilt.
 
 ### K122 (2026-07-26) — power-up is fixed, RENDERING still wedges; failure has moved later in init
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-26
 
 Same image as K121 (`766fc54f…`, probe default off).
@@ -6378,10 +6278,9 @@ configuration (M6 Phosh, software-rendered).
 
 ### K123–K127 (2026-07-26) — GPU RENDERING REACHED: `GL renderer: FD540`, OpenGL ES 3.1 on freedreno; root cause of the render wedge was **GX power-collapse restore**, not rendering
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-26
-Host: build on nym-skyforge, all fastboot transport from nym-nest (standing rule)
+Host: build on <build-host>, all fastboot transport from <usb-host> (standing rule)
 
 **Headline:** Mesa's freedreno driver now creates a hardware GLES2 renderer on
 joan — `GL vendor: freedreno`, `GL renderer: FD540`, `Using OpenGL ES 3.1 Mesa
@@ -6419,7 +6318,7 @@ walk cost one boot and removed the entire hypothesis.
 
 The device resets hard enough that on-disk dmesg is lost, so **everything was
 streamed off-box per-line over the USB gadget link** — bytes that already
-reached nym-nest survive the target dying. Three concurrent streams: device
+reached <usb-host> survive the target dying. Three concurrent streams: device
 `dmesg -w`, a 4–5 Hz heartbeat (uptime + GPU `cur_freq` + every regulator's
 microvolts), and the compositor's stderr. Each piped through
 `while IFS= read -r l; do printf '%s\n' "$l"; done` so no line waits in a 4 KB
@@ -6685,10 +6584,9 @@ mapping per se).
 
 ### K128–K133 (2026-07-26) — first PROVEN GPU execution (fence signalled); preemption breaks all submits; IB1 fetch hangs independent of mapping, cache, TLB, GPMU, and ucode; recovery localised as the SoC-killer
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-26
-Host: build on nym-skyforge, transport from nym-nest (standing rule)
+Host: build on <build-host>, transport from <usb-host> (standing rule)
 
 Model note: this session switched harness models mid-day; entries above this
 one were written under claude-opus-5, this one and later under claude-fable-5.
@@ -6697,8 +6595,8 @@ not rewritten.
 
 #### Root access recovered from our own docs
 
-The device user password (`147147`) and the exact sudo recipe were in
-`docs/ember-handoff-2026-07-11-m4-smmu-next.md` all along. Root on the RAM-booted
+The device user password (`[REDACTED]`) and the exact sudo recipe were in
+`docs/handoff-2026-07-11-m4-smmu-next.md` all along. Root on the RAM-booted
 pmOS was never missing. Used for: clean reboots to LineageOS (`sudo reboot`
 instead of asking Lance to power-cycle) and mounting the LG system partition.
 
@@ -6819,8 +6717,7 @@ once, to extract firmware).
 
 ### K134–K138 (2026-07-26, late session) — THE RULE FOUND: GPU accesses succeed only on mappings created BEFORE the CP starts; IB fetch itself is PROVEN GOOD (gpmufw); secure-switch, BO flags, and packet-content hypotheses all refuted
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-26
 
 #### K134 — boot-time IB experiment, three rounds
@@ -6903,8 +6800,7 @@ on Lance's budget call (usage credits), with the discriminator queued.
 
 ### K139–K140 (2026-07-26, final pass) — mapping-age rule REFUTED by paired test; kernel-ring IBs execute with positive proof; userspace IBs still hang; preempt-wrapper theory REFUTED
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-26
 
 #### K139 — the paired discriminator, and it flipped the story again
@@ -6986,8 +6882,7 @@ retire. Session closed on budget.
 
 ### K141–K143 (2026-07-27) — ROOT CAUSE FOUND: GCC_GPU_BIMC_GFX_SRC_CLK. GPU rendering works; Phosh runs on freedreno
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-27
 
 #### The answer
@@ -7088,8 +6983,7 @@ local DoS via any render node. Routed through `msm_context_vm()`.
 
 ### K144–K159 (2026-07-27, later) — display finalization: flicker fixed, brightness control NOT solved
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-27
 
 #### Fixed
@@ -7264,7 +7158,7 @@ to LineageOS, and a "pmOS is gone" symptom usually means exactly that and
 nothing worse.
 
 The address orientation bites every time: **the phone is 172.16.42.1**, the
-host is 172.16.42.2. Key `id_pi_migration` on nym-nest, user `user`.
+host is 172.16.42.2. Key `<device-ssh-key>` on <usb-host>, user `user`.
 
 Reaching the bootloader from pmOS: busybox `reboot` cannot pass a mode string,
 so use the syscall directly —
@@ -7281,6 +7175,454 @@ aboot's fastboot endpoint wedges if it sits idle, and a stalled transfer
 leaves it enumerating while refusing to be claimed: `fastboot devices` still
 lists it but every real command says `< waiting for any device >`. Recovery is
 a forced power cycle (Power + Vol Down, ~10-15 s). `/tmp/ramboot-joan.sh` on
-nym-nest exists to avoid the state — it starts the transfer the instant
+<usb-host> exists to avoid the state — it starts the transfer the instant
 fastboot answers and retries from a fresh bootloader entry, never against a
 wedged one.
+
+#### Hermes Agent-assisted follow-up — k175 isolates the regression; k176 was not executed
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-28
+
+The one-boot bisect requested above is now decisive:
+
+- **k175** is commit `15d1ea453303` alone: the panel DBV ceiling/parameter
+  change is present and DSI serialisation commit `b64896e7e` is absent. The
+  RAM-only image is `out/boot-joan-k175-panel-only.img`, SHA-256
+  `bbfc965d2e03bf7c793c67c932f40795a3eac0a5d684bf152172c030a25cf820`.
+  It enumerated as pmOS at 06:39:52 and disconnected at 06:40:21, then
+  LineageOS appeared at 06:40:38. It therefore reproduced the k174 failure in
+  about 29 seconds without the DSI commit.
+- **k172-noarb control** (`7.2.0-rc2-g863a30a79582-dirty`) enumerated as pmOS
+  at 06:50:42 and stayed alive until an intentional bootloader transition at
+  07:15:01. On-device SSH and the GUI were usable. This same-morning control
+  clears device/rootfs drift as the explanation for k175's short life.
+- Result: `b64896e7e` is not required for the boot regression. Focus on
+  `15d1ea453` and its runtime interaction. Lance separately reports that work
+  assisted by `Claude-Code:claude-fable-5` confirmed manual brightness values
+  6 through 255 worked on glass; the pmOS
+  GUI slider was the action that froze the UI. Do not equate this result with
+  "DBV 255 is electrically invalid."
+
+The next discriminator was packaged but **not executed**:
+
+- **k176** uses the exact k175 kernel and ramdisk, with only
+  `panel_lg_sw43402.sw43402_dbv_max=251` appended to the kernel cmdline.
+- Image: `out/boot-joan-k176-max251-cmdline.img`; SHA-256
+  `a0257dede6d2f10dc1632a2e83e4c7472fcd5b9227fcc78f61fcd9f29908fd10`.
+- Unpack verification proved the k175/k176 kernels byte-identical and the
+  ramdisks byte-identical; their only intended difference is the cmdline.
+- Repeated host transfers never completed: they stalled at `Sending
+  'boot.img'`. The endpoint then listed in `fastboot devices` while even
+  `fastboot getvar product` hung or reported `< waiting for any device >`.
+  No `Booting` success was printed, k176 never enumerated, and no kernel result
+  may be inferred from this attempt.
+- The phone was recovered by shutting down from aboot's "any key to shutdown"
+  screen and booting normally. LineageOS 20.0 / Android 13 was verified by ADB
+  at 07:38:46. Nothing was flashed and the installed boot partition remained
+  untouched.
+
+Operational correction to the note above: after this observed failure, do not
+use a retry loop or wrap an active joan fastboot transfer in a timeout. Before
+retrying k176, start from a genuinely fresh bootloader/USB enumeration and use
+one direct RAM-only `fastboot boot` attempt. If it stalls, stop and recover the
+device rather than issuing another transfer against the same aboot session.
+
+#### Hermes Agent-assisted audit correction — K127 packaging confounded the startup result
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-28
+
+The earlier conclusion that k175 isolated `15d1ea453` as the startup-reset
+cause is withdrawn. Archive inspection found a critical packaging difference:
+
+- stable k172-noarb, k173-floor6, and k174-max255 include
+  `msm.k127_no_suspend=1`;
+- k174, k175, and k177 omit it.
+
+K127 is not optional historical noise. This ledger records that all-defaults
+still dies because the a540 GX collapse/restore path is broken, while the
+session runs clean with `msm.k127_no_suspend=1` alone. The failing images all
+reset around greetd/phosh GPU startup. k175 still clears `b64896e7e` as a
+necessary cause inside the no-K127 configuration, but it does not isolate the
+panel commit relative to the known-stable k172 packaging.
+
+**k177: REJECTED before slider test.** Image
+`out/boot-joan-k177-slider-link-gate.img`, SHA-256
+`40a759ac73554e6d5eb351140e3f03566bc11e565359291625242e44d44d1a90`,
+RAM-booted cleanly (send 0.591 s, boot 5.098 s). pmOS USB appeared at
+15:42:43 UTC, disconnected at 15:43:21 UTC, and LineageOS appeared at
+15:43:38 UTC. The command line omitted `msm.k127_no_suspend=1`; the slider was
+never reached. Nothing was flashed.
+
+k177 also carried two avoidable source risks: it descended from
+`15d1ea453`, and it removed the disabled-encoder guard added by `72a8deb11`.
+The corrected v3 worktree starts at clean `72a8deb11`, retains that guard,
+omits `15d1ea453`, disables per-update readback diagnostics by default, and
+adds only the DPU/DSI acquire-release exclusion. Package it against k172's
+known-stable ramdisk and command line so K127 remains present.
+
+**k178: BUILT / STAGED / UNTESTED.** Clean branch
+`joan/slider-link-gate-v3` at signed head
+`88f68643ad397b5c5cae8ce034793bc579ce1420` contains signed gate commit
+`e5d4d381a7aca76cc7628feaccb6a6235f29b7ac` plus the default-off readback
+commit at HEAD. The source starts at `72a8deb11`; `15d1ea453` and its
+`sw43402_dbv_max` parameter are absent, while the disabled-encoder guard is
+retained.
+
+Final release: `7.2.0-rc2-g88f68643ad39`. Image
+`out/boot-joan-k178-slider-gate-k127.img`, SHA-256
+`5f7d2ea14dcd3f64d737638c8cf710bb41ec3cb47782c1a0ab411e0efad98d37`.
+The ramdisk is byte-identical to stable k172 and the command line is inherited
+unchanged, including `msm.k127_no_suspend=1`. Strict checkpatch, full fresh
+build, final committed-tree rebuild, signatures, unpack, header, embedded
+release, source, and local/remote hash verification pass.
+
+Staged one-shot runner `/tmp/k178-ramboot-once.sh`, SHA-256
+`a75374827c266595a23bd1a65181b25d55fe767783edf287875063073c2b97e9`,
+uses the sealed K103 field parser with no getvar, timeout, retry, or flash.
+Manifest SHA-256:
+`cc8465b639646f125d85e4d4d539aeac8bbdab70b93b0fbeed8a1fdc1cd18285`.
+No k178 device result exists yet.
+
+**k178 DEVICE RESULT: PASS.** The untested statement above is superseded by one
+authorized RAM-only test of the exact hashed candidate; nothing was flashed.
+Transport completed in 0.590 s send / 5.095 s boot, pmOS USB appeared after
+8 s, and live release/K127 gates matched. The same boot reached at least
+1,839.67 s uptime with continuous pmOS USB and SSH.
+
+Lance exercised the built-in postmarketOS/phosh brightness slider slowly and
+then rapidly across most of its range while UI animation was active. Visual
+result: UI responsive, no garbage frames, no blackouts, no freezes, no reboot,
+and brightness mostly in line with the slider. All 180 rapid-monitor samples
+remained in pmOS. Sampled brightness values were 9, 14, 20, 41, 44, 61, 137,
+and 251; `actual_brightness` matched each requested sample.
+
+Post-stress dmesg contained no link-acquisition timeout, DPU kickoff timeout,
+panic, oops, watchdog, or new display error. Only the pre-existing
+`mmc0: tuning execution failed: -5` warnings were added.
+
+Verdict: K178 passes the original built-in GUI-slider acceptance criterion for
+this RAM-booted configuration. This is aggregate-candidate evidence; it does
+not isolate the gate from the readback reduction and does not solve the
+separate a540 power-collapse defect masked by K127. Normal reboot recovery is
+still pending explicit authorization.
+
+Result artifact: `out/boot-joan-k178-slider-gate-k127.test-result.txt`,
+SHA-256
+`5f9240f8653795bf2d1e8a0d98ae4100a5fcb5996dbac363de2f9c597a224796`.
+Raw logs: `out/evidence/k178-slider-gate-k127/`.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-07-28
+
+---
+
+## A180 — brightness/GPU optimization audit and clean pmOS candidate (host-only)
+
+Date: 2026-08-02
+
+### Purpose
+
+Audit the hardware-proven K178 brightness path first, then review the Adreno
+A540/freedreno bring-up for correctness, unnecessary work, pmOS integration,
+and safe hardware utilization. Produce a clean host-qualified candidate without
+contacting or booting the phone.
+
+### Exact kernel state
+
+- Worktree: local worktree of `ShapeShifter499/linux-lg-v30-joan`
+- Branch: `joan/clean-gpu-brightness-v1`
+- Base: `323451cb679aeba2c51dce2fb15a11410cb13631`
+- Candidate HEAD: `3886e860d607bc1c670601a40b25341c2e67f727`
+- Release: `7.2.0-rc2-g3886e860d607`
+- Eight local signed commits; none pushed.
+
+### Brightness verdict
+
+No panel/backlight hot-path rewrite was justified. The implementation maps
+0..251 monotonically to DBV 3/off and DBV 6..251/on, emits one one-byte LP-mode
+`WRDISBV` per update, performs no runtime readback, and serializes commands
+against DPU kickoff. K178 remains the device evidence: 180/180 monitored samples
+under animated rapid slider motion, with no corruption, timeout, blackout,
+freeze, or reboot.
+
+### GPU verdict
+
+Hardware FD540/freedreno rendering is real, but the port is not yet full
+DVFS/power closure:
+
+- only the hardware-proven 257 MHz safety OPP is enabled;
+- one A540 runtime-PM reference prevents the still-broken GX collapse/restore;
+- higher OPPs remain blocked on voltage/CPR/thermal evidence;
+- A540 GPMU/ZAP firmware remains local because no redistributable upstream
+  source was found.
+
+Do not call those limitations fully optimized and do not enable 710 MHz from the
+downstream frequency table alone.
+
+### Changes made
+
+1. Added A540's seven-clock `gpu.yaml` contract, with `mem_src` in actual DT
+   order while retaining the six-clock A508/A509/A512 contract.
+2. Added the MSM GPU `vdd` and optional `vddcx` supply properties after compiled
+   joan-DTB validation exposed the missing schema contract.
+3. Prepared an isolated, uncommitted pmaports branch that makes the proven
+   display/GPU/firmware gates built-in and adds
+   `firmware-qcom-adreno-a530` plus `soc-qcom`. It remains uncommitted because
+   the published kernel pin predates the candidate; publication and checksum
+   must change atomically.
+4. Tightened `make-pmos-image-fw.sh` to require the exact seven runtime blobs,
+   reject missing/empty input, omit the unused ZAP ELF, and report hashes.
+
+### Host verification
+
+- full `Image.gz modules dtbs` cross-build: PASS, 1,612 modules;
+- focused `W=1` graphics-object build: PASS;
+- per-commit source checkpatch and signature verification: PASS;
+- `gpu.yaml` binding/example validation: PASS;
+- compiled joan DTB validation against `gpu.yaml`: PASS after supply fix;
+- pmOS config normalization: required DRM/panel/backlight/GPUCC/firmware gates
+  remained built-in;
+- firmware helper positive, missing-input negative, and byte-identity unpack
+  tests: PASS;
+- image: `out/audit-20260802/boot-joan-audit-3886e860.img`;
+- image SHA-256:
+  `d3e7cea1a57fa87dd262810a54ece888d2433b156920c2c5966e25da0db75347`;
+- manifest: `out/audit-20260802/candidate-3886e860.manifest.txt`.
+
+Continuity correction: work assisted by `Claude-Code:claude-fable-5` had already
+completed full signed Joan package
+flows before migration. The preserved package repository contains signed
+`linux-lge-joan` and `device-lge-joan` APKs at `r0` and `r1`, all carrying the
+old `pmos@local-6a51a15c.rsa.pub` signature identity. The `r1` kernel package is
+the older `ce78c136...` source pin, not this candidate.
+
+The narrower current result is that this audit did not emit a signed
+`3886e860...` APK. Its `pmbootstrap build --src` attempt reached signing, then
+found that migrated abuild state retained the public key and `abuild.conf` but
+not the matching private key. No signing credential was overwritten or
+regenerated. A keyless `abuild prepare build` phase against an exact staged copy
+of the candidate passed with Alpine's cross-toolchain: all 94,839 tracked
+entries were byte-identical, release `7.2.0-rc2`, 1,612 modules, and zero
+warning/error matches. That qualifies the exact candidate's Alpine build
+function; it is not a newly signed package pass. The exact-candidate device
+package was not produced.
+
+### Device boundary
+
+No ADB, fastboot, SSH-to-phone, boot, reboot, or flash action was performed. The
+clean SHA is host-qualified and inherits semantic hardware evidence from
+K178/K127; it is not exact-SHA device-qualified.
+
+### Authoritative public continuation
+
+Read these together:
+
+- `docs/test-results/README.md` — mandatory no-replay index and candidate chain;
+- `docs/test-results/A182-2026-08-02.md` — closed/superseded A182 result;
+- `docs/test-results/A183-2026-08-03.md` — consumed runtime candidate and open gates;
+- `docs/test-results/A184-2026-08-03-host-only.md` — host-only 255 correction.
+
+### Provenance
+
+- Generated: 2026-08-02
+- Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+
+---
+
+## A181 — exact clean candidate device test: MMCC activation failure
+
+Date: 2026-08-02
+
+- Source: `3886e860d607bc1c670601a40b25341c2e67f727`.
+- Image: `out/audit-20260802/boot-joan-audit-3886e860.img`.
+- SHA-256: `d3e7cea1a57fa87dd262810a54ece888d2433b156920c2c5966e25da0db75347`.
+- Scope: one authorized RAM-only `fastboot boot`; no flash, erase, getvar,
+  slot change, timeout, or retry.
+
+Transport passed and pmOS USB/SSH stayed healthy, but the screen was black,
+`/dev/dri` and backlight were absent, and MSM DRM did not initialize. Runtime
+evidence identified an effective-config/package activation failure:
+`CONFIG_MSM_MMCC_8998=m`, no matching git-suffixed module tree, unbound MMCC,
+then display-IOMMU and MSM-MDSS deferred-probe timeouts. A181 therefore did not
+exercise panel brightness, A540 firmware, rendering, or GPU submits.
+
+The K103 pmOS reboot route documented with assistance from
+`Claude-Code:claude-fable-5` was then exercised through pinned
+SSH. pmOS USB disappeared, persistent Lineage USB returned, one authorized ADB
+serial appeared, and `sys.boot_completed=1` was observed. Final classification:
+`RECOVERED_TO_AUTHORIZED_LINEAGEOS`; no fastboot recovery or manual restart was
+needed.
+
+Authoritative result:
+`out/evidence/a181-exact-candidate/A181-RESULT.md`.
+
+## A182 — MMCC built in: display/FD540 pass, touch activation fail
+
+Date: 2026-08-02
+
+- Source: unchanged `3886e860d607...`.
+- Config delta from A181: exactly `CONFIG_MSM_MMCC_8998=m -> y`.
+- Image:
+  `out/audit-20260802/boot-joan-a182-mmcc-builtin-3886e860-normalized.img`.
+- SHA-256: `81789748cf1a05659af3b36092ca915c6fa4670f9d1f69e34d6ea0bb88ea48e2`.
+- Scope: one separately authorized RAM-only boot; no flash/erase/getvar/retry.
+
+A182 initialized bound MSM8998 MMCC, MSM DRM/DPU, connected and enabled
+1440x2880 DSI, SW43402 backlight, render node, A530 PM4/PFP firmware, and A540
+GPMU firmware. A bounded direct EGL/GLES query returned
+`GL_VENDOR=freedreno`, `GL_RENDERER=FD540`, and OpenGL ES 3.1 Mesa 26.1.1.
+Precise pre/post dmesg scans found no GPU fault, hangcheck, IOMMU/SMMU fault,
+panel timeout, panic, oops, or BUG.
+
+Touch failed acceptance. Lance reported, "Touch seems broken"; runtime input
+enumeration had no touchscreen node or STMFTS probe. A182 had
+`CONFIG_TOUCHSCREEN_STMFTS=n`; touch-proven K178 had it built in. The FTS3670
+driver, binding, and complete Joan touch DTS region remained identical to K178,
+making this a second exact effective-config activation regression rather than a
+new source/DT failure.
+
+The GPU remained at the sole safe 257 MHz OPP. Runtime PM stayed active through
+at least 1,251 s with zero suspended time, directly confirming the stability
+hold rather than idle-power closure. Owner-visible brightness sweep,
+blank/unblank, stress, suspend, and resume were not attempted after Lance became
+unavailable. Communications remain blocked.
+
+Authoritative result:
+`out/evidence/a182-mmcc-builtin/A182-RESULT.md`.
+
+## A183 — STMFTS built in: host-qualified, approval required
+
+Date: 2026-08-02
+
+- Source: unchanged `3886e860d607...`; clean worktree.
+- Config delta from A182: exactly `CONFIG_TOUCHSCREEN_STMFTS=n -> y`.
+- DTB: byte-identical to A182.
+- Touch driver/binding/Joan DTS region: byte-identical to K178.
+- Image:
+  `out/audit-20260802/boot-joan-a183-mmcc-touch-builtin-3886e860.img`.
+- SHA-256: `44e5f22fed866348d7dc28ac21a9cc2feddede43566795b0cd74deecfa555716`.
+- Manifest:
+  `out/audit-20260802/a183-mmcc-touch-builtin.manifest.txt`.
+- Manifest SHA-256:
+  `5c1b63f01933e074ec66efc5f55162729c33221fef24fc50879d409b1ee05634`.
+
+Host qualification passed: Image.gz/DTB, full 1,611-module build, zero
+warning/error matches, built-in `stmfts_probe` and FTS3670 variant, exact packed
+kernel payload, A182/A183 337/337 ramdisk semantic identity, exact seven GPU
+firmware payloads, no ZAP ELF, preserved pmOS UUID cmdline, and no K127 arguments.
+The one-module reduction from A180's 1,612 is exactly `mmcc-msm8998.ko`, now
+built in.
+
+The K178 built-in regression audit also identifies `CONFIG_QCOM_SOCINFO=y -> m`.
+SOCINFO is outside the touch/display supplier chain and its module is present in
+the complete build, so it was not bundled into this one-variable discriminator;
+the exact package/module integration must still resolve the soc0 metadata gap.
+
+A183 was local-only at this checkpoint, had not been copied to the authoritative
+USB host, had not been booted, and was not authorized
+while Lance is unavailable. Its runner requires explicit physical and exact-image
+authorization gates. Do not infer a boot attempt from image/runner preparation.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-02
+
+---
+
+## A183 runtime correction — STMFTS/display/FD540 pass; brightness ABI and power open
+
+Date: 2026-08-03
+
+This append-only correction supersedes the host-only state above. A183 later
+received one exact authorization and its guarded runner was invoked exactly once.
+The authorization is consumed; never invoke that runner again.
+
+- Source: `3886e860d607bc1c670601a40b25341c2e67f727`.
+- Image SHA-256:
+  `44e5f22fed866348d7dc28ac21a9cc2feddede43566795b0cd74deecfa555716`.
+- Manifest SHA-256:
+  `5c1b63f01933e074ec66efc5f55162729c33221fef24fc50879d409b1ee05634`.
+- Class: `bringup-local` device qualification.
+- Public/PR disposition: `needs cleanup`; runtime evidence is publishable, but
+  source integration and open power/suspend gates prevent readiness claims.
+
+Direct runtime result:
+
+- STMFTS identified FTS3670, registered event3, and emitted 26 bounded contacts
+  with matching releases across two slots while Lance exercised touch. Owner and
+  machine evidence both pass. The outer SSH capture ended 255 at teardown, but
+  the 4,178-line payload includes complete contact/release evidence; do not replay
+  the input capture merely to replace the wrapper status.
+- MSM DPU/DSI and the 1440x2880 UI pass. A183 directly returned
+  `GL_VENDOR=freedreno`, `GL_RENDERER=FD540`; pre/post-EGL dmesg is byte-identical
+  and has no matched GPU/DRM/IOMMU/panel fault.
+- Owner slider response/no-crash passes, but the live ABI advertises
+  `max_brightness=251` rather than the accepted visible range 6..255. The
+  retained sample recorded requested/actual 9 and contains no endpoint-255
+  telemetry, so endpoint/sweep acceptance remains open; this is not a claim
+  that the panel blanked.
+- Only the 257 MHz OPP is enabled. Runtime status stayed active with zero
+  suspended time. Live dmesg also reports `vddcx` using a dummy regulator and
+  devfreq unable to update transition information. Sustained performance,
+  runtime-power closure, and suspend/resume remain open.
+- Communications remain blocked.
+
+Authoritative compact result:
+`docs/test-results/A183-2026-08-03.md`.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-03
+
+---
+
+## A184 — host-only SW43402 maximum correction
+
+Date: 2026-08-03
+
+- Handle: signed local/unpushed commit
+  `739bc79d39e8d7bc4d4da1a7448d2aeb79b4bf68` on exact A183 parent
+  `3886e860d607bc1c670601a40b25341c2e67f727`.
+- Documentation-only follow-up: signed local/unpushed commit
+  `fa041e2916441ca355ea4271821fa0c6ba571e81`, which corrects the Joan DTS
+  firmware-distribution comment without changing DT properties or behavior.
+- Class: `upstream-candidate` source correction; device state `not tested`.
+- Touched file: `drivers/gpu/drm/panel/panel-lg-sw43402.c`.
+- Comment-only follow-up file:
+  `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`.
+- Change: retain internal off 3 and visible minimum 6; correct exposed maximum
+  251 -> 255 and reconcile the comment with `blmap_v1`, later `blmap-ex`, and
+  direct 252..255 lineage. Serialized update behavior and perceptual mapping are
+  unchanged.
+- Verification: clean signed worktree; `git diff --check`; strict checkpatch 0/0;
+  exhaustive logical 0..255 mapping; focused AArch64 panel-object compile with
+  zero warning/error matches.
+- Firmware-boundary verification: upstream A540 catalog uses packaged A530
+  PM4/PFP plus A540 GPMU/ZAP; the follow-up was checked as a comment-only diff.
+- Object SHA-256:
+  `d2afeed4601d0495d609322266a7a3322ef803f4422cfa0f0c79a6f4ae24b1f1`.
+- Public/PR disposition: `needs cleanup` until the remaining touch/GPU audit,
+  complete build, commit-message/trailer review, and runtime qualification close.
+- Device boundary: no complete kernel/image/manifest and no authorization exist.
+
+Authoritative host checkpoint:
+`docs/test-results/A184-2026-08-03-host-only.md`.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-03
+
+---
+
+## 2026-08-03 publication security redaction — documentation only
+
+- Replaced every current-tree occurrence of a compromised historical pmOS
+  test-user password with `[REDACTED]` before publication.
+- Four occurrences already exist in older public Git objects; one additional
+  ledger occurrence was still unpublished and was removed before push.
+- No history rewrite was performed. The old credential must never be reused.
+- No source, build artifact, runtime result, candidate authorization, or phone
+  state changed.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-03
+Update-scope: Security redaction and prospective publication boundary.

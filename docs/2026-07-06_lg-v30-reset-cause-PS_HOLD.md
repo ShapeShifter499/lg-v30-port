@@ -1,13 +1,12 @@
 # LG V30 reset-cause handoff — PS_HOLD secure-side reset
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 ## Current headline
 
 The LG V30 (`joan`) mainline reset is still a controlled PS_HOLD reset. The
-secure/liveness hypothesis remains active, but Aurel has now rejected several
+secure/liveness hypothesis remains active, but Hermes Agent has now rejected several
 specific first-second deltas: downstream's DLOAD-off SCM argument shape,
 downstream-style QSEE log-buffer registration, RPM `rpm_requests` rpmsg
 reachability as a standalone liveness oracle, a minimal downstream PMI8998
@@ -67,7 +66,7 @@ in K025.
 
 - K025 secure-interface archaeology: downstream `watchdog_v2`/QSEECOM obvious early paths produced no valid boot oracle; no image built.
 
-## New Aurel test: DLOAD-off SCM argument-shape oracle
+## New Hermes Agent test: DLOAD-off SCM argument-shape oracle
 
 Downstream reference:
 
@@ -86,7 +85,7 @@ Mainline delta:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-dload-off-argshape-test-2026-07-06.patch`
+  `out/latest-dload-off-argshape-test-2026-07-06.patch`
 - Patch sha256:
   `eb285f2d73b2711fa505c0938183954b18ebb125735ae69176e7311fc8f1a5a0`
 - Image:
@@ -109,7 +108,7 @@ Result:
 Conclusion: `SET_DLOAD_MODE` argument shape is not the missing liveness handshake.
 
 
-## New Aurel test: QSEE/QSEEOS log-buffer oracle
+## New Hermes Agent test: QSEE/QSEEOS log-buffer oracle
 
 Downstream reference:
 
@@ -123,7 +122,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-qsee-logbuf-oracle-2026-07-06.patch`
+  `out/latest-qsee-logbuf-oracle-2026-07-06.patch`
 - Patch sha256:
   `68b0883cae085712a446475c5ae3bd723defb056ddd28e6babfe18521ce797d3`
 - Image:
@@ -147,7 +146,7 @@ Conclusion: standalone QSEE log-buffer registration is not the missing liveness
 handshake.
 
 
-## New Aurel test: RPM `rpm_requests` reachability oracle
+## New Hermes Agent test: RPM `rpm_requests` reachability oracle
 
 Downstream reference:
 
@@ -161,7 +160,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
+  `out/latest-rpm-rpmsg-reachability-oracle-2026-07-06.patch`
 - Patch sha256:
   `a92efaa88f7717d5762fa71bd2d22c84510bf13c4b43a3e22f893bd25bc895f1`
 - Image:
@@ -171,9 +170,9 @@ Oracle:
 - Size:
   `15740928` bytes
 - Fastboot transcript:
-  `out/aurel-rpm-rpmsg-fastboot-2026-07-06.txt`
+  `out/rpm-rpmsg-fastboot-2026-07-06.txt`
 - PON evidence:
-  `out/aurel-rpm-rpmsg-pon-2026-07-06.txt`
+  `out/rpm-rpmsg-pon-2026-07-06.txt`
 
 Result:
 
@@ -192,7 +191,7 @@ RPM-channel setup is weaker as a root cause; still compare actual downstream RPM
 resource votes and SMEM/boot-state cookies separately.
 
 
-## New Aurel test: RPM BOB-mode state-changing oracle
+## New Hermes Agent test: RPM BOB-mode state-changing oracle
 
 Downstream reference:
 
@@ -206,7 +205,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-rpm-bob-mode-oracle-2026-07-06.patch`
+  `out/latest-rpm-bob-mode-oracle-2026-07-06.patch`
 - Patch sha256:
   `eca4d41b1532903e541118e951f9dda4e366fed3b89a2feedd08915386cbd7df`
 - Image:
@@ -216,9 +215,9 @@ Oracle:
 - Size:
   `15736832` bytes
 - Fastboot transcript:
-  `out/aurel-rpm-bob-mode-fastboot-2026-07-06.txt`
+  `out/rpm-bob-mode-fastboot-2026-07-06.txt`
 - PON evidence:
-  `out/aurel-rpm-bob-mode-pon-2026-07-06.txt`
+  `out/rpm-bob-mode-pon-2026-07-06.txt`
 
 Result:
 
@@ -236,7 +235,7 @@ mainline diagnostics or prevent the PS_HOLD reset. Its much longer timing keeps
 full downstream RPM regulator/default-vote parity worth comparing next, but this
 single vote is not the fix by itself.
 
-## New Aurel test: DT-backed RPM L19 default-vote oracle
+## New Hermes Agent test: DT-backed RPM L19 default-vote oracle
 
 Downstream reference:
 
@@ -249,7 +248,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-rpm-l19-always-on-oracle-2026-07-06.patch`
+  `out/latest-rpm-l19-always-on-oracle-2026-07-06.patch`
 - Patch sha256:
   `41bb06f48df489e454c4d44aab7284e6990ac97367b8b8925e68cc642c95df45`
 - Image:
@@ -259,9 +258,9 @@ Oracle:
 - Size:
   `15736832` bytes
 - Fastboot transcript:
-  `out/aurel-rpm-l19-always-on-fastboot-2026-07-06.txt`
+  `out/rpm-l19-always-on-fastboot-2026-07-06.txt`
 - PON evidence:
-  `out/aurel-rpm-l19-always-on-pon-2026-07-06.txt`
+  `out/rpm-l19-always-on-pon-2026-07-06.txt`
 
 Result:
 
@@ -278,7 +277,7 @@ prevent the controlled PS_HOLD reset or expose diagnostics. It strengthens the
 case for broader PM/RPM regulator parity, but not another L19-only retry.
 
 
-## New Aurel test: DT-backed PM/RPM overlay parity oracle
+## New Hermes Agent test: DT-backed PM/RPM overlay parity oracle
 
 Downstream reference:
 
@@ -294,7 +293,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-rpm-pm-overlay-oracle-2026-07-06.patch`
+  `out/latest-rpm-pm-overlay-oracle-2026-07-06.patch`
 - Patch sha256:
   `8b6d4480fe54b7ae7300ecb80b8b4091b542adadb57d1dc986851ec72dfb3c3f`
 - Image:
@@ -304,9 +303,9 @@ Oracle:
 - Size:
   `15736832` bytes
 - Fastboot transcript:
-  `out/aurel-rpm-pm-overlay-fastboot-2026-07-06.txt`
+  `out/rpm-pm-overlay-fastboot-2026-07-06.txt`
 - PON evidence:
-  `out/aurel-rpm-pm-overlay-pon-2026-07-06.txt`
+  `out/rpm-pm-overlay-pon-2026-07-06.txt`
 
 Result:
 
@@ -323,7 +322,7 @@ not sufficient to prevent the controlled PS_HOLD reset or expose diagnostics.
 The next test should not be another standard regulator voltage/enable bundle.
 
 
-## New Aurel test: TCSR DLOAD/restart-cookie oracle
+## New Hermes Agent test: TCSR DLOAD/restart-cookie oracle
 
 Downstream reference:
 
@@ -337,7 +336,7 @@ Downstream reference:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
+  `out/latest-tcsr-dload-cookie-oracle-2026-07-06.patch`
 - Patch sha256:
   `bd4c3fc21b3d10260fe2b7c2ee96291966fdd9b7f43424c97288e876d1e86b97`
 - Image:
@@ -347,9 +346,9 @@ Oracle:
 - Size:
   `15736832` bytes
 - Fastboot transcript:
-  `out/aurel-tcsr-dload-cookie-fastboot-2026-07-06.txt`
+  `out/tcsr-dload-cookie-fastboot-2026-07-06.txt`
 - PON evidence:
-  `out/aurel-tcsr-dload-cookie-pon-2026-07-06.txt`
+  `out/tcsr-dload-cookie-pon-2026-07-06.txt`
 
 Result:
 
@@ -365,9 +364,9 @@ Conclusion: routing DLOAD-mode clearing through the downstream-observed TCSR
 boot-misc cookie is not the missing standalone liveness handshake.
 
 
-## Aurel follow-up: PM8998 PON S3 source/debounce oracle rejected
+## Hermes Agent follow-up: PM8998 PON S3 source/debounce oracle rejected
 
-After the TCSR DLOAD/restart-cookie oracle, Aurel compared downstream joan
+After the TCSR DLOAD/restart-cookie oracle, Hermes Agent compared downstream joan
 PMIC/PON setup against mainline and isolated one unsupported downstream PON
 delta:
 
@@ -380,11 +379,11 @@ delta:
 Oracle:
 
 - Patch:
-  `out/aurel-latest-pon-s3-oracle-2026-07-06.patch`
+  `out/latest-pon-s3-oracle-2026-07-06.patch`
 - Patch sha256:
   `e8dfba3949f4ace1d678ed94ce7e254287197ba4c6ee0d6368d4efa642dc051d`
 - Config artifact:
-  `out/aurel-latest-pon-s3-oracle-config-2026-07-06.txt`
+  `out/latest-pon-s3-oracle-config-2026-07-06.txt`
 - Config artifact sha256:
   `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
 - Image:
@@ -394,11 +393,11 @@ Oracle:
 - Size:
   `15740928` bytes
 - Fastboot transcript:
-  `out/aurel-pon-s3-fastboot-2026-07-06.txt`
+  `out/pon-s3-fastboot-2026-07-06.txt`
 - Fastboot transcript sha256:
   `c8222c05a1ee402d091d708bc14b31c64b7d0b1da0b3aedd99f499a34c0a5f62`
 - PON evidence:
-  `out/aurel-pon-s3-pon-2026-07-06.txt`
+  `out/pon-s3-pon-2026-07-06.txt`
 - PON evidence sha256:
   `c5acb2a3c56a0a1f1e0c42d5b85c04ea95033f3690cee79251ede518ef048c4d`
 
@@ -418,17 +417,17 @@ standalone liveness handshake.
 
 ## PM8998 PON reset-sequence/S1/S2 oracle — rejected
 
-Aurel tested the fuller downstream PM8998 PON reset-sequence delta after the S3
+Hermes Agent tested the fuller downstream PM8998 PON reset-sequence delta after the S3
 source/debounce-only oracle failed.
 
 Patch and image:
 
 - Patch:
-  `out/aurel-latest-pon-reset-seq-oracle-2026-07-06.patch`
+  `out/latest-pon-reset-seq-oracle-2026-07-06.patch`
 - Patch sha256:
   `588264cfb140c0c307a57b8898f5c1c77bf8fa623da32e68ffaa7ce66f9f552c`
 - Config artifact:
-  `out/aurel-latest-pon-reset-seq-oracle-config-2026-07-06.txt`
+  `out/latest-pon-reset-seq-oracle-config-2026-07-06.txt`
 - Config artifact sha256:
   `bababe3d52ff1bd1e7b6ede056c8986696260024010f38ab56696039b0bb193c`
 - Image:
@@ -438,11 +437,11 @@ Patch and image:
 - Size:
   `15740928` bytes
 - Fastboot transcript:
-  `out/aurel-pon-reset-seq-fastboot-2026-07-06.txt`
+  `out/pon-reset-seq-fastboot-2026-07-06.txt`
 - Fastboot transcript sha256:
   `71f352f65822e597d37a769d374408bb06864c6e2739a839a4cda5132b3b7fd1`
 - PON evidence:
-  `out/aurel-pon-reset-seq-pon-2026-07-06.txt`
+  `out/pon-reset-seq-pon-2026-07-06.txt`
 - PON evidence sha256:
   `c643c1db1c555052bdb1da483062e86d5b5b691d16d3df8a70e7c928e83d005d`
 - Clean post-revert image:
@@ -467,7 +466,7 @@ missing standalone liveness handshake.
 
 ## CPU/Kryo SCM errata comparison — no boot oracle
 
-Aurel compared downstream `drivers/soc/qcom/scm-errata.c` before creating another
+Hermes Agent compared downstream `drivers/soc/qcom/scm-errata.c` before creating another
 RAM-boot image.
 
 The downstream helper can issue SCM BOOT command `0x12` for Kryo errata toggles
@@ -516,7 +515,7 @@ If the reset is a secure watchdog/liveness service that can only be serviced fro
 signed TZ/aboot firmware, it may be unfixable purely from mainline Linux. The
 US998 is unlocked, so there may still be a path, but do not promise one.
 
-## Current state after Aurel update
+## Current state after Hermes Agent update
 
 - Kernel branch `joan/latest-clean-test` clean and rebuilt.
 - Harness docs updated through the PM8998 PON reset-sequence/S1/S2 oracle and the CPU/Kryo SCM errata comparison.
@@ -525,13 +524,12 @@ US998 is unlocked, so there may still be a path, but do not promise one.
 - No packages installed.
 
 
-## Aurel follow-up — secure-interface archaeology K025 cancelled before boot
+## Hermes Agent follow-up — secure-interface archaeology K025 cancelled before boot
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
-Aurel followed Ember's session-2 handoff by inspecting downstream early
+Hermes Agent followed Claude Code's session-2 handoff by inspecting downstream early
 secure/TZ/SCM paths before spending another boot cycle. Goal: find exactly one
 active downstream-default, early, state-changing secure call that mainline lacks
 and that is safe enough to test as a debug oracle.
@@ -586,7 +584,7 @@ Decision:
 
 Artifact:
 
-- `out/aurel-secure-interface-archaeology-k025-2026-07-06.txt`
+- `out/secure-interface-archaeology-k025-2026-07-06.txt`
 - sha256 `f1a47398089fd7640179a042a8f3016005c3526b5d498fad58cbed5f4f06b630`
 
 Next better targets:
@@ -599,29 +597,28 @@ Next better targets:
   secure monitor, qseecom, msm_watchdog, and restart-reason lines.
 
 
-## Aurel follow-up — K026 LGE IMEM default restart-reason oracle tested
+## Hermes Agent follow-up — K026 LGE IMEM default restart-reason oracle tested
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 Downstream joan enables `CONFIG_LGE_HANDLE_PANIC=y`; downstream `lge_handle_panic`
 maps IMEM `0x146bf000` in an early initcall and writes `LGE_RB_MAGIC | LGE_ERR_TZ`
 (`0x6d630300`) to restart_reason offset `0x65c`. Mainline has no equivalent LGE
-panic/IMEM restart-reason setup. Aurel therefore reused Ember's debug-only
+panic/IMEM restart-reason setup. Hermes Agent therefore reused Claude Code's debug-only
 `joan/imem-oracle` commit `f0d368d28` and repackaged it with the safer K023
 `panic=0` null-init classifier.
 
 Artifacts:
 
-- Patch: `out/aurel-lge-imem-default-reason-k026-2026-07-06.patch`
+- Patch: `out/lge-imem-default-reason-k026-2026-07-06.patch`
   sha256 `d68baabab6c1b82d0b976b826de49a5aed621747893bf5fe40fa98fba8a89f62`
 - Image: `out/boot-joan-imem-k026.img`
   sha256 `ccf08dbea0e889fa11404335d423e46e5078f37883469234694aff4d3939d035`
-- Result artifact: `out/aurel-lge-imem-k026-result-2026-07-06.txt`
-- Logs: `out/aurel-imem-k026-fastboot-2026-07-06.txt`,
-  `out/aurel-imem-k026-monitor-2026-07-06.txt`,
-  `out/aurel-imem-k026-pon-2026-07-06.txt`
+- Result artifact: `out/lge-imem-k026-result-2026-07-06.txt`
+- Logs: `out/imem-k026-fastboot-2026-07-06.txt`,
+  `out/imem-k026-monitor-2026-07-06.txt`,
+  `out/imem-k026-pon-2026-07-06.txt`
 
 Device result:
 
@@ -645,17 +642,16 @@ Interpretation:
 - Do not repeat K026. Next useful work is to identify LG/XBL/TZ subreason `0x09`
   or the early secure-world handshake that produces it.
 
-## Aurel follow-up — K027 decoded as TZ CONF_NOC_ERR; clk/power-retention attempt inconclusive
+## Hermes Agent follow-up — K027 decoded as TZ CONF_NOC_ERR; clk/power-retention attempt inconclusive
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-06
 
 K026's returned downstream bootreason `0x6D630309` is now decoded using a public
 older LG/QCOM header from the bullhead msm kernel:
 
 - URL: `https://android.googlesource.com/kernel/msm.git/+/android-msm-bullhead-3.10-n-preview-1/include/soc/qcom/lge/reboot_reason.h?format=TEXT`
-- Preserved artifact: `out/aurel-k027-public-bullhead-reboot_reason.h`
+- Preserved artifact: `out/k027-public-bullhead-reboot_reason.h`
 - Header hash: `90e24ee46dfedef922c02a55f492b01af460bbbdae1a1c9c3bd40e4fdb8b0355`
 - Relevant define: `LGE_ERR_TZ_CONF_NOC_ERR = 0x0009`
 
@@ -677,14 +673,14 @@ Comparison notes:
 
 Artifacts:
 
-- Result: `out/aurel-k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`
+- Result: `out/k027-conf-noc-decode-and-clkpd-attempt-2026-07-06.txt`
 - Image: `out/boot-joan-clkpd-k027.img`, sha256
   `60f5484be2aaa8616681dd09130b47decc8684bf6d1e3feb96df2fc90f08bb0e`
-- Cmdline artifact: `out/aurel-k027-clkpd-cmdline-2026-07-06.txt`, sha256
+- Cmdline artifact: `out/k027-clkpd-cmdline-2026-07-06.txt`, sha256
   `cd7ec2fb23b86cc00fcd34f433f1bfbfcaee4573f2be24833cadb3588f400ace`
-- Fastboot/attempt log: `out/aurel-k027-clkpd-fastboot-2026-07-06.txt`, sha256
+- Fastboot/attempt log: `out/k027-clkpd-fastboot-2026-07-06.txt`, sha256
   `92fd7bec7355c4cb62978904186e013ec976bd7a3dc6a7225c0a4e455af491df`
-- Passive post-timeout observation: `out/aurel-k027-post-timeout-observe-2026-07-06.txt`,
+- Passive post-timeout observation: `out/k027-post-timeout-observe-2026-07-06.txt`,
   sha256 `bf7dad650ef88d18b97a4e784b6980e33ddf68d523722f68d694d85176adedb1`
 
 Device result:

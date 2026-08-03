@@ -1,6 +1,6 @@
 # IMEM reset-reason oracle — run procedure
 
-Prepped by Ember 2026-07-06. STAGED and ready; needs Lance + device.
+Prepped by Claude Code 2026-07-06. STAGED and ready; needs Lance + device.
 
 ## Idea in one line
 
@@ -16,7 +16,7 @@ LineageOS — the channel ramoops couldn't be).
 - Image: `out/boot-joan-imem-oracle.img`
   (sha256 `8d180d57b91aefae1d4fdbbb88cf138d76711866c7e5e3dcdceebc118fb768c7`).
 - Readback helper: `scripts/read-imem-reset-reason.sh`.
-- Patch backup: `out/ember-imem-oracle-2026-07-06.patch`.
+- Patch backup: `out/imem-oracle-2026-07-06.patch`.
 
 ## Run it (Lance present)
 
@@ -73,6 +73,5 @@ Update `kernel-change-ledger.md` (fill in the observed reason + verdict),
 `bringup-debug-state-2026-07-06.md`, internal mirror handoff, and the internal tracker. Keep
 `joan/latest-clean-test` clean; the oracle lives only on `joan/imem-oracle`.
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-06

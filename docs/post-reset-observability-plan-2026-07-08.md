@@ -25,7 +25,7 @@ Unsafe / do not use casually:
 
 - **Do not read `/sys/kernel/debug/tzdbg/*` during routine probing.** The files
   are exposed by downstream `drivers/firmware/qcom/tz_log.c`, and they look like
-  ordinary read-only debugfs files. However, Aurel's broad read-only probe reached
+  ordinary read-only debugfs files. However, Hermes Agent's broad read-only probe reached
   `FILE:/sys/kernel/debug/tzdbg/boot`, then adb disappeared. After the phone came
   back, uptime was only about 43 seconds and `ro.boot.product.lge.bootreasoncode`
   had changed to `0x6D630309`. Treat tzdbg content reads as potentially
@@ -229,14 +229,12 @@ If none of those exists, do not spend device cycles on another blind boot.
 
 ## Attribution
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-08
 
-## Aurel supersession note — raw pstore/TLMM breakthrough
+## Hermes Agent supersession note — raw pstore/TLMM breakthrough
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-08
 
 This plan is superseded in two important ways by

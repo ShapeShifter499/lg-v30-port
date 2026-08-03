@@ -3,7 +3,13 @@ initramfs/bin/
 *.apk
 backups/
 
-# Qualcomm GPU microcode pulled off the device. Proprietary; redistributing it
-# from here is not ours to do. Fetch it from linux-firmware (qcom/a530_pm4.fw,
-# qcom/a530_pfp.fw) or extract it from the vendor image instead.
+# Firmware distribution boundary:
+# - A530 PM4/PFP comes from postmarketOS firmware-qcom-adreno-a530 and is not
+#   vendored here.
+# - LG A540 GPMU/ZAP is owner-extracted, proprietary, and local-only.
+# Keep all local copies available for fail-closed image construction while
+# excluding them from the public Git tree.
 firmware/lg-vendor/
+firmware/zap/
+initramfs/root/lib/firmware/qcom/a530_*.fw
+initramfs/root/lib/firmware/qcom/a540_*

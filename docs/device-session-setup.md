@@ -1,7 +1,6 @@
 # joan: getting a working, seat-attached Phosh session on postmarketOS
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-opus-5
+Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-07-27
 
 Everything here is device-side configuration on the SD rootfs, not kernel work.

@@ -1,10 +1,10 @@
 # Null-init discriminator — run procedure
 
-Prepped by Ember 2026-07-06. STAGED and ready; needs Lance + device.
+Prepped by Claude Code 2026-07-06. STAGED and ready; needs Lance + device.
 
 ## Why this, and why now
 
-Every prior oracle (mine and Aurel's ~15) was booted with the full bring-up
+Every prior oracle (mine and Hermes Agent's ~15) was booted with the full bring-up
 initramfs, which during the reset window:
   1. runs `wdkill`, writing the APSS watchdog registers at 0x17817000 via
      /dev/mem — and round 18 proved writing EN=0 there PROVOKES an earlier
@@ -12,7 +12,7 @@ initramfs, which during the reset window:
   2. brings up dwc3 + the USB PHY (configfs gadget, UDC bind).
 
 So no prior test actually observed the phone's behaviour with Linux doing
-NOTHING. The reset timing across Aurel's runs also varies wildly (host cycle
+NOTHING. The reset timing across Hermes Agent's runs also varies wildly (host cycle
 ~30s to ~108s). A fixed hardware watchdog resets on a fixed period; that much
 variance smells like it's triggered by variable-timing userspace activity —
 exactly what a do-nothing init removes.
@@ -66,9 +66,8 @@ Safety unchanged: RAM-only, one fastboot client, no flash, enter fastboot via
 ## After the round
 
 Fill the observed class into `docs/kernel-change-ledger.md` (entry K-NULL),
-`bringup-debug-state-2026-07-06.md`, update the Ember handoff, internal mirror, and
+`bringup-debug-state-2026-07-06.md`, update the Claude Code handoff, internal mirror, and
 the internal tracker. Kernel stays clean; this is initramfs-only, no kernel revert needed.
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-06

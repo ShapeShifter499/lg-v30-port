@@ -1,7 +1,6 @@
 # Display path verdict (parcel P3) — DPU1, not MDP5
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
 
 ## Verdict

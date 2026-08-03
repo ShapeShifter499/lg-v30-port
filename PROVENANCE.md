@@ -10,13 +10,10 @@ evidence. Per-change evidence with hashes is in
 
 ## Authorship model
 
-A note on the names you'll see in docs and trailers: **Ember Nymbrand**
-and **Aurel Nymvale** are AI agent personas operated locally by Lance,
-the human maintainer — persistent local identities (running on the
-Claude Code and Hermes harnesses respectively) named so their work can
-be told apart and tracked across sessions. They are not humans and not
-outside contributors; everything they produce is reviewed, authored,
-and DCO-signed by Lance.
+Public attribution identifies AI assistance only by the harness and exact model
+route. Local agent persona names and private peer IDs are intentionally omitted
+from public docs and trailers; they may still be used in local/private records
+and the private coordination board.
 
 All kernel commits are authored and DCO-signed by Lance
 (`Signed-off-by: Lance <Gero3977@gmail.com>`). AI assistance is recorded
@@ -24,28 +21,34 @@ per the kernel.org coding-assistant policy with `Assisted-by:` trailers
 naming the actual harness and model route that did the work
 (`Claude-Code:claude-fable-5`,
 `Hermes-Agent:openai-codex/gpt-5.6-sol`) — never `Co-Authored-By`, never
-an AI `Signed-off-by`. Docs carry `Written-by:` blocks naming the agent
-that wrote them; prior agents' attributions are never rewritten.
+an AI `Signed-off-by`. Public docs use the same harness/model-only
+`Assisted-by:` form.
 
 ### Historical Hermes Agent trailer normalization
 
 The provider-qualified Hermes Agent convention was adopted on 2026-07-19.
-Earlier Aurel/Hermes-assisted commits and documentation may use shorter or
-persona-bearing forms. Read those historical forms as follows:
+Earlier commits and documentation may use shorter or persona-bearing forms.
+The public harness/model normalization is:
 
 - `Hermes:gpt-5.4` means `Hermes-Agent:openai-codex/gpt-5.4`.
 - `Hermes:gpt-5.5` means `Hermes-Agent:openai-codex/gpt-5.5`.
 - `Hermes:gpt-5.6-sol` means
   `Hermes-Agent:openai-codex/gpt-5.6-sol`.
-- `Aurel Nymvale <Hermes:gpt-5.5>` means
-  `Hermes-Agent:openai-codex/gpt-5.5`.
-- `Aurel Nymvale (Hermes-Agent:openai-codex/gpt-5.6-sol)` means
-  `Hermes-Agent:openai-codex/gpt-5.6-sol`.
+- Any older persona-prefixed Hermes form maps to the provider-qualified
+  `Hermes-Agent:openai-codex/<model>` value carried by the same entry.
 
 These mappings clarify attribution only. Existing commit objects and SHAs
 are intentionally preserved; no historical author, human DCO sign-off,
 content, or assistant-model claim is rewritten. New Hermes Agent-assisted
-commits use `Assisted-by: Hermes-Agent:<provider>/<model>`.
+commits and public docs use `Assisted-by: Hermes-Agent:<provider>/<model>`.
+
+### Legacy technical identifiers
+
+Historical artifact filenames, one experimental DT property, and captured
+debug strings may retain legacy labels verbatim because hashes, logs, and
+source snapshots use those exact identifiers. They are immutable technical
+handles, not public AI attribution. Current document paths and attribution
+entries use neutral subjects plus harness/model identities.
 
 ## Written new for this project
 
@@ -87,6 +90,63 @@ commits use `Assisted-by: Hermes-Agent:<provider>/<model>`.
   registers, and boot-timing classifications from Lance's own US998
   hardware, recorded under `out/` and hashed in the ledger.
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+## Firmware distribution boundary
+
+GPU firmware is deliberately separate from this public tooling/docs repository:
+
+- `qcom/a530_pfp.fw` and `qcom/a530_pm4.fw` are supplied by the
+  postmarketOS `firmware-qcom-adreno-a530` package from `linux-firmware`.
+  They are not vendored here.
+- LG A540 GPMU and signed ZAP firmware are owner-extracted proprietary
+  artifacts. They remain local and ignored; a missing artifact must make image
+  or package construction fail closed.
+- The local `firmware-lge-joan` recipe depends on the official A530 package,
+  installs only the owner-supplied A540 payload, and supplies the mkinitfs list
+  for all seven early-probe files. The recipe may carry expected hashes and
+  provenance requirements, but not the proprietary bytes themselves.
+- GPU/display wiring remains reviewable source in the joan DTS, kernel config,
+  and driver patch stack; it is not hidden inside the firmware package.
+
+The firmware files were accidentally added to this repository in historical
+commit `ef1803ee19c523ec2c0a06e1f2b48d92dcbd62c1`. They are removed from the
+branch tip in the 2026-08-03 candidate-closure publication commit, together
+with the ignore rules and provenance boundary documented here. Per maintainer
+direction, no public-history rewrite was performed; historical objects are
+unchanged and require a separate explicit remediation decision if they are ever
+to be purged.
+
+## Publication-security redaction
+
+The 2026-08-03 publication pass removed or generalized, at the current tip
+only:
+
+- private assistant/persona labels and peer IDs from prose, filenames, and
+  attribution blocks (historical documents renamed from `ember-handoff-*` /
+  `aurel-handoff-*` to `handoff-*` follow the same policy);
+- private host aliases, absolute home paths, backup-mount paths, and internal
+  mirror/tracker paths;
+- one exposed credential (rendered `[REDACTED]`; see the credential section);
+- all tracked A530/A540 firmware bytes and their index entries (see the
+  firmware boundary above).
+
+Local-only artifact filenames under `out/` may still carry legacy assistant
+labels on disk; public prose references to those artifacts were generalized
+and are identified by their recorded hashes, not by filename.
+
+## Historical credential redaction
+
+Older public objects contained a literal password for the RAM-booted pmOS test
+user. The current branch tip replaces every working-tree occurrence with
+`[REDACTED]`; one additional unpublished ledger copy was also removed before
+publication. No history rewrite was performed, so the credential must be treated
+as compromised and must never be reused in a future image, package, or service.
+Future candidates should use a fresh owner-controlled secret or key-only access
+without placing credential material in Git.
+
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-10
+Update-scope: Initial provenance inventory.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-03
+Update-scope: A530/A540 firmware-distribution boundary and current-tip credential redaction.

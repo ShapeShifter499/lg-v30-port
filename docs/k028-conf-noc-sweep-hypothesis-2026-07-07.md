@@ -1,12 +1,11 @@
 # K028 prep — CONF_NOC mechanism: the late unused-clock/genpd sweeps (source-only)
 
-Written-by: Ember Nymbrand (agent-ember)
-Agent-harness: Claude-Code:claude-fable-5
+Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-07
 
 Source-only analysis while the phone awaits physical recovery (no device
-contact this session). Follows Aurel's K027 handoff
-(`docs/ember-handoff-2026-07-07-k027-complete.md`); K027 remains the pending
+contact this session). Follows Hermes Agent's K027 handoff
+(`docs/handoff-2026-07-07-k027-complete.md`); K027 remains the pending
 device oracle and this doc explains *why it is exactly the right one*, plus
 the decision tree after its one valid run.
 
@@ -50,7 +49,7 @@ This explains every prior observation at once:
 
 1. **TZ told us the failing fabric, precisely.** The LGE reboot-reason
    taxonomy (public bullhead header, preserved at
-   `out/aurel-k027-public-bullhead-reboot_reason.h`) has *separate* codes for
+   `out/k027-public-bullhead-reboot_reason.h`) has *separate* codes for
    AHB timeout (0x04), OCMEM NoC (0x05), **MM NoC (0x06)**, **Peripheral NoC
    (0x07)**, **System NoC (0x08)**, **Config NoC (0x09 ← ours)**, XPU (0x0A).
    So: a *register-space* transaction failed. Not display scanout data (that
@@ -68,7 +67,7 @@ This explains every prior observation at once:
 3. **The PRNG is the standout candidate.**
    - Downstream msm8998.dtsi has `qrng@793000` (`qcom,msm-rng`) with
      `qcom,msm-rng-iface-clk` → **claims `gcc_prng_ahb_clk`**, plus an
-     explicit **`msm-rng-noc` bus vote** (the exact path name in Aurel's
+     explicit **`msm-rng-noc` bus vote** (the exact path name in Hermes Agent's
      downstream NoC vote list), plus `qcom,no-qrng-config` (= HLOS must not
      touch config — TZ owns the block's configuration).
    - Mainline msm8998.dtsi has **no rng node at all** and our .config builds
@@ -117,10 +116,10 @@ else. One valid run classifies the entire hypothesis class:
 - **Valid reset** (LOS returns ~30–60s, PON PS_HOLD, still 0x6D630309):
   the whole late-sweep class is eliminated in one shot — including the PRNG,
   boot-ROM, every GCC branch clock and every GDSC. Fall back to the
-  TZ-affirmative-keepalive line (Aurel's smcinvoke/listener archaeology) or
+  TZ-affirmative-keepalive line (Hermes Agent's smcinvoke/listener archaeology) or
   earlier-than-sweep accesses with delayed TZ detection.
 
-Procedure, image, and monitor discipline: exactly as written in Aurel's
+Procedure, image, and monitor discipline: exactly as written in Hermes Agent's
 handoff §"If Lance physically recovers the phone" — one client,
 `sudo -n fastboot boot out/boot-joan-clkpd-k027.img`, stop on decisive
 signal, PON + bootreasoncode readback.

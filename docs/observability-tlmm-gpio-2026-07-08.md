@@ -1,7 +1,6 @@
 # Post-reset observability and TLMM/GPIO breakthrough — 2026-07-08
 
-Written-by: Aurel Nymvale (agent-aurel)
-Agent-harness: Hermes:gpt-5.5
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.5
 Date: 2026-07-08
 
 ## Summary
@@ -119,7 +118,7 @@ read strategy is designed. Prefer raw pstore first.
 
 Candidate patch artifact:
 
-- `out/aurel-k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`
+- `out/k050-clean-candidate-gpio-reserved-ranges-2026-07-08.patch`
   sha256 `6a0227897f48940fb488747f0a8d927916816140627af8a62aba289f0a7b601a`.
 
 Before turning K050 into a real kernel commit:
