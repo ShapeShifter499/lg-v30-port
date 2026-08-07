@@ -19,7 +19,8 @@ Supersedes the open items in `ember-handoff-2026-08-07-icc-workstream-close.md`.
 
 Ready to pick up:
 
-1. `mas_ipa` QoS — one boot, everything worked out (see below).
+1. `mas_ipa` QoS — **not blocked**, one-boot task; the clock is
+   `RPM_SMD_IPA_CLK` from rpmcc, already in mainline (see below).
 2. `GDK_SCALE=1` + phoc output `scale = 2` — config-only, quarters phosh's
    pixel count shell-wide at the cost of a softer upscale. Untested.
 
@@ -162,18 +163,58 @@ is not a negative result.
 
 ## What is actually left
 
-- `mas_ipa` — the only remaining QoS candidate, and my earlier "blocked
-  on the missing IPA clock" call was **wrong**. `icc-rpm` has no
-  per-master clock mechanism at all; QoS runs under the fabric's
-  `intf_clocks`. Every close sibling programs it — sdm660 (FIXED, port 3,
-  prio 1/1), msm8953 (port 14), msm8976 (port 18), msm8996, qcm2290 —
-  and none has an IPA clock either. The missing `GCC_IPA` clock blocks
-  IPA as a *device*, not its QoS entry.
+- `mas_ipa` — **NOT blocked. Keep poking at this; it is a small,
+  one-boot task.** I called it blocked twice and was wrong twice.
 
-  For msm8998, downstream gives: a2noc, `qport = <1>`, `qos-mode =
-  "fixed"`, `prio0 = <1>`, `prio1 = <1>`. a2noc's `qos_offset` is
-  `0x5000`, so the write lands at `0x600c` — inside its `0x10000`
-  window. This is a one-boot test and should be the next thing tried.
+  What is true: a2noc QoS needs the IPA clock held on. Downstream's
+  `fab_a2noc` lists it **first** in `qcom,node-qos-clks`
+  (`clk-ipa-clk`), and mainline sdm660 — the only platform that programs
+  `mas_ipa` — carries `"ipa"` first in its a2noc `intf_clocks`, with its
+  binding requiring it (`- const: ipa`, "IPA Clock."). We dropped that
+  clock when building `msm8998_a2noc_intf_clocks`.
+
+  What I got wrong: I said the prerequisite was adding `GCC_IPA_CLK` to
+  `gcc-msm8998`. **The IPA clock is not a GCC clock.** It is an RPM SMD
+  clock, and it is *already registered for msm8998 in mainline*:
+
+	/* drivers/clk/qcom/clk-smd-rpm.c, inside msm8998_clks[] */
+	[RPM_SMD_IPA_CLK]   = &clk_smd_rpm_ipa_clk,
+	[RPM_SMD_IPA_A_CLK] = &clk_smd_rpm_ipa_a_clk,
+
+	/* include/dt-bindings/clock/qcom,rpmcc.h */
+	#define RPM_SMD_IPA_CLK   68
+	#define RPM_SMD_IPA_A_CLK 69
+
+  I only ever grepped `gcc-msm8998.c` and the gcc dt-bindings header,
+  found `GCC_IPA_BCR` (a reset) and nothing else, and concluded no IPA
+  clock existed anywhere. It was in the next driver over the whole time.
+
+  **The actual work, in order:**
+
+  1. Add `<&rpmcc RPM_SMD_IPA_CLK>` to the a2noc interconnect node in
+     `msm8998.dtsi`, with `"ipa"` in `clock-names`.
+  2. Add `"ipa"` to `msm8998_a2noc_intf_clocks[]` — put it **first**,
+     matching downstream and sdm660.
+  3. Set `mas_ipa` QoS: `ap_owned` already true, `qos_mode = FIXED`,
+     `qos_port = 1`, `areq_prio = 1`, `prio_level = 1` (downstream
+     `prio0/prio1 = <1>`; sdm660 uses the same 1/1).
+  4. Update `Documentation/devicetree/bindings/interconnect/` for the new
+     msm8998 a2noc clock, following the sdm660 stanza.
+
+  Address check: a2noc `qos_offset = 0x5000`, so port 1 lands at
+  `0x5000 + 0xc + 0x1000 = 0x600c`, inside a2noc's `0x10000` window.
+
+  **One caution that is still real:** a2noc has never performed a single
+  QoS write. Every other a2noc master is `ap_owned = false`, so its
+  `intf_clocks` have never actually been exercised. `mas_ipa` will be the
+  first write that fabric has ever taken from us, so treat it as a fresh
+  bring-up — one change, one boot, `scripts/dtb-check-reg-overlaps.sh`
+  first, and expect a hang to be informative rather than surprising.
+
+  Value note: IPA is a networking datapath accelerator, mostly cellular
+  modem offload, which is not up on this port. The gap is real but
+  currently inert — worth closing for completeness and upstreamability,
+  not for user-visible performance.
 - `docs/upstream-question-icc-rpm-qos-clocks.md` — **do not send as
   written.** Its central premise (that per-master QoS clocks are the
   missing mechanism) is now disproven for our case; the answer was
