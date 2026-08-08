@@ -80,11 +80,28 @@ device. Options:
 ## Kernel state
 
 - Tree: ~/vibe-coding-projects/coding/linux-mainline-v30
-- Branch: joan/battery-fg — 8 clean commits, PUSHED as
-  https://github.com/ShapeShifter499/linux-lg-v30-joan/pull/5
-  (FG driver + binding, charging limits + binding, SDP fix,
-  wifi/BT DT enable, crnv21 firmware-name). History was cleaned
-  before push (TEMP-DIAG + mystery reverts dropped).
+- Branch: joan/battery-fg — 8 clean commits, **MERGED into master
+  as linux-lg-v30-joan#5** (2026-08-08). mas_ipa QoS also merged
+  (#4). ALL joan kernel work is now upstream in
+  ShapeShifter499/linux-lg-v30-joan master — branch new work from
+  master, not from the local branches.
+- History was cleaned before push (TEMP-DIAG + mystery reverts
+  dropped).
+
+## Port repo state (IMPORTANT — merge timing)
+
+- lg-v30-port PR #3 was MERGED at 2026-08-08T01:06:56Z — at that
+  moment the branch carried up to d2d33a9 (battery audit, WCN3990
+  fw injection, dtb overlap checker).
+- TWO LATER COMMITS landed on the branch AFTER the merge and are
+  NOT in master: the 2026-08-08 handoff (949c4aa) and the
+  D-series/C2 recovery commit incl. sd-throughput fix (5e848b3).
+  They were re-applied on top of master in the branch
+  aurel/handoff-merge-status → PR lg-v30-port#6 (or whatever PR
+  this lands in) — MERGE THAT to close the gap.
+- Ember's overlap-scan work (32caa47, branch
+  ember/overlap-scan-reserved-memory) sits on top of the merge;
+  coordinate through Lance if it needs the late commits.
 - .config currently: wifi/BT as MODULES (ATH10K=m, ATH10K_SNOC=m,
   BT=m, BT_HCIUART=m, BT_HCIUART_QCA=m, MAC80211/CFG80211/RFKILL=m,
   POWER_SEQUENCING=y, QCOM_RPROC_COMMON=m) — do NOT flip back to
