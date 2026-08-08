@@ -7626,3 +7626,68 @@ Date: 2026-08-03
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-03
 Update-scope: Security redaction and prospective publication boundary.
+
+---
+
+## joan/qos-prio-fix-v1 — REJECTED, do not merge (2026-08-07)
+
+- Handle: branch `joan/qos-prio-fix-v1` on
+  github.com/ShapeShifter499/linux-lg-v30-joan; commits `97d770f16`
+  (reset ten masters' priorities to 0) and `bc3cf0c86` (reverts six
+  of them).
+- Class: `rejected` — kept as the record of a wrong turn. Do not
+  merge, do not cherry-pick, do not rebase onto clean branches.
+- Why rejected: the motivating audit searched only for
+  `qcom,prio-lvl` / `qcom,prio-rd`, but downstream declares
+  `qcom,prio0 = <1>` / `qcom,prio1 = <1>` for `mas_hmss`,
+  `mas_qdss_bam`, `mas_qdss_etr`, `mas_pcie_0`, `mas_ufs`,
+  `mas_usb3` — the msm-bus binding accepts both spellings.
+  "Downstream declares no priority" was a single-form-grep artifact,
+  not a fact. sdm660 independently confirms the mapping (`mas_ipa`:
+  `areq_prio = 1`, `prio_level = 1`).
+- The parser fallback agreed with downstream everywhere except
+  `mas_gnoc_bimc`, which is already correct on the merged QoS branch.
+- Touched files: `drivers/interconnect/qcom/msm8998.c` (priorities).
+- Verification: never merged, never booted; superseded by the merged
+  QoS series (PR #3).
+- Public/PR disposition: `do not publish` — keep the branch only as a
+  local record.
+- Cross-ref: `docs/ember-handoff-2026-08-07-bimc-qos-closed.md`
+  (second transferable lesson: search every spelling the binding
+  accepts before concluding it declares nothing).
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
+Date: 2026-08-07
+
+---
+
+## 2026-08-07 ICC QoS close-out (merged)
+
+- Handle: PR `linux-lg-v30-joan#3` (9 commits, branch
+  `joan/qos-bimc-v2`) merged 2026-08-07 into `joan/latest-clean-test`
+  (merge commit `4dcd16654c8dc5111413ee0e13974a5ac3efcc91`).
+- Class: `upstream-candidate` — interconnect QoS for msm8998.
+- Root cause / fix: the BIMC M_BKE register block sits 0x8000 into the
+  BIMC window; with `.qos_offset` unset every write landed 0x8000 low,
+  inside BIMC's own configuration space — three SoC hangs, no console.
+  One line: `.qos_offset = 0x8000` on `msm8998_bimc`. (Downstream
+  encodes the displacement in driver macros (`M_REG_BASE` in
+  `msm_bus_bimc_adhoc.c`); msm8996 folds it into its DT reg base
+  `0x408000`. A missing field meant "expressed elsewhere", not zero —
+  three platforms agreeing (msm8916/8953/8976) outweighed the one that
+  only looked like a counterexample.)
+- Result: QoS now programs 16 of 17 programmable masters (35 total;
+  real prior count was 13, not "17 of 22" — the `ap_owned` probe gate
+  skips the rest). Display 32.45 -> 62.49 -> **70.44 mdss/s**;
+  `icc_rpm_error_lines=0`; device-verified RAM boot; nothing flashed.
+- Remaining: `mas_ipa` — a2noc's first-ever QoS write (every other
+  a2noc master is `ap_owned = false`, so its intf_clocks have never
+  been exercised). Clock exists in mainline as `RPM_SMD_IPA_CLK` from
+  rpmcc (twice wrongly searched for in gcc-msm8998). Fresh bring-up:
+  one change, one boot, dtb overlap scan first. Tracked on Deck card
+  78.
+- Cross-ref: `docs/ember-handoff-2026-08-07-bimc-qos-closed.md`,
+  `docs/ember-handoff-2026-08-07-icc-workstream-close.md`.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
+Date: 2026-08-07
