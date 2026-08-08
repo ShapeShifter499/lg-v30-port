@@ -73,20 +73,32 @@ for f in "${required_fw[@]}"; do
     install -m 0644 "$f" "$WORK/rd/lib/firmware/qcom/"
 done
 
+# WCN3990 BT NVM — device-exact crnv21.bin (SHA-256
+# 43f429abcf72c6a0e93e6de2875a174369dc83002ab539826c40da30677337e9),
+# staged per the DT firmware-name ("crnv21.bin" -> /lib/firmware/).
+WCN_FW_DIR="${WCN_FW_DIR:-$HERE/firmware/wcn}"
+if [[ -s "$WCN_FW_DIR/crnv21.bin" ]]; then
+    install -m 0644 "$WCN_FW_DIR/crnv21.bin" "$WORK/rd/lib/firmware/crnv21.bin"
+else
+    echo "WCN3990 crnv21.bin missing (WCN_FW_DIR) — BT will lack NVM" >&2
+fi
+
 echo "firmware injected (SHA-256):"
 for f in "$WORK/rd/lib/firmware/qcom"/a530_* \
-         "$WORK/rd/lib/firmware/qcom"/a540_*; do
-    sha256sum "$f"
+         "$WORK/rd/lib/firmware/qcom"/a540_* \
+         "$WORK/rd/lib/firmware/crnv21.bin"; do
+    [[ -f "$f" ]] && sha256sum "$f"
 done
 
 ( cd "$WORK/rd" && find . | cpio -o -H newc --owner=0:0 --quiet | gzip -9 ) > "$WORK/ramdisk.new"
 
 cat "$IMAGE" "$DTB" > "$WORK/Image.gz-dtb"
+RAMDISK_OFFSET="${RAMDISK_OFFSET:-0x02000000}"
 mkbootimg \
     --kernel "$WORK/Image.gz-dtb" \
     --ramdisk "$WORK/ramdisk.new" \
     --base 0x00000000 --pagesize 4096 \
-    --kernel_offset 0x00008000 --ramdisk_offset 0x02000000 \
+    --kernel_offset 0x00008000 --ramdisk_offset "$RAMDISK_OFFSET" \
     --tags_offset 0x00000100 \
     --cmdline "$CMDLINE" \
     --output "$DEST"
