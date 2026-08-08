@@ -18,7 +18,30 @@
 # It rejects commits missing either required trailer:
 #
 #     Signed-off-by: <human>
-#     Assisted-by: <Harness>:<model actually running>
+#     Assisted-by: AGENT_NAME:MODEL_VERSION [tool ...]
+#
+# Two of those rules come straight from
+# https://docs.kernel.org/process/coding-assistants.html:
+#
+#   - "AI agents MUST NOT add Signed-off-by tags." Only the human can
+#     certify the DCO.
+#   - Assisted-by is spelled AGENT_NAME:MODEL_VERSION, optionally
+#     followed by specialised analysis tools (coccinelle, sparse,
+#     smatch, clang-tidy). Basic tooling -- git, gcc, make, editors --
+#     is not listed. Upstream's own example is
+#         Assisted-by: Claude:claude-3-opus coccinelle sparse
+#
+# One rule is deliberately STRICTER than upstream. kernel.org requires
+# Assisted-by only when an assistant was actually used; a purely human
+# commit simply omits it. Here it is required on every commit, because
+# the whole point is telling four committers apart when they all share
+# one git identity, and "no trailer" is indistinguishable from "agent
+# that forgot". Unaided human commits use:
+#
+#     Assisted-by: none
+#
+# That is a local convention, not a kernel.org one. Strip it when
+# exporting a patch upstream.
 #
 # Merges and reverts-in-progress are exempt: their messages are generated
 # by git before a human or agent can annotate them, and the follow-up
@@ -41,7 +64,27 @@ grep -qE '^(fixup|squash)! ' "$MSG_FILE" && exit 0
 
 missing=()
 grep -qE '^Signed-off-by: .+ <.+@.+>' "$MSG_FILE" || missing+=("Signed-off-by")
-grep -qE '^Assisted-by: .+'           "$MSG_FILE" || missing+=("Assisted-by")
+
+# Assisted-by must be AGENT_NAME:MODEL_VERSION, optionally followed by
+# specialised tools, or the local "none" for an unaided human commit.
+# Neither field may be empty and neither may contain whitespace, which
+# is what catches a bare "Assisted-by: Claude" or a stray "Assisted-by:".
+assisted_re='^Assisted-by: ([^[:space:]:]+:[^[:space:]]+([[:space:]]+[^[:space:]]+)*|none)[[:space:]]*$'
+if grep -qE '^Assisted-by:' "$MSG_FILE"; then
+	if ! grep -qE "$assisted_re" "$MSG_FILE"; then
+		echo "commit-msg: rejected -- malformed Assisted-by trailer." >&2
+		echo "  Found: $(grep -m1 '^Assisted-by:' "$MSG_FILE")" >&2
+		echo >&2
+		echo "  kernel.org format is AGENT_NAME:MODEL_VERSION [tool ...]" >&2
+		echo "      Assisted-by: Claude-Code:claude-opus-5" >&2
+		echo "      Assisted-by: Claude:claude-3-opus coccinelle sparse" >&2
+		echo "  Do not list basic tools (git, gcc, make, editors)." >&2
+		echo "  For an unaided human commit use: Assisted-by: none" >&2
+		exit 1
+	fi
+else
+	missing+=("Assisted-by")
+fi
 
 # An AI must never sign off; only the human does.
 if grep -qiE '^Signed-off-by: .*(claude|hermes|openclaw|gpt|copilot|agent)' "$MSG_FILE"; then
@@ -65,13 +108,18 @@ if (( ${#missing[@]} )); then
 	echo "      Signed-off-by: Lance <Gero3977@gmail.com>" >&2
 	echo "      Assisted-by: <Harness>:<model>" >&2
 	echo >&2
-	echo "  Assisted-by must name the model ACTUALLY running when the commit" >&2
-	echo "  was written -- never a copied or stale id. Examples:" >&2
+	echo "  Assisted-by is AGENT_NAME:MODEL_VERSION and must name the model" >&2
+	echo "  ACTUALLY running when the commit was written -- never a copied" >&2
+	echo "  or stale id. Examples:" >&2
 	echo "      Assisted-by: Claude-Code:claude-opus-5" >&2
 	echo "      Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash" >&2
 	echo >&2
 	echo "  A human committing unaided may use:" >&2
-	echo "      Assisted-by: none (human)" >&2
+	echo "      Assisted-by: none" >&2
+	echo >&2
+	echo "  Requiring Assisted-by on every commit is a local rule, stricter" >&2
+	echo "  than kernel.org, so four committers sharing one git identity can" >&2
+	echo "  be told apart. See the comments at the top of this hook." >&2
 	exit 1
 fi
 
