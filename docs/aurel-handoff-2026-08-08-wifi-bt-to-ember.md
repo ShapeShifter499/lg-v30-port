@@ -137,8 +137,16 @@ device. Options:
 - scripts/dtb-check-reg-overlaps.sh every boot (PASS required).
 - Persistent-rootfs writes need Lance's approval; SD logs removed
   after tests; script files over inline SSH quoting (scp then run).
-- Commit convention: Signed-off-by: Lance <Gero3977@gmail.com> +
-  Assisted-by: Hermes-Agent:<harness>/<model>.
+- Commit convention (per Ember's hook, b92017b — VERIFIED against
+  the live hook on 2026-08-08): EVERY commit needs BOTH trailers —
+  "Signed-off-by: Lance <Gero3977@gmail.com>" (the human certifies
+  the DCO; an AI must never sign as itself) AND
+  "Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash" (names
+  the model actually running; a model-less variant is rejected).
+  Unaided human commits use "Assisted-by: none". No Co-Authored-By.
+  Merges / in-flight revert-cherry-pick / fixup+squash are exempt.
+  --no-verify is the escape hatch. Hook is global
+  (core.hooksPath = ~/.config/git/hooks, all 24 repos).
 - Phone on nym-nest: adb serial LGUS9986e606d55; USB IDs
   18d1:d001 (pmOS/fastboot) / 18d1:4ee7 (LineageOS); pmOS SSH via
   nym-nest-family → sshpass user@172.16.42.1, sudo via
