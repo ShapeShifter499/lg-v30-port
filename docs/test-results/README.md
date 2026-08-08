@@ -2,12 +2,12 @@
 
 > **Mandatory read-first source for device work.** Before building, booting, diagnosing, or replaying an LG V30 candidate, read this index, the newest applicable closure packet, and `../kernel-change-ledger.md`. A node, UI, boot, or successful command alone is not a pass.
 
-## Current state — 2026-08-03
+## Current state — 2026-08-07
 
-- **Newest completed device test:** [A183](A183-2026-08-03.md).
-- **A183 closed result:** touch/input ✅; display/DRM ✅; direct freedreno/FD540 identity ✅; owner slider/no-crash behavior ✅; exposed brightness contract ❌ because `max_brightness` remained 251 instead of the established visible 6–255 range; GPU runtime-power and sustained-performance ⏳; suspend/resume ⏳.
-- **Current source preparation:** [A184 host-only](A184-2026-08-03-host-only.md) changes only the bounded SW43402 maximum/comment from 251 to 255 while retaining DBV off 3, visible minimum 6, perceptual userspace scaling, and serialized updates. A signed comment-only follow-up records that physical A540 reuses packaged A530 PM4/PFP while A540 GPMU/ZAP remains owner-local; no DT behavior changed.
-- **Hardware boundary:** A183's one-shot authorization is consumed. Never invoke its runner again. A184 has no complete image and no device authorization.
+- **Newest completed device test:** [mas_ipa QoS](mas-ipa-2026-08-07.md).
+- **mas_ipa closed result:** interconnect ✅ (a2noc first-ever QoS write, FIXED/qport 1/prio 1,1, IPA clock from rpmcc; no hang, 6/6 fabrics bound, icc errors 0 — two boots); GPU chain bind ✅; display/DRM ✅ (card0+renderD128, mdss 71.39/s vs 70.44 close-out baseline); recovery ✅ both boots. QoS now covers 17/17 programmable masters. Renderer-identity query and GPU power/suspend remain ⏳/N/A (pre-existing, out of scope).
+- **Config baseline correction (binding):** kernel builds must use the exact QoS-era config `coding/build-qos-bimc-v2-24e82e84e/.config` (the stale July tree config lacks `CONFIG_MSM_GPUCC_8998` — boot 1 of mas_ipa consumed an approval proving the failure mode: gpucc never probes, SMMU/adreno -110, no /dev/dri).
+- **A183/A184 prior state (superseded by newer work, kept as history):** touch/display/FD540 passed; exposed brightness max remained 251 → A184 host-only 255 correction; GPU power/suspend open.
 - **Communications:** blocked until graphics/input integration, GPU power/performance, and suspend/resume close.
 
 ## Status symbols
@@ -39,6 +39,7 @@
 | [G5-OC](G5-OC-2026-08-04.md) | 2026-08-04 | Device-tested once: experimental 750 MHz GPU OPP @ 965 mV — REJECTED-WITH-CAUSE at parse: "OPP not supported by regulators" (965000 uV off the pm8005_s1 4 mV grid). GPU otherwise fully healthy; 750 never attempted. | Fix committed 92df37a6a (964000 uV, on-grid). G5-OC2 rebuilds; the 750 MHz clock-chain question remains OPEN. |
 | [G5-OC2](G5-OC2-2026-08-05.md) | 2026-08-05 | Device-tested once: 750 MHz GPU OPP @ 964 mV (on-grid) — **PASS**: 750 parses, clock chain runs cur=750000000 held during render, rail delivers exactly 964000 uV (summary-confirmed), zero real GPU faults. +5.6% over stock 710. | 750 device-proven (local-only). Follow-ups: 800/850/900 sweep (G6) — 900 REJECTED (PLL no-lock at probe), 850 DEVICE-PROVEN (G6-OC3). Short-session proof only — soak test if kept. |
 | [G6-OC3](G6-OC3-2026-08-05.md) | 2026-08-05 | Device-tested once: 850 MHz GPU corner DEVICE-PROVEN **PASS** (cur=850000048, rail 1036 mV, zero faults, 38-40C); 900 MHz REJECTED (PLL no-lock at probe, GPU session wedged). +19.7% over stock 710. NOTE: phosh/lockscreen did not load this boot (open userspace item, separate from the GPU PASS). | 850 proven local-only (never upstream). Keep 800/850 in table, 850 = top. Open: phosh-no-start needs journalctl on next boot; soak test if kept. |
+| [mas_ipa](mas-ipa-2026-08-07.md) | 2026-08-07 | PASS: a2noc first QoS write safe ×2 boots; 17/17 masters; display regression-free (mdss 71.39/s). | Branch joan/mas-ipa-qos local/unpushed; images 4efd83f2 (boot 1, superseded) and a57ea7ca (boot 2, sealed). Do not replay boot 1's config (missing GPUCC_8998). |
 
 ## Closure-packet rule
 

@@ -7691,3 +7691,38 @@ Date: 2026-08-07
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
 Date: 2026-08-07
+
+---
+
+## mas_ipa QoS — device-tested PASS (2026-08-07/08)
+
+- Handle: branch `joan/mas-ipa-qos` (local/unpushed): `a56daf1c4`
+  (runtime) + `0439cbf10` (binding docs) on merged base `4dcd166`.
+- Class: `upstream-candidate` — completes the msm8998 QoS set.
+- Change: mas_ipa `FIXED`/qport 1/prio 1,1 (register 0x600c inside
+  a2noc's 0x10000 window at qos_offset 0x5000); `"ipa"` first in
+  `msm8998_a2noc_intf_clocks[]`; `<&rpmcc RPM_SMD_IPA_CLK>` first on
+  the a2noc DTS node (clock exists in mainline clk-smd-rpm msm8998
+  table; earlier gcc-msm8998 searches only found the GCC_IPA_BCR
+  reset and wrongly concluded it did not exist). New docs-only
+  binding `qcom,msm8998.yaml` (a2noc requires ipa first).
+- Verification: two owner-approved RAM boots (images
+  `4efd83f2...` then sealed `a57ea7ca...`). No hang; 6/6 fabrics
+  bound; icc_rpm_error_lines=0; GPU chain bound (gpucc/smmu/adreno);
+  /dev/dri card0+renderD128; acceptance capture CRITERION_1/2=PASS,
+  axi_clk_src_hz=405999902, mdss_per_sec=71.39 (close-out 70.44 —
+  no regression); recovered to LineageOS both times, nothing
+  flashed. QoS coverage now 17/17 programmable masters.
+- Boot-1 note: first boot lacked /dev/dri — HOST CONFIG ERROR
+  (stale July tree .config missing CONFIG_MSM_GPUCC_8998=y → gpucc
+  never probes → SMMU/adreno deferred-probe timeout -110). Root
+  cause proven by diff against the QoS-era build config
+  (`build-qos-bimc-v2-24e82e84e/.config`, 61 options). Use that
+  config as the kernel baseline from now on.
+- Public/PR disposition: `needs cleanup` — commits local/unpushed;
+  push decision pending owner; kernel branch may become PR #4.
+- Cross-ref: `docs/test-results/mas-ipa-2026-08-07.md` (closure
+  packet), `out/audit-20260807/mas-ipa2.manifest.txt`.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
+Date: 2026-08-07
