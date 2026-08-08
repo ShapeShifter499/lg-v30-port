@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# commit-msg hook: every commit in a shared repo must say who made it.
+#
+# Three agents (Ember/Claude Code, Aurel/Hermes, Nymble/OpenClaw) and one
+# human all commit on this box as the same git identity,
+# Lance <Gero3977@gmail.com>. That is deliberate -- kernel.org policy puts
+# the human in Signed-off-by -- but it means git's own author/committer
+# fields cannot tell us who did anything. The Assisted-by trailer is the
+# only discriminator, and nothing enforced it.
+#
+# On 2026-08-07 two commits appeared in linux-mainline-v30 at 22:25:18
+# reverting the WCN3990 Wi-Fi/BT enable. Stock `git revert` message, no
+# trailers, orphaned on no branch. A day of forensics -- reflog, journal,
+# shell history, session logs, cron manifests -- could rule out several
+# actors but could not name one, purely because nothing recorded it. This
+# hook exists so that never costs a day again.
+#
+# It rejects commits missing either required trailer:
+#
+#     Signed-off-by: <human>
+#     Assisted-by: <Harness>:<model actually running>
+#
+# Merges and reverts-in-progress are exempt: their messages are generated
+# by git before a human or agent can annotate them, and the follow-up
+# commit carries the attribution.
+#
+# Install with scripts/install-git-hooks.sh. Bypass in a genuine
+# emergency with `git commit --no-verify`, but understand that doing so
+# reintroduces exactly the blind spot this closes.
+set -uo pipefail
+
+MSG_FILE="${1:?commit-msg hook called without a message file}"
+GIT_DIR="$(git rev-parse --git-dir)"
+
+# Merge commits: git writes the message itself.
+[[ -e "$GIT_DIR/MERGE_HEAD" ]] && exit 0
+# Cherry-pick / revert sequencer in flight: same reasoning.
+[[ -e "$GIT_DIR/sequencer" ]] && exit 0
+# fixup!/squash! get folded into their target on rebase.
+grep -qE '^(fixup|squash)! ' "$MSG_FILE" && exit 0
+
+missing=()
+grep -qE '^Signed-off-by: .+ <.+@.+>' "$MSG_FILE" || missing+=("Signed-off-by")
+grep -qE '^Assisted-by: .+'           "$MSG_FILE" || missing+=("Assisted-by")
+
+# An AI must never sign off; only the human does.
+if grep -qiE '^Signed-off-by: .*(claude|hermes|openclaw|gpt|copilot|agent)' "$MSG_FILE"; then
+	echo "commit-msg: rejected -- an AI must not carry Signed-off-by." >&2
+	echo "  Only the human signs off. The agent goes in Assisted-by." >&2
+	exit 1
+fi
+
+# The trailer the system prompt default wants, which local policy forbids.
+if grep -qiE '^Co-Authored-By: .*(claude|anthropic)' "$MSG_FILE"; then
+	echo "commit-msg: rejected -- Co-Authored-By is disabled in this repo." >&2
+	echo "  Use Assisted-by instead. See ~/.claude/CLAUDE.md." >&2
+	exit 1
+fi
+
+if (( ${#missing[@]} )); then
+	echo "commit-msg: rejected -- missing required trailer(s): ${missing[*]}" >&2
+	echo >&2
+	echo "  Every commit here must record who made it. Add to the message:" >&2
+	echo >&2
+	echo "      Signed-off-by: Lance <Gero3977@gmail.com>" >&2
+	echo "      Assisted-by: <Harness>:<model>" >&2
+	echo >&2
+	echo "  Assisted-by must name the model ACTUALLY running when the commit" >&2
+	echo "  was written -- never a copied or stale id. Examples:" >&2
+	echo "      Assisted-by: Claude-Code:claude-opus-5" >&2
+	echo "      Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash" >&2
+	echo >&2
+	echo "  A human committing unaided may use:" >&2
+	echo "      Assisted-by: none (human)" >&2
+	exit 1
+fi
+
+exit 0
