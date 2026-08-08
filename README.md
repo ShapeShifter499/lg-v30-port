@@ -91,6 +91,31 @@ Boot format (from LineageOS BoardConfig): `Image.gz-dtb` appended DTB, base
 fallback is flashing the **recovery** partition (never boot) and key-combo
 booting it (Vol-Down + Power, release/re-hold Power at the LG logo).
 
+## Procedures
+
+- **SD card filesystem (the pmOS rootfs lives on the microSD).** Runbook:
+  `docs/sd-card-fsck-and-recovery.md`; automated helper:
+  `scripts/sd-fsck-repair.sh`.
+  - Pre-boot check (read-only, no authorization needed):
+    `scripts/sd-fsck-repair.sh check` — runs e2fsck 1.47.4 from the pmOS
+    initramfs (pushed via adb root, musl loader) read-only against
+    `mmcblk0p2`. Use this instead of LineageOS's e2fsck 1.46.2, which
+    cannot check `p2` (newer ext4 features; its "still has errors" means
+    "could not check", never a result in either direction).
+  - Repair (persistent write — Lance must be present and approving):
+    `AUTH=yes-i-have-owner-authorization scripts/sd-fsck-repair.sh repair`.
+    Trigger: a RAM boot prints "I/O error on the SD card, FSCK repair
+    wait timed out" (the 30 s auto-continue from the recovery-patched
+    initramfs) — that is a dirty journal, not a dead card. Expect rc 1
+    (errors corrected); rc >= 4 means uncorrected/hard errors — card
+    replacement/reimage. Orphaned trees (e.g. `/home/user`) land in
+    `/lost+found`; restoring them is a persistent-rootfs write and
+    needs authorization too.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
+Date: 2026-08-07
+Update-scope: SD fsck procedure + script.
+
 ## Work parcels
 
 **Claim a parcel by opening a GitHub issue on this repo (or commenting on an

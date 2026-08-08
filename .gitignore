@@ -11,5 +11,6 @@ backups/
 # excluding them from the public Git tree.
 firmware/lg-vendor/
 firmware/zap/
+firmware/wcn/
 initramfs/root/lib/firmware/qcom/a530_*.fw
 initramfs/root/lib/firmware/qcom/a540_*
