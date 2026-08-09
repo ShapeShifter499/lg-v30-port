@@ -66,10 +66,26 @@ Notes that cost time to learn:
                                 /tmp/rmtfs-*.apk
 
   Passing only some of them makes apk go to the network for the rest.
-- **`rmtfs` mediates modem access to NV partitions on INTERNAL storage**
-  (`modemst1`, `modemst2`, `fsg`, `fsc` — `/dev/disk/by-partlabel/`).
-  Read its flags before running it. That is calibration and provisioning
-  data shared with your Android install.
+- **`rmtfs` is not optional — the modem does not finish initialising
+  without it.** Before running it the modem advertised 3 QMI services;
+  with it running the full suite appears (Voice, Network Access,
+  Wireless Data, Wireless Messaging, UIM, Card Application Toolkit,
+  Location, IPA control, ~30 in total). If your modem boots but has
+  almost no services, this is why.
+
+  Correct invocation, from the source's own `getopt(argc, argv, "o:S:Prsv")`:
+
+      rmtfs -P -r -s
+
+  `-P` use raw EFS partitions, `-r` avoid writing to storage, `-s` sync
+  for the mss rproc instance. **Do not pass `-o <dir>`** unless you mean
+  it — it redirects storage to files in that directory and you will see
+  `failed to open '<dir>/modemst1' (requested '/boot/modem_fs1')`.
+
+  `rmtfs` mediates modem access to NV partitions on **internal storage**
+  (`modemst1`, `modemst2`, `fsg`, `fsc` under `/dev/disk/by-partlabel/`)
+  — calibration and provisioning data shared with your Android install.
+  Use `-r` unless you have a reason not to.
 
 ## 3. Kernel config: what must be built in, not modular
 
@@ -141,6 +157,15 @@ Working and device-verified:
 - **ICC/QoS**: 17/17 masters, 0 errors.
 
 Not working:
+
+- **ModemManager**: reads the QRTR bus and enumerates every service, but
+  reports "No modems were found". It needs IPA's rmnet/wwan netdevs to
+  instantiate a modem object — pmaports !3531 says exactly this about
+  OnePlus 5/5T ("blocking `ipa` from autoloading makes ModemManager not
+  detect the modem over QRTR at all"). **There is no `ipa@` node in
+  upstream `msm8998.dtsi`**; the driver supports `qcom,msm8998-ipa` but
+  nothing instantiates it. Writing that node is the next concrete task,
+  and it likely unblocks data, SMS and possibly Wi-Fi together.
 
 - **Wi-Fi**: `ath10k_snoc` binds `18800000.wifi` and stops. No firmware
   request is ever made, so it is stalling before that — in the QMI
