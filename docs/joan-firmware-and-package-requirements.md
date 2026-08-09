@@ -23,7 +23,7 @@ destinations:
 | Bluetooth | `/vendor/firmware/crnv21.bin` | `/lib/firmware/qca/` |
 | WLAN | `/system/vendor/firmware_mnt/image/wlanmdsp.mbn` | `/lib/firmware/` |
 | WLAN board | `/vendor/firmware_mnt/image/bdwlan.bin` | `/lib/firmware/ath10k/WCN3990/hw1.0/board.bin` |
-| IPA | `/vendor/firmware_mnt/image/ipa_fws.mdt` + `ipa_fws.b??` | `/lib/firmware/` |
+| IPA | `/vendor/firmware_mnt/image/ipa_fws.mdt` + `ipa_fws.b??` | `/lib/firmware/` |  *(6 files, 48 KB — required with `qcom,gsi-loader = "self"`)*
 
 Known-good hashes on a US998 (yours should match if you are on the same
 firmware; a mismatch is informational, not necessarily wrong):
@@ -166,31 +166,34 @@ Working and device-verified:
 
 Not working:
 
-- **IPA**: loads and handshakes with the modem, but does not yet create
-  its netdev. `qcom,gsi-loader = "modem"` works and means **no
-  `ipa_fws.mdt` extraction is needed** — the AP-loads-it default
-  ("self") asks for that file and fails `-2` without it.
-
-  Current state:
+- **IPA**: **working.** `rmnet_ipa0` exists.
 
       ipa 1e40000.ipa: IPA driver initialized
-      ipa 1e40000.ipa: received modem starting event
-      ipa 1e40000.ipa: received modem running event
+      ipa 1e40000.ipa: IPA driver setup completed successfully
+      netdevs: lo rmnet_ipa0 usb0
 
-  sysfs exposes endpoint_id/feature/modem/version and lists all six
-  interconnect providers as suppliers, so the driver is genuinely up.
-  QMI shows IPA control service (49) and Wireless Data Service (1).
+  The setting that matters is `qcom,gsi-loader = "self"` **plus**
+  `ipa_fws.mdt` and its five `.b??` segments in `/lib/firmware`.
+  `"modem"` looks attractive because it needs no extracted firmware, and
+  it does get further than bare "self" — the driver initialises and sees
+  the modem start and run — but the handshake never completes and no
+  netdev appears. Reading `ipa_qmi_ready()` explains why: it gates on
+  `modem_ready` and `uc_ready`, and both are set by messages the *modem's*
+  IPA driver sends (`INDICATION_REGISTER` and `DRIVER_INIT_COMPLETE`).
+  With `"modem"` the modem is supposed to load GSI firmware and signal
+  first; LG's modem firmware does not, so nothing ever arrives. Load it
+  on the AP.
 
-  What is missing is `rmnet_ipa0`. That netdev is created by IPA itself
-  in `ipa_modem_start()` (`ipa_modem.c`, `IPA_NETDEV_NAME`), not by the
-  rmnet module, so loading rmnet does not help — it waits on the
-  IPA/modem QMI handshake to finish. That handshake is the open
-  question, and it is the last thing between here and ModemManager
-  seeing a modem.
+  One benign-looking message remains after setup:
+  `unexpected init_completed response`.
 
-- **ModemManager**: reads the QRTR bus and enumerates every service, but
-  reports "No modems were found". It needs IPA's rmnet/wwan netdevs to
-  instantiate a modem object — pmaports !3531 says exactly this about
+- **ModemManager**: still reports "No modems were found", now for a
+  narrower reason. `rmnet_ipa0` exists and comes up, MM logs
+  `qrtr devices allowed: yes` and loads 44 plugins across
+  tty/net/usbmisc/wwan/rpmsg/qrtr — but there is no `/sys/class/wwan/`.
+  Mainline IPA registers a plain netdev, not a WWAN-class device, so MM's
+  QRTR path has nothing to bind to. This now looks like a userspace or
+  plugin-matching question rather than a kernel one — pmaports !3531 says exactly this about
   OnePlus 5/5T ("blocking `ipa` from autoloading makes ModemManager not
   detect the modem over QRTR at all"). **There is no `ipa@` node in
   upstream `msm8998.dtsi`**; the driver supports `qcom,msm8998-ipa` but
