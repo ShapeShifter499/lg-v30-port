@@ -74,6 +74,12 @@ Notes that cost time to learn:
   Location, IPA control, ~30 in total). If your modem boots but has
   almost no services, this is why.
 
+  It needs `CONFIG_QCOM_RMTFS_MEM=y` to give it `/dev/qcom_rmtfs_uio*`.
+  Without that it prints `failed to open /dev/qcom_rmtfs_uio1`, falls
+  back to `/dev/mem`, and fails with `failed to mmap: Invalid argument`.
+  The `rmtfs_mem` reserved region already exists in msm8998.dtsi at
+  `memory@88f00000`; only the driver was modular.
+
   Correct invocation, from the source's own `getopt(argc, argv, "o:S:Prsv")`:
 
       rmtfs -P -r -s
@@ -108,6 +114,7 @@ Each of these cost at least one boot to discover:
 | `QCOM_SPMI_ADC_TM5` | pm8998 `adc-tm@3400` (`qcom,spmi-adc-tm-hc`) | thermal monitor missing |
 | `BATTERY_PMI8998_FG` | fuel gauge | no battery |
 | `CHARGER_QCOM_SMB2` | charger (note: **SMB2**, not "SMBX") | no charger |
+| `QCOM_RMTFS_MEM` | creates `/dev/qcom_rmtfs_uio*` | rmtfs falls back to `/dev/mem` and fails to mmap; modem gets 3 QMI services instead of ~45 |
 
 **Not needed** — joan does not instantiate them; the only
 `qcom,spmi-vadc` reference in `pm8998.dtsi` is a `#include` of the
@@ -159,19 +166,27 @@ Working and device-verified:
 
 Not working:
 
-- **IPA**: the node now exists (see below) and the driver gets to
-  "IPA driver initialized", then fails:
+- **IPA**: loads and handshakes with the modem, but does not yet create
+  its netdev. `qcom,gsi-loader = "modem"` works and means **no
+  `ipa_fws.mdt` extraction is needed** — the AP-loads-it default
+  ("self") asks for that file and fails `-2` without it.
 
-      ipa 1e40000.ipa: Direct firmware load for ipa_fws.mdt failed with error -2
-      ipa 1e40000.ipa: probe with driver ipa failed with error -2
+  Current state:
 
-  With `qcom,gsi-loader` absent the AP loads GSI firmware itself
-  ("self" is the default), so `ipa_fws.mdt` and its `.b??` segments must
-  be extracted like the modem's. The alternative is
-  `qcom,gsi-loader = "modem"`, which hands the job to the modem and
-  needs no extra firmware — worth trying first on joan, since the modem
-  is up and healthy. Most sdm845 devices use "self";
-  sc7180-trogdor-lte-sku uses "modem".
+      ipa 1e40000.ipa: IPA driver initialized
+      ipa 1e40000.ipa: received modem starting event
+      ipa 1e40000.ipa: received modem running event
+
+  sysfs exposes endpoint_id/feature/modem/version and lists all six
+  interconnect providers as suppliers, so the driver is genuinely up.
+  QMI shows IPA control service (49) and Wireless Data Service (1).
+
+  What is missing is `rmnet_ipa0`. That netdev is created by IPA itself
+  in `ipa_modem_start()` (`ipa_modem.c`, `IPA_NETDEV_NAME`), not by the
+  rmnet module, so loading rmnet does not help — it waits on the
+  IPA/modem QMI handshake to finish. That handshake is the open
+  question, and it is the last thing between here and ModemManager
+  seeing a modem.
 
 - **ModemManager**: reads the QRTR bus and enumerates every service, but
   reports "No modems were found". It needs IPA's rmnet/wwan netdevs to
