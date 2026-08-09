@@ -23,6 +23,7 @@ destinations:
 | Bluetooth | `/vendor/firmware/crnv21.bin` | `/lib/firmware/qca/` |
 | WLAN | `/system/vendor/firmware_mnt/image/wlanmdsp.mbn` | `/lib/firmware/` |
 | WLAN board | `/vendor/firmware_mnt/image/bdwlan.bin` | `/lib/firmware/ath10k/WCN3990/hw1.0/board.bin` |
+| IPA | `/vendor/firmware_mnt/image/ipa_fws.mdt` + `ipa_fws.b??` | `/lib/firmware/` |
 
 Known-good hashes on a US998 (yours should match if you are on the same
 firmware; a mismatch is informational, not necessarily wrong):
@@ -157,6 +158,20 @@ Working and device-verified:
 - **ICC/QoS**: 17/17 masters, 0 errors.
 
 Not working:
+
+- **IPA**: the node now exists (see below) and the driver gets to
+  "IPA driver initialized", then fails:
+
+      ipa 1e40000.ipa: Direct firmware load for ipa_fws.mdt failed with error -2
+      ipa 1e40000.ipa: probe with driver ipa failed with error -2
+
+  With `qcom,gsi-loader` absent the AP loads GSI firmware itself
+  ("self" is the default), so `ipa_fws.mdt` and its `.b??` segments must
+  be extracted like the modem's. The alternative is
+  `qcom,gsi-loader = "modem"`, which hands the job to the modem and
+  needs no extra firmware — worth trying first on joan, since the modem
+  is up and healthy. Most sdm845 devices use "self";
+  sc7180-trogdor-lte-sku uses "modem".
 
 - **ModemManager**: reads the QRTR bus and enumerates every service, but
   reports "No modems were found". It needs IPA's rmnet/wwan netdevs to
