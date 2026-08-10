@@ -11,7 +11,7 @@
 - Booted in pmOS from `boot-joan-touch-pwr4.img` (SHA 74dec228..., kernel `7.2.0-rc2-g0d045615328b`) on nym-nest.
 - Keypad works across lock/wake cycles ("seems to work now" — Lance).
 - BT: `hci_uart`/`btqca` loaded, dmesg "QCA setup on UART is completed" at 22.5s, but `bluetoothctl` says "No default controller available". hci0 sysfs is MINIMAL (no type/address/name — partial registration). bluetoothd 5.87 starts clean, adapter_init sends read-version, controller never answers. rfkill unblocked. HCI reset tried. Fresh boot tried. **Lance sees a Bluetooth icon in phosh's top bar (left side) even though no controller is on D-Bus** — worth checking what phosh's BT indicator listens to.
-- pmOS root password: 147147 (also in /tmp/pmos-pass on nym-nest).
+- pmOS tethered login: user `user` / password 147147 (also in /tmp/pmos-pass on nym-nest). NOTE (2026-08-10): root does NOT accept 147147 on this rootfs — use user; root's password differs/locked. Phone at 172.16.42.1 over the USB NCM gadget (host side: 172.16.42.2 on enp0s29u1u5).
 
 ## The keypad fix (the win)
 - `stmfts_set_power()` exported (drivers/input/touchscreen/stmfts.c); `panel-lg-sw43402.c` powers the touch controller OFF at unprepare (before the display's power transition) and re-inits it at prepare.
