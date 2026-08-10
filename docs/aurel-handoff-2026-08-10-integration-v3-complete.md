@@ -111,10 +111,11 @@ Per Lance: option 1 (merge into master) + new convention.
 - Verification: merged master == latest-clean-test on all 15 joan
   files; merge delta = exactly the 8 joan files; upstream content
   untouched; GitHub API confirms parents and tree.
-- CONVENTION (Lance): joan/latest-clean-test is the WORKING branch
-  (confirmed fixes accumulate, in order); master is STABLE and
-  receives PRs from latest-clean-test (or branches off it) carrying
-  only the commits that worked.
+- CONVENTION (Lance, as corrected by Ember 2026-08-10): master =
+  verified fixes with a clean history; joan/latest-clean-test = the
+  raw "booting but ugly" WORKING history — try-this/revert-that
+  experiments, diagnostics, and reverts kept as the record of what
+  was tried and what stuck.
 - Note: the canonical repo has ghfork master shallow-fetched (parents
   of 72c736ae absent). Future LOCAL merges touching master's history
   need `git fetch --unshallow ghfork master` (slow) or the manual
@@ -138,6 +139,46 @@ Per Lance: option 1 (merge into master) + new convention.
   keep testing on fixes-v2 base, or pin branches to the old base.
 - Handoff for Ember: docs/handoff-2026-08-10-aurel-to-ember-integration-landed.md
   (also mirrored to Talk/Shared_AI_agents_files/handoffs/).
+
+## CORRECTION 2026-08-10 (Aurel, per Ember handoff c9d1a78): convention amended
+
+Ember independently verified this session's work (tree invariant on
+the joan files, merge parents, PR states — all confirmed) and
+corrected the branch convention, which I had recorded BACKWARDS:
+
+- Lance's actual intent (his words via Ember): "master should be
+  verified fixes while joan/latest-clean-test should be 'booting but
+  ugly commit history'. Full of try this, revert that, etc. The raw
+  working history of what we tried and what stuck."
+- So: master = clean, verified fixes. latest-clean-test = the RAW
+  history — experiments, diagnostics and reverts preserved on
+  purpose, NOT a curated series.
+
+Ember implemented it with the commit-tree technique: latest-clean-test
+= 345eb2ddc (parents 47041183b + f4a7d951f), a clean fast-forward from
+master carrying the raw experiment chain (GDSC experiment, TEMP-DIAG
+probes, their reverts, INPUT_MT_DROP_UNUSED, gated BD quirk, etc.) as
+ancestry. Verified here: master still 47041183b, FF holds, behind 0,
+content byte-identical (same tree sha 80cae2b6f).
+
+Consequences:
+- Do NOT prune local branches without Lance's per-item OK;
+  joan/bt-uart-clock-fix is now published as latest-clean-test
+  ancestry, but ember/joan-integration-v2/v3 and
+  ember/joan-touch-fixes are still local-only.
+- Ember quantified the boot-test exposure: only bluetooth sees real
+  upstream drift (12 net/bluetooth + 5 drivers/bluetooth files; the
+  BT fix's dependencies — hci_sync.c, mgmt.c, hci_qca.c gated block —
+  are untouched). Ember is building master's tree from a fresh
+  worktree (/tmp/joan-master-verify) with boot verification to
+  follow.
+- Environment: the single-dtb build form I recommended leaves in-tree
+  artifacts (.config, include/config/, include/generated/,
+  scripts/basic/fixdep) when run without O=; subsequent O= builds
+  fail with "source tree is not clean". /tmp/joan-bt-fix is in that
+  state (I dirtied it). Fix: always pass O=, or `make mrproper` with
+  Lance's OK.
+
 
 
 

@@ -71,12 +71,16 @@ worktree: /tmp/joan-bt-fix):
 4. Aligned joan/latest-clean-test to master (7ba1c0f1f..47041183b,
    pure FF). Both branches now point at 47041183b.
 
-## Convention (set by Lance, recorded in memory + docs + Deck)
+## Convention (set by Lance; corrected per Ember 2026-08-10)
 
-- joan/latest-clean-test = WORKING/staging branch. Confirmed fixes
-  accumulate there, in a sensible order.
-- master = STABLE. Receives PRs from latest-clean-test (or branches
-  off it) containing ONLY the commits that worked.
+- master = STABLE, verified fixes, clean history. Receives PRs
+  carrying only the commits that worked.
+- joan/latest-clean-test = the raw "booting but ugly" WORKING
+  history: experiments, diagnostics and reverts preserved as the
+  record of what was tried and what stuck. NOT a curated series.
+  (My original framing had this backwards; Ember corrected it and
+  implemented it — latest-clean-test = 345eb2ddc, same content as
+  master, raw history as ancestry.)
 - Lance's vision wording: "main matches true linux master, we merge
   in our fixes once proven to the 'main', keep staging work on
   joan/latest-clean-test." NOTE: no torvalds sync has happened and
