@@ -5,7 +5,13 @@ command=/usr/local/sbin/joan-bt-address
 
 depend() {
 	before bluetooth
-	need dev
+	# Soft ordering only. "need dev" looks right but there is no "dev"
+	# service on postmarketOS (it uses devfs/udev), and an unsatisfiable
+	# need makes OpenRC refuse to start this service at all -- silently,
+	# since it then never appears in rc-status either. The script waits
+	# for hci0 on its own, so ordering is a convenience, not a
+	# requirement.
+	after udev modules
 }
 
 start() {
