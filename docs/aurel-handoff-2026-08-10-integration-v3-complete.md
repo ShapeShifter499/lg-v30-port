@@ -121,5 +121,24 @@ Per Lance: option 1 (merge into master) + new convention.
   commit-tree construction documented here; GitHub-side PR flow is
   unaffected.
 
+## FINAL 2026-08-10 (Aurel): branches aligned, session banked
+
+- joan/latest-clean-test fast-forwarded 7ba1c0f1f -> 47041183b and
+  pushed; master and joan/latest-clean-test now BOTH point at
+  47041183b (byte-identical, verified by ancestry + zero joan-file
+  gap).
+- Clarification recorded: NO upstream code was pulled in during this
+  session — all fetches were from ghfork only. The 148-commit
+  upstream line was already on master before any of this work (the
+  fork's master had advanced past the joan working base before PR #5
+  merged). The merge only overlaid the 8 differing joan files.
+- Open decision (Lance): master's combined tree (newer upstream base
+  + tested joan files) has not been booted as a unit; tested combo =
+  ember/joan-fixes-v2. Lance to choose: boot-test master's tree,
+  keep testing on fixes-v2 base, or pin branches to the old base.
+- Handoff for Ember: docs/handoff-2026-08-10-aurel-to-ember-integration-landed.md
+  (also mirrored to Talk/Shared_AI_agents_files/handoffs/).
+
+
 
 
