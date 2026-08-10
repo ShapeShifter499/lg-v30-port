@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+
+description="Give joan's Bluetooth controller a public BD address"
+command=/usr/local/sbin/joan-bt-address
+
+depend() {
+	before bluetooth
+	need dev
+}
+
+start() {
+	ebegin "Configuring the Bluetooth public address"
+	"$command"
+	eend $?
+}
+
+stop() {
+	# The address lives in the controller until it is powered down;
+	# there is nothing to undo.
+	return 0
+}

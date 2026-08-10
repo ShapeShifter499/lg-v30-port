@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# Give joan's Bluetooth controller a public BD address.
+#
+# The WCN3990 on joan has no factory address. The NVM's address TLV
+# (qca/crnv21.bin, tag 2, length 6) is all zeroes, and LG's vendor stack
+# generates a random address on first use and keeps it in
+# /persist/bluetooth/.bt_nv.bin -- a path that does not exist on this
+# device, so there is nothing to recover.
+#
+# With no address, the kernel registers hci0 as HCI_UNCONFIGURED and
+# bluetoothd will not adopt it ("No default controller available"). The
+# supported way out is for userspace to supply one over the mgmt
+# interface, which also programs it into the controller.
+#
+# Derive the address from the fused SoC serial rather than at random, so
+# it is stable across reboots and unique per device, with no per-device
+# value baked into the device tree or this script.
+
+set -eu
+
+SERIAL_FILE=/sys/devices/soc0/serial_number
+HCI_SYSFS=/sys/class/bluetooth/hci0
+WAIT_SECS=30
+
+if [ ! -r "$SERIAL_FILE" ]; then
+	echo "joan-bt-address: cannot read $SERIAL_FILE" >&2
+	exit 1
+fi
+serial=$(cat "$SERIAL_FILE")
+
+# 0x02 in the first octet: unicast, locally administered.
+mac=$(printf '02:00:%02X:%02X:%02X:%02X' \
+	$(( (serial >> 24) & 255 )) $(( (serial >> 16) & 255 )) \
+	$(( (serial >>  8) & 255 )) $((  serial        & 255 )))
+
+# hci0 only appears once hci_uart has loaded and the QCA firmware
+# download has completed, which is ~20s into boot on this device.
+waited=0
+while [ ! -d "$HCI_SYSFS" ]; do
+	if [ "$waited" -ge "$WAIT_SECS" ]; then
+		echo "joan-bt-address: $HCI_SYSFS did not appear in ${WAIT_SECS}s" >&2
+		exit 1
+	fi
+	sleep 1
+	waited=$((waited + 1))
+done
+
+if ! command -v btmgmt >/dev/null 2>&1; then
+	echo "joan-bt-address: btmgmt missing (apk add bluez-btmgmt)" >&2
+	exit 1
+fi
+
+echo "joan-bt-address: SoC serial $serial -> $mac"
+btmgmt --index 0 public-addr "$mac"
