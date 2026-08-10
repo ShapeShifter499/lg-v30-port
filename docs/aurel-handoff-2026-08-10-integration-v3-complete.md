@@ -179,6 +179,21 @@ Consequences:
   state (I dirtied it). Fix: always pass O=, or `make mrproper` with
   Lance's OK.
 
+## PRUNED 2026-08-10 (Lance approved per-item)
+
+- Deleted local-only branches: ember/joan-integration-v3 (was
+  7ba1c0f1f — fully published as latest-clean-test ancestry),
+  ember/joan-integration-v2 (was 56b64365e — content fully covered,
+  commits superseded re-applies), ember/joan-touch-fixes (was
+  6f9d93774 — content fully covered, patches byte-identical to
+  fixes-v2). No worktrees were using them; verified gone.
+- /tmp/joan-bt-fix mrproper'd (in-tree dtb-build dirt removed).
+- Kept: verify/master-tip (Ember's marker at master tip),
+  ember/joan-fixes-v2 (device-tested ground truth),
+  ember/joan-touch-clean, joan/bt-uart-clock-fix (published
+  ancestry), all joan/* experiment branches.
+
+
 
 
 
