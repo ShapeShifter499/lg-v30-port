@@ -104,17 +104,25 @@ under review, so no force-push):
 Both verified to build: `hci_qca.o` compiles clean, and `fdtget` confirms
 the placeholder lands in the DTB.
 
-**Device side** (`device/` in the port repo, not yet installed):
+**Device side** (`device/` in the port repo, installed and enabled):
 
 - `usr/local/sbin/joan-bt-address` — derives a locally-administered
-  address from the fused SoC serial and applies it with
-  `btmgmt --index 0 public-addr`. Waits up to 30s for `hci0`, since the
-  controller only appears ~20s into boot.
-- `etc/init.d/joan-bt-address` — openrc service, `before bluetooth`.
-- Needs `apk add bluez-btmgmt` on the rootfs.
+  address from the fused SoC serial and applies it over the mgmt control
+  socket. Waits up to 30s for `hci0`, since the controller only appears
+  ~20s into boot.
+- `etc/init.d/joan-bt-address` — openrc service, `before bluetooth`,
+  added to the `default` runlevel.
+
+It speaks mgmt directly rather than shelling out to `btmgmt`, because
+joan has no route off the USB link (`172.16.0.0/16 dev usb0` is its only
+route) so `apk` cannot reach the Alpine mirrors. python3 is already on the
+rootfs, so the service needs no packages at all.
 
 joan's SoC serial is `2695651760` = `0xA0AC61B0`, giving
 **`02:00:A0:AC:61:B0`** (unicast, locally administered).
+
+Note `/usr/local/sbin` does not exist on the pmOS rootfs and has to be
+created.
 
 ## Proven live, no rebuild and no reboot
 
@@ -139,9 +147,36 @@ returned **15 devices with live RSSI**, including the same ResMed CPAP
 This state is live but not persistent — it is gone on the next reboot
 until the openrc service is installed.
 
-## Separate finding: a real bug in the touch fix
+## Staged and ready to boot
 
-Not BT, but it fires three times per boot and taints the kernel:
+`out/boot-joan-bt-unconf-fix.img` — sealed and copied to nym-nest as
+`/tmp/boot-joan-bt-unconf-fix.img`, md5 `b96d3e5843448a9305cbec97bf22858b`.
+
+- Kernel `7.2.0-rc2-gb3ea8a9cdca6`, extracted back out of the sealed
+  image and checked rather than assumed (the stale-gz trap nearly caught
+  me this session — see below).
+- Image 47.32 MB uncompressed, well under the ~55.5 MB cap.
+- `local-bd-address` confirmed present in the image's DTB.
+- Modules for this release are already installed on joan's rootfs
+  (`/lib/modules/7.2.0-rc2-gb3ea8a9cdca6`, 29.5 MB, `depmod` run, 1596
+  entries; `hci_uart`, `btqca` and `ath10k_snoc` all resolvable). The
+  running kernel is untouched.
+
+Nothing has been booted. On the next boot the full chain gets its real
+test: DT placeholder -> quirk -> HCI_UNCONFIGURED -> openrc service ->
+configured controller.
+
+**A process note worth keeping.** I lost time to a false build signal:
+`nohup make ... &` inside a backgrounded tool call meant the harness saw
+the *wrapper shell* exit 0, not `make`. I reported a clean build and read
+sizes off artifacts that were two hours stale, from someone else's build.
+Comparing artifact mtimes against the commit timestamp is what caught it.
+Do not double-background, and check mtimes before sealing.
+
+## Separate finding, now fixed: the touch power state
+
+`b3ea8a9cd` fixes this. It fired three times per boot and tainted the
+kernel:
 
     Unbalanced enable for IRQ 75
     WARNING: kernel/irq/manage.c:774 at __enable_irq+0x4c/0x80
@@ -163,9 +198,20 @@ and never updates the flag either. Consequences:
 
 That desync is a plausible cause of the very symptom the commit's own
 comment is working around ("frozen keypad after wake #2 ... runtime PM
-thinks it is active"). Worth fixing before that commit goes near a PR —
-either move the guard into `stmfts_power_on()`/`stmfts_power_off()`, or
-have `stmfts_runtime_resume()` go through `stmfts_set_power()`.
+thinks it is active").
+
+Fixed in `b3ea8a9cd` by moving the state tracking into
+`stmfts_power_on()`/`stmfts_power_off()` themselves, so every caller —
+probe, runtime PM, system PM and the panel — goes through one guard and
+the flag always describes the hardware. The wake re-init still happens,
+just once instead of twice. **Unverified on device**: it compiles clean
+and the reasoning is solid, but the warning going away and the keypad
+still working across lock/wake needs the next boot to confirm.
+
+One thing I left alone: `stmfts_set_power()` is exported with no header
+declaration, so it builds with `-Wmissing-prototypes` and the panel
+driver must be declaring it locally. That is Aurel's design call, not a
+correctness bug, so I did not touch it.
 
 ## Still open
 
