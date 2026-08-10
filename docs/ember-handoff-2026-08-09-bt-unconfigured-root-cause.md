@@ -195,12 +195,48 @@ Kernel `7.2.0-rc2-gb3ea8a9cdca6` confirmed running.
      invisible to the dependency tree.
 
   Fixed in `868993d`: soft `after` ordering, and stamp installed files
-  with a real date via `touch -d`. After that `rc-status` lists the
-  service and the deptree stamp advances. **Autostart itself is still
-  unproven** — it needs one more boot to confirm.
+  with a real date via `touch -d`.
 
 Trap #2 is the one worth carrying forward: it will silently break
 *anything* installed on this rootfs, not just this service.
+
+## Autostart proven — lane closed (2026-08-10)
+
+Second RAM boot of the same image, with nothing run on the device
+afterwards:
+
+    joan-bt-address                    [ started ]
+    Controller 02:00:A0:AC:61:B0 LG V30 [default]
+    deptree stamp: 2026-08-10           (cache invalidation working)
+    Unbalanced enable for IRQ:          0
+    discovery:                          16 devices
+    ath10k modules:                     loaded
+
+Controller powered, public address, class `0x000c020c`, BR/EDR + LE, full
+profile set — matching the originally proven session.
+
+The whole chain now works unattended:
+
+    DT zero placeholder
+      -> quirk set only because the property exists
+      -> HCI_UNCONFIGURED (honest: the controller has no address)
+      -> openrc service derives 02:00:A0:AC:61:B0 from the fused SoC serial
+      -> mgmt SET_PUBLIC_ADDRESS programs it into the controller
+      -> bluetoothd adopts it
+
+## How this compares to Android
+
+Worth recording, because it is the opposite of what you would assume.
+LG's stack does **not** have a factory address either — `btnvtool`
+generates a *random* one on first use (`Writing Random BD_ADDR`) and
+persists it to `/persist/bluetooth/.bt_nv.bin`. Wipe that file and the
+phone gets a different BT MAC.
+
+Ours derives from a hardware fuse, so it needs no storage and is identical
+on every boot. Two honest consequences: it will not match whatever
+LineageOS used, so **existing pairings do not carry over**; and it is
+*predictable* from the SoC serial, which is fine here but is a real
+property rather than a nit.
 
 **A process note worth keeping.** I lost time to a false build signal:
 `nohup make ... &` inside a backgrounded tool call meant the harness saw
