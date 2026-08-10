@@ -76,8 +76,21 @@ vote once at probe and never drops it:
 Downstream KGSL instead drops the bus vote on every power transition
 (`msm_bus_scale_client_update_request(pwr->pcl, buslevel)`) and gates SPTP
 collapse on `A5XX_GPMU_SP_PWR_CLK_STATUS`. So mainline collapses the power
-domain **with an ICC vote still outstanding** — a concrete candidate for
-the wedge. Worth testing before anything more speculative.
+domain **with an ICC vote still outstanding**, where the vendor does not.
+
+**Chronology rules this out as the original cause**, and I had it wrong in
+the first draft of this document. The vote is ours, added by `7d9b74b7f`
+on 2026-08-04 along with the msm8998 ICC driver itself — two days *after*
+the pin. On 2026-08-02 there was no mainline interconnect driver for this
+SoC at all ("the 8998 GPU previously ran without any bus-bandwidth
+scaling"), so whatever wedged then was the hardware NoC, not a vote we
+were holding.
+
+It is still worth testing, but as "does holding the vote across collapse
+make things worse, and does dropping it on suspend help now" — not as an
+explanation of the original breakage. The experiment is cheap: drop the
+`gfx-mem` vote in the a5xx suspend path, restore it on resume, and retry
+the unpin.
 
 Cost of the workaround is real: an idle screen-off phone keeps the GPU
 domain powered.
