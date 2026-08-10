@@ -1,55 +1,150 @@
-#!/bin/sh
-#
-# Give joan's Bluetooth controller a public BD address.
-#
-# The WCN3990 on joan has no factory address. The NVM's address TLV
-# (qca/crnv21.bin, tag 2, length 6) is all zeroes, and LG's vendor stack
-# generates a random address on first use and keeps it in
-# /persist/bluetooth/.bt_nv.bin -- a path that does not exist on this
-# device, so there is nothing to recover.
-#
-# With no address, the kernel registers hci0 as HCI_UNCONFIGURED and
-# bluetoothd will not adopt it ("No default controller available"). The
-# supported way out is for userspace to supply one over the mgmt
-# interface, which also programs it into the controller.
-#
-# Derive the address from the fused SoC serial rather than at random, so
-# it is stable across reboots and unique per device, with no per-device
-# value baked into the device tree or this script.
+#!/usr/bin/env python3
+"""Give joan's Bluetooth controller a public BD address.
 
-set -eu
+The WCN3990 on joan has no factory address. The NVM's address TLV
+(qca/crnv21.bin, tag 2, length 6) is all zeroes, and LG's vendor stack
+generates a random address on first use and keeps it in
+/persist/bluetooth/.bt_nv.bin -- a path that does not exist on this
+device, so there is nothing to recover.
 
-SERIAL_FILE=/sys/devices/soc0/serial_number
-HCI_SYSFS=/sys/class/bluetooth/hci0
-WAIT_SECS=30
+Without an address the kernel registers hci0 as HCI_UNCONFIGURED and
+bluetoothd never adopts it ("No default controller available"). The
+supported way out is for userspace to supply one over the mgmt interface,
+which also programs it into the controller itself.
 
-if [ ! -r "$SERIAL_FILE" ]; then
-	echo "joan-bt-address: cannot read $SERIAL_FILE" >&2
-	exit 1
-fi
-serial=$(cat "$SERIAL_FILE")
+Derive the address from the fused SoC serial rather than at random, so it
+is stable across reboots and unique per device, with no per-device value
+baked into the device tree or into this script.
 
-# 0x02 in the first octet: unicast, locally administered.
-mac=$(printf '02:00:%02X:%02X:%02X:%02X' \
-	$(( (serial >> 24) & 255 )) $(( (serial >> 16) & 255 )) \
-	$(( (serial >>  8) & 255 )) $((  serial        & 255 )))
+Speaks the mgmt protocol directly so the device needs no extra packages;
+joan has no route to the Alpine mirrors to install bluez-btmgmt.
+"""
 
-# hci0 only appears once hci_uart has loaded and the QCA firmware
-# download has completed, which is ~20s into boot on this device.
-waited=0
-while [ ! -d "$HCI_SYSFS" ]; do
-	if [ "$waited" -ge "$WAIT_SECS" ]; then
-		echo "joan-bt-address: $HCI_SYSFS did not appear in ${WAIT_SECS}s" >&2
-		exit 1
-	fi
-	sleep 1
-	waited=$((waited + 1))
-done
+import ctypes
+import os
+import socket
+import struct
+import sys
+import time
 
-if ! command -v btmgmt >/dev/null 2>&1; then
-	echo "joan-bt-address: btmgmt missing (apk add bluez-btmgmt)" >&2
-	exit 1
-fi
+SERIAL_FILE = "/sys/devices/soc0/serial_number"
+HCI_SYSFS = "/sys/class/bluetooth/hci0"
+WAIT_SECS = 30
 
-echo "joan-bt-address: SoC serial $serial -> $mac"
-btmgmt --index 0 public-addr "$mac"
+AF_BLUETOOTH = 31
+BTPROTO_HCI = 1
+HCI_CHANNEL_CONTROL = 3
+HCI_DEV_NONE = 0xFFFF
+
+MGMT_OP_READ_INDEX_LIST = 0x0003
+MGMT_OP_READ_UNCONF_INDEX_LIST = 0x0036
+MGMT_OP_SET_PUBLIC_ADDRESS = 0x0039
+MGMT_EV_CMD_COMPLETE = 0x0001
+
+
+def log(msg):
+    print("joan-bt-address: %s" % msg, flush=True)
+
+
+def derive_address():
+    with open(SERIAL_FILE) as fh:
+        serial = int(fh.read().strip())
+    # 0x02 in the first octet: unicast, locally administered.
+    octets = (0x02, 0x00,
+              (serial >> 24) & 0xFF, (serial >> 16) & 0xFF,
+              (serial >> 8) & 0xFF, serial & 0xFF)
+    return serial, ":".join("%02X" % o for o in octets)
+
+
+def wait_for_hci0():
+    """hci0 appears only once hci_uart has loaded and the QCA firmware
+    download has finished, which is ~20s into boot on this device."""
+    for _ in range(WAIT_SECS):
+        if os.path.isdir(HCI_SYSFS):
+            return True
+        time.sleep(1)
+    return os.path.isdir(HCI_SYSFS)
+
+
+class Mgmt:
+    def __init__(self):
+        libc = ctypes.CDLL("libc.so.6", use_errno=True)
+        self.sock = socket.socket(AF_BLUETOOTH,
+                                  socket.SOCK_RAW | socket.SOCK_CLOEXEC,
+                                  BTPROTO_HCI)
+        sa = struct.pack("<HHH", AF_BLUETOOTH, HCI_DEV_NONE,
+                         HCI_CHANNEL_CONTROL)
+        if libc.bind(self.sock.fileno(), ctypes.c_char_p(sa), len(sa)) != 0:
+            raise OSError(ctypes.get_errno(),
+                          "cannot bind the mgmt control socket "
+                          "(needs CAP_NET_ADMIN)")
+
+    def cmd(self, op, index=HCI_DEV_NONE, params=b"", timeout=5):
+        self.sock.send(struct.pack("<HHH", op, index, len(params)) + params)
+        self.sock.settimeout(timeout)
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            pkt = self.sock.recv(1024)
+            ev, _, length = struct.unpack("<HHH", pkt[:6])
+            body = pkt[6:6 + length]
+            if ev == MGMT_EV_CMD_COMPLETE and \
+                    struct.unpack("<H", body[:2])[0] == op:
+                return body[2], body[3:]
+        raise TimeoutError("no reply to mgmt opcode 0x%04x" % op)
+
+    def index_list(self, op):
+        status, resp = self.cmd(op)
+        if status != 0 or len(resp) < 2:
+            return []
+        count = struct.unpack("<H", resp[:2])[0]
+        return list(struct.unpack("<%dH" % count, resp[2:2 + 2 * count]))
+
+
+def main():
+    try:
+        serial, mac = derive_address()
+    except (OSError, ValueError) as err:
+        log("cannot derive an address from %s: %s" % (SERIAL_FILE, err))
+        return 1
+
+    log("SoC serial %d -> %s" % (serial, mac))
+
+    if not wait_for_hci0():
+        log("%s did not appear within %ds" % (HCI_SYSFS, WAIT_SECS))
+        return 1
+
+    try:
+        mgmt = Mgmt()
+    except OSError as err:
+        log("%s" % err)
+        return 1
+
+    if 0 in mgmt.index_list(MGMT_OP_READ_INDEX_LIST):
+        log("hci0 is already configured, nothing to do")
+        return 0
+
+    if 0 not in mgmt.index_list(MGMT_OP_READ_UNCONF_INDEX_LIST):
+        log("hci0 is in neither index list; not touching it")
+        return 1
+
+    # bdaddr_t is stored least-significant octet first.
+    packed = bytes(int(o, 16) for o in reversed(mac.split(":")))
+    status, _ = mgmt.cmd(MGMT_OP_SET_PUBLIC_ADDRESS, index=0, params=packed)
+    if status != 0:
+        log("SET_PUBLIC_ADDRESS rejected, mgmt status %d" % status)
+        return 1
+
+    # The kernel drops the index and re-adds it once the controller has
+    # powered on with the new address; give it a moment to come back.
+    for _ in range(10):
+        time.sleep(1)
+        if 0 in mgmt.index_list(MGMT_OP_READ_INDEX_LIST):
+            log("hci0 configured as %s" % mac)
+            return 0
+
+    log("address accepted but hci0 has not reappeared as configured")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
