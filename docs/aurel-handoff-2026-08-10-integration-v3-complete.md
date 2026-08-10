@@ -78,3 +78,23 @@ relative to latest-clean-test; superseding/closing them is Lance's
 call. ember/joan-integration-v3 and ember/joan-integration-v2 remain
 as local landmarks (v3 == latest-clean-test tip).
 
+## UPDATE 2026-08-10 (Aurel): PRs closed, latest-clean-test canonical
+
+Per Lance's direction ("close out any current PRs since we are trying
+to make joan/latest-clean-test the proper main branch"):
+
+- PR #6 (joan/integration-20260808) — CLOSED 2026-08-10T18:02Z,
+  superseded by latest-clean-test.
+- PR #7 (joan/bt-uart-clock-fix) — CLOSED 2026-08-10T18:03Z,
+  superseded by latest-clean-test; close comment documents the
+  ungated-quirk hazard in the old series.
+- gh pr list --state open now returns [].
+- Deck card 86 comment filed.
+
+Next candidate (not done, Lance's call): repoint master at
+joan/latest-clean-test — non-fast-forward (master holds the PR #5
+battery variants, latest-clean-test holds the re-applied series of
+the same tree), so it needs an explicit decision and a force/merge
+strategy before anything touches the default branch.
+
+
