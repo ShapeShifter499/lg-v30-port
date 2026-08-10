@@ -97,4 +97,29 @@ battery variants, latest-clean-test holds the re-applied series of
 the same tree), so it needs an explicit decision and a force/merge
 strategy before anything touches the default branch.
 
+## UPDATE 2026-08-10 (Aurel): master merged — convention set
+
+Per Lance: option 1 (merge into master) + new convention.
+
+- master merged: 47041183b (parents 72c736ae + 7ba1c0f1f), pushed
+  72c736ae..47041183b. Master turned out to be 148 upstream commits
+  ahead of the shared PR #4 merge base (v7.2-rc era fixes). The
+  15-file joan set had ZERO overlap with that upstream drift, so the
+  merge overlays the confirmed joan stack losslessly — only 8 joan
+  files actually differed (the other 7 battery files were already
+  byte-identical between PR #5 and the re-applied series).
+- Verification: merged master == latest-clean-test on all 15 joan
+  files; merge delta = exactly the 8 joan files; upstream content
+  untouched; GitHub API confirms parents and tree.
+- CONVENTION (Lance): joan/latest-clean-test is the WORKING branch
+  (confirmed fixes accumulate, in order); master is STABLE and
+  receives PRs from latest-clean-test (or branches off it) carrying
+  only the commits that worked.
+- Note: the canonical repo has ghfork master shallow-fetched (parents
+  of 72c736ae absent). Future LOCAL merges touching master's history
+  need `git fetch --unshallow ghfork master` (slow) or the manual
+  commit-tree construction documented here; GitHub-side PR flow is
+  unaffected.
+
+
 
