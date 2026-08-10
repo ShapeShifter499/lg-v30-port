@@ -62,11 +62,20 @@ is 0 at *any* `inactive_period`, and why Aurel's later 5-minute GDSC
 change measured as a no-op. Two workarounds for one thing, the second
 unaware of the first.
 
-**Retest run and failed.** Lifting the pin on the theory that the ICC work
-since 2026-08-02 had made collapse safe hung the device at the LG logo —
-autosuspend fires ~250 ms after probe, collapse wedges the interconnect,
-boot dies there. USB came up as `18d1:d00d`, recovered by force-restart,
-nothing flashed, reverted in `b79ba8084`.
+**Retest run and appeared to fail — but the result is confounded and has
+been withdrawn.** Lifting the pin hung the device at the LG logo, and this
+document originally read that as confirmation the pin is load-bearing. The
+image booted for that test carried a kernel ~1 MB smaller than every
+image that booted successfully, built from a `.config` that has since been
+deleted along with its build directory. An eleven-line deletion cannot
+account for that, and a kernel missing that much driver hangs at the logo
+regardless of the pin. Full analysis in
+`ember-2026-08-10-unpin-result-was-confounded.md`.
+
+**The pin's status is unknown, not confirmed necessary.** Retest staged as
+`out/boot-joan-icc-suspend.img`, size-consistent with the working family.
+USB came up as `18d1:d00d`, recovered by force-restart, nothing flashed,
+reverted in `b79ba8084`.
 
 **Research lead for the real fix.** Mainline sets the GPU's interconnect
 vote once at probe and never drops it:

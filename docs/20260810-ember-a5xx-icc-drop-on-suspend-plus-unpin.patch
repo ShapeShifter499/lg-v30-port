@@ -1,0 +1,115 @@
+diff --git a/drivers/gpu/drm/msm/adreno/a5xx_gpu.c b/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
+index 0e563c893..bc591e4b5 100644
+--- a/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
++++ b/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
+@@ -1347,12 +1347,20 @@ static void a5xx_dump(struct msm_gpu *gpu)
+ static int a5xx_pm_resume(struct msm_gpu *gpu)
+ {
+ 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
++	struct a5xx_gpu *a5xx_gpu = to_a5xx_gpu(adreno_gpu);
+ 	int ret;
+ 
++	/* Restore the bus vote before the GPU can issue any memory traffic */
++	if (a5xx_gpu->gfx_mem_path)
++		icc_set_bw(a5xx_gpu->gfx_mem_path, 0, a5xx_gpu->gfx_mem_peak_bw);
++
+ 	/* Turn on the core power */
+ 	ret = msm_gpu_pm_resume(gpu);
+-	if (ret)
++	if (ret) {
++		if (a5xx_gpu->gfx_mem_path)
++			icc_set_bw(a5xx_gpu->gfx_mem_path, 0, 0);
+ 		return ret;
++	}
+ 
+ 	/* Adreno 505, 506, 508, 509, 510, 512 needs manual RBBM sus/res control */
+ 	if (!(adreno_is_a530(adreno_gpu) || adreno_is_a540(adreno_gpu))) {
+@@ -1418,9 +1426,22 @@ static int a5xx_pm_suspend(struct msm_gpu *gpu)
+ 		gpu_write(gpu, REG_A5XX_RBBM_BLOCK_SW_RESET_CMD, 0x00000000);
+ 	}
+ 
++	/*
++	 * Drop the gfx-mem vote before the power domain collapses. The VBIF
++	 * XIN ports are halted above, so nothing is in flight to the bus by
++	 * this point, and downstream KGSL likewise re-votes the bus on every
++	 * power transition rather than holding a peak vote across collapse.
++	 */
++	if (a5xx_gpu->gfx_mem_path)
++		icc_set_bw(a5xx_gpu->gfx_mem_path, 0, 0);
++
+ 	ret = msm_gpu_pm_suspend(gpu);
+-	if (ret)
++	if (ret) {
++		if (a5xx_gpu->gfx_mem_path)
++			icc_set_bw(a5xx_gpu->gfx_mem_path, 0,
++				   a5xx_gpu->gfx_mem_peak_bw);
+ 		return ret;
++	}
+ 
+ 	if (a5xx_gpu->has_whereami)
+ 		for (i = 0; i < gpu->nr_rings; i++)
+@@ -1770,9 +1791,11 @@ static struct msm_gpu *a5xx_gpu_init(struct drm_device *dev)
+ 
+ 		if (!IS_ERR_OR_NULL(icc_path)) {
+ 			/* Max bandwidth for now; scale with devfreq later. */
+-			icc_set_bw(icc_path, 0, Bps_to_icc(gpu->fast_rate) * 8);
+-			dev_info(&pdev->dev, "gfx-mem interconnect: %llu Bps\n",
+-				 Bps_to_icc(gpu->fast_rate) * 8ULL);
++			a5xx_gpu->gfx_mem_path = icc_path;
++			a5xx_gpu->gfx_mem_peak_bw = Bps_to_icc(gpu->fast_rate) * 8;
++			icc_set_bw(icc_path, 0, a5xx_gpu->gfx_mem_peak_bw);
++			dev_info(&pdev->dev, "gfx-mem interconnect: %u Bps\n",
++				 a5xx_gpu->gfx_mem_peak_bw);
+ 		}
+ 	}
+ 
+diff --git a/drivers/gpu/drm/msm/adreno/a5xx_gpu.h b/drivers/gpu/drm/msm/adreno/a5xx_gpu.h
+index 407bb950d..99cff750d 100644
+--- a/drivers/gpu/drm/msm/adreno/a5xx_gpu.h
++++ b/drivers/gpu/drm/msm/adreno/a5xx_gpu.h
+@@ -4,6 +4,8 @@
+ #ifndef __A5XX_GPU_H__
+ #define __A5XX_GPU_H__
+ 
++#include <linux/interconnect.h>
++
+ #include "adreno_gpu.h"
+ 
+ /* Bringing over the hack from the previous targets */
+@@ -27,6 +29,14 @@ struct a5xx_gpu {
+ 
+ 	uint32_t lm_leakage;
+ 
++	/*
++	 * gfx-mem bus vote. Held while the GPU is resumed and dropped over
++	 * power collapse, the way downstream KGSL scales it on every power
++	 * transition. NULL on boards with no interconnect provider.
++	 */
++	struct icc_path *gfx_mem_path;
++	u32 gfx_mem_peak_bw;
++
+ 	struct msm_ringbuffer *cur_ring;
+ 	struct msm_ringbuffer *next_ring;
+ 
+diff --git a/drivers/gpu/drm/msm/adreno/adreno_device.c b/drivers/gpu/drm/msm/adreno/adreno_device.c
+index fb4320b56..7f20320ef 100644
+--- a/drivers/gpu/drm/msm/adreno/adreno_device.c
++++ b/drivers/gpu/drm/msm/adreno/adreno_device.c
+@@ -120,17 +120,6 @@ struct msm_gpu *adreno_load_gpu(struct drm_device *dev)
+ 		goto err_put_rpm;
+ 	}
+ 
+-	/*
+-	 * Runtime power collapse leaves the A540 interconnect wedged on MSM8998.
+-	 * Hold a device-managed reference until the collapse sequence is fixed.
+-	 * System sleep still reaches the runtime callbacks through force suspend.
+-	 */
+-	if (adreno_is_a540(adreno_gpu)) {
+-		ret = devm_pm_runtime_get_noresume(&pdev->dev);
+-		if (ret)
+-			goto err_put_rpm;
+-	}
+-
+ 	pm_runtime_put_autosuspend(&pdev->dev);
+ 
+ #ifdef CONFIG_DEBUG_FS
