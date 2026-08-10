@@ -162,9 +162,45 @@ until the openrc service is installed.
   entries; `hci_uart`, `btqca` and `ath10k_snoc` all resolvable). The
   running kernel is untouched.
 
-Nothing has been booted. On the next boot the full chain gets its real
-test: DT placeholder -> quirk -> HCI_UNCONFIGURED -> openrc service ->
-configured controller.
+## Boot test result (2026-08-10)
+
+RAM-booted from nym-nest, `fastboot boot` OKAY in 5.7s, nothing flashed.
+Kernel `7.2.0-rc2-gb3ea8a9cdca6` confirmed running.
+
+- **PASS — stmfts warning gone.** `Unbalanced enable for IRQ 75` count is
+  **0**, down from 3 per boot. The kernel still reports `tainted=512`, but
+  that is `gcc_rx1_usb2_clkref_clk status stuck at 'on'` from
+  `clk_branch_toggle` at 4.18s — pre-existing and unrelated.
+- **PASS — the kernel fix behaves as designed.** hci0 came up in the
+  *unconfigured* index list rather than silently carrying a zero address,
+  which is exactly what the DT placeholder plus the gated quirk should
+  produce.
+- **PASS — modules load** from the freshly installed tree: `hci_uart`,
+  `btqca`, `ath10k_snoc` all present.
+- **PASS — the service configures the controller** when it runs: hci0
+  moves to the configured list and `bluetoothctl` shows
+  `Controller 02:00:A0:AC:61:B0 LG V30 [default]`.
+- **FAIL, now fixed — it did not autostart.** Two independent silent
+  faults, both in my own device-side work rather than the kernel:
+
+  1. `need dev` is unsatisfiable on postmarketOS (no `/etc/init.d/dev`;
+     it uses devfs/udev). OpenRC refuses the service *and* omits it from
+     `rc-status` entirely, so it reads as "never enabled" rather than as
+     a dependency failure.
+  2. The device clock runs **backwards** through boot — `rtc-pm8xxx` sets
+     it to 1970-02-05 at 15.7s — so files installed afterwards carry 1970
+     mtimes. OpenRC stamps `/run/openrc/deptree` with the newest
+     init-script mtime it scanned (2026-07-25 here) and rebuilds only when
+     something looks newer. A 1970 file never does, so the service stayed
+     invisible to the dependency tree.
+
+  Fixed in `868993d`: soft `after` ordering, and stamp installed files
+  with a real date via `touch -d`. After that `rc-status` lists the
+  service and the deptree stamp advances. **Autostart itself is still
+  unproven** — it needs one more boot to confirm.
+
+Trap #2 is the one worth carrying forward: it will silently break
+*anything* installed on this rootfs, not just this service.
 
 **A process note worth keeping.** I lost time to a false build signal:
 `nohup make ... &` inside a backgrounded tool call meant the harness saw
