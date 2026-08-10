@@ -55,3 +55,26 @@ New branch `ember/joan-integration-v3` from the battery-series tip
 - Nothing pushed: deciding how to land v3 (supersede PR #7 with a
   corrected PR, separate touch PR from ember/joan-touch-fixes, etc.)
   is Lance's call.
+
+## UPDATE 2026-08-10 (Aurel): LANDED on joan/latest-clean-test
+
+Per Lance's direction ("pull in all confirmed fixes into
+joan/latest-clean-test in order of what makes sense"), the v3 history
+is now the joan/latest-clean-test branch:
+
+- Local: joan/latest-clean-test fast-forwarded 4dcd16654 ->
+  7ba1c0f1f (via remote 3c5618704).
+- Remote: pushed 3c5618704..7ba1c0f1f to ghfork
+  (ShapeShifter499/linux-lg-v30-joan), plain fast-forward, no force.
+- Final order (bottom to top): touchscreen (3) -> battery (8) ->
+  modem bring-up (5: enable modem, gnoc, IPA mem, modem GSI, GSI on
+  AP) -> bluetooth (5: BT node, crnv21, UART/NVM, gated BD address,
+  DTS placeholder) -> Wi-Fi initial work (1).
+- Tree verified byte-identical to the device-tested ember/joan-fixes-v2;
+  joan DTB builds clean.
+
+Still open: PR #6 (joan/integration-20260808) and PR #7 are now stale
+relative to latest-clean-test; superseding/closing them is Lance's
+call. ember/joan-integration-v3 and ember/joan-integration-v2 remain
+as local landmarks (v3 == latest-clean-test tip).
+
