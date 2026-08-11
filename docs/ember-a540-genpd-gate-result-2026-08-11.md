@@ -216,3 +216,82 @@ Bisect against the reproducible ~17-18 s point rather than the GPU. The boot
 partition mount is the last coherent milestone in all three runs; the next
 question is what pmOS init does immediately after it, and whether the reset is
 driven by that or by something asynchronous that merely lands there.
+
+---
+
+## Addendum 2 — clock-disable class ruled out; the death tracks SD-card I/O
+
+Fourth RAM boot, same binary `93cc2be54`, cmdline `joan_gpu_gate=0
+clk_ignore_unused`.
+
+### Why it was worth testing
+
+A DT/driver wiring audit found `GCC_GPU_SNOC_DVM_GFX_CLK` (gcc index 78) is
+referenced by **no** `clocks =` property anywhere in the joan DT and carries no
+`CLK_IS_CRITICAL` flag, while its GPU siblings 75/76/77/176 are all claimed by
+the GPU node. `clk_disable_unused` therefore switched it off at ~4.36 s in every
+prior run. That is the same failure shape as the July 2026
+`GCC_GPU_BIMC_GFX_SRC_CLK` bug on this device, and SNOC-DVM carries the GPU's
+distributed-virtual-memory / TLB-maintenance traffic — plausibly quiet during
+rendering but exercised when the GPU tears down.
+
+Two further gaps found in the same audit, both real and both still open:
+downstream `msm8998-gpu.dtsi` lists **8** GPU clocks including `isense_clk`
+(`gpucc_gfx3d_isense`) and `iref_clk` (`gcc_gpu_iref`); mainline joan lists 7 and
+has neither, though both clocks exist in mainline's clock drivers. Downstream
+also sets `qcom,isense-clk-on-level = <1>`. Because `msm_gpu.c:840` uses
+`devm_clk_bulk_get_all()`, anything listed in the node is enabled and disabled
+with the GPU, so these are DT-only changes. The GPU **SMMU** node matches
+downstream exactly (same three clocks) and is not a gap.
+
+### Result: ruled out
+
+```text
+cmdline token clk_ignore_unused        present
+"Disabling unused clocks" lines        0   (fired at 4.36 s in all prior runs)
+last coherent timestamp                19.873904  EXT4-fs (mmcblk0p1): mounted
+outcome                                PS_HOLD reset
+```
+
+Every unused clock, SNOC-DVM included, stayed enabled and the phone died anyway.
+**The clock-disable class does not explain this failure.** The wiring gaps above
+remain worth fixing on their own merits, but they are not the cause, and should
+not be promoted as one.
+
+### What four runs now agree on
+
+| Run | cmdline delta | last coherent ts |
+|---|---|---|
+| gate1 | `joan_gpu_gate=1` | 17.835 s |
+| gate0 | `joan_gpu_gate=0` | 17.122 s |
+| dpt600 | `+ deferred_probe_timeout=600` | 18.426 s |
+| clkignore | `+ clk_ignore_unused` | 19.874 s |
+
+All four die within about a second of
+`EXT4-fs (mmcblk0p1): mounted filesystem ... r/w without journal`.
+
+`mmcblk0` is the **microSD card**: joan's internal storage is UFS
+(`1da4000.ufshc`; LineageOS boots `root=/dev/dm-0 ... /dev/sda22`), so pmOS root
+and boot live on SD. The fatal moment is therefore SD-card I/O, not anything
+graphics-side. Boot 1 of the original Card 94 matrix already logged
+`SDCC bandwidth removal failed -110`, so SDCC has been implicated before.
+
+### Refined hypothesis
+
+A **completed** A540 runtime suspend degrades a shared NoC/BIMC path, and the
+next heavy consumer of that path — SD-card I/O during the boot-partition mount —
+is what trips the fault. This fits every result in the bank: the pin-present
+control performs the same mounts and survives because the GPU never suspends and
+the path is never degraded, while every configuration in which the GPU completes
+a suspend dies at the first substantial SD transfer afterwards.
+
+It also predicts testable things: a pmOS root on UFS rather than SD should move
+or remove the death; and heavy SD I/O forced *before* the GPU ever suspends
+should be harmless.
+
+### Method note
+
+`clk_ignore_unused` was verified to have taken effect by the **absence** of the
+`Disabling unused clocks` line that appears in every other capture, not by
+assuming the parameter was honoured. A negative result is only worth recording
+once the intervention is shown to have happened.
