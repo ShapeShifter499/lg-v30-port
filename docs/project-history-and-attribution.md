@@ -710,3 +710,43 @@ Current index:
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-03
 Update-scope: A183 runtime closure, A184 host checkpoint, and reusable closure workflow.
+
+## 2026-08-11 — source-correct four-lane clock audit and GPU IREF candidate
+
+Primary helper: Hermes Agent (`Hermes-Agent:moa/deep-flash`).
+
+Main artifacts:
+
+- `docs/clock-ownership-audit-2026-08-11.md`;
+- `docs/test-results/GPU-IREF-HOST-2026-08-11.md`;
+- kernel branch `joan/clock-ownership-v1`, commits `0ab3de5ac`, `1ae761e14`,
+  `5eded6318`, and `35750026c`;
+- local sealed image/manifest under `out/audit-20260811/`.
+
+What happened:
+
+- Reconciled SDCC2, UFS controller/PHY, GPU, and USB-C/PHY clock ownership
+  against current bindings, consumer code, and exact LG/Qualcomm downstream
+  sources rather than copying legacy clock lists.
+- Confirmed SDCC2 and UFS already have complete modern clock ownership.
+- Confirmed the V30 hardware supports USB 3.1 Gen 1; current mainline Joan is
+  intentionally USB2-only for bring-up. Proper SuperSpeed enablement depends on
+  PMI8998 Type-C role/orientation support, not additional clock phandles.
+- Ported the directly proven MSM8998 GPU IREF gate as a four-piece,
+  upstream-shaped series. Full post-commit build and host qualification passed.
+- Mapped but deferred A540 `isense`: downstream uses 200 MHz for its two fastest
+  levels and 19.2 MHz below them, while mainline still disables A540 GPMU limits
+  management and lacks the matching live DVFS policy.
+- Caught and rejected a byte-correct but provenance-wrong image whose release
+  string named the pre-series base plus `-dirty`; rebuilt after commit splitting
+  and sealed an exact-source replacement.
+
+Publication relevance:
+
+- The IREF series is local/unpushed and host-qualified, not device-verified.
+- No phone action occurred. Publication, Deck synchronization, staging, and any
+  RAM-only boot remain pending owner direction/approval.
+
+Assisted-by: Hermes-Agent:moa/deep-flash
+Date: 2026-08-11
+Update-scope: Clock ownership, USB3 capability, GPU IREF, and exact-source seal.

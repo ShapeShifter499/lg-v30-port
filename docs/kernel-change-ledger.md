@@ -7726,3 +7726,61 @@ Date: 2026-08-07
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
 Date: 2026-08-07
+
+---
+
+## GPU IREF clock ownership — host-only candidate (2026-08-11)
+
+- Handle: branch `joan/clock-ownership-v1`, four local/unpushed commits on
+  `569fbe2c7fa05ff0265878182a544ecbc825ff1a`:
+  - `0ab3de5ac732a7bdc67e3a23c963aff58b527c4f` — clock binding ID;
+  - `1ae761e14245fc4889e0ce45c05b6917b05c8a3d` — MSM8998 GCC provider;
+  - `5eded6318c717b5d1247e979c35ba5c3ac552628` — optional eighth A540 clock binding;
+  - `35750026c2538ea7666ee6df93f1e1fed5f110ed` — MSM8998 Adreno consumer.
+- Class: `upstream-candidate`, **host-verified only**.
+- Purpose: represent the downstream-documented `gcc_gpu_iref_clk` gate at
+  register `0x88010` and assign it to A540 through the existing MSM GPU bulk
+  clock lifecycle. This is independent platform-correctness work, not a claimed
+  Card 94/reset/suspend fix.
+- Touched files:
+  - `include/dt-bindings/clock/qcom,gcc-msm8998.h`;
+  - `drivers/clk/qcom/gcc-msm8998.c`;
+  - `Documentation/devicetree/bindings/display/msm/gpu.yaml`;
+  - `arch/arm64/boot/dts/qcom/msm8998.dtsi`.
+- Exact downstream basis:
+  - `msm-clocks-hwio-8998.h` defines `GCC_GPU_IREF_EN = 0x88010`;
+  - `clock-gcc-8998.c` exposes `gcc_gpu_iref_clk`;
+  - `msm8998-gpu.dtsi` assigns `iref_clk` to KGSL.
+- Verification:
+  - clean post-commit release `7.2.0-rc2-g35750026c253`;
+  - full `Image.gz dtbs modules` build exit 0;
+  - focused GCC object + Joan DTB and `W=1` pass;
+  - GPU binding check passes with dtschema 2026.6/yamllint 1.38.0;
+  - new compiled-DTB clock/count errors eliminated (unrelated pre-existing
+    Joan schema debt retained separately);
+  - per-file strict checkpatch: 0 errors, 0 warnings;
+  - sealed RAM-only image:
+    `out/audit-20260811/boot-joan-gpu-iref-35750026c-sealed.img`,
+    SHA-256 `1fb50bffb570d9d90f2ff26f3e261a7eb239242cd07e398bf3cc1e29a5edeaf4`;
+    exact embedded kernel+DTB, committed release, reference ramdisk, header,
+    cmdline, and UUID lineage independently verified.
+- Rejected/no-replay artifact: unsealed image SHA-256 `a78cb4e6...` embedded
+  `g569fbe2...-dirty`; retain only as rejected packaging evidence and never boot.
+- Independent follow-ups:
+  - `isense` is blocked on proper A540 limits-management/DVFS semantics; direct
+    downstream policy is 200 MHz at levels 0–1 and 19.2 MHz at levels 2+;
+  - `GCC_GPU_SNOC_DVM_GFX_CLK` needs a truthful fourth MSM8998 SMMU binding
+    name/rationale and must not replace the existing `mem_iface` clock;
+  - SDCC/UFS clock ownership already matches modern bindings;
+  - USB3 capability is proven, but mainline enablement first needs PMI8998
+    Type-C role/orientation integration rather than more clock phandles.
+- Authority: image prepared only; not staged, booted, flashed, or sent to the
+  phone. Fresh explicit approval is required for one RAM-only test.
+- Public/PR disposition: `needs cleanup/review` before push; device evidence is
+  still required before promotion into the confirmed stack.
+- Cross-reference:
+  `docs/clock-ownership-audit-2026-08-11.md` and
+  `docs/test-results/GPU-IREF-HOST-2026-08-11.md`.
+
+Assisted-by: Hermes-Agent:moa/deep-flash
+Date: 2026-08-11

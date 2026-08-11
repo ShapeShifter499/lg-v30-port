@@ -27,6 +27,7 @@ Rules:
 | 2026-07-11 | `pmbootstrap` 3.10.3 | pacman | postmarketOS build tooling (M3) | Claude Code |
 | 2026-07-11 | `pahole` | pacman | kconfig BTF resolution for the pmOS kernel config (PAHOLE_VERSION) | Claude Code |
 | 2026-08-02 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into disposable `/tmp/v30-dtschema-venv` | kernel `gpu.yaml` schema, style, example-DTB validation | Hermes Agent |
+| 2026-08-11 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into isolated `/data/buildcache/venvs/dtschema`; no Arch-repository package existed, so no machine-wide install was made | repeatable MSM8998 GPU binding and compiled-DTB validation for the clock-ownership audit | Hermes Agent |
 
 ## Sources / repos / downloads
 
