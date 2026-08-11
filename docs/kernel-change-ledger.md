@@ -7769,11 +7769,13 @@ Date: 2026-08-07
 - Independent follow-ups:
   - `isense` is blocked on proper A540 limits-management/DVFS semantics; direct
     downstream policy is 200 MHz at levels 0–1 and 19.2 MHz at levels 2+;
-  - `GCC_GPU_SNOC_DVM_GFX_CLK` needs a truthful fourth MSM8998 SMMU binding
-    name/rationale and must not replace the existing `mem_iface` clock;
+  - `GCC_GPU_SNOC_DVM_GFX_CLK` is provided at `0x71018`, but downstream has no
+    MSM8998 consumer and the binding defines only `iface`, `mem`, and
+    `mem_iface`; no patch is justified without new ownership evidence;
   - SDCC/UFS clock ownership already matches modern bindings;
-  - USB3 capability is proven, but mainline enablement first needs PMI8998
-    Type-C role/orientation integration rather than more clock phandles.
+  - USB3 capability is proven and its DWC3/QUSB2/QMP clocks are complete, but
+    mainline enablement first needs a PMI8998 TCPM bridge over SMB2 USBIN plus a
+    seven-interrupt PD-PHY resource set rather than more clock phandles.
 - Authority: image prepared only; not staged, booted, flashed, or sent to the
   phone. Fresh explicit approval is required for one RAM-only test.
 - Public/PR disposition: `needs cleanup/review` before push; device evidence is

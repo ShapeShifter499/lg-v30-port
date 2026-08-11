@@ -167,8 +167,22 @@ SMMU as an interface clock. However:
 - those three existing clocks are legitimate owners and must not be replaced or
   renamed to force SNOC DVM into the schema.
 
-Any adoption needs a separate binding extension with a truthful fourth clock
-name and rationale. It is not bundled with IREF and is not yet a candidate.
+The final owner trace confirms that the generic ARM SMMU driver bulk-enables
+every clock listed by DT, so a fourth clock would be functional if the binding
+and hardware ownership justified it. They currently do not:
+
+- the mainline provider is a real branch at register `0x71018`;
+- the downstream Joan/MSM8998 DTS tree has no consumer of that branch;
+- the MSM8998 SMMU binding explicitly defines the existing three-clock tuple as
+  `iface`, `mem`, and `mem_iface`;
+- newer Adreno SMMUs use equivalent SNOC-DVM clocks as an interface clock, but
+  that newer topology is not evidence that MSM8998's legitimate `mem_iface`
+  owner should be replaced.
+
+Any adoption therefore needs new MSM8998-specific ownership evidence and a
+binding extension with a truthful fourth clock name and rationale. Provider
+existence alone is insufficient. It is not bundled with IREF and is not a
+candidate from this audit.
 
 ### Device acceptance
 
@@ -222,21 +236,39 @@ and Type-C policy, not missing clock phandles.
 ### Proper upstream adoption of legacy behavior
 
 Downstream obtains cable attach, role, negotiated speed, and CC orientation from
-the PMI8998 Type-C/PD PHY. It chooses the corresponding SuperSpeed lane before
-resuming the QMP PHY. Mainline's QMP driver supports Type-C orientation events,
-but the current PMIC Type-C binding/driver covers later PMICs and has no
-`qcom,pmi8998-typec` compatible.
+two cooperating PMI8998 blocks. The Type-C CC/role state machine lives in the
+SMB2 USBIN peripheral at base `0x1300`: status is at offsets `0x0b` through
+`0x0f`, control is around `0x58` through `0x68`, and `type-c-change` is USBIN
+interrupt 7. The PD message PHY is a separate peripheral at `0x1700` with seven
+signal/message interrupts.
+
+Mainline already contains PMI8998's real USBIN register map in `qcom_smbx`, but
+uses it for charging and currently hardcodes an upstream-facing port role; its
+initialization comment explicitly leaves this ownership to a future Type-C
+driver. Mainline's current `qcom_pmic_typec` driver cannot be aliased blindly:
+it models a newer standalone Type-C port at `0x1500` with eight dedicated port
+interrupts. Its PD-PHY register layout at `0x1700` is largely compatible with
+PMI8998, but its resource table requires an eighth `fr-swap` interrupt which the
+PMI8998 downstream node does not expose.
+
+Mainline's QMP driver already registers a Type-C orientation switch and safely
+reinitializes an active PHY when orientation changes. The missing link is thus
+a source-correct PMI8998 TCPM/Type-C bridge over the SMB2 USBIN role engine,
+with a PMI8998-specific seven-interrupt PD-PHY resource set—not another USB
+clock or a PM8150B-compatible DT alias.
 
 Therefore SuperSpeed must not be enabled by a clocks-only DTS edit. The proper
 sequence is:
 
-1. add source-correct PMI8998 Type-C port/PD support to the existing Qualcomm
-   PMIC Type-C/TCPM architecture, using exact register/IRQ differences;
-2. describe the USB-C connector and endpoint graph;
-3. connect DWC3 role switching and QMP orientation switching;
-4. port only Joan's QMP analog tuning that has a current binding/driver
+1. define source-correct ownership between `qcom_smbx` and a PMI8998 TCPM/Type-C
+   port implementation for the shared SMB2 USBIN register space;
+2. add a PMI8998-specific PD-PHY resource set without inventing an `fr-swap`
+   IRQ, while reusing the common register-level implementation where valid;
+3. describe the USB-C connector and endpoint graph;
+4. connect DWC3 role switching and QMP orientation switching;
+5. port only Joan's QMP analog tuning that has a current binding/driver
    representation (or add a reviewed representation when required);
-5. then remove Joan's USB2-only overrides and enable/test the QMP PHY.
+6. then remove Joan's USB2-only overrides and enable/test the QMP PHY.
 
 ### Device acceptance
 
@@ -253,9 +285,17 @@ separate from all GPU and storage clock tests.
 | UFS + PHY | modern clock ownership complete | no clock patch needed | existing operation; new lane-specific acceptance pending |
 | GPU IREF | missing owner directly proven | four commits + full post-commit build + sealed RAM-only image host-qualified | not tested |
 | GPU ISENSE | legacy behavior fully mapped | blocked on proper A540 LM/DVFS integration | not tested |
-| GPU SNOC DVM | newer-upstream SMMU precedent; MSM8998 binding gap | audit only | not tested |
+| GPU SNOC DVM | provider exists; downstream consumer absent and MSM8998 ownership unproven | no patch; audit closed | not tested |
 | USB clocks | modern DWC3/QUSB2/QMP ownership complete | no clock patch needed | USB2 proven historically |
-| USB3/Type-C | V30 capability proven; orientation/role path missing | PMI8998 Type-C port required before enablement | not tested in mainline |
+| USB3/Type-C | V30 capability proven; SMB2 USBIN role bridge and seven-IRQ PD-PHY integration missing | separate PMI8998 TCPM project required; no clock patch | not tested in mainline |
+
+## Clock-adoption closure
+
+All four requested ownership lanes have reached a source-backed disposition.
+IREF was the sole directly proven missing clock consumer and has a host-qualified
+four-commit candidate. SDCC2, UFS, and USB already have complete modern clock
+ownership. ISENSE, SNOC DVM, and USB SuperSpeed remain deliberately separate
+policy/binding/Type-C projects rather than speculative clock additions.
 
 No phone was booted, flashed, written, or otherwise touched during this audit.
 
