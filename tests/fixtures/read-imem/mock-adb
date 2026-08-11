@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -u
+
+scenario=${MOCK_SCENARIO:-rooted-success}
+command=${1-}
+shift || true
+
+case "$command" in
+    devices)
+        printf 'List of devices attached\nLGMOCK\tdevice\n'
+        ;;
+    shell)
+        remote="$*"
+        case "$remote" in
+            id)
+                if [[ $scenario == unrooted ]]; then
+                    echo 'uid=2000(shell) gid=2000(shell)'
+                else
+                    echo 'uid=0(root) gid=0(root) context=u:r:su:s0'
+                fi
+                ;;
+            "su -c id")
+                if [[ $scenario == unrooted ]]; then
+                    echo '/system/bin/sh: su: inaccessible or not found' >&2
+                    exit 127
+                fi
+                echo 'uid=0(root) gid=0(root) context=u:r:su:s0'
+                ;;
+            *"busybox devmem"*|*" devmem "*)
+                if [[ $scenario == devmem-unavailable ]]; then
+                    echo 'devmem: No such device or address' >&2
+                    exit 1
+                fi
+                case "$remote" in
+                    *0x146bf65c*) echo 0x6d63033a ;;
+                    *0x146bf640*) echo 0x4a4f414e ;;
+                    *0x146bf04c*) echo 0x4c474500 ;;
+                esac
+                ;;
+            *"getprop"*) echo '[ro.boot.product.lge.bootreasoncode]: [0x20]' ;;
+            "cat /proc/cmdline") echo 'console=tty0 androidboot.bootreason=hard_reset' ;;
+            *) exit 1 ;;
+        esac
+        ;;
+    *)
+        echo "unexpected adb command: $command $*" >&2
+        exit 64
+        ;;
+esac
