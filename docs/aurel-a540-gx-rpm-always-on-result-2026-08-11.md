@@ -140,6 +140,28 @@ The `gcc_rx1_usb2_clkref_clk status stuck at 'on'` warning at 4.18 seconds was
 non-fatal and the kernel continued through switch-root; it is not the Phase 8
 failure.
 
+## Display state observed by Lance
+
+Lance reported that the screen was blank during this same Phase 8 boot. Live
+inspection after more than eleven minutes confirmed that this was a display
+pipeline failure on an otherwise-running kernel, not a reset or dead boot:
+
+- `/sys/class/drm/` had no `card0`, connector, or render node;
+- `/sys/class/graphics/` had no framebuffer device;
+- the DSI backlight interface existed and reported brightness 255/255;
+- `msm-mdss`, `msm_dpu`, `msm_dsi`, and `msm_dsi_phy` were individually bound;
+- the aggregate MSM DRM/KMS device never appeared;
+- `panel_vpnl` and `panel_vddio` were disabled at 35.8 seconds;
+- GPUCC and the GPU remained unbound throughout.
+
+This is consistent with MSM DRM component aggregation waiting for the enabled
+Adreno GPU component: `msm_drm_probe()` adds the available GPU node to its
+component match, while the GPU could not bind after its GPUCC supplier failed.
+Thus the blank display belongs to the same Phase 8 precondition failure rather
+than indicating a kernel crash. The evidence proves the missing DRM aggregate
+and the concurrent GPUCC/GPU failure; it does not imply that the already-bound
+DPU or DSI drivers independently failed probe.
+
 ## Classification
 
 **DEVICE-TESTED REJECTED DIAGNOSTIC / PRECONDITION FAILURE.**
@@ -163,6 +185,8 @@ RPM-always-on.
 - `out/a540-gx-rpm-a856f868e-runtime-immediate.txt`
 - `out/a540-gx-rpm-a856f868e-runtime-2min.txt`
 - `out/a540-gx-rpm-a856f868e-full-dmesg.txt`
+- `out/a540-gx-rpm-a856f868e-display-state.txt`
+- `out/a540-gx-rpm-a856f868e-display-bindings-corrected.txt`
 
 Evidence SHA-256:
 
@@ -172,4 +196,6 @@ Evidence SHA-256:
 3aa9e6d42df7e0ee19d1284fa1a7da53b9d1f7c7e43ced2259d0e40cf9e8a857  a540-gx-rpm-a856f868e-runtime-immediate.txt
 ef2d2f48840f4dd25d97bb31062fe26ddcf8cccc7c7380c1c7429d86f8af2ea8  a540-gx-rpm-a856f868e-runtime-2min.txt
 1d00b2bb2be02f43b8d94cbf84a37a08621d9ac3051070bac1f35a521c44e462  a540-gx-rpm-a856f868e-full-dmesg.txt
+67615cbc2544b24508909112c5c7764ef829f27034377f40e16fc3ff88842d23  a540-gx-rpm-a856f868e-display-state.txt
+b45e2cd282efeaf81abfab07314be74d672771e00e7cf0067b898f1af293e876  a540-gx-rpm-a856f868e-display-bindings-corrected.txt
 ```
