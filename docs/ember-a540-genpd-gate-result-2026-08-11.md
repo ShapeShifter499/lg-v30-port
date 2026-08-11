@@ -139,3 +139,80 @@ unsafe. It is neither.
 - Any claim that TSIF `mas 35` is the GPU path.
 - **New:** do not read the aboot `PON=`/`FAULT1=` lines in a pstore capture as
   the reset reason for that same boot.
+
+---
+
+## Addendum — control arm and deferred-probe-timeout test (same session)
+
+Two further RAM boots, **same binary** as above, differing only in cmdline.
+
+| Run | cmdline delta | `sync_state` lines | last coherent ts | outcome |
+|---|---|---|---|---|
+| gate1 | `joan_gpu_gate=1` | present @17.379 | 17.835 s | PS_HOLD reset |
+| gate0 | `joan_gpu_gate=0` | present @17.121 | 17.122 s | PS_HOLD reset |
+| dpt600 | `joan_gpu_gate=0 deferred_probe_timeout=600` | **0 (absent)** | 18.426 s | PS_HOLD reset |
+
+### The gate makes no difference — GPU genpd collapse is not the killer
+
+The control proves it with a same-binary comparison. With `gate=0` the markers
+still logged and collapse actually **proceeded** at 1.35 s / 2.26 s, and the box
+still ran to 17.1 s. Suppressing collapse (`gate=1`) neither saved it nor changed
+the death window. Two conclusions:
+
+1. Probe-time GX/CX collapse is *survivable* — it happens in the control and the
+   boot continues for another ~15 s.
+2. The earlier 9.46 s figure for unpin-only came from a **different binary**
+   (`3d55e94d6`); this build reaches ~17-18 s regardless of gate state, so the
+   apparent "extra progress" in the armed run was not the gate.
+
+### deferred_probe_timeout was a false lead — recorded so nobody retries it
+
+Both first runs died within ~0.7 s of the `sync_state() pending due to
+1e40000.ipa` block, which looked causal. Pushing `deferred_probe_timeout` to 600
+removed those messages **entirely** (count 0) and the phone died anyway, at
+18.4 s. Correlation, not cause. Ruled out.
+
+### What actually replicates
+
+Across three cmdlines the death window is stable at **~17-18.4 s**, and in every
+run it falls shortly after:
+
+```text
+EXT4-fs (mmcblk0p1): mounted filesystem a5d40a96-... r/w without journal
+```
+
+pmOS mounting its boot partition. No panic, no oops, no BUG in any capture;
+console simply stops. Reset class `0x20` / PS_HOLD each time. That reproducibility
+is the most useful thing this session produced — it is a fixed point to bisect
+against, and it is not graphics.
+
+### Capture hazard
+
+The dpt600 ramoops dump contains entries stamped `552.9 s` and `710.6 s`
+*after* an 18.4 s line. The timestamp sequence is non-monotonic (wrap at line
+559) and the surrounding text is corrupt (`s_kvn_ggt`, `il!knvclkd stq|e 1`,
+`MSM-SE^`). These are stale, partially-overwritten ring records from earlier
+boots of the same kernel, **not** evidence that any boot survived 9 minutes.
+Always check timestamp monotonicity before quoting a "last" line from ramoops.
+
+### IMEM reset reason remains unreadable — and root is not the reason
+
+We do have root on LineageOS (`uid=0(root) ... context=u:r:su:s0`, and
+`adb exec-out dd` of the pstore block device succeeds). The blockers are:
+
+- `/dev/mem` does not exist and, once created with `mknod`, returns
+  `No such device or address` — the LineageOS kernel is built `CONFIG_DEVMEM=n`.
+- `lge_handle_panic` exposes only panic **generators** (`gen_wdt_bark`,
+  `gen_panic`, ... all `N`), no reader for the stored reason.
+
+`scripts/read-imem-reset-reason.sh` reports "no read / no root", which is
+misleading: it wraps every call in `sudo -n adb ... 2>/dev/null`, so a missing
+passwordless sudo on the host silently presents as missing root on the phone.
+Worth fixing the script rather than trusting its verdict.
+
+### Suggested next step
+
+Bisect against the reproducible ~17-18 s point rather than the GPU. The boot
+partition mount is the last coherent milestone in all three runs; the next
+question is what pmOS init does immediately after it, and whether the reset is
+driven by that or by something asynchronous that merely lands there.
