@@ -71,6 +71,54 @@ cd ~/vibe-coding-projects/coding/lg-v30-port
 ./make-testimage.sh          # → out/boot-joan-mainline.img
 ```
 
+### Build environment: ccache and reproducible paths
+
+For `O=<build-dir>` builds (the per-experiment pattern), pass `KCFLAGS` so debug
+info stops recording absolute paths:
+
+```bash
+make -j"$(nproc)" O=<build-dir> ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+  CC="/usr/bin/ccache aarch64-linux-gnu-gcc" \
+  KCFLAGS="-ffile-prefix-map=$(pwd)/= -ffile-prefix-map=<build-dir>/=" \
+  Image.gz dtbs modules
+```
+
+**Do not set `CCACHE_DIR`.** If it is exported, ccache looks for its config at
+`$CCACHE_DIR/ccache.conf`, does not find one, and **silently stops looking** —
+never reading `~/.config/ccache/ccache.conf`. The 30 GB limit then falls back to
+the 5 GiB default, which can evict a warm cache. `cache_dir` is already set in
+the user config, so the variable is redundant as well as harmful. (Ember set it
+on 2026-08-11 copying a descriptive line out of a result doc; it may have caused
+some eviction. Do not repeat.)
+
+Why the `KCFLAGS` matter, measured 2026-08-11:
+
+- Each object records two absolute paths: `DW_AT_comp_dir` (the `O=` build dir)
+  and `DW_AT_name` (the source tree). Both differ per experiment.
+- Consequence: two builds of the *same* source produced **zero** byte-identical
+  objects, while only ~1.5% of each file actually differed. Stripping debug info
+  made them identical.
+- ccache hit rate was **6.73%** over ~198k compilations — nearly every compile in
+  a fresh build dir was a guaranteed miss.
+- The kernel already does the `__FILE__` half itself
+  (`Makefile:1188`, `-fmacro-prefix-map=$(srcroot)/=`); this extends the same
+  sanctioned pattern to debug info.
+
+`~/.config/ccache/ccache.conf` now carries `base_dir = /home/kumo02` and
+`hash_dir = false`. **Ordering constraint:** `hash_dir = false` is only safe
+while the build passes `-ffile-prefix-map`. Drop the flag and cache hits can
+return objects carrying a different build's paths.
+
+Debug-tooling impact is near zero: line numbers live in the DWARF line table
+regardless, so `scripts/faddr2line`, `scripts/decode_stacktrace.sh` and
+`addr2line` are unaffected and simply report relative paths. Only interactive
+source display in `gdb`/`crash` needs a hint — run it from the tree root, or
+`set substitute-path . <tree>`.
+
+Per-build `.config` snapshots for retired build trees are kept, gzipped, in
+`docs/build-configs/`. Those trees were kbuild `O=` output directories holding
+no original source, so each is rebuildable from its commit plus its config.
+
 The initramfs (`initramfs/root/init`) brings up a USB ECM+ACM gadget at
 172.16.42.1 with telnetd and a ttyGS0 shell. Milestone 1 = phone enumerates on
 the host (`lsusb`), then `ip addr add 172.16.42.2/24 dev <usb-if>` and
