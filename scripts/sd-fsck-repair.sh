@@ -115,4 +115,4 @@ A full pass can orphan inconsistent trees (2026-08-05: /home/user) into
 write — get Lance's authorization first, and verify /home/user exists
 before relying on the install.
 EOF
-echo "SD_FSCK_$MODE_DONE"
+echo "SD_FSCK_${MODE}_DONE"
