@@ -2,10 +2,11 @@
 
 > **Mandatory read-first source for device work.** Before building, booting, diagnosing, or replaying an LG V30 candidate, read this index, the newest applicable closure packet, and `../kernel-change-ledger.md`. A node, UI, boot, or successful command alone is not a pass.
 
-## Current state — 2026-08-11
+## Current state — 2026-08-13
 
-- **Newest completed device test:** [mas_ipa QoS](mas-ipa-2026-08-07.md).
+- **Newest completed device test:** [Card 94 CX/GX final v4](CARD94-CXGX-V4-2026-08-13.md) — exact clean source and marker-free image booted to graphical pmOS with no SMMU/secure-world reset or GPU/context/internal fault, but the first idle suspend aborted because SP/TP and RBCCU stayed on. Runtime PM entered `error`; VDD_GFX stayed at 3/3 enable/open counts. No workload ran; recovery to LineageOS passed. Do not replay this image/runner.
 - **Newest host-only checkpoint:** [GPU-IREF-HOST](GPU-IREF-HOST-2026-08-11.md) — four source-correct MSM8998 GPU IREF commits, full post-commit kernel build, binding/static checks, and exact RAM-only image seal passed. The image is not staged or booted; all device behavior remains open and needs fresh explicit approval.
+- **Card 94 split verdict:** the MSM8998 Adreno SMMU retention/reset mechanism survived the tested boot/first-idle scope, but the independent A540 SP/TP/RBCCU collapse defect blocks a valid suspend/resume and VDD_GFX-release result. Next: readback-only GPMU/PC-register instrumentation before any behavioral fix.
 - **mas_ipa closed result:** interconnect ✅ (a2noc first-ever QoS write, FIXED/qport 1/prio 1,1, IPA clock from rpmcc; no hang, 6/6 fabrics bound, icc errors 0 — two boots); GPU chain bind ✅; display/DRM ✅ (card0+renderD128, mdss 71.39/s vs 70.44 close-out baseline); recovery ✅ both boots. QoS now covers 17/17 programmable masters. Renderer-identity query and GPU power/suspend remain ⏳/N/A (pre-existing, out of scope).
 - **Config baseline correction (binding):** kernel builds must use the exact QoS-era config `coding/build-qos-bimc-v2-24e82e84e/.config` (the stale July tree config lacks `CONFIG_MSM_GPUCC_8998` — boot 1 of mas_ipa consumed an approval proving the failure mode: gpucc never probes, SMMU/adreno -110, no /dev/dri).
 - **A183/A184 prior state (superseded by newer work, kept as history):** touch/display/FD540 passed; exposed brightness max remained 251 → A184 host-only 255 correction; GPU power/suspend open.
@@ -42,6 +43,7 @@
 | [G6-OC3](G6-OC3-2026-08-05.md) | 2026-08-05 | Device-tested once: 850 MHz GPU corner DEVICE-PROVEN **PASS** (cur=850000048, rail 1036 mV, zero faults, 38-40C); 900 MHz REJECTED (PLL no-lock at probe, GPU session wedged). +19.7% over stock 710. NOTE: phosh/lockscreen did not load this boot (open userspace item, separate from the GPU PASS). | 850 proven local-only (never upstream). Keep 800/850 in table, 850 = top. Open: phosh-no-start needs journalctl on next boot; soak test if kept. |
 | [mas_ipa](mas-ipa-2026-08-07.md) | 2026-08-07 | PASS: a2noc first QoS write safe ×2 boots; 17/17 masters; display regression-free (mdss 71.39/s). | Branch joan/mas-ipa-qos local/unpushed; images 4efd83f2 (boot 1, superseded) and a57ea7ca (boot 2, sealed). Do not replay boot 1's config (missing GPUCC_8998). |
 | [GPU-IREF-HOST](GPU-IREF-HOST-2026-08-11.md) | 2026-08-11 | HOST-ONLY PASS: exact four-commit IREF series, full `Image.gz dtbs modules`, schema/static checks, and sealed pmOS RAM-only image all passed. No device claim. | Sealed image `1fb50bff...` remains local/not staged; dirty-release attempt `a78cb4e6...` is rejected. Fresh explicit approval is required before one RAM-only boot. |
+| [CARD94-CXGX-V4](CARD94-CXGX-V4-2026-08-13.md) | 2026-08-13 | MIXED: exact clean series booted with no SMMU/XPU2 reset or GPU fault, but first idle runtime suspend FAILED (`SPTP/RBCCU still on`, status `error`) and VDD_GFX remained 3/3. | One-shot consumed; no workload ran; LineageOS recovery passed. Do not replay. Instrument GPMU initialization and PC-register readback before changing behavior. |
 
 ## Closure-packet rule
 

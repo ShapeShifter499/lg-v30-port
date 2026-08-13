@@ -7786,3 +7786,63 @@ Date: 2026-08-07
 
 Assisted-by: Hermes-Agent:moa/deep-flash
 Date: 2026-08-11
+
+---
+
+## Card 94 CX/GX final v4 — clean source device characterization (2026-08-13)
+
+- Handle: kernel branch `joan/a540-cx-gx-final-v4`, exact commit
+  `76d180923dc2eb2a7033e7a37cf394318a3c2bac`, tree
+  `8622155b25dea27e77334107039b9e9b7a5dfbf6`, reconstructed from clean base
+  `9f3d891201060dba13e0a28e641914365e9cf6cd`.
+- Class: `upstream-candidate` series with **device-tested mixed result**. The
+  SMMU retention/reset mechanism survived the tested boot/first-idle scope;
+  complete GPU power-cycle acceptance remains failed/open.
+- Series content:
+  - drops the experimental overclock corners;
+  - permits and owns the MSM8998 GPUCC `vdd-gfx-supply`;
+  - lets Qualcomm arm-smmu implementations retain state across power collapse;
+  - avoids re-running the destructive MSM8998 Adreno SMMU reset;
+  - adds the MSM8998 Adreno SMMU binding tuple;
+  - wires GPU/SMMU CX/GX domains and joan PM8005 S1/VDD_GFX ownership.
+- Provenance/host qualification:
+  - all eight commits signed, parsed Lance DCO + exact assisted-by trailers;
+  - strict checkpatch per commit passed;
+  - focused GPUCC/SMMU dtschema checks and focused W=1 builds passed;
+  - full exact-source `Image.gz dtbs modules` build exited 0;
+  - config SHA-256
+    `0bf3c4370e774528470558b1b4675ff2bcaafb6212e02d67c9118e40f0689651`;
+  - clean marker-free image SHA-256
+    `08bc9f8047fd2be34db63a80b601348928e77ec291cd77a69cccb70191679807`.
+- One owner-authorized fail-closed RAM-only boot ran as
+  `CARD94-CXGX-V4-20260813T115738Z`; nothing was flashed.
+- Device result:
+  - exact release `7.2.0-rc2-g76d180923dc2`, graphical pmOS, `card0` and
+    `renderD128`;
+  - no secure-world/SMMU reset, context fault, GPU fault, internal error,
+    panic, watchdog, or ICC-RPM error through the first idle attempt;
+  - at 30.423461 s, `a5xx_pm_suspend()` aborted with
+    `SPTP/RBCCU still on (sp=00140000 rbccu=00140000)`;
+  - runtime PM became `error`; `runtime_suspended_time` did not progress;
+  - PM8005 S1 remained enabled/open 3/3 at 792 mV, with both GPU and GPUCC
+    VDD_GFX consumers present;
+  - the idle gate failed, so no GL/workload/submit test ran;
+  - evidence was SHA-verified and the phone recovered to fully booted
+    LineageOS with no fastboot client.
+- Interpretation: Card 94's SMMU/XPU2 reset mechanism and A540's inner
+  SP/TP/RBCCU collapse failure are separate. Absence of a reset is a scoped
+  mechanism pass, not suspend/resume or rail-release closure.
+- Corrected hypothesis: mainline already programs the same four GPMU
+  inter-frame collapse registers as downstream via `a5xx_power_init()`.
+  Do not add duplicate programming. The next candidate must instrument and
+  read back GPMU initialization and PC/status registers before any behavioral
+  fix.
+- Rejected/no-replay artifacts:
+  - marker-contaminated package SHA-256 `e4fca563...` (inherited
+    `joan_gpu_gate=0` cmdline) — never boot;
+  - build lineage `ce4af127c` — contains debug-gate ancestry, never boot;
+  - exact clean v4 image/runner — one-shot consumed; do not replay.
+- Closure: `docs/test-results/CARD94-CXGX-V4-2026-08-13.md`.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-13

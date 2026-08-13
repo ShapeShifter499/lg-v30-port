@@ -750,3 +750,52 @@ Publication relevance:
 Assisted-by: Hermes-Agent:moa/deep-flash
 Date: 2026-08-11
 Update-scope: Clock ownership, USB3 capability, GPU IREF, and exact-source seal.
+
+## 2026-08-13 — Card 94 clean reconstruction and exact-source characterization
+
+Primary helper: Hermes Agent
+(`Hermes-Agent:openai-codex/gpt-5.6-sol`), continuing Ember's Card 94
+mechanism/root-cause work (`Claude-Code:claude-opus-5`) with Lance as
+owner/operator and device authority.
+
+Main artifacts:
+
+- kernel branch `joan/a540-cx-gx-final-v4`, commit `76d180923dc2`;
+- exact-source build `/data/buildcache/kbuild/build-a540-cxgx-final-v4-76d180923`;
+- marker-free image and raw evidence under ignored
+  `out/audit-20260813/card94-cxgx-v4-76d180923/`;
+- `docs/test-results/CARD94-CXGX-V4-2026-08-13.md`.
+
+What happened:
+
+- Reconstructed Ember's CX/GX, VDD_GFX, and SMMU-retention work from a clean
+  deterministic base, removed debug-gate ancestry, added the missing binding
+  coverage, preserved original assistance provenance, and qualified all eight
+  signed commits plus an exact full build.
+- Caught and quarantined an initially packaged image whose source was clean but
+  whose reused cmdline still contained `joan_gpu_gate=0`; repackaged from a
+  clean transport baseline and independently verified the replacement.
+- Executed exactly one hash-bound RAM-only boot. The clean series reached
+  graphical pmOS and did not reproduce Card 94's SMMU/secure-world reset,
+  context fault, GPU fault, or internal error.
+- The first idle GPU suspend nevertheless aborted because SP/TP and RBCCU
+  remained on. Runtime PM entered `error`, PM8005 S1 remained 3/3, and the
+  workload gate correctly stopped before rendering. Evidence was banked and
+  the phone recovered to installed LineageOS without flashing.
+- Corrected an early post-run source hypothesis: mainline already carries the
+  same four GPMU inter-frame collapse-register writes as downstream. The next
+  safe experiment is readback-only instrumentation around GPMU init and the
+  first suspend boundary, not duplicate programming.
+
+Publication relevance:
+
+- The kernel series and this documentation remain local/unpushed.
+- The SMMU retention mechanism has scoped positive device evidence, but the
+  complete series is not yet power-cycle-qualified or ready to claim final
+  runtime-PM closure.
+- Public push and shared Deck synchronization remain owner-approval gates.
+
+Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
+Date: 2026-08-13
+Update-scope: Card 94 clean reconstruction, exact-source device test, mixed
+power result, recovery, and corrected next diagnostic boundary.

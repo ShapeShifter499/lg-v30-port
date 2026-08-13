@@ -28,6 +28,7 @@ Rules:
 | 2026-07-11 | `pahole` | pacman | kconfig BTF resolution for the pmOS kernel config (PAHOLE_VERSION) | Claude Code |
 | 2026-08-02 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into disposable `/tmp/v30-dtschema-venv` | kernel `gpu.yaml` schema, style, example-DTB validation | Hermes Agent |
 | 2026-08-11 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into isolated `/data/buildcache/venvs/dtschema`; no Arch-repository package existed, so no machine-wide install was made | repeatable MSM8998 GPU binding and compiled-DTB validation for the clock-ownership audit | Hermes Agent |
+| 2026-08-13 | `dtschema` 2026.6 and dependencies | `uv pip install dtschema` into isolated `/data/buildcache/tools/dtschema-venv` | redundant Card 94 validation environment created after the already-tracked `/data/buildcache/venvs/dtschema` was missed during PATH discovery; retained pending owner-approved cleanup, and the existing tracked venv was used for qualification | Hermes Agent |
 
 ## Sources / repos / downloads
 
