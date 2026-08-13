@@ -2,7 +2,8 @@
 # Read the raw LG V30 pstore partition from LineageOS without writing to the phone.
 #
 # Why: /sys/fs/pstore can be empty/misleading on joan, while the raw pstore
-# block partition may still contain the previous mainline ramoops console.
+# block partition may still contain the previous mainline ramoops console,
+# persistent-ftrace region, and bootloader reset log.
 # Pull it immediately after a failed RAM-only mainline boot before LineageOS
 # rotates/overwrites the region.
 #
@@ -43,12 +44,29 @@ adb wait-for-device
   adb devices || true
   echo "Device block entry:"
   adb shell "ls -l '$PSTORE_DEV' 2>/dev/null || true" || true
+  echo "Device block size:"
+  adb shell "blockdev --getsize64 '$PSTORE_DEV' 2>/dev/null || true" || true
   echo "START_DD: $(date)"
 } >> "$META"
 
-# Read-only pull. bs/count intentionally capture the first 256 KiB quickly; this
-# was enough to preserve the K042 mainline ramoops record in the 2026-07-08 run.
-adb exec-out dd if="$PSTORE_DEV" bs=262144 count=1 2>>"$META" > "$BIN"
+# Read the complete partition. Joan's pstore block device is larger than the
+# 256 KiB console region: later regions may contain persistent ftrace and the
+# bootloader reset log needed to classify a silent reset.
+PSTORE_SIZE="$(adb shell "blockdev --getsize64 '$PSTORE_DEV'" | tr -d '\r')"
+if [[ ! "$PSTORE_SIZE" =~ ^[0-9]+$ ]] || (( PSTORE_SIZE == 0 || PSTORE_SIZE > 16777216 )); then
+  echo "invalid pstore size: $PSTORE_SIZE" >> "$META"
+  exit 1
+fi
+
+adb exec-out "dd if='$PSTORE_DEV' bs=1048576 2>/dev/null" > "$BIN"
+CAPTURE_SIZE="$(stat -c %s "$BIN")"
+if [[ "$CAPTURE_SIZE" != "$PSTORE_SIZE" ]]; then
+  printf 'short pstore read: expected=%s captured=%s\n' \
+    "$PSTORE_SIZE" "$CAPTURE_SIZE" >> "$META"
+  exit 1
+fi
+printf 'PSTORE_SIZE=%s\nCAPTURE_SIZE=%s\n' \
+  "$PSTORE_SIZE" "$CAPTURE_SIZE" >> "$META"
 
 python - "$BIN" "$TXT" <<'PY'
 from pathlib import Path
