@@ -175,3 +175,86 @@ claimed now, but by only one of its two consumers.
 Fix: `d63fa520b` (binding: allow a fourth "mem_src" clock) and `b9e50b685`
 (claim it in `adreno_smmu`). Focused `dt_binding_check` on `arm,smmu.yaml`
 exits 0; checkpatch --strict 0/0/0 on both.
+
+## 8. Boot 4 (`b9e50b685`, mem_src claimed): Card 94 criteria 1 and 2 PASS
+
+Image `cf9b74a8fcc4a532dfc3131ce160572ced93d7d1e296745c3df90662e89182a3`,
+run `A540-MEMSRC-20260814T104118Z`. Two captures, `device-immediate.txt` at
+`UPTIME=64.40` and `device-after_idle.txt` at `UPTIME=338.47`.
+
+Boot 3 panicked at 60.94 s. This one ran 5.6 minutes with phoc rendering
+throughout:
+
+| | at 64.40 s | at 338.47 s |
+|---|---|---|
+| `runtime_status` | suspended | suspended |
+| `runtime_suspended_time` | 39381 | **310399** |
+| `runtime_active_time` | 23342 | 26386 |
+| `smmu_runtime_status` | active (pinned) | active (pinned) |
+
+The GPU spent ~92% of the run suspended. Counts of `aborting suspend`,
+`SPTP/RBCCU`, `context fault`, `GPU fault`, `hangcheck`, `recovery`,
+`Internal error`, `SError` and `Kernel panic` were **all zero in both
+captures**. `pm_genpd_summary` showed `gpu_gx off-0` with `gpu_cx on`,
+exactly the intended split.
+
+The SError is gone under real compositor rendering -- which is the same
+workload that produced it in boot 3, via `drm_gem_close_ioctl`.
+
+**Card 94 acceptance:**
+
+1. suspends and resumes with no reset -- **PASS**
+2. `runtime_status=suspended`, `runtime_suspended_time` advancing -- **PASS**
+3. VDD_GFX releases when idle -- **PARTIAL**
+
+On (3), PM8005 S1 went from `use=3 open=3 @644 mV` to `use=1 open=3
+@628 mV`. The consumer breakdown is decisive:
+
+```
+s1                                  1    3      0    fast   628mV
+   5000000.gpu-vdd                  0
+   5000000.gpu-vdd                  1                       628mV
+   5065000.clock-controller-vdd-gfx 0
+```
+
+`5065000.clock-controller-vdd-gfx` is the GX GDSC and it now correctly
+releases -- that is the `2494f8beb`/`c0396bb9d` ownership work doing its job.
+The remaining vote is the second of the two `vdd` consumers on the GPU node,
+which are `msm_gpu.c:955` (`gpu->gpu_reg`, released by `disable_pwrrail()`,
+the one showing 0) and `adreno_gpu.c:1119`
+(`devm_pm_opp_set_regulators()`). The OPP core enables the supply on the
+first `dev_pm_opp_set_rate()` and never lets go.
+
+Fix `88dbc4e26`: call `dev_pm_opp_set_rate(dev, 0)` from
+`adreno_runtime_suspend()` where a `vdd-supply` exists. `enable_clk()`
+already calls `dev_pm_opp_set_rate(fast_rate)` on the way back up, which
+restores both voltage and rate before the core clock is used, so the pairing
+is symmetric and no OPP is ever run at the boot voltage.
+
+## 9. Connectivity lanes are blocked on module deployment
+
+A read-only enumeration on the live pmOS (`connectivity-probe.txt` in the
+same run directory; no association, scan, pairing or TX) found:
+
+- `lsmod` returns **nothing at all** -- no `ath10k_snoc`, `cfg80211`,
+  `bluetooth`, `btqca`, `qrtr` or `ipa`;
+- no `/sys/bus/qrtr/devices`, no `/sys/class/bluetooth`, netdevs are `lo` and
+  `usb0` only;
+- `remoteproc0` = `4080000.remoteproc`, state `offline`;
+- `pd-mapper`, `tqftpserv`, `rmtfs` all absent; `ModemManager` and
+  `wpa_supplicant` running with nothing to bind to.
+
+The rootfs carries no module tree for these kernels -- the initramfs already
+says `modprobe: FATAL: Module ext4 not found in directory
+/lib/modules/7.2.0-rc2-g<hash>` on every boot. Each RAM-booted kernel has a
+different release string, so `/lib/modules/<release>` never matches.
+
+Wi-Fi, Bluetooth and cellular therefore cannot progress from a RAM boot
+alone. They need the matching 1,596-module tree installed into the pmOS
+rootfs on the SD card, which is a **persistent write to the SD card** and is
+outside the RAM-only authorization. This needs Lance's explicit approval, and
+the SD card has a prior fsck history (`docs/sd-card-fsck-and-recovery.md`).
+
+The DT topology itself is already in place: `msm8998-lge-joan.dts` has the
+`qcom,wcn3990-bt` node with all four supplies and the `&wifi` node with its
+four supplies enabled.
