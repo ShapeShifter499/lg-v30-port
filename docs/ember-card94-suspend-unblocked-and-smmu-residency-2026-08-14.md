@@ -128,3 +128,50 @@ collapse, which is where the power is. Test J (SMMU pinned) previously survived
 - pmOS sshd is not ready until roughly 40-60 s after `PMOS_USB_ENUMERATED`;
   earlier capture attempts fail with "scp: Connection closed" and that is not
   a device fault.
+
+## 6. Boot 3 (`521c2fe50`, pinned SMMU): the reset becomes a diagnosable panic
+
+Image `596ab8fe58768414ba2cba7416698407440be40b0d964efd38e4b504aaed0114`,
+run `A540-SMMUPIN-20260814T100729Z`, pstore `pstore-after-reset.strings.txt`
+in `out/audit-20260814/a540-smmupin-521c2fe50/`.
+
+Pinning GPU_CX turned the silent secure-world reset into a **Linux panic with
+a full backtrace** at 60.94 s:
+
+```
+SError Interrupt on CPU5, code 0x00000000bf000002
+pc : qcom_smmu_tlb_sync+0xd8/0x104
+Comm: phoc
+  arm_smmu_iotlb_sync / iommu_unmap / msm_iommu_unmap
+  msm_gem_vma_unmap / put_iova_spaces / msm_gem_close
+  drm_gem_object_release_handle / drm_gem_handle_delete / drm_gem_close_ioctl
+```
+
+This is the same failure Aurel recorded for rejected image #1
+(`bfd863403`): "asynchronous SError in `arm_smmu_unmap_pages()` while phoc
+closed a GEM handle". It is **not** a property of that rejected approach; it is
+what this SoC does once the GPU can actually reach runtime suspend, and it is
+now reproducible and diagnosed.
+
+## 7. Root cause of the SError: an unclaimed clock (Card 97 lane)
+
+`msm8998.dtsi` gives the GPU node all three GFX BIMC gates --
+`GCC_BIMC_GFX_CLK` ("mem"), `GCC_GPU_BIMC_GFX_CLK` ("mem_iface") and
+`GCC_GPU_BIMC_GFX_SRC_CLK` ("mem_src") -- but gives `adreno_smmu` only the
+first two. `mem_src` is the gate feeding the other two.
+
+While the GPU could never suspend, its vote held the source on permanently and
+the omission was invisible. Once the GPU suspends it drops that vote while the
+SMMU is still live and still has to reach the GPU-side TBU to invalidate. The
+branches remain enabled with no source behind them, the transaction gets no
+response, and the external abort surfaces as an asynchronous SError -- reported
+at `qcom_smmu_tlb_sync()` because its status read is what drains the posted
+writes.
+
+This is the same `GCC_GPU_BIMC_GFX_SRC_CLK` trap that broke A540 rendering in
+July (killed by `clk_disable_unused` because nothing claimed it); the clock is
+claimed now, but by only one of its two consumers.
+
+Fix: `d63fa520b` (binding: allow a fourth "mem_src" clock) and `b9e50b685`
+(claim it in `adreno_smmu`). Focused `dt_binding_check` on `arm,smmu.yaml`
+exits 0; checkpatch --strict 0/0/0 on both.
