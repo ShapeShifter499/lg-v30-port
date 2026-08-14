@@ -183,3 +183,94 @@ first. A binary patch is not viable either: the unused table entries
 Weigh that against the fact that joan has no such partitions, so LG's own stock
 software must fail these requests too while stock Wi-Fi works -- which argues
 they are tolerated, not fatal.
+
+## The fault decoded: a bad pointer load, not an assert
+
+With LLVM's Hexagon target (`llvm-mc --disassemble --arch=hexagon`), the
+instruction at `PC=0xb01c4d3c` is reachable: joan's `wlanmdsp.mbn` is an ELF32
+whose segment 3 covers `0xb0000000 + 0x25b5a4` at file offset `0x20000`, so the
+PC sits at file offset `0x1e4d3c`. The packet there is:
+
+```
+{
+	jump 0xec
+	r2 = memw(r3+r2<<#0)      <- load from r3 + r2
+}
+```
+
+**A memory load, not an explicit trap or assertion.** The WLAN process is
+dereferencing a pointer that was never populated. That is the signature of
+missing data rather than a logic error or a race, which is why the NV/storage
+leads were worth pursuing.
+
+(String-proximity analysis around the PC found nothing -- the region is pure
+Hexagon code and the apparent "strings" are printable code bytes.)
+
+## Tested and disproved: the LG OEM FSG partitions
+
+To test this properly, upstream rmtfs was patched and cross-built:
+
+- `storage.c`: added `/boot/modem_fsg_oem_1` and `_2` to `partition_table`,
+  following the OnePlus/Oppo precedent already merged upstream.
+- `sharedmem.c`: replaced libudev with direct `/sys/dev/char/<maj>:<min>/`
+  reads, removing the dependency entirely. rmtfs only used udev to read two
+  sysattrs.
+- Built fully static with `aarch64-linux-gnu-gcc -static`, compiling libqrtr
+  from source, because pmOS is musl and the cross toolchain is glibc, so
+  linking against the device's shared libraries was not possible.
+
+Patch and binary: `out/rmtfs-joan-oem-fsg.patch`, `out/rmtfs-joan`.
+
+Result (`RMTFSOEM-20260814T232949Z`): the paths are now served correctly --
+
+```
+[RMTFS] open /boot/modem_fsg_oem_1 => 4 (0:0)
+[RMTFS] open /boot/modem_fsg_oem_2 => 5 (0:0)
+unknown-partition rejections: 0
+```
+
+-- and the crash rate is **unchanged**: delta 4 over 95 s, against a
+read-write baseline of ~3 and a read-only baseline of ~10. **Serving the OEM
+FSG partitions is not the fix.**
+
+## Tested and disproved: the persist partition
+
+`persist` mounted read-only contains only a directory skeleton and two marker
+files:
+
+```
+5  /persist/rfs/msm/mpss/server_check.txt
+15 /persist/rfs/shared/server_info.txt
+2  /persist/sensors/sensors_settings
+```
+
+`rfs/msm/{adsp,cdsp,slpi,mpss}`, `rfs/mdm/*`, `hlos_rfs/shared` and `secnvm`
+are all empty. There is no WLAN MAC file, no calibration blob, nothing the
+WLAN firmware could be missing from here. This also means the empty
+`/var/lib/tqftpserv/` we give tqftpserv is not materially different from
+stock's `/persist/rfs/...`.
+
+## Updated ruled-out list
+
+- scanning, and any particular band
+- board data (md5-identical to LG's default `bdwlan.bin`)
+- the WLAN firmware image (`wlanmdsp.mbn`, byte-size identical, transfer completes)
+- MSA-ready handling
+- the OEM NV-backup paths `/oem/nvbk/*`
+- **the LG OEM FSG partitions, with a patched rmtfs that actually serves them**
+- **the persist partition, which holds no WLAN data**
+
+## What is left
+
+1. **The missing cnss-daemon equivalent.** ath10k sends
+   `host_cap.daemon_support = 0`. Downstream runs a WLAN daemon. This is the
+   last structural difference from stock that has not been examined.
+2. **Deeper firmware analysis.** The faulting load is now located precisely;
+   working out which structure `r3` should point to would need Hexagon RE
+   against a 3 MB stripped image.
+3. **A second WCN3990 device** to establish whether mainline crashes there too,
+   separating "joan-specific" from "mainline WCN3990-wide".
+
+The crash remains **not cleared**. Wi-Fi is usable in spite of it -- ath10k
+recovers every time and a 63-BSS passive scan completes -- but the modem
+restarts roughly every 10 s, which would disrupt cellular.
