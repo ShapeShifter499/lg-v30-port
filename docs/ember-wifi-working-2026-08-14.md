@@ -113,3 +113,72 @@ firmware file, for instance -- does not unwind the permissions.
 - `board_file api 1 bmi_id N/A crc32 00000000` -- the board data checksum is
   zero, worth confirming the right `board.bin` variant is being applied.
 - No association was attempted, by design.
+
+## Follow-up: the modem crash, and why waiting for MSA_READY is not the answer
+
+The residual `board_file ... crc32 00000000` turned out to be a **symptom, not a
+bug**: `ath10k_core_free_board_files()` is called from
+`ath10k_qmi_event_server_exit()`, so every modem crash frees the board data and
+the next info print simply finds `normal_mode_fw.board` NULL. Fix the crash and
+it resolves itself.
+
+The modem prints its own crash reason; my earlier greps just never matched it:
+
+```
+qcom-q6v5-mss 4080000.remoteproc: fatal error received:
+    err_qdi.c:450:EX:wlan_process:1:WLAN RT:1075:PC=b01c4d3c
+```
+
+An exception inside the modem's **`wlan_process`**, looping every 20-28 s
+(crash -> MBA -> mpss -> crash).
+
+### Ruled out
+
+- **Wrong WLAN firmware over TFTP.** `/lib/firmware/wlanmdsp.mbn` is 3,055,364
+  bytes, the same as joan's own `/lib/firmware/qcom/msm8998/joan/wlanmdsp.mbn`,
+  and `tqftpserv` logs a completed transfer. Correct image.
+- **ath10k debug tracing.** Compiled out (`kconfig debug 0`); would need a
+  rebuild.
+
+### Tested: removing `qcom,no-msa-ready-indicator`
+
+The property makes ath10k synthesise `msa_ready` on SERVER_ARRIVE instead of
+waiting for the modem. It predates the MSA assignment working, so with the
+assignment now succeeding it was worth retesting whether the modem sends the
+real indication.
+
+Image `770b65510c53daefd1e39aa9e7ea62847abffbfe607a660093afdd4a145b39bf`,
+run `WIFI2-20260814T221422Z`:
+
+| `qcom,no-msa-ready-indicator` | modem | Wi-Fi |
+|---|---|---|
+| present | crashes/recovers every 20-28 s | `wlan0` up, 63-BSS passive scan |
+| **absent** | **zero crashes** | never comes up at all |
+
+Without it, QMI negotiates at 84.7 s and then nothing further happens --
+checked again at 221 s uptime: no `wlan0`, no ath10k messages, zero crashes.
+A permanent stall.
+
+**msm8998's modem does not send the MSA_READY indication even when the MSA is
+correctly assigned.** The property is right for this SoC and stays. Reverted.
+
+So the crash is a separate defect, not a consequence of skipping the wait. Next
+candidates, untested:
+
+- a delay between `ath10k_qmi_event_server_arrive()` and the synthesised
+  `ath10k_qmi_event_msa_ready()`, to let the modem finish its own MSA setup
+  before board data arrives;
+- `CONFIG_ATH10K_DEBUG=y` to see the BDF download and host-cap exchange, which
+  is where the modem-side WLAN task would object;
+- comparing the host capability payload against downstream, given
+  `qcom,snoc-host-cap-8bit-quirk` already exists for this SoC.
+
+Note the crash is not fatal to the lane -- ath10k logs `device successfully
+recovered` and the passive scan works -- but it would disrupt cellular and
+should be closed before anyone calls Wi-Fi finished.
+
+### Correction: IPA firmware is present
+
+An earlier note said `ipa_fws.mdt` was absent from the rootfs. That was wrong:
+`/lib/firmware/ipa_fws.mdt` and `ipa_fws.b0*` are present at the top level. I
+had only listed the `qcom/msm8998/joan/` subdirectory.
