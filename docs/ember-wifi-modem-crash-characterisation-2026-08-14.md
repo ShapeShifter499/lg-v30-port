@@ -134,3 +134,52 @@ device partitions: the store lives in tmpfs, so nothing persists and the
 4. **A second WCN3990 device** (sdm845 class) to see whether mainline shows the
    same crash there, which would separate "joan-specific" from "mainline
    WCN3990-wide".
+
+## Follow-up: serving the OEM NV-backup paths does not help
+
+Lance asked whether `_oem` is simply dropped from the naming, i.e. whether
+`modem_fsg_oem_1` is really just `fsg`. The request log says no -- the modem
+asks for both, as distinct objects:
+
+```
+9 x /boot/modem_fsg_oem_1     <- most requested of anything
+7 x /boot/modem_fsg_oem_2
+3 x /boot/modem_fs1
+2 x /boot/modem_fsc
+1 x /boot/modem_fsg           <- requested separately
+1 x /oem/nvbk/static
+1 x /oem/nvbk/dynamic
+```
+
+joan has no partition with "oem" in its label at all. The shape of these is
+OEM NV-backup storage, LG's analogue of the OnePlus/Oppo `oem_stanvbk` /
+`oem_dycnvbk` pair -- and notably this modem requests those OnePlus paths too.
+
+Since `/oem/nvbk/static` and `/oem/nvbk/dynamic` are **already** in upstream
+rmtfs's table, they can be served in directory mode with no patch at all.
+Tested (`NVBK-20260814T231808Z`) with both files present in the tmpfs store:
+
+- crash delta **3 over 90 s**, versus a read-only baseline of ~9.6/90 s --
+  which merely reproduces the known read-write rate effect, not an
+  improvement on top of it;
+- **`/oem/nvbk/*` was requested zero times in that run**, so serving those
+  files changed nothing. The single earlier request came from a different
+  modem state.
+- `/boot/modem_fsg_oem_1` and `_2` were still rejected, 9 times each.
+
+So the OEM NV-backup hypothesis is **not supported**, and the earlier
+observation of `/oem/nvbk/*` requests was not representative.
+
+## Why the remaining rmtfs test is expensive
+
+Testing `modem_fsg_oem_1/2` needs a `partition_table` entry, because
+`storage_open()` rejects unknown paths before consulting the storage
+directory. rmtfs links `-lqrtr -ludev -lpthread` and there is no aarch64
+`libqrtr`/`libudev` in the cross sysroot here, so it means cross-building those
+first. A binary patch is not viable either: the unused table entries
+(`/boot/modem_study`, `/boot/modem_tunning`) are shorter strings than
+`/boot/modem_fsg_oem_1`, so there is nowhere in-place to put it.
+
+Weigh that against the fact that joan has no such partitions, so LG's own stock
+software must fail these requests too while stock Wi-Fi works -- which argues
+they are tolerated, not fatal.
