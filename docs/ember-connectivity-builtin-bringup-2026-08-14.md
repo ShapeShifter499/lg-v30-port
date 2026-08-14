@@ -166,20 +166,36 @@ rebind then gets `msa info req rejected: 90`, because the WLAN firmware
 service keeps state from the crashed session -- **re-binding without
 restarting the modem is not a valid retry.**
 
-### Leading hypothesis for the MSA failure
+### The MSA failure is NOT a relocation problem (hypothesis withdrawn)
 
-`msm8998.dtsi`'s `wifi@18800000` has `memory-region = <&wlan_msa_mem>`, and
-joan's own DT comments record that mainline's `gpu_mem`/`wlan_msa` addresses
-(`0x95600000`/`0x95700000`) collide with LG's reserved ranges and were moved
-(`msm8998-lge-joan.dts:84-89`, and the note at line 871 that the range covers
-`ipa_fw_mem`, `ipa_gsi_mem` and `wlan_msa_mem`). If `wlan_msa_mem` now sits
-where TZ will not grant the assignment, `qcom_scm_assign_mem()` returns
-`-EINVAL` exactly as seen.
+My first reading was that joan relocates `wlan_msa_mem` and TZ therefore
+refuses the assignment. **The DT says otherwise and that hypothesis is
+withdrawn.** `msm8998-lge-joan.dts:867-878` is explicit:
 
-Next step: compare joan's relocated `wlan_msa_mem` base/size against the
-downstream `msm8998` reserved-memory map, and against what the TZ protected
-region table allows -- the same table already extracted for the Card 94 XPU2
-work.
+> slpi_mem is the exception. LG gives SLPI 0x94d00000 + 0xf00000, but that
+> range covers ipa_fw_mem, ipa_gsi_mem and wlan_msa_mem, **which sit at their
+> mainline addresses and are working: WiFi is up on those** [...]
+
+`slpi_mem` was shrunk precisely so that `wlan_msa_mem` could stay at the
+mainline `0x95700000 + 0x100000`. The older comment at lines 84-88 ("must move
+before [...] wifi bringup") is superseded by that resolution; both are in the
+file and they read as contradictory, which is what misled me.
+
+So the region is where it has previously worked, and the `-22` needs a
+different explanation. Things worth checking next, roughly in order:
+
+- whether `qcom_scm_assign_mem()` is failing before it reaches the firmware at
+  all -- the same boot logs `qcom_scm firmware:scm: SHM Bridge not supported`
+  and `qseecom: untested machine, skipping`;
+- whether the earlier "WiFi is up on those" was ever taken past this same
+  point, or only proved the rails and module load -- Aurel's handoff says
+  prior tests "proved modules/rails but stopped before WLFW service 69", which
+  suggests this MSA step may never actually have been exercised;
+- whether anything in the CX/GX series or the built-in-driver config changes
+  the SCM path or probe ordering, by testing this same connectivity config on
+  the pre-CX/GX baseline;
+- the TZ protected-region table already extracted for Card 94, for whether
+  `0x95700000` appears in it.
 
 ## 6. Reproduction recipe (RAM-only, no persistent writes)
 
