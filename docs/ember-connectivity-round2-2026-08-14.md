@@ -195,3 +195,62 @@ the whole connectivity stack loaded.
 | Wi-Fi | QMI negotiates with real chip/board/fw data; **blocked** on the MSA handshake, which must be solved rather than skipped |
 | Sound | ADSP probes; blocked on a 3 MiB carveout shortfall, then on absent board topology |
 | Camera | blocked on absent DT topology |
+
+## 8. UART speed hypothesis: tested and REJECTED
+
+After the `0x204b` quirk let init advance to `0x2031` (LE Read Resolving List
+Size, answered `-56` = `-EBADRQC`, HCI "Unknown HCI Command", though the
+controller advertises it in `commands[34] & 0x40`), I read the three symptoms
+together -- repeated `Frame reassembly failed (-84)`, a one byte command
+complete where three are required, and a command answered as unknown that is
+advertised -- as one underlying problem: bytes lost on the UART.
+
+Supporting that: LG drives this port with the vendor high-speed UART driver
+(`blsp1_uart3_hs`), while mainline uses `msm_serial` in UARTDM mode. The pin
+configuration is byte-identical downstream (gpio45-48, drive-strength 2,
+bias-disable), so the pins are not the difference; the 3 Mbps operating rate
+looked like it.
+
+I reverted my own quirk and lowered `max-speed` to 115200 to test it
+(`CONN-V6-20260814T151311Z`, image
+`9137930a6a0b7287b0b7afbef0ba90872dd07a85d55d8e6438b3268f03c7f9d4`).
+
+**The hypothesis is wrong on both counts:**
+
+```
+[66.547157] Bluetooth: hci0: Frame reassembly failed (-84)
+[66.548574] Bluetooth: hci0: Frame reassembly failed (-84)
+[66.697691] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+[68.703308] Bluetooth: hci0: command 0xfc00 tx timeout
+[68.703585] Bluetooth: hci0: QCA Failed to send TLV segment (-110)
+[68.703902] Bluetooth: hci0: QCA Failed to request file: qca/crbtfw21.tlv (-110)
+[68.817840] Bluetooth: hci0: Retry BT power ON:2
+```
+
+1. The frame reassembly errors occur at 66.5 s, **before** any rate change and
+   at the initial speed. They are not caused by the 3 Mbps operating rate.
+2. 115200 cannot push the 177 KB TLV firmware inside the command timeout, so
+   lowering the rate breaks firmware download outright.
+
+The frame errors therefore look like spurious bytes as the controller powers
+up, not a data-integrity failure, and the `0x204b` / `0x2031` responses are
+most likely genuine controller behaviour after all.
+
+The tree is back to quirk + 3 Mbps (`f9b6f2841`), which is the furthest BT has
+got. The revert churn was collapsed rather than shipped; the finding lives
+here.
+
+### What `0x2031` needs
+
+`hci_le_read_resolv_list_size_sync()` is gated only on
+`hdev->commands[34] & 0x40` and has no quirk, so a fix means adding one, in the
+established style of `HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE` /
+`_READ_VOICE_SETTING` / `_READ_PAGE_SCAN_TYPE`.
+
+**Not done deliberately.** Setting such a quirk for the whole WCN399x family
+would disable LL privacy on sdm845 boards where this controller works today,
+and there is no hardware here to check that against. It needs either a
+narrower key than "WCN399x", or testing on another WCN3990 device. The same
+caution applies retrospectively to `f9b6f2841`: it is device-verified on joan
+and follows existing practice, but it has not been checked for regression on
+other WCN399x boards.
