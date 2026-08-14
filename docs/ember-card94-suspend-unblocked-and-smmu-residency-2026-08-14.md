@@ -258,3 +258,64 @@ the SD card has a prior fsck history (`docs/sd-card-fsck-and-recovery.md`).
 The DT topology itself is already in place: `msm8998-lge-joan.dts` has the
 `qcom,wcn3990-bt` node with all four supplies and the `&wifi` node with its
 four supplies enabled.
+
+## 10. Boot 5 (`88dbc4e26`): Card 94 CLOSED -- all three criteria PASS
+
+Image `dbe4e7ab13f6bfdbbf91fee60e58840d50bbb7994fa7f1cb62e6e5541a84770e`,
+run `A540-OPPVOTE-20260814T111613Z`.
+
+```
+kernel_exact=PASS              zero_aborting_suspend=PASS
+cmdline_present=PASS           zero_sptp_rbccu=PASS
+no_diag_marker=PASS            runtime_not_error=PASS
+zero_gpu_fault=PASS            runtime_suspended_when_idle=PASS
+zero_internal_error=PASS       suspend_counter_readable=PASS
+zero_kernel_panic=PASS         suspend_counter_increased=PASS
+zero_serror=PASS               vddgfx_readable=PASS
+zero_context_fault=PASS        vddgfx_released=PASS
+zero_unhandled_fault=PASS
+zero_joan=PASS                 IDLE_GATE=PASS
+```
+
+`runtime_suspended_time` 39766 -> 313957 across the two captures,
+`runtime_status=suspended` at both, `gpu_gx off-0` with `gpu_cx on`, and:
+
+```
+s1                                  0    3      0    fast   628mV
+   5000000.gpu-vdd                  0
+   5000000.gpu-vdd                  0
+   5065000.clock-controller-vdd-gfx 0
+```
+
+**VDD_GFX use count is zero.** Every consumer has released the rail with the
+GPU idle. This is the first time joan has done that: the board previously had
+to pin it with `regulator-always-on` because nothing owned it.
+
+### Final series on `joan/a540-suspend-hwinit-gate` (base final-v4 `76d180923`)
+
+```
+ea1cdd7e2 drm/msm/adreno: skip the A540 collapse gate when the GPU was never initialised
+ab2b6869a iommu/arm-smmu: only skip the retained part of the reset on resume
+521c2fe50 iommu/arm-smmu-qcom: keep the MSM8998 Adreno SMMU resident
+d63fa520b dt-bindings: iommu: arm-smmu: allow the GFX bus source clock on MSM8998
+b9e50b685 arm64: dts: qcom: msm8998: give the Adreno SMMU the GFX bus source clock
+88dbc4e26 drm/msm/adreno: release the OPP core's supply vote on runtime suspend
+```
+
+All six: checkpatch --strict 0 errors / 0 warnings / 0 checks. Focused
+`dt_binding_check` on `arm,smmu.yaml` exits 0. Builds exit 0, 0 errors, 1,596
+modules, config SHA-256 `0bf3c437...` unchanged from final-v4 throughout.
+
+Phone recovered to LineageOS after every boot, adbd returned to uid 2000, no
+partition ever flashed.
+
+### Still open
+
+- `ab2b6869a` is retained on correctness grounds (the TLB and `sCR0` genuinely
+  are not preserved across a collapse) but is not independently proven --
+  `521c2fe50` pins the SMMU, so the resume path it corrects no longer runs on
+  joan. It matters for any future attempt to let the SMMU collapse.
+- Power saving from the VDD_GFX release is unquantified. `use=0` is proven;
+  actual current draw is not measured.
+- Whether GPU_CX could also be released with a different mechanism is untested.
+  Residency is a deliberate trade, not a proof that collapse is impossible.
