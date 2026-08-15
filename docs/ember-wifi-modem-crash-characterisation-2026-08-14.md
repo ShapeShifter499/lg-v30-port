@@ -274,3 +274,57 @@ stock's `/persist/rfs/...`.
 The crash remains **not cleared**. Wi-Fi is usable in spite of it -- ath10k
 recovers every time and a 63-BSS passive scan completes -- but the modem
 restarts roughly every 10 s, which would disrupt cellular.
+
+## Tested and disproved: the host capability message
+
+The faulting instruction being a pointer load suggested the firmware's
+capability structure might be built wrong at setup. msm8998 sends `host_cap`
+with `qcom,snoc-host-cap-8bit-quirk`, which encodes `daemon_support` as 8 bits
+instead of 64 -- a quirk written for sdm845-era firmware, and LG's MPSS build
+is not that firmware.
+
+ath10k also supports `qcom,snoc-host-cap-skip-quirk`, which sends **no host
+capability request at all** ("Skip the host capability request for the firmware
+versions which do not support this feature"). That is the sharpest available
+discriminator, so it was tested rather than the encoding variant.
+
+Result (`HOSTCAP-*`, msm8998.dtsi with `skip-quirk` in place of `8bit-quirk`):
+
+- no host capability request was sent (`host capability` log count 0)
+- `wlan0` still came up
+- crash **delta 3 over 95 s**, identical to the read-write baseline
+- same SFR, same `PC=b01c4d3c`
+
+**The host capability message is not the cause.** DT reverted to
+`qcom,snoc-host-cap-8bit-quirk`.
+
+## Status
+
+Everything cheaply testable has been eliminated:
+
+| candidate | verdict |
+|---|---|
+| scanning / any specific band | ruled out (idle has the highest rate) |
+| board data | ruled out (md5-identical to LG's default) |
+| WLAN firmware image | ruled out (identical size, transfer completes) |
+| MSA-ready handling | ruled out (waiting only prevents bring-up) |
+| `/oem/nvbk/*` NV backup | ruled out (not even requested) |
+| LG OEM FSG partitions | ruled out (patched rmtfs served them, no change) |
+| persist partition | ruled out (contains no WLAN data) |
+| host capability message | ruled out (skipped entirely, no change) |
+
+What remains needs real investment, not another quick experiment:
+
+1. **Hexagon reverse engineering.** The faulting load is located exactly
+   (`0xb01c4d3c`, file offset `0x1e4d3c` in `wlanmdsp.mbn`). Establishing what
+   `r3` should point to means working backwards through a 3 MB stripped image.
+2. **A second WCN3990 device** (sdm845 class) to determine whether mainline
+   crashes there too. That single data point would separate "joan/LG MPSS
+   specific" from "mainline WCN3990-wide" and decide where the fix belongs.
+3. **The cnss-daemon's behaviour beyond `daemon_support`** -- what services it
+   actually provides to a running WLAN firmware on stock.
+
+The crash is **not cleared**. Wi-Fi is usable regardless: ath10k recovers every
+time and a 63-BSS passive scan completes. The cost is a modem restart roughly
+every 10-30 s, which is fine for Wi-Fi but would disrupt cellular, so the two
+lanes cannot currently be considered simultaneously working.
