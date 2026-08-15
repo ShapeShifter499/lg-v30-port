@@ -469,3 +469,75 @@ advertises `NL80211_IFTYPE_AP`, but nothing has exercised it, and issues
 #26/#27 are on the *station* association path (hostapd runs the authenticator
 side in AP mode), so whether they apply is unknown. Establishing that AP mode
 works at all should precede any thermal work.
+
+## 11. Appendix: calibration and board_id are already correct
+
+Investigated under the goal "fix LG V30 mainline wifi calibration and
+board_id", after AP-mode throughput came in low and `board_id 0xff` plus
+`invalid MAC address; choosing random` looked like a calibration failure.
+
+**They are not broken. The suspicion was wrong, and the evidence says so.**
+
+### Calibration data is the correct file
+
+```
+/lib/firmware/ath10k/WCN3990/hw1.0/board.bin
+md5 8c5e6060d42f9bc4b28e686081a6df0b
+```
+
+That is byte-identical to LG's own `bdwlan.bin`. It is also the *only* board
+file present -- there is no `board-2.bin`.
+
+### `board_id 0xff` is provably inert here
+
+`qmi.c:619` shows `0xFF` is simply the fallback when the QMI response carries
+no `board_info`. Every use of the value is then:
+
+```
+core.h:1097   u32 qmi_board_id;
+qmi.c:869     ar->id.qmi_board_id = qmi->board_info.board_id;
+core.c:1587   scnprintf(... "bus=%s,qmi-board-id=%x,qmi-chip-id=%x%s" ...)
+core.c:1593   scnprintf(... "bus=%s,qmi-board-id=%x" ...)
+```
+
+Both remaining uses are inside `ath10k_core_create_board_name()`, which builds
+the lookup key for **board-2.bin**. And `ath10k_core_fetch_board_file()`
+(`core.c:1668`) only uses that key for the api-2 path:
+
+```c
+	ar->bd_api = 2;
+	ret = ath10k_core_fetch_board_data_api_n(ar, boardname, ...);
+	if (!ret) goto success;
+fallback:
+	ar->bd_api = 1;
+	ret = ath10k_core_fetch_board_data_api_1(ar, bd_ie_type);
+```
+
+With no `board-2.bin`, the api-2 lookup fails, ath10k falls back to
+`bd_api = 1`, and `board.bin` is loaded by fixed path -- no name, no board id
+consulted. The boot log confirms that path ran: `board_file api 1`.
+
+`qcom,calibration-variant` would likewise change nothing, since a variant only
+selects *within* board-2.bin. joan's DT lacking it (where
+`msm8998-lenovo-miix-630.dts` has it) is therefore not a defect.
+
+### The random MAC is real, but is not a calibration fault
+
+`core.c:3453` fetches the MAC with `device_get_mac_address(ar->dev, ...)`,
+i.e. from DT `mac-address` / `local-mac-address` / nvmem only. joan's wifi
+node has none, the firmware's WMI ready event supplies nothing
+(`wmi.c:5769` leaves it zero), so `mac.c:10014` falls back to
+`eth_random_addr()` -- hence the `52:` locally-administered address.
+
+The MAC is **not** in the persist partition: mounted read-only, it contains
+only `rfs/msm/mpss/server_check.txt`, `rfs/shared/server_info.txt`,
+`sensors/sensors_settings` and `.twrps`. It therefore lives in modem NV,
+reachable only over QMI, which is why nothing on the Linux side finds it.
+
+A random MAC does not affect throughput. Supplying the real one is a
+correctness fix, and a per-device value cannot go into a shared DTS, so an
+upstreamable fix needs nvmem or a QMI path rather than a hardcoded property.
+
+**Conclusion: the AP throughput ceiling is not a calibration or board-id
+problem, and neither needs fixing.** The remaining suspect is the AP transmit
+path itself.
