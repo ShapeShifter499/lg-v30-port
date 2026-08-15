@@ -171,10 +171,39 @@ it. The fix trades a crash for a clean absence; it does not remove a working
 capability.
 
 The channel is also not one access points sit on. Consumer APs use 36-48,
-52-64, 100-144 and 149-165; 5845 MHz is above UNII-3's usable top (165 =
-5825 MHz) and below the 5850-5895 MHz band that only became unlicensed in
-2020, which a 2017 Wi-Fi 5 part has no business using and demonstrably cannot
-tune.
+52-64, 100-144 and 149-165; 5845 MHz is above UNII-3's usable top
+(165 = 5825 MHz), in the 5.9 GHz band that only became unlicensed in 2020,
+which a 2017 Wi-Fi 5 part has no business using and demonstrably cannot tune.
+
+### Why the channel is in the table at all
+
+Not because it is a stray entry. `ath10k_5ghz_channels` is a single static
+table shared by **all sixteen** ath10k hardware entries -- qca988x, qca9887,
+four qca6174 variants, qca99x0, qca9984/9994, qca9888, qca9377, qca4019 and
+wcn3990 -- so it is the union of what any chip of that generation can tune,
+not what this one can.
+
+It is also deliberate rather than legacy. ath9k carries no 5845/5865 at all,
+while **ath11k and ath12k both carry `CHAN5G(169, 5845, 0)` and
+`CHAN5G(173, 5865, 0)`**, and ath12k names the reason:
+
+```c
+#define ATH12K_5_9_GHZ_MIN_FREQ 5845
+```
+
+Channel 169 is the first channel of the 5.9 GHz band as these drivers model
+it -- real spectrum that Wi-Fi 6E/7 parts use. It is not obscure to the
+driver family; it is ahead of WCN3990.
+
+So the channel was reachable because three layers that could each have
+filtered it all default permissive: the driver table is a cross-chip union,
+the board's regdomain code is blank so ath substitutes US, and the firmware
+declares its raw 4912-6100 MHz tuning range. Nothing in that chain encodes
+"this firmware has no entry for 5845 MHz", which is the gap the `hw_params`
+field fills.
+
+(The local clone is shallow, so the upstream commit that first added 169/173
+to ath10k, and its stated rationale, were not retrievable here.)
 
 ## 5. Verification
 
