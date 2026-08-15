@@ -404,3 +404,68 @@ someone who can determine whether the true CE base is 413 or 414.
 | Camera | blocked: no CCI/CSIPHY/sensor DT |
 
 Association is still untested and remains outside the agreed boundary.
+
+## 10. Appendix: WLAN thermal throttling is not available on this firmware
+
+Checked at Lance's request, motivated by Wi-Fi tethering: sustained AP-mode
+transmit is the case where throttling would matter. Measured on
+`THERMCHK-20260815T052033Z`.
+
+**Result: joan's WCN3990 firmware does not advertise
+`WMI_TLV_SERVICE_THERM_THROT`, so no throttling is possible.**
+
+```
+cooling_device0 = devfreq-5000000.gpu     <- the only one; no ath10k_thermal
+hwmon: ...thermal zones..., pmi8998_charger, qcom_battery   <- no ath10k hwmon
+wlan-thermal temp=36100                   <- sensor itself works, 36.1 C idle
+```
+
+This is a genuine early return, not a path that never ran:
+`ath10k_thermal_register()` is `core.c:3540`, immediately after
+`ath10k_mac_register()` at 3516 on the same registration path, and both `phy0`
+and `wlan0` exist, so line 3540 was reached. It returned at
+
+```c
+	if (!test_bit(WMI_SERVICE_THERM_THROT, ar->wmi.svc_map))
+		return 0;
+```
+
+### Why there is nothing to implement
+
+The plumbing is already complete for this firmware type -- `wmi-tlv.c:3630`
+implements `ath10k_wmi_tlv_op_gen_pdev_set_quiet_mode()`, `wmi-tlv.c:4593`
+wires it into `wmi_tlv_ops`, and `wmi-tlv.h:1628` maps
+`WMI_TLV_SERVICE_THERM_THROT` to the generic bit. Throttling would work today
+if the firmware advertised it. It does not, and commit
+`53884577fbcef` ("ath10k: skip sending quiet mode cmd for WCN3990", Rakesh
+Pillai, 2018) exists precisely because sending the command to firmware that
+lacks it raises a fatal exception,
+`err_qdi.c:456:EX:wlan_process:1:WLAN RT:207a:PC=b001b4f0` -- the same fault
+class as the channel 169 crash, and the same shape of fix: stop the host
+sending what the firmware cannot handle.
+
+### What would remain possible
+
+Even with the service bit, automatic in-kernel throttling via the DT zone
+would need two further changes, so it was never a config tweak:
+
+1. `msm8998.dtsi`'s `wlan-thermal` has a single trip of type `"hot"`, which is
+   notification-only, and no `cooling-maps`. It would need a `passive` trip
+   plus a map.
+2. ath10k registers its cooling device with
+   `thermal_cooling_device_register()` (`thermal.c:164`), which has no backing
+   `device_node`, so DT `cooling-maps` cannot reference it by phandle -- unlike
+   msm8998's GPU zones, the file's only two maps, which bind
+   `<&adreno_gpu 0 6>`. Binding it would require ath10k to switch to
+   `devm_thermal_of_cooling_device_register()` with `#cooling-cells`, an
+   upstream change affecting every ath10k platform.
+
+For tethering the practical mitigation is therefore host-side: the
+`wlan-thermal` zone reads correctly, so userspace can watch it and reduce TX
+power, narrow the channel, or stop the AP. No kernel change needed for that.
+
+**Bigger unknown first:** AP mode on joan is completely untested. ath10k
+advertises `NL80211_IFTYPE_AP`, but nothing has exercised it, and issues
+#26/#27 are on the *station* association path (hostapd runs the authenticator
+side in AP mode), so whether they apply is unknown. Establishing that AP mode
+works at all should precede any thermal work.
