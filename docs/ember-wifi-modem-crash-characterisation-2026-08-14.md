@@ -409,3 +409,53 @@ shadow-register configuration would produce, and these are the values
 downstream icnss/cld sets differently per firmware generation. This is the
 next place to look, and unlike the storage leads it cannot be tested by
 substitution -- it needs the downstream values to compare against.
+
+## Shadow registers: an over-read, and a correction
+
+Disabling the v1 shadow-register table (`shadow_reg_valid = 0`) produced zero
+crashes over 60 s -- the first such result while "the firmware was running" --
+and a comparison against downstream appeared to show mainline missing CE 5's
+destination shadow register. Both readings were wrong.
+
+**The zero-crash result was not meaningful.** That run also logged:
+
+```
+Service connect timeout
+failed to connect htt (-110)
+could not init core (-110)
+```
+
+No `wlan0`. WLAN never became operational, which places it in exactly the same
+class as the MSA-ready-wait test: WLAN not running implies no crash, which was
+already established. It narrowed nothing.
+
+**The CE 5 comparison was apples-to-oranges.** `shadow_dst_wr_ind_addr()` in
+`qca-wifi-host-cmn` maps CE control addresses to *host-side* shadow registers
+(`SHADOW_VALUE13` = `scn->host_shadow_regs->d_A_LOCAL_SHADOW_REG_VALUE_13`).
+The QMI `shadow_reg` table means something different: for each CE, the offset
+of the write-index register within the CE block (`WCN3990_SRC_WR_IDX_OFFSET`
+0x3C, `WCN3990_DST_WR_IDX_OFFSET` 0x40). The two lists are not comparable and
+mainline's table is not missing anything.
+
+Tested anyway, and it made things worse -- adding a CE 5 destination entry
+moved the crash earlier, into firmware init:
+
+```
+firmware crashed! ... firmware ver  api 0 features  crc32 00000000
+could not power on hif bus (-110)
+```
+
+Reverted. The one thing this does establish is that the firmware is sensitive
+to the exact contents of the shadow table, so it is not a free parameter.
+
+### The pattern that actually holds
+
+Across every configuration tested:
+
+- **WLAN firmware operational** -> crash, deterministic, same PC
+- **WLAN firmware not operational** (MSA-ready wait, shadow regs off) -> no
+  crash, no `wlan0`
+
+No configuration has produced a working `wlan0` without the crash. The crash
+looks intrinsic to mainline ath10k driving this particular LG MPSS WLAN
+firmware, rather than to any single parameter the host supplies.
