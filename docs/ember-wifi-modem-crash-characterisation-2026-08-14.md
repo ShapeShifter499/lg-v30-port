@@ -328,3 +328,39 @@ The crash is **not cleared**. Wi-Fi is usable regardless: ath10k recovers every
 time and a 63-BSS passive scan completes. The cost is a modem restart roughly
 every 10-30 s, which is fine for Wi-Fi but would disrupt cellular, so the two
 lanes cannot currently be considered simultaneously working.
+
+## Firmware substitution: INCONCLUSIVE, not negative
+
+joan runs LG's `wlanmdsp.mbn` (3,055,364 B) where other mainline WCN3990
+devices run their own vendor build. linux-firmware ships a generic image
+(3,725,044 B). The two are genuinely different -- the `0xb0000000` code segment
+is md5 `bc53992fe6df` (LG) vs `69102a4bacb1` (generic), with different segment
+layouts entirely.
+
+Bind-mounting the generic image over `/lib/firmware/wlanmdsp.mbn` (no
+persistent write) and cold-starting MSS produced: `wlan0` up, tqftpserv serving
+7 wlanmdsp requests, crash delta 3/95 s -- and **the same reported firmware
+version (1.0.0.695) and the same fault PC**.
+
+Two different code images cannot plausibly fault at an identical address, so
+that result was treated as suspect rather than as a negative. A positive
+control settled it:
+
+```
+bind-mounted 1024 bytes of /dev/urandom as wlanmdsp.mbn
+tqftpserv wlanmdsp requests: 0
+wlan0 still came up, firmware ver 1.0.0.695, still crashing
+```
+
+**On a modem restart the WLAN firmware is not re-fetched over TFTP at all.**
+The modem reuses what it already holds, so every crash/recovery cycle runs the
+same image regardless of what is on disk, and firmware substitution cannot be
+tested this way.
+
+Firmware is therefore **untested**, not ruled out. Testing it needs the
+alternate image in place before the modem's first load of a cold boot, with a
+positive control proving the swap took effect -- for instance a deliberately
+corrupt image that must break bring-up.
+
+Recorded because without the positive control this would have been filed as
+"firmware ruled out", which would have been wrong.
