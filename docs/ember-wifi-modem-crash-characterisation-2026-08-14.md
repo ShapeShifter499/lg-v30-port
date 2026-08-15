@@ -364,3 +364,48 @@ corrupt image that must break bring-up.
 
 Recorded because without the positive control this would have been filed as
 "firmware ruled out", which would have been wrong.
+
+## The served wlanmdsp.mbn is not the running WLAN firmware
+
+Cold-boot positive control (`FWCTL-*`): 1024 bytes of `/dev/urandom`
+bind-mounted over `/lib/firmware/wlanmdsp.mbn` **before the modem's first
+start**, so tqftpserv could only ever serve garbage.
+
+```
+tqftpserv wlanmdsp requests: 9      <- requested, and served the garbage
+wlan0: up
+firmware ver 1.0.0.695 api 5        <- unchanged
+still crashing, same PC
+```
+
+The modem asks for the file and then runs its own WLAN firmware anyway,
+evidently from the modem image it already holds. This explains every
+previously puzzling observation at once: why the generic image changed
+nothing, why the reported version never moves off 1.0.0.695, and why the fault
+PC is byte-identical across images with genuinely different code.
+
+Consequences:
+
+- **Firmware substitution over TFTP is impossible on this device.** Changing
+  the WLAN firmware would mean modifying the modem partition, which is a
+  persistent device write and out of scope.
+- The handoff's framing that `tqftpserv` serving `wlanmdsp.mbn` is a required
+  part of the WLAN chain is, at minimum, not the whole story here -- WLAN comes
+  up with that file corrupt.
+- The running WLAN firmware is LG's, and LG's own Android drives it
+  successfully with icnss/cld. So the difference that matters is most likely
+  **the host driver**, not the firmware or its data.
+
+That reframes the remaining search. Everything ath10k *sends* has now been
+varied except the WLAN configuration itself:
+
+- `wlan_cfg`: the copy-engine config, target service map and shadow register
+  config (`ath10k_snoc_ce_config_wlan[]`,
+  `ath10k_snoc_target_ce_config_wlan[]`, `ath10k_snoc_target_service_map[]`)
+- `wlan_mode`
+
+A bad pointer inside the WLAN process is exactly what a mismatched CE or
+shadow-register configuration would produce, and these are the values
+downstream icnss/cld sets differently per firmware generation. This is the
+next place to look, and unlike the storage leads it cannot be tested by
+substitution -- it needs the downstream values to compare against.
