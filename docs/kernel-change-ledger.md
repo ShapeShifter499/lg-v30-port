@@ -7846,3 +7846,44 @@ Date: 2026-08-11
 
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-13
+
+---
+
+### K174 — WCN3990 pairwise delete-key wait quirk (host-only, 2026-08-15)
+
+- Handle: kernel branch `joan/wcn3990-delete-key-no-wait` in
+  `linux-mainline-v30-wcn3990-keyfix`, three local/unpushed signed commits on
+  `ghfork/joan/latest-clean-test` `5fbb6db354d950ee3ab7f07deca7d5524ebce518`:
+  - `c17e83d9b91f6c3bf74e8ab666feecad4de34079` — DT binding;
+  - `a53a7ef68716833010c9bee298a09811cf6afabb` — ath10k optional skip;
+  - `834154d6b0829b5fab79d087e1944725d25fecd0` — joan `&wifi` opt-in.
+- Class: `upstream-candidate` shape, **host-verified only**. Device behavior
+  is untested because Lance held off the RAM boot.
+- Change: add `qcom,skip-pairwise-delete-key-wait`. When set, pairwise
+  `DISABLE_KEY` returns without waiting for `SEC_IND`. Installs and group-key
+  replacement still wait 3s. Justified by the 2026-08-15 HTT classification
+  (matched install, lost teardown indication) and the Acayan/Prestwood
+  ath10k RFC thread.
+- Touched files:
+  - `Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml`
+  - `drivers/net/wireless/ath/ath10k/{core.h,mac.c,snoc.c}`
+  - `arch/arm64/boot/dts/qcom/msm8998-lge-joan.dts`
+- Verification:
+  - three commits signed;
+  - clean full `Image.gz dtbs modules` exited 0;
+  - release `7.2.0-rc2-g834154d6b082`;
+  - Image.gz SHA-256 `7336888c9c18ae007a935091b1c1614e8c79dac7289e4260b3db854507ad4551`;
+  - Joan DTB SHA-256 `7547b76040823108912db13d66250e26557110085908532d81c107cdb8c23dda`;
+  - no boot.img packaged; phone left on LineageOS.
+- Authority: host-only. Fresh explicit approval required before one RAM-only
+  test. Do not treat this ledger row as authorization.
+- Public/PR disposition: `needs cleanup` — local/unpushed; kernel trailers
+  are bare `moa/deep-flash` without expanded models; Baochen preferred a
+  shorter timeout rather than skipping the wait.
+- Cross-ref:
+  `docs/test-results/WCN3990-DELETE-KEY-HOST-2026-08-15.md`,
+  `docs/aurel-handoff-2026-08-15-to-next-session-wcn3990-delete-key-ram-test.md`,
+  `docs/test-results/WIFI-KEYINSTALL-HTT-2026-08-15.md`.
+
+Assisted-by: Hermes-Agent:xai-oauth/grok-4.6
+Date: 2026-08-15
