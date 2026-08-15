@@ -24,7 +24,24 @@ ath10k_snoc 18800000.wifi: firmware crashed!
 ```
 
 That is the same signature, to the byte, as every crash recorded in this
-port, and matches upstream msm8998-mainline issue #27.
+port.
+
+**It is *not* the same bug as msm8998-mainline #26/#27, and an earlier claim
+of mine that it "matches issue #27" was wrong.** Those two report
+`PC=b00bfa9c` on firmware 1.0.0.483, triggered by disconnecting (#26) and by
+connecting (#27); this one is `PC=b01c4d3c` on firmware 1.0.0.695, triggered
+by a scan. They share `err_qdi.c:450` and the `wlan_process` / `WLAN RT`
+task only because that line is the firmware's generic exception reporter --
+the reporting path, not the identity of the fault. The faulting PC is the
+identity, and the two differ.
+
+That also answers "was this ever flagged?". The modem-crash *family* on
+MSM8998 has been open since May 2022 (#26 and #27, both still open), but the
+scan trigger does not appear in either, and no report of channel 169 or
+5845 MHz was found. It is easy to see why it stayed buried: when every
+connect and every disconnect crashes the modem, nobody isolates an
+additional per-scan crash underneath that, and isolating it needs WMI
+tracing plus per-channel scan control.
 
 The Hexagon disassembly of `PC=b01c4d3c` is `r2 = memw(r3+r2<<#0)` -- an
 indexed load. That is what indexing a channel table with no entry for
@@ -273,8 +290,10 @@ dead for that window every time.
 
 **Does it affect an established connection?** Yes, it would have. The WLAN
 firmware runs behind MPSS, so a modem crash destroys the association, keys
-and session state, not just the interface -- upstream #27 shows the sequence
-ending in `deauthenticated (Reason: 15=4WAY_HANDSHAKE_TIMEOUT)`. A recovered
+and session state, not just the interface -- msm8998-mainline #27, a
+different fault reached the same way, shows a modem crash taking a
+connection down and ending in
+`deauthenticated (Reason: 15=4WAY_HANDSHAKE_TIMEOUT)`. A recovered
 interface is not a preserved connection. Since a full scan is exactly what a
 connection manager does periodically, this was on a timer. With the fix that
 trigger is gone.
@@ -310,6 +329,35 @@ Country hints do work on this device, and do change the outcome:
 `/lib/firmware/regulatory.db` is present and its certificates load at boot
 (`Loaded X.509 cert 'sforshee: ...'`), so the regulatory database is not the
 missing piece -- JP demonstrably restricts the list.
+
+### This is not a joan quirk -- SDM845 does the same
+
+sdm845-mainline issue #70, "EEPROM access problems leading to random MAC
+address and missing wifi channels" (opened 2026-01-14, still open), shows an
+SDM845 device producing output byte-for-byte identical to joan's:
+
+```
+ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+ath: EEPROM regdomain: 0x0
+ath: EEPROM indicates default country code should be used
+ath: country maps to regdmn code: 0x3a
+ath: Country alpha2 being used: US
+ath: Regpair used: 0x3a
+```
+
+So the blank regdomain that lands every WCN3990 mainline port on US, with
+channel 169 advertised, is a property of these ports generally rather than
+of this board. Devices such as the Ayn Odin (Snapdragon 845, WCN3990,
+`ath10k_snoc`, pmaports MR !4986) are in exactly the same position: they
+advertise the same channel from the same blank regdomain.
+
+What differs is the firmware. On SDM845 the WLAN firmware is a per-device
+`wlanmdsp.mbn` from the vendor image, a different build from joan's
+LG-MPSS-embedded 1.0.0.695, and nobody has tested 5845 MHz on those builds.
+This cuts both ways for the WCN3990-wide scope: it either protects those
+devices from the same latent fault, or costs them an India-only channel they
+were unlikely to be using. It does make the shared exposure condition
+concrete, which is the part that was previously assumption.
 
 The conclusion is that the regulatory domain is a real lever but the wrong
 one to rely on: a country that forbids 5845 MHz masks the crash, and the
