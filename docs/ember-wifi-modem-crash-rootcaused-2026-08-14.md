@@ -168,7 +168,49 @@ interface is not a preserved connection. Since a full scan is exactly what a
 connection manager does periodically, this was on a timer. With the fix that
 trigger is gone.
 
-## 7. Open, unrelated: an upstream DT oddity found on the way
+## 7. Is this an unset country code? No -- the default *is* US
+
+Lance asked whether the crashing channel is exposed because no country code
+is set. Measured on `REGTEST-20260815T035411Z` (pre-fix image, so 169 is
+live). The driver logs its own answer:
+
+```
+ath: EEPROM regdomain: 0x0
+ath: EEPROM indicates default country code should be used
+ath: country maps to regdmn code: 0x3a
+ath: Country alpha2 being used: US
+ath: Regpair used: 0x3a
+```
+
+The WCN3990's regdomain code is **0x0**, i.e. blank. `__ath_regd_init()`
+treats a blank code as "use the default country" and substitutes
+`CTRY_UNITED_STATES` outright. So joan is not sitting in a permissive
+world/00 fallback -- it comes up as **US**, and US permits 5845 MHz here.
+
+Country hints do work on this device, and do change the outcome:
+
+| country | Mode[A] channels | full scan |
+|---|---|---|
+| default (US, from blank EEPROM) | ...161 165 **169** 173 | **1 crash** |
+| `set country US` explicitly | unchanged, 169 still present | **1 crash** |
+| `set country JP` | ...140 144 (all UNII-3 gone) | **0 crashes** |
+| back to US (positive control) | 169 present again | **1 crash**, and 5845 alone **1 crash** |
+
+`/lib/firmware/regulatory.db` is present and its certificates load at boot
+(`Loaded X.509 cert 'sforshee: ...'`), so the regulatory database is not the
+missing piece -- JP demonstrably restricts the list.
+
+The conclusion is that the regulatory domain is a real lever but the wrong
+one to rely on: a country that forbids 5845 MHz masks the crash, and the
+device's own default does not. Every joan gets US out of the box and
+therefore gets the crash. That is why the fix belongs in the driver rather
+than in configuration. Note also that ath10k sets `REGULATORY_STRICT_REG |
+REGULATORY_CUSTOM_REG` and applies its custom domain before wiphy
+registration, so those disables live in `orig_flags`: a user country hint
+can further restrict the list but cannot re-enable what the driver withheld,
+which is what makes the fix in section 4 durable against any country setting.
+
+## 8. Open, unrelated: an upstream DT oddity found on the way
 
 `msm8998.dtsi` gives the WCN3990 twelve CE interrupts, but the list starts one
 SPI lower than sdm845's and has a hole:
@@ -191,7 +233,7 @@ copy engine on any CE interrupt, so a shifted line is largely masked, and
 because it is a genuine upstream discrepancy worth resolving separately, by
 someone who can determine whether the true CE base is 413 or 414.
 
-## 8. State
+## 9. State
 
 | lane | state |
 |---|---|
