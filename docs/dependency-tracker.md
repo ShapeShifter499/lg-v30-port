@@ -48,6 +48,8 @@ Rules:
 | 2026-07-11 | upstream 10nm DSI initial VCO-rate fix `8a48e35becb214743214f5504e726c3ec131cd6d` | `https://github.com/torvalds/linux/commit/8a48e35becb214743214f5504e726c3ec131cd6d` / linked lore and Patchwork discussion | read-only network reference; current upstream raw source compared, no new checkout | explain K070's zero initial `vco_current_rate` and its interaction with local/public-reference VCO formula fix | Hermes Agent |
 | 2026-08-02 | Linux master source snapshot `2d2338c93da79b3bfe4b6099a931d9468d539952` | `https://github.com/torvalds/linux` raw/API | `out/audit-20260802/upstream-linux-2d2338c93da79b3bfe4b6099a931d9468d539952/` plus disposable `/tmp/v30-upstream-audit` | compare joan brightness/GPU changes with current upstream and validate binding shape | Hermes Agent |
 | 2026-08-02 | `linux-firmware` `WHENCE` at `a968c5c2962e0bad2482f4b05a3fb627b871ca89` | `https://gitlab.com/kernel-firmware/linux-firmware` | disposable `/tmp/linux-firmware-WHENCE-20260802`, SHA-256 `b78facd5dcc32f3cb079f0727104408acbedde17547569557c28f02030c099f9` | verify redistributability boundary: A530 PM4/PFP are listed; joan A540 GPMU/ZAP are not | Hermes Agent |
+| 2026-08-15 | Alpine edge aarch64 `hostapd-2.12-r0.apk` | `http://dl-cdn.alpinelinux.org/alpine/edge/main/aarch64/hostapd-2.12-r0.apk` | `nym-nest-family:~/joan-images/staging/apk-cache-aarch64/hostapd-2.12-r0.apk`, SHA-256 `966665f253025d2ef919e570b3a7e6797703f74c6eef561ddaec7e8261e77eaf` | tmpfs-only hostapd for the controlled HTT key diagnostic; package extracted, not installed | Hermes Agent |
+| 2026-08-15 | Alpine edge aarch64 `iw-6.17-r0.apk` | `http://dl-cdn.alpinelinux.org/alpine/edge/main/aarch64/iw-6.17-r0.apk` | `nym-nest-family:~/joan-images/staging/apk-cache-aarch64/iw-6.17-r0.apk`, SHA-256 `28b12964ec10553bb853cc93fea0b6add20b29fb11573ee4e44e1392837241ce` | tmpfs-only radio inspection for the controlled HTT key diagnostic; package extracted, not installed | Hermes Agent |
 
 Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
@@ -57,3 +59,6 @@ Date: 2026-07-11
 
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-02
+
+Assisted-by: Hermes-Agent:moa/deep-flash
+Date: 2026-08-15

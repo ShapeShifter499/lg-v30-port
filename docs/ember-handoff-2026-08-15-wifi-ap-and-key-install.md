@@ -1,8 +1,11 @@
-# Ember handoff, 2026-08-15: Wi-Fi crash fixed, tethering measured, `-110` key install open
+# Wi-Fi handoff, 2026-08-15: crash fixed; no teardown-key SEC_IND observed for `-110`
 
 Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-opus-5
 Date: 2026-08-15
+
+Follow-up-by: Hermes Agent:moa/deep-flash
+Follow-up-date: 2026-08-15
 
 For whoever picks this up next -- a future me, or Aurel. Supersedes the open
 Wi-Fi items in `ember-handoff-2026-08-14-gpu-closed-connectivity-state.md`.
@@ -61,104 +64,107 @@ Pushed to `ghfork` = `github.com/ShapeShifter499/linux-lg-v30-joan`:
 **`origin` in that repo is torvalds/linux. Never push there.**
 
 Docs repo `~/vibe-coding-projects/coding/lg-v30-port`, branch
-`aurel/card94-reset-script`, pushed to `ghpub` at `31c3894`.
+`aurel/card94-reset-script`; the pre-diagnostic handoff commit was `d1b86a4`.
 
-## 3. The open problem: `-110` on key install
+## 3. `-110` classified: the association key succeeded; teardown-key deletion lost its indication
 
-This is the one worth picking up.
+**This section supersedes the earlier association-time diagnosis. Do not run
+another association merely to repeat this split.** The one-variable HTT-debug
+boot and one controlled nym-fang association were completed and the evidence
+was sealed before recovery.
 
-### Symptom
+### Exact diagnostic
 
-In AP mode, associating clients intermittently fail with
+- Intended/current source baseline: kernel `519646f01`; source AP image SHA-256
+  `bb7362e981cc3686648557c169732abce55ba969e0347a3a7c71fba8bb0630cf`.
+  The runtime release was `7.2.0-rc2-gd05e70c5e484-dirty`, so exact build-source
+  provenance is inherited from that source image and remains unproven.
+- Only changed variable: kernel command line gained
+  `ath10k_core.debug_mask=0x8`; runtime sysfs value was exactly `8`.
+- RAM-only candidate SHA-256:
+  `3dfad94194d3bedef972eed11c7c9a37aa1cee3427042682605b03479171b19f`.
+- AP: BSSID `be:a7:df:92:bf:78`, channel 36/VHT80. Client:
+  `e4:5f:01:07:fc:f3` (nym-fang). Exactly one controlled association.
 
-```
-ath10k_snoc 18800000.wifi: failed to install key for vdev 0 peer <mac>: -110
-ath10k_snoc 18800000.wifi: cipher 0 is not supported
-ath10k_snoc 18800000.wifi: failed to disassociate station: <mac> vdev 0: -95
-```
+### What the correlated logs prove
 
-The client sees it as a **wrong password** -- both Android and
-`wpa_supplicant` report the failed 4-way handshake that way
-(`4-Way Handshake failed - pre-shared key may be incorrect`). It does **not**
-crash the modem.
-
-### Mechanism, established
-
-`-110` is `ETIMEDOUT` from `ath10k_install_key()` (`mac.c:307`):
-
-```c
-	reinit_completion(&ar->install_key_done);
-	if (arvif->nohwcrypt)
-		return 1;
-	ret = ath10k_send_key(arvif, key, cmd, macaddr, flags);
-	time_left = wait_for_completion_timeout(&ar->install_key_done, 3 * HZ);
-	if (time_left == 0)
-		return -ETIMEDOUT;
-```
-
-`install_key_done` is completed by **exactly one thing**: the firmware's
-`HTT_T2H_MSG_TYPE_SEC_IND` message (`htt_rx.c:4181`). The other `complete()`
-(`core.c:2587`) is the crash-recovery path unblocking all waiters. So `-110`
-means *the firmware did not send an HTT security indication within 3 s*.
-
-### The lead: the WLAN is faulting the IOMMU
+The client mapped to HTT peer ID 30:
 
 ```
-arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000,
-                        fsynr=0x1, cbfrsynra=0x1900, cb=1
-ath10k_snoc 18800000.wifi: failed to extract amsdu: -11
+[731.474514] htt peer map vdev 0 peer e4:5f:01:07:fc:f3 id 30
 ```
 
-`16c0000.iommu` is `anoc2_smmu` (msm8998.dtsi:1116) and the wifi node declares
-`iommus = <&anoc2_smmu 0x1900>, <&anoc2_smmu 0x1901>` (msm8998.dtsi:3866). So
-**`cbfrsynra=0x1900` is the WLAN**, doing DMA to **address zero**, repeatedly
-(t=2408, 2665, 2670, 3188, 3189, 3331, 3336, 3528 in one boot), interleaved
-with corrupted RX (`failed to extract amsdu: -11`).
+The WPA2 four-way handshake reached hostapd's pairwise `NEW_KEY` at
+731.568572. The firmware returned the matching indication about 21 ms later:
 
-A device whose DMA is faulting will drop HTT messages. That is exactly the
-symptom. It may also explain #26/#27's `unhandled tx completion status 5`,
-which is the same family of "HTT came back wrong".
+```
+[731.589262] sec ind peer_id 30 unicast 1 type 6
+```
 
-### Next steps, in order
+Hostapd then marked the station connected and the pairwise handshake complete;
+the client independently logged `WPA: Key negotiation completed` and
+`CTRL-EVENT-CONNECTED`. Therefore the association-time PTK installation was
+**matched and on time**, not lost or late.
 
-1. **Split "lost" from "late".** Boot with `ath10k_core.debug_mask=0x8`
-   (`ATH10K_DBG_HTT`) and hostapd, and watch for `sec ind peer_id ...` during
-   a failing handshake. If it never appears, the SMMU lead is the thing. If it
-   appears at ~3.5 s, the event is merely late and raising the timeout fixes
-   it outright. One boot, and it decides the whole direction.
-2. **Chase the `iova=0` fault.** This is *our* bug rather than a firmware one,
-   which makes it far more tractable than the upstream position implies.
-   Check whether stream `0x1901` is correct/needed, whether the wifi node
-   wants `dma-coherent`, and the MSA region handling (`qcom,msa-fixed-perm`
-   was reverted, so that path is live). `ath10k_ce_alloc_rri()` uses
-   `dma_alloc_coherent(ar->dev, ...)` and is properly mapped, so the RRI ring
-   is probably not the source.
-3. Only then consider timeout/retry patches. Note Kalle Valo's position on the
-   ath10k list is that the proper fix belongs in firmware, and the one
-   proposed patch merely shortened the wait.
+The controlled client process was stopped about 12 seconds later. The client
+sent disassociation reason 8 at 743.699674. Hostapd immediately issued a
+pairwise `DEL_KEY` at 743.709249. That call blocked for the driver's three-second
+completion timeout; the kernel reported at 746.976115:
+
+```
+ath10k_snoc 18800000.wifi: failed to install key for vdev 0 peer e4:5f:01:07:fc:f3: -110
+```
+
+Despite the generic wording, this occurrence belongs to the **DISABLE_KEY /
+pairwise teardown path**, not the successful initial key install. No further
+`SEC_IND` appeared through the evidence seal at uptime 936.982. Classification:
+**no matching teardown indication observed; lost from the host's perspective**.
+It was not late within the captured ~190-second tail, and it was not
+mismatched: the only client-unicast indication was the prompt, matching peer-30
+indication for the successful install. This does not prove transport loss;
+whether firmware generated a delete acknowledgement remains open.
+
+### SMMU lead downgraded for this timeout
+
+There were five WLAN stream-`0x1900`, `iova=0` SMMU faults before the controlled
+association, but the count stayed exactly five from pre-association through
+the timeout and evidence seal. There were no `failed to extract amsdu`, modem
+fatal, or crash events in this run. The faults remain a real independent issue,
+but this experiment directly rejects them as the proximate cause of this
+specific lost teardown acknowledgement. Deprioritize SMMU work unless a future
+timeout coincides with a new fault.
+
+### Mechanism and next steps
+
+`ath10k_install_key()` waits on the same `install_key_done` completion for both
+`SET_KEY` and `DISABLE_KEY`; the HTT `SEC_IND` handler is still the only normal
+completion source. Next work, in order:
+
+1. Instrument the wait boundary with command (`SET_KEY` versus `DISABLE_KEY`),
+   peer, key index/flags, and begin/end timestamps so the generic warning can no
+   longer obscure which operation timed out.
+2. Compare downstream/CAF WCN3990 behavior and determine whether this firmware
+   is expected to emit `SEC_IND` for key deletion.
+3. If downstream confirms no delete acknowledgement, test a narrowly scoped
+   WCN3990/SNOC change that skips the `SEC_IND` wait only for key disable while
+   preserving the wait for real installs. Do not globally raise the timeout.
+4. Separately explain why stopping the client triggers this cleanup failure and
+   whether the earlier apparent "wrong password" reports were actually a
+   different event; this run did not reproduce a failed association.
 
 ### Do not bother with
 
-- **`cryptmode=1` (software crypto).** It would bypass hardware key install
-  entirely, but `core.c:2675` requires raw-mode firmware support and joan
-  reports `raw 0`. Dead end.
+- **`cryptmode=1` (software crypto).** It would bypass hardware key install,
+  but `core.c:2675` requires raw-mode firmware support and joan reports `raw 0`.
 - **PMF / 802.11w.** Setting `ieee80211w=0` explicitly changed nothing.
-- **Two spatial streams.** Forcing one chain
-  (`iw phy phy0 set antenna 1 1`, confirmed `Configured Antennas: TX 0x1 RX
-  0x1`) while keeping VHT80 changed nothing.
-- **Progressive state degradation over a long boot.** Fitted well -- the
-  `-110` errors only start at t~1397 s -- but was rejected when restoring the
-  NetworkManager hotspot even later in the same boot worked immediately.
+- **Two spatial streams.** A confirmed one-chain VHT80 test changed nothing.
+- **Progressive state degradation.** NetworkManager worked later in the same
+  prior boot.
+- **Raising the three-second timeout as the first fix.** No delete indication
+  appeared even through the long tail, so this result is lost, not merely late.
 
-### The unexplained split
-
-The same phone works under **NetworkManager's** wpa_supplicant AP mode on
-either band, and fails under **hostapd** on every configuration tried, while a
-Pi 4B client works under hostapd at VHT80 for 326 s and 200 MB. That points at
-something in the hostapd association/key sequence rather than a client
-capability, and it is not isolated. Diffing the two daemons' association and
-key-install sequences with `debug_mask=0x8` would likely settle it alongside
-step 1 above.
+The prior NetworkManager-versus-hostapd split is now narrower: compare their
+**disconnect/key-delete sequences**, not just association key installation.
 
 ## 4. Tethering: what it does
 
@@ -193,8 +199,11 @@ tethering config needs `NF_TABLES`, `NF_NAT` and `NFT_MASQ` as `=y`.
 
 ## 5. Loose ends someone should close
 
-- **Host state left up** (all runtime-only, nothing installed anywhere; a
-  pacman attempt on nym-nest failed on a stale db and rolled back cleanly):
+- **The prior runtime host state is now cleaned up.** nym-nest has no remaining
+  `10.42.0.0/24` route/forward/NAT rule and its pmOS USB interface is gone;
+  nym-fang has no test routes, is NetworkManager-managed again, its system
+  wpa_supplicant is running, and Wi-Fi was restored to its original disabled
+  state. The older cleanup commands remain below only as historical detail:
 
 ```sh
 # nym-nest
@@ -238,6 +247,12 @@ Helpers on nym-nest in `~/joan-images/staging/`: `stage.sh` (one stage, fetch
 immediately), `stage-candidate.sh` (package + verify + stage + hash-bound
 runner), the per-image `*-ramboot-once.sh` runners, and
 `a540-hwinit-recover-lineage-on-nest.sh <RUN_DIR>` to get back to LineageOS.
+
+The recovery helper has one known false-negative trap: with `set -euo pipefail`,
+an expected zero-match `lsusb` probe can terminate its polling loop after the
+reboot command. In this diagnostic the helper returned 1, but direct ADB
+verification proved LineageOS fully booted and pmOS transport absent. Fix the
+probe before relying on the helper's exit status alone.
 
 `hostapd`, `iw` and `wpa_supplicant` were all run **from tmpfs** (`apk fetch`
 or an Arch package extracted with `tar -I zstd`), never installed. That

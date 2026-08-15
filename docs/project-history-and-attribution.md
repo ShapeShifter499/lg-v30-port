@@ -799,3 +799,53 @@ Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-13
 Update-scope: Card 94 clean reconstruction, exact-source device test, mixed
 power result, recovery, and corrected next diagnostic boundary.
+
+## 2026-08-15 — WCN3990 HTT key-timeout discriminator
+
+Primary helper: Hermes Agent (`Hermes-Agent:moa/deep-flash`) with Lance as
+owner/operator and device authority, following Ember's Wi-Fi crash and AP-mode
+work (`Claude-Code:claude-opus-5`).
+
+Main artifacts:
+
+- `docs/test-results/WIFI-KEYINSTALL-HTT-2026-08-15.md`;
+- `docs/keyinstall-httdebug-evidence-bank-2026-08-15.md`;
+- updated `docs/ember-handoff-2026-08-15-wifi-ap-and-key-install.md`;
+- ignored, SHA-sealed raw evidence under
+  `out/audit-20260815/keyinstall-httdebug-519646f01/`.
+
+What happened:
+
+- Repacked the hashed channel-169-fixed AP image with one change only:
+  `ath10k_core.debug_mask=0x8`. Unpacked kernel and ramdisk remained
+  byte-identical to the source image. The runtime kernel identified itself as
+  `7.2.0-rc2-gd05e70c5e484-dirty`, so the exact build-source commit remains
+  unproven rather than being inferred from the intended/current `519646f01`
+  baseline.
+- Executed one fail-closed RAM-only boot and exactly one controlled hostapd
+  association from nym-fang.
+- Correlated hostapd, client, and kernel HTT logs. The pairwise key installation
+  mapped the client to peer 30, received a matching unicast `SEC_IND` about
+  21 ms after `NEW_KEY`, and completed the WPA2 connection.
+- The later controlled client teardown issued pairwise `DEL_KEY`; no security
+  indication followed, and the driver's shared three-second waiter produced
+  the generic `failed to install key ... -110` warning.
+- Reclassified this occurrence as no matching teardown-key delete indication
+  observed — lost from the host's perspective — rather than an association-time
+  PTK failure. Whether firmware generated a delete acknowledgement remains
+  open. The WLAN SMMU fault count stayed fixed across the relevant window,
+  weakening it as the proximate cause.
+- Sealed 35 artifacts in a portable manifest, recovered to installed LineageOS,
+  and verified Android identity/boot completion plus pmOS transport absence.
+
+Publication relevance:
+
+- No kernel source changed and no phone partition was flashed or erased.
+- The next step is host-only downstream/CAF research into the WCN3990 delete-ack
+  contract, followed by explicit command-boundary instrumentation only if still
+  needed. A new device test requires fresh approval.
+
+Assisted-by: Hermes-Agent:moa/deep-flash
+Date: 2026-08-15
+Update-scope: HTT key-timeout discriminator, teardown classification, evidence
+seal, and installed-OS recovery.
