@@ -541,3 +541,79 @@ upstreamable fix needs nvmem or a QMI path rather than a hardcoded property.
 **Conclusion: the AP throughput ceiling is not a calibration or board-id
 problem, and neither needs fixing.** The remaining suspect is the AP transmit
 path itself.
+
+## 12. Appendix: tethering works, and what it actually pushes
+
+AP mode was brought up on joan and measured under the goal "confirm tethering
+can push the true limits". Run `APMODE-20260815T052619Z`.
+
+### It works
+
+`hostapd` v2.12 (fetched into tmpfs, not installed) driving `wlan0` as an AP
+on channel 36 at **80 MHz**, WPA2, with `dnsmasq` for DHCP. A Galaxy Z Fold 5
+associated, took a lease, and reached the internet through joan; NAT was done
+on nym-nest because joan's kernel has no `NF_TABLES` (see below).
+
+### Throughput, measured
+
+The pure Wi-Fi hop, AP -> client, fetching a 60 MiB file over HTTP:
+
+| client | link | AP -> client |
+|---|---|---|
+| nym-nest (802.11n, HT40, MCS 4) | 81 Mbit/s PHY | **33.6 Mbps** |
+| nym-fang (Pi 4B, VHT80, VHT-NSS 1) | 325 Mbit/s PHY | **63.1 / 67.5 / 65.1 Mbps** |
+
+Three consecutive VHT80 runs agree within 7%. For context on the rest of the
+chain: nym-nest to the internet is ~590 Mbps, and joan to the internet over
+the USB link (no Wi-Fi hop) is 214-246 Mbps. **The Wi-Fi hop is the limiting
+segment, and doubling the channel width roughly doubled it**, which is what a
+healthy radio should do. `crashes=0 fatal=0`, modem `running`, across ~190 MB.
+
+The Pi is a single-stream client seen at -73 dBm, so 63-68 Mbps is not joan's
+ceiling either. The Fold 5 negotiates VHT-MCS 4 / 80 MHz / **NSS 2** at
+390 Mbit/s, i.e. twice the spatial streams and a stronger signal.
+
+### A retraction
+
+Earlier in this investigation I computed an "effective AP TX rate" of roughly
+5 Mbps by dividing `tx bytes` by `tx duration` from the station dump, and used
+it to argue joan's transmitter was crippled. **That was wrong.** The station
+dump reports `tx duration: 286321855 us` -- 286 seconds of airtime -- for
+about 23 seconds of transfers. The counter is not populated meaningfully by
+this firmware, the same way the PDEV TX stats are all zero. Measured
+throughput of 63-68 Mbps contradicts the inference, and the measurement wins.
+
+A related near-miss worth recording: a client-side `rx bitrate: 6.0 MBit/s`
+reading looked like rate control pinned to the basic rate, but with no bulk
+data in flight it was only beacons and management frames. Rates from a station
+dump mean nothing unless traffic is actually flowing.
+
+### Two real bugs found along the way
+
+1. **`failed to install key ... -110` occurs in AP mode.** This is the
+   signature from msm8998-mainline #26/#27, previously only reported for a
+   station associating outward. In AP mode it makes the 4-way handshake fail,
+   which both Android and `wpa_supplicant` report as a wrong password
+   (`4-Way Handshake failed - pre-shared key may be incorrect`). It is
+   intermittent, leaves the peer wedged (`failed to disassociate station:
+   -95`), and is cleared by restarting hostapd. It does **not** crash the
+   modem. This corrects an earlier claim of mine that those bugs do not affect
+   the AP path.
+
+2. **The kernel config cannot NAT.** `CONFIG_NF_TABLES` is absent and
+   `CONFIG_IP_NF_IPTABLES=m` -- a module, and a RAM boot cannot load modules.
+   NetworkManager's `ipv4.method shared` therefore silently installs no
+   masquerade rule, and hotspot NAT is impossible on this build. Real tethering
+   on joan needs `NF_TABLES`, `NF_NAT` and `NFT_MASQ` built in as `=y`.
+
+### Host-side notes
+
+- `hostapd`, `iw` and `wpa_supplicant` were run from tmpfs on the respective
+  machines; nothing was installed on joan or nym-nest. A pacman attempt on
+  nym-nest failed on a stale package database and rolled back cleanly.
+- nym-nest's Wi-Fi is 802.11n only (zero VHT capability), so it cannot test
+  VHT80 at all.
+- nym-fang's radio was soft-blocked by rfkill, which made `iw scan` return
+  zero APs -- indistinguishable from being out of range until the scan was
+  positive-controlled. `rfkill unblock wifi` fixed it; its regulatory domain
+  was already US.
