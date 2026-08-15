@@ -527,3 +527,56 @@ Closing it means identifying which WMI/QMI command this firmware build does not
 implement -- the same class of fix as the quiet-mode commit -- which needs
 either Hexagon RE of the stripped image or comparison against a second WCN3990
 device that does not crash.
+
+## CORRECTION: the crash is scan-triggered, not continuous
+
+Earlier in this document I recorded that the crash is "independent of host
+activity" because an idle measurement showed the *highest* rate. **That was
+wrong, and the conclusions drawn from it were wrong.**
+
+The idle test killed `wpa_supplicant` with `killall`, but pmOS supervises it
+and respawned it, and it kept scanning. The measurement was of a system that
+was still scanning throughout.
+
+With the services actually stopped (`rc-service wpa_supplicant stop`,
+`rc-service networkmanager stop`) and the interface genuinely down (flags
+`<BROADCAST,MULTICAST>`, no `UP`):
+
+| condition | crashes | window |
+|---|---|---|
+| WLAN firmware loaded, `wlan0` DOWN, no scans | **0** | 95 s |
+| `wlan0` UP, no scan issued | **0** | 25 s |
+| exactly **one** scan issued | **1** | 35 s |
+
+**One scan costs exactly one modem crash.** The interface being up is
+harmless. The "continuous crash loop" was simply the supplicant scanning on
+repeat, and the ~10 s period was its scan interval, not a firmware timer.
+
+The scan still returns results -- 51 BSSs on that single scan -- because the
+firmware completes the scan and delivers events before dying. The trace shows
+`wmi tlv start scan`, ~440 receive completions carrying the results, then the
+fault about 1.8 s later.
+
+This also explains the band tests: every one of them scanned, so every one
+crashed, and the apparent "band doesn't matter" was correct but for the wrong
+reason.
+
+It puts joan in the same place as
+[msm8998-mainline issue #27](https://gitlab.com/msm8998-mainline/linux/-/issues/27)
+after all -- Wi-Fi *activity* crashes the modem -- rather than joan having an
+extra idle-only fault, which is what I previously claimed.
+
+### Where that leaves the search
+
+The trigger is now precise and cheap to reproduce: one scan, one crash. The
+remaining question is which part of the scan the firmware cannot handle.
+`ath10k_wmi_tlv_op_gen_start_scan()` has two visible suspects:
+
+- `cmd->num_probes` is hardcoded to 3, which is meaningless for a passive scan
+- the FIXME immediately below it: *"There are some scan flag inconsistencies
+  across firmwares, e.g. WMI-TLV inverts the logic behind the following flag"*,
+  followed by an XOR of `WMI_SCAN_FILTER_PROBE_REQ` into `scan_ctrl_flags`
+- `mac_addr` / `mac_mask` carry scan MAC randomisation
+
+Each is a single-field experiment against a one-scan reproducer, which is a
+far better position than the whole-configuration sweeps done so far.
