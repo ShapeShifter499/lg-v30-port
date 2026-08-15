@@ -94,11 +94,42 @@ list cannot simply be trimmed. Only 5845 MHz is poison.
 
 ## 4. The fix
 
-`04a93a807 wifi: ath10k: withhold 5845 MHz from the WCN3990 channel list`
+`c44c2e3bf wifi: ath10k: withhold 5845 MHz from the WCN3990 channel list`
 
 A `hw_params` field names a 5 GHz centre frequency the firmware must not be
 asked to scan, applied from `ath10k_mac_update_channel_list()` beside the
 existing `low_5ghz_chan`/`high_5ghz_chan` clamp. checkpatch --strict 0/0/0.
+
+### Why the firmware cannot gate this itself
+
+Measured on `FWRANGE-20260815T042707Z` with `ath10k_core.debug_mask=0x2`, the
+service ready event reports:
+
+```
+low_2ghz_chan 2312 high_2ghz_chan 2732 low_5ghz_chan 4912 high_5ghz_chan 6100
+```
+
+That is the raw tuning range, not a list of channels the firmware can
+service. Every channel in ath10k's 5 GHz table (5180-5865) falls inside
+4912-6100, so the existing `low_5ghz_chan`/`high_5ghz_chan` clamp excludes
+nothing on this device. **The firmware advertises 5845 MHz and then faults on
+it**, which is why a data-driven fix is not available and the frequency has
+to be named explicitly.
+
+This also settles the scope question. A firmware that declares a range it
+cannot honour is a firmware-family trait rather than a board one, so keying
+the field on the WCN3990 `hw_params` entry -- shared with SDM845 and QCS404 --
+is the defensible default, with the caveat stated in the commit so a
+maintainer with access to those boards can narrow it. Decision by Lance,
+2026-08-14.
+
+An aside worth recording: `ieee80211-freq-limit` looks like a zero-driver-
+change alternative, since `ath10k_mac_register()` already calls
+`wiphy_read_of_freq_limits()`. It is very likely inert here. `net/wireless/of.c`
+applies the limit by setting `IEEE80211_CHAN_DISABLED` directly, and that call
+sits *before* `ieee80211_register_hw()` -- exactly the position wiped by the
+`SET_BY_DRIVER` + `REGULATORY_STRICT_REG` reset described below. Not tested,
+but it would fall into the same trap.
 
 ### The first attempt was wrong, and why
 
@@ -128,6 +159,22 @@ every update.
 
 Worth recording as a general point: a channel flag set before registration is
 not durable for a driver that requests its own regulatory domain.
+
+### Does this cost anyone a usable channel?
+
+Not on joan. Channel 169 has never once worked on this hardware: across every
+observation, requesting 5845 MHz produced a firmware fault and never a channel
+visit, and the full-scan trace shows the firmware silently skipping it. A
+channel whose firmware faults when touched cannot carry an association either,
+so before the fix an AP on 169 meant a modem crash during the scan that found
+it. The fix trades a crash for a clean absence; it does not remove a working
+capability.
+
+The channel is also not one access points sit on. Consumer APs use 36-48,
+52-64, 100-144 and 149-165; 5845 MHz is above UNII-3's usable top (165 =
+5825 MHz) and below the 5850-5895 MHz band that only became unlicensed in
+2020, which a 2017 Wi-Fi 5 part has no business using and demonstrably cannot
+tune.
 
 ## 5. Verification
 
