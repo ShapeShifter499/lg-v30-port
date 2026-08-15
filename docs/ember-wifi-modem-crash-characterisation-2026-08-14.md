@@ -459,3 +459,71 @@ Across every configuration tested:
 No configuration has produced a working `wlan0` without the crash. The crash
 looks intrinsic to mainline ath10k driving this particular LG MPSS WLAN
 firmware, rather than to any single parameter the host supplies.
+
+## This is a known, still-open msm8998-mainline issue
+
+Searching on the crash signature rather than continuing to guess found it
+already documented.
+
+The **exact same line number** appears in
+[msm8998-mainline/linux issue #27](https://gitlab.com/msm8998-mainline/linux/-/issues/27):
+
+> `fatal error received: err_qdi.c:450:EX:wlan_process:1:WLAN RT`
+
+on Snapdragon 835 mainline, with the modem repeatedly crashing and recovering.
+The issue is **open**, with no kernel, DT or firmware fix -- only a userspace
+workaround (`ControlPortOverNL80211=false` for iwd).
+
+The same signature *format* also appears in an ath10k commit,
+["skip sending quiet mode cmd for WCN3990"](https://git.zx2c4.com/linux-dev/commit/?id=53884577fbcef33a7d15ad664e664a3dabe35171),
+where HL2.0 firmware crashes with
+`err_qdi.c:456:EX:wlan_process:1:WLAN RT:207a:PC=b001b4f0` if the host sends a
+command it does not support. That fix is already in this tree (the thermal
+throttle service is gated on `WMI_SERVICE_THERM_THROT`), so it is a different
+unsupported command, but it establishes the pattern: **this firmware family
+kills its WLAN process when the host sends something it does not implement.**
+
+One difference worth noting: issue #27 reports the crash **during connection**
+(4-way handshake), whereas joan crashes while idle as well. So joan may have an
+additional trigger, or the reporters simply did not measure the idle case.
+
+## Our rmtfs invocation was wrong: `-s` was missing
+
+Upstream's own service file is:
+
+```
+ExecStart=rmtfs -r -P -s
+```
+
+Every run in this investigation used `rmtfs -r -P -v` -- **no `-s`**. That flag
+calls `rproc_init()`, which opens the MSS remoteproc's `state` file so rmtfs
+starts and stops the modem itself, and `select()`s on that fd so it is
+*notified when the modem restarts*. Without it, rmtfs never learns the modem
+restarted and keeps stale per-client state across every crash/recovery cycle.
+
+Measured (`RMTFSSYNC-*`):
+
+| invocation | crashes / 95 s |
+|---|---|
+| `rmtfs -r -P` (what we had been running) | ~10 |
+| `rmtfs -r -P -s` (upstream's service file) | **3** |
+| `rmtfs -o <tmpfs> ` read-write | ~3 |
+
+So the correct invocation cuts the rate roughly threefold, and the read-write
+result recorded earlier is most likely the same effect rather than an
+independent one. **Any future work on this device should use `-r -P -s`.**
+
+It does not clear the crash.
+
+## Bottom line
+
+The crash is a known open upstream defect with the same signature, in a
+firmware family that is documented to kill its WLAN process when the host
+sends an unsupported command. It is not caused by anything joan-specific that
+was testable here: board data, firmware image, NV/OEM storage, persist, MSA
+handling, host capability and shadow registers are all eliminated.
+
+Closing it means identifying which WMI/QMI command this firmware build does not
+implement -- the same class of fix as the quiet-mode commit -- which needs
+either Hexagon RE of the stripped image or comparison against a second WCN3990
+device that does not crash.
