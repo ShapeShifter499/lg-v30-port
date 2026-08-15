@@ -617,3 +617,41 @@ dump mean nothing unless traffic is actually flowing.
   zero APs -- indistinguishable from being out of range until the scan was
   positive-controlled. `rfkill unblock wifi` fixed it; its regulatory domain
   was already US.
+
+### The -110 key failure splits on the AP daemon, not the client
+
+Follow-up testing narrowed, then failed to close, the `-110` key-install
+failure. Recording it so the next person does not repeat the dead ends.
+
+| AP | client | width | result |
+|---|---|---|---|
+| NetworkManager hotspot, 2.4 GHz | Galaxy Z Fold 5 | HT20 | works, 10-16 Mbps |
+| NetworkManager hotspot, 5 GHz | Galaxy Z Fold 5 | HT20 | works, 11-13 / 15-20 Mbps |
+| hostapd, 5 GHz | Pi 4B (VHT-NSS 1) | VHT80 | works, 63-68 Mbps, 326 s / 200 MB |
+| hostapd, 5 GHz | Galaxy Z Fold 5 (NSS 2) | VHT80 | **fails every time**, `-110` |
+
+**Hypotheses tested and rejected:**
+
+- **PMF / 802.11w.** The phone negotiates `MFP: yes` and the Pi does not, so an
+  IGTK/BIP install looked like the trigger. Setting `ieee80211w=0` explicitly
+  in hostapd changed nothing.
+- **Two spatial streams.** Every working case was single-stream or HT20 and
+  every failing case was NSS 2. Forcing the radio to one chain
+  (`iw phy phy0 set antenna 1 1`, confirmed `Configured Antennas: TX 0x1 RX
+  0x1`) while keeping VHT80 changed nothing.
+- **Progressive firmware/driver state degradation over a long boot.** The
+  `-110` errors only begin at t~1397 s, after the channel-169 crash campaign
+  and many AP restarts, which fitted well. Rejected: restoring the
+  NetworkManager hotspot at t~3400 s, later still and after even more churn,
+  worked immediately.
+
+What survives is that the same phone succeeds under wpa_supplicant's AP mode
+(via NetworkManager) and fails under hostapd, on either band, while a
+different client succeeds under hostapd. That points at something in the
+hostapd association/key sequence rather than at a client capability or at
+accumulated state, and it is not yet isolated.
+
+Practical consequence: the phone can reach the AP reliably only in the
+NetworkManager configuration, which is HT20 and therefore caps it around
+10-16 Mbps. The 63-68 Mbps figure required hostapd for VHT80 and so was
+measured with the Pi.
