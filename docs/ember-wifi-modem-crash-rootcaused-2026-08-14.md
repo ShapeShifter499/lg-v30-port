@@ -183,27 +183,62 @@ four qca6174 variants, qca99x0, qca9984/9994, qca9888, qca9377, qca4019 and
 wcn3990 -- so it is the union of what any chip of that generation can tune,
 not what this one can.
 
-It is also deliberate rather than legacy. ath9k carries no 5845/5865 at all,
-while **ath11k and ath12k both carry `CHAN5G(169, 5845, 0)` and
-`CHAN5G(173, 5865, 0)`**, and ath12k names the reason:
+It is also deliberate rather than legacy, and the primary sources say why.
+The local clone is shallow, so these were recovered through the GitHub blame
+API rather than `git log`:
 
-```c
-#define ATH12K_5_9_GHZ_MIN_FREQ 5845
-```
+- **Channel 169** -- commit `34c30b0a5e97` ("ath10k: enable advertising
+  support for channel 169, 5Ghz"), 2016-12-30, Mohammed Shafi Shajakhan
+  (`mohammed@qti.qualcomm.com`), applied by Kalle Valo:
 
-Channel 169 is the first channel of the 5.9 GHz band as these drivers model
-it -- real spectrum that Wi-Fi 6E/7 parts use. It is not obscure to the
-driver family; it is ahead of WCN3990.
+  > Enable advertising support for channel 169, 5Ghz **so that based on the
+  > regulatory domain(country code) this channel shall be active for use**.
+  > For example in countries like India this channel shall be available for
+  > use with latest regulatory updates
+
+- **Channel 173** -- commit `38441fb6fcbb` ("ath10k: support use of channel
+  173"), 2018-06-14, Ben Greear:
+
+  > The India regulatory domain allows CH 173, so add that to the available
+  > channel list. **I verified basic connectivity between a 9880 and 9984
+  > NIC.**
+
+So both channels exist for **India's regulatory allocation**, and the design
+intent was explicitly that *the regulatory domain would gate them*. Note also
+that channel 173 was verified on QCA9880 and QCA9984 -- not on WCN3990.
+Nobody ever tested 169 on this chip.
+
+**This corrects an earlier reading of mine.** I first explained the entry via
+ath12k's `#define ATH12K_5_9_GHZ_MIN_FREQ 5845`, concluding that channel 169
+is "the first channel of the 5.9 GHz band". That is how *ath12k* models it,
+but it is not why the channel is in *ath10k*: the ath10k rationale is India,
+two years before the 5.9 GHz allocation existed. The conclusion is unchanged;
+the provenance is not what I said it was.
 
 So the channel was reachable because three layers that could each have
 filtered it all default permissive: the driver table is a cross-chip union,
-the board's regdomain code is blank so ath substitutes US, and the firmware
-declares its raw 4912-6100 MHz tuning range. Nothing in that chain encodes
-"this firmware has no entry for 5845 MHz", which is the gap the `hw_params`
-field fills.
+the board's regdomain code is blank so ath substitutes US -- defeating
+exactly the gate `34c30b0a5e97` was relying on -- and the firmware declares
+its raw 4912-6100 MHz tuning range.
 
-(The local clone is shallow, so the upstream commit that first added 169/173
-to ath10k, and its stated rationale, were not retrievable here.)
+### Upstream precedent for the mechanism
+
+ath12k solves this same class of problem in
+`ath12k_mac_update_5_9_ghz_ch_list()`:
+
+```c
+	if (test_bit(WMI_TLV_SERVICE_5_9GHZ_SUPPORT, ar->ab->wmi_ab.svc_map))
+		return;
+	...
+	band->channels[i].flags |= IEEE80211_CHAN_DISABLED;
+```
+
+That is the same mechanism as this fix -- walk the band, set
+`IEEE80211_CHAN_DISABLED` over a frequency range -- but gated on a **firmware
+service bit**, so it is discovered rather than hardcoded. ath10k's WMI has no
+equivalent bit (`grep` for `5_9`/`SERVICE_5` in `wmi.h`/`wmi-tlv.h` returns
+nothing, and ath11k has none either), which is why the frequency has to be
+named in `hw_params` here.
 
 ## 5. Verification
 
