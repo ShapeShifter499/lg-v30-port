@@ -125,11 +125,14 @@ build.** It is doing real work, not spinning: `/data/buildcache/kbuild` is
 occupies only 457 GB — so sharing has already reclaimed 200 GB+, and `/data`
 used fell 486 → 457 GB over ~5 h of this session.
 
-Two improvements not yet made, both need Lance:
-- the wrapper `/usr/local/sbin/duperemove-run.sh` passes no `-q`, so it logged
-  **3.1 M journal lines** (1.5 GB of journal) to the same disk it was deduping.
-- 85 kernel build trees is the actual driver of runtime; pruning dead ones would
-  shorten every future pass.
+**Done 2026-08-16:** `-q` added to `/usr/local/sbin/duperemove-run.sh` with
+Lance's approval (backup at `duperemove-run.sh.bak-20260816`). Without it the
+pass logged **3.1 M journal lines** (1.5 GB of journal) to the same disk it was
+deduping. Takes effect next monthly run; the in-flight pass keeps its old argv.
+
+**Still open, needs Lance:** 85 kernel build trees in `/data/buildcache/kbuild`
+is the actual driver of runtime. Pruning dead ones would shorten every future
+pass. Not urgent for space — dedup is already reclaiming it.
 
 Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-08-16
