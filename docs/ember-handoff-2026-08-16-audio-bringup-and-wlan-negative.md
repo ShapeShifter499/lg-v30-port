@@ -72,6 +72,42 @@ exactly this topology and its match table says not to grow the list, which is
 why db845c and yoga-c630 reuse it. Revisit only if msm8998 needs behaviour it
 does not provide.
 
+### Later findings (same session, after the handoff was first written)
+
+**Two test images were built from a stale staging dir.** The
+`deferred_probe_timeout=0` and `log_buf_len=8M` images were repacked from
+`staging/adsp-only`, whose DTB predates the SLIMbus/codec/sound nodes. Both
+boots therefore tested the wrong kernel and proved nothing. Rebuilt from
+`staging/snd3` (verified: 6 matches for sndcard/slim-ngd/codec/apr in the DTB).
+**Check which staging dir a repack points at.**
+
+**SLIMbus is flaky, not deterministically broken.** With the correct DTB:
+
+```
+PDR: service lookup for avs/audio failed: -6
+qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+qcom,slim-ngd-ctrl: failed to select h/w instance
+qcom,slim-ngd-ctrl: qmi init fail, ret:-110, state:3
+```
+
+The earlier `snd3` boot got `SLIM SAT: Rcvd master capability` and enumerated
+the codec from the *same* DT. The difference here is `deferred_probe_timeout=0`,
+which plausibly reshuffles probe ordering by keeping more drivers retrying — so
+that cmdline "fix" appears to have *caused* a regression and should be dropped.
+
+**`PDR: service lookup for avs/audio failed: -6` is the mechanism to chase.**
+`qcom-ngd-ctrl` looks up the ADSP audio protection domain, but msm8998 has no PD
+maps (userspace `pd-mapper` reports "no pd maps available"). `qcom,protection-domain`
+was deliberately omitted from the Q6 services for that reason, but the NGD driver
+does the lookup regardless. That mismatch is the most likely reason SLIMbus init
+is racy on this SoC, and it is where the next investigation should start — not in
+the sound-card node.
+
+**Also still unexplained:** even in the good `snd3` boot, the `sound` platform
+device never bound and the deferred list was empty, with no `msm-snd-sdm845`
+message beyond the one deferred-probe report. Get a clean run on the plain snd3
+image (no cmdline extras) with `log_buf_len=8M` before theorising further.
+
 ### Quad DAC (ES9218P)
 
 Driver written and compiling: `sound/soc/codecs/es9218p.c`, ~290 lines.
