@@ -37,7 +37,8 @@ scans (`max_freq=5785` every time). `519646f01` (withhold 5845 MHz) confirmed â€
 the Aug-14 baseline crashed every 20-28 s; 3362 s covers ~120-170 intervals.
 
 **Remaining WLAN work** â€” the lane is reopened, not finished:
-1. Confirm the modem-crash fix with a longer window and a repeated 5 GHz scan.
+1. Re-confirm the modem fix across *separate boots* (this was one 56-min boot;
+   it kills the fluke reading but not boot-to-boot nondeterminism).
 2. The real target is the fragility: why is bring-up timing-sensitive enough that
    enabling logging loses the race? Start from
    `docs/ember-wifi-modem-crash-rootcaused-2026-08-14.md` (MSA permission vs
