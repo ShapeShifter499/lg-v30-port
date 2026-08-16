@@ -11,7 +11,7 @@ Everything is banked and pushed.
 | | |
 |---|---|
 | `ghfork/joan/latest-clean-test` | `7187fbbb5` (full history) |
-| `ghfork/master` | `d649b6a31` (device-verified only) |
+| `ghfork/master` | `63a15f526` (device-verified only; history amended 2026-08-16) |
 | kernel tree | `~/vibe-coding-projects/coding/linux-mainline-v30-usb-otg`, branch `joan/usb3-otg-bringup`, clean |
 | build dir | `/data/buildcache/kbuild/build-adsp-only` — build **in place**, no `cp -a` |
 | test image | `~/joan-images/boot-joan-snd-pdm.img` on nym-nest |
@@ -63,12 +63,20 @@ Worth trying alongside: now that PD maps work, add
 `qcom,protection-domain = "msm/adsp/audio_pd"` to the Q6 service nodes, as
 sdm845 does. It was omitted on a false premise.
 
-## Needs your decision, Lance
+## Resolved: the false PD-maps claim is fixed
 
-`719e34de5` on `ghfork/master` says *"msm8998 does not run the audio PD split --
-its firmware carries no PD maps."* **That is false** — joan ships six `.jsn` PD
-maps in `/firmware/image`. Amend the pushed commit, or fix it when the series is
-prepared for upstream? I did not rewrite pushed history.
+`719e34de5` claimed *"msm8998 does not run the audio PD split -- its firmware
+carries no PD maps."* False; joan ships six. Lance approved amending, so master
+was rewritten: `719e34de5` → `a72f66c1d`, and `ghfork/master` is now
+`63a15f526`. Verified message-only — both old and new histories resolve to tree
+`f16de7d1a`. The corrected body says the property is dropped because the
+*kernel's* msm8998 PD table had no ADSP domains, cites `adspua.jsn`, and points
+at revisiting `qcom,protection-domain`.
+
+⚠️ **`joan/latest-clean-test` still carries the original `c43b281a5` with the
+wrong body.** It was not rewritten — that would force-push six commits of the
+shared full-history branch. Fix it when preparing the series for upstream, or
+ask Lance.
 
 ## Bring-up sequence on device
 
