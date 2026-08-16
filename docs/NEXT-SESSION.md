@@ -1,8 +1,9 @@
 # LG V30 (joan) — next session start here
 
-- **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16 (session B)
+- **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16 (session C)
 - **Full detail:** `docs/ember-handoff-2026-08-16b-pd-mapper-fixed-qmi-is-next.md`
-- **WLAN detail:** `docs/ember-wlan-delta-recovered-2026-08-16.md`
+- **WLAN detail:** `docs/ember-wlan-delta-recovered-2026-08-16.md` →
+  **CONFIRMED ON HARDWARE:** `docs/ember-wlan-confound-confirmed-2026-08-16.md`
 
 ## State
 
@@ -22,23 +23,30 @@ Recover with `adb reboot` or a 10 s power hold.
 
 ## Do this first
 
-**Two independent lanes are ready. Pick one; don't interleave them.**
+### Lane A — WLAN — ✅ DONE 2026-08-16, positive
 
-### Lane A — WLAN, one boot from a real answer
+`wlan0` comes up from committed state (`7187fbbb5`) with both symbols cleared,
+and passively scans **84 BSSs** (54× 2.4 GHz, 30× 5 GHz). QMI service 69 present
+at t+10 s. Full writeup: `docs/ember-wlan-confound-confirmed-2026-08-16.md`.
 
-The bisect was a confound: `CONFIG_ATH10K_DEBUG` / `ATH10K_DEBUGFS` are the
-*only* difference between the working image and every failing one, and turning
-them on is what breaks Wi-Fi. Proven by extracting the embedded `.config` from
-both binaries (`CONFIG_IKCONFIG=y`).
+The driver confirms the config itself:
+`kconfig debug 0 debugfs 0 tracing 0 dfs 0 testmode 0`.
 
-1. Build `joan/latest-clean-test` with **both symbols cleared**.
-2. RAM boot, bring up `rmtfs`, check for `wlan0` and QMI service 69 (WLFW).
-3. If it comes up, WLAN is reproducible from committed state and the real target
-   becomes *why bring-up is timing-fragile enough that logging breaks it*.
+Bonus, **one boot only**: `fatal_error_lines=0` over 160 s, where the Aug-14
+baseline crashed the modem every 20-28 s. Likely `519646f01` (withhold 5845 MHz),
+which post-dates the Aug-14 working image. Wants 2-3 more boots to confirm.
 
-This is the cheapest high-value test available.
+**Remaining WLAN work** — the lane is reopened, not finished:
+1. Confirm the modem-crash fix with a longer window and a repeated 5 GHz scan.
+2. The real target is the fragility: why is bring-up timing-sensitive enough that
+   enabling logging loses the race? Start from
+   `docs/ember-wifi-modem-crash-rootcaused-2026-08-14.md` (MSA permission vs
+   modem watchdog, ~2.5 s).
+3. Both symbols must stay **off** in any image meant to have Wi-Fi. That is a
+   footgun for the next person who turns them on to debug — worth a ledger note.
+4. `tqftpserv` is staged from tmpfs every boot; Lance approved installing it.
 
-### Lane B — audio, and the wall moved
+### Lane B — audio, and the wall moved (STILL OPEN — start here)
 
 The PD lookup fix landed and is **verified on device**: `avs/audio` now resolves
 and the audio PD reports `SERVREG_SERVICE_STATE_UP`. Still no ALSA card. The

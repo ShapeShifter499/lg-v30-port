@@ -1,0 +1,29 @@
+uptime=153s
+=== stage iw from tmpfs (not installed) ===
+iw version 6.17
+=== wlan0 up ===
+down
+=== passive scan ===
+BSS_COUNT=84
+--- sample (ssid/freq/signal) ---
+e8:94:f6:d4:40:27(on 2437.0 -66.00 LG's Wifi
+ac:b6:87:3d:82:45(on 2437.0 -70.00 Verizon_C7GTXK
+10:05:01:7d:df:38(on 2437.0 -61.00 Tamkeen
+fa:d0:0e:42:07:42(on 2437.0 -44.00 Co-Hosted BSSID: 3
+fa:d0:0e:42:07:46(on 2437.0 -43.00 Co-Hosted BSSID: 3
+00:90:a9:13:52:26(on 2462.0 -35.00 LG's Wifi
+b0:39:56:52:ba:70(on 2462.0 -69.00 NETGEAR09
+72:13:01:0e:b2:9d(on 2462.0 -68.00 Bukatatanoa
+72:13:01:0e:b2:9d(on 2462.0 -68.00 Co-Hosted BSSID: 3
+aa:b5:7c:ec:d3:b9(on 5785.0 -76.00 DIRECT-roku-PJ2-5D078A
+00:90:a9:13:52:28(on 5785.0 -65.00 LG's Wifi 5GHz
+80:d0:4a:83:21:86(on 5785.0 -75.00 Riverhut
+=== bands seen ===
+2.4GHz=54  5GHz=30
+=== modem stability over this window ===
+fatal_error_lines=0
+mss=running
+uptime_end=160s
+DONE_SCAN
+
+[exited with code 0]

@@ -1,0 +1,124 @@
+### 1. back to Android
+android ready
+### 2. RAM boot (hash-bound, single attempt)
+Sending 'boot.img' (29244 KB)                      OKAY [  0.674s]
+Booting                                            OKAY [  5.087s]
+Finished. Total time: 5.771s
+FASTBOOT_BOOT_RETURNED=0
+PMOS_USB_ENUMERATED_SECOND=12
+RESULT=RAM_BOOT_LAUNCHED
+### 3. usb net up
+net up at 3s
+### 4. wait for sshd
+ssh up at 17s
+### 5. stage and run
+##### RESULT #####
+uptime_at_start=30s
+kernel=7.2.0-rc2-g7187fbbb5675
+=== 0. positive controls ===
+qrtr-lookup: /usr/bin/qrtr-lookup
+rmtfs: /usr/bin/rmtfs
+ath10k_snoc driver dir: /sys/bus/platform/drivers/ath10k_snoc
+ath10k debugfs present (expect ABSENT): ABSENT
+=== 1. stage tqftpserv ===
+libqrtr.so.1
+libzstd.so.1
+tqftpserv
+=== 2. start tqftpserv ===
+tqftpserv=running
+=== 3. start rmtfs -r -P -s (read-only; -s syncs mss rproc) ===
+rmtfs=running
+=== 4. poll for modem, WLFW(69) and wlan0 ===
+t+5s mss=running svc69=absent net=[lo usb0 ]
+t+10s mss=running svc69=PRESENT net=[lo usb0 wlan0 ]
+WLAN0_APPEARED_AT=t+10s
+=== 5. final state ===
+--- qrtr-lookup ---
+  Service Version Instance Node  Port
+       66       1      180    0     1 Service registry notification service
+       43       2       18    0     4 Subsystem control service
+       15       1        0    0    20 Test service
+       51       1        2    0    21 CoreSight remote tracing service
+       21       1        0    0    22 Modem embedded file system service
+       24       1        0    0    23 Thermal mitigation device service
+       23       1        0    0    24 Thermal sensors service
+       22       1        0    0    25 Time service
+       36       1        0    0    27 Persistent device configuration service
+       49       1        2    0    28 IPA control service
+       54       1        0    0    34 <unknown>
+       17       1        0    0    35 Specific absorption rate service
+     4098       0        0    0    36 <unknown>
+       34       1        0    0    38 Coexistence service
+       41       1        1    0    39 RF radiated performance enhancement service
+       55       1        2    0    48 QMI-SLIM service
+        9       2        0    0    49 Voice service
+        3       1        0    0    51 Network Access Service
+       12       1        0    0    52 Phonebook Management service
+       10       2        0    0    53 Card Application Toolkit service (v2)
+       47       1        0    0    54 Data Port Mapper service
+       11       1        0    0    55 User Identity Module service
+        1       1        0    0    56 Wireless Data Service
+        4       1        0    0    57 Quality Of Service service
+       26       1        0    0    58 Wireless data administrative service
+        7       1        0    0    59 Authentication service
+        8       1        0    0    60 AT service
+       29       1        0    0    61 Circuit switched videotelephony service
+       71       1        0    0    62 UIMHTTP service
+        5       1        0    0    65 Wireless Messaging Service
+       42       1        0    0    66 Data system determination service
+      800       2        1    0    67 <unknown>
+      704       2        1    0    69 <unknown>
+      701       2        1    0    70 <unknown>
+      705       2        1    0    71 <unknown>
+      702       2        1    0    72 <unknown>
+      703       2        1    0    73 <unknown>
+      707       2        1    0    74 <unknown>
+      706       2        1    0    75 <unknown>
+        2       1        0    0    76 Device Management Service
+       48       1        0    0    77 QMI DFS service
+       68       1        0    0    78 <unknown>
+       16       2        0    0    80 Location service (~ PDS v2)
+       51       1        3    0    83 CoreSight remote tracing service
+       69       1        0    0    84 ATH10k WLAN firmware service
+     4099       0        0    0    97 <unknown>
+       57       1        0    0    99 WLPS service
+       14       1        0    1    14 Remote file system service
+     4096       1        0    1 16390 TFTP
+       64       1        1    1 16391 Service registry locator service
+--- net ---
+lo usb0 wlan0 
+--- remoteproc ---
+/sys/class/remoteproc/remoteproc0 4080000.remoteproc running
+/sys/class/remoteproc/remoteproc1 adsp offline
+--- ath10k dmesg ---
+[    0.690165] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   35.002631] EMBER-MARK-WLAN-NODBG
+[   37.645725] ath10k_snoc 18800000.wifi: qmi chip_id 0x30214 chip_family 0x4001 board_id 0xff soc_id 0x40010002
+[   37.645758] ath10k_snoc 18800000.wifi: qmi fw_version 0x110f01a0 fw_build_timestamp 2019-08-30 09:17 fw_build_id QC_IMAGE_VERSION_STRING=WLAN.HL.1.1.c2-00416-QCAHLSW8998MTPLZ-1.221535.1
+[   37.645780] ath10k_snoc 18800000.wifi: qmi not waiting for msa_ready indicator
+[   41.196592] ath10k_snoc 18800000.wifi: wcn3990 hw1.0 target 0x00000008 chip_id 0x00000000 sub 0000:0000
+[   41.196625] ath10k_snoc 18800000.wifi: kconfig debug 0 debugfs 0 tracing 0 dfs 0 testmode 0
+[   41.196638] ath10k_snoc 18800000.wifi: firmware ver  api 5 features wowlan,mgmt-tx-by-reference,non-bmi crc32 b3d4b790
+[   41.249876] ath10k_snoc 18800000.wifi: htt-ver 3.71 wmi-op 4 htt-op 3 cal file max-sta 32 raw 0 hwcrypto 1
+[   41.320588] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+--- modem dmesg ---
+[    2.010965] remoteproc remoteproc0: 4080000.remoteproc is available
+[   10.903311] [pmOS-rd]: modprobe: FATAL: Module ext4 not found in directory /lib/modules/7.2.0-rc2-g7187fbbb5675
+[   11.018395] [pmOS-rd]: modprobe: FATAL: Module ext4 not found in directory /lib/modules/7.2.0-rc2-g7187fbbb5675
+[   35.019821] remoteproc remoteproc0: powering up 4080000.remoteproc
+[   35.038050] remoteproc remoteproc0: Booting fw image qcom/msm8998/joan/mba.mbn, size 230056
+[   35.141505] qcom-q6v5-mss 4080000.remoteproc: MBA booted without debug policy, loading mpss
+[   36.571536] qcom-q6v5-mss 4080000.remoteproc: Handover signaled, but it already happened
+[   36.575588] remoteproc remoteproc0: remote processor 4080000.remoteproc is now up
+--- rmtfs log ---
+[RMTFS storage] request for unknown partition '/boot/modem_fsg_oem_1', rejecting
+[RMTFS storage] request for unknown partition '/boot/modem_fsg_oem_2', rejecting
+--- tqftpserv log ---
+/readwrite/server_check.txt opened for writing from 0:30
+tqftpserv: failed to open ota_firewall/ruleset: No such file or directory
+unable to open /readwrite/ota_firewall/ruleset (2), reject
+tqftpserv: failed to open ota_firewall/ruleset: No such file or directory
+unable to open /readwrite/ota_firewall/ruleset (2), reject
+DONE_INNER
+
+[exited with code 0]
