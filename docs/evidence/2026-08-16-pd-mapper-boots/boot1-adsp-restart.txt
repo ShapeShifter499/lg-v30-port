@@ -1,0 +1,28 @@
+state after stop: offline
+t+5s 769=absent
+t+10s 769=absent
+t+15s 769=absent
+t+20s 769=absent
+t+25s 769=absent
+t+30s 769=absent
+t+35s 769=absent
+t+40s 769=absent
+=== dmesg since restart ===
+[  581.871516] EMBER-MARK-ADSP-RESTART
+[  586.975663] qcom_q6v5_pas 17300000.remoteproc: timeout waiting for shutdown response
+[  586.991511] qcom_q6v5_pas 17300000.remoteproc: Handover signaled, but it already happened
+[  587.020616] remoteproc remoteproc1: stopped remote processor adsp
+[  590.033275] remoteproc remoteproc1: powering up adsp
+[  590.033407] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[  590.240757] remoteproc remoteproc1: remote processor adsp is now up
+[  590.243687] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[  590.244438] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[  590.351046] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[  590.355296] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[  591.264037] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  595.423664] PDR: msm/adsp/audio_pd register listener txn wait failed: -110
+=== cards ===
+--- no soundcards ---
+=== slimbus devices ===
+=== deferred ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found

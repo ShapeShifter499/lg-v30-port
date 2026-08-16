@@ -1,94 +1,115 @@
 # LG V30 (joan) — next session start here
 
-- **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16
-- **Full detail:** `docs/ember-handoff-2026-08-16-audio-bringup-and-wlan-negative.md`
+- **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16 (session B)
+- **Full detail:** `docs/ember-handoff-2026-08-16b-pd-mapper-fixed-qmi-is-next.md`
+- **WLAN detail:** `docs/ember-wlan-delta-recovered-2026-08-16.md`
 
 ## State
 
-Everything is banked. Nothing is dirty, nothing is unpushed.
+Everything is banked and pushed.
 
 | | |
 |---|---|
-| `ghfork/joan/latest-clean-test` | `dbd7d8f4d` (4 commits) |
-| `ghfork/master` | `0315abb74` (device-verified only) |
-| docs | `303fb28` |
-| Deck | Shared Tasks board 4, card **98**, stack Active, label Ember |
-| firmware repo | complete, no action (manifest tracks blobs by sha256) |
+| `ghfork/joan/latest-clean-test` | `7187fbbb5` (full history) |
+| `ghfork/master` | `d649b6a31` (device-verified only) |
+| kernel tree | `~/vibe-coding-projects/coding/linux-mainline-v30-usb-otg`, branch `joan/usb3-otg-bringup`, clean |
+| build dir | `/data/buildcache/kbuild/build-adsp-only` — build **in place**, no `cp -a` |
+| test image | `~/joan-images/boot-joan-snd-pdm.img` on nym-nest |
+| Deck | Shared Tasks board 4, card **98** |
 
-Phone: LG V30 `LGUS9986e606d55` on nym-nest. **RAM boots only all session — never
-flashed.** Recover with `adb reboot` or a 10 s power hold.
-
-## Where each lane actually is
-
-**Audio — furthest ever, one step short.** ADSP boots, APR registers all four Q6
-services, SLIMbus enumerates, and the codec answers:
-`wcd934x-slim 217:250:1:0: WCD934x chip id major 0x108, minor 0x1`.
-**No ALSA card yet.**
-
-**WLAN — closed negative, do not resume bisecting.** Both candidates cleared over
-3 boots each, and building the known-good commit `d05e70c5e484` itself also fails.
-The working image is `-dirty`; its source no longer exists anywhere. **The only
-artifact that has ever brought `wlan0` up cannot be rebuilt from git.** Needs a
-decision from Lance: hunt the lost delta, or adopt clean `d05e70c5e484` as baseline
-and debug WLFW directly with `ath10k_core.debug_mask` + QMI tracing. Hardware is
-fine (LineageOS Wi-Fi 243 Mbps).
-
-**USB-C** — `dr_mode="otg"` + `usb-role-switch` kills USB entirely even with
-`PHY_QCOM_QMP_USB=y`; system stays up, only the gadget dies. Next: `dr_mode="host"`
-(needs no role provider), tested **alone**. Bus-powered host + auto role still need
-new drivers upstream (no VBUS regulator, no PMI8998 TCPM).
-
-**Camera** — specified and compiling, never probed. `docs/msm8998-camss-port-map.md`.
-
-**ES9218P Quad DAC** — driver written, compiles, unprobed. Sits *downstream* of the
-WCD9340, so it cannot be tested until playback works.
+Phone: LG V30 `LGUS9986e606d55` on nym-nest. **RAM boots only — never flashed.**
+Recover with `adb reboot` or a 10 s power hold.
 
 ## Do this first
 
-1. Boot **plain `snd3`** (`~/joan-images/boot-joan-snd3.img`) with only
-   `log_buf_len=8M` added to the cmdline. **Do not** add
-   `deferred_probe_timeout=0` — it caused a SLIMbus regression.
-2. Confirm SLIMbus comes up (`SLIM SAT: Rcvd master capability` + codec chip id).
-   It is **flaky**, not deterministic — retry before concluding.
-3. Read what `msm-snd-sdm845` says with the full log intact. Previously only:
-   `platform sound: deferred probe pending: msm-snd-sdm845: MultiMedia1: error
-   getting cpu dai name`, with the sound device unbound and the deferred list empty.
-4. Chase `PDR: service lookup for avs/audio failed: -6` — `qcom-ngd-ctrl` looks up
-   the ADSP audio protection domain but msm8998 has **no PD maps**. Most likely
-   reason SLIMbus is racy. **The problem is below the sound card, not in it.**
+**Two independent lanes are ready. Pick one; don't interleave them.**
 
-Bring-up sequence on device (ADSP firmware is absent from pmOS; stage to tmpfs):
+### Lane A — WLAN, one boot from a real answer
+
+The bisect was a confound: `CONFIG_ATH10K_DEBUG` / `ATH10K_DEBUGFS` are the
+*only* difference between the working image and every failing one, and turning
+them on is what breaks Wi-Fi. Proven by extracting the embedded `.config` from
+both binaries (`CONFIG_IKCONFIG=y`).
+
+1. Build `joan/latest-clean-test` with **both symbols cleared**.
+2. RAM boot, bring up `rmtfs`, check for `wlan0` and QMI service 69 (WLFW).
+3. If it comes up, WLAN is reproducible from committed state and the real target
+   becomes *why bring-up is timing-fragile enough that logging breaks it*.
+
+This is the cheapest high-value test available.
+
+### Lane B — audio, and the wall moved
+
+The PD lookup fix landed and is **verified on device**: `avs/audio` now resolves
+and the audio PD reports `SERVREG_SERVICE_STATE_UP`. Still no ALSA card. The
+blocker is now **below SLIMbus**:
+
+```
+qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+PDR: msm/adsp/audio_pd register listener txn wait failed: -110
+```
+
+The ADSP never registers **QMI service 769 (SLIMbus control service)** — checked
+with `qrtr-lookup` across three boots. APR over the same GLINK edge works fine
+(all four Q6 services register), so this is specific to QMI/QRTR.
+
+Investigate the QMI layer to the ADSP. **Not** the sound node, **not** SLIMbus.
+Open questions: why QMI transactions time out at `-110` while APR is healthy;
+whether the ADSP needs something before it starts its SLIMbus service; whether
+a `tms/pdr_enabled` equivalent is wanted (joan's `modemr.jsn` advertises it,
+`mpss_root_pd` does not carry it).
+
+Worth trying alongside: now that PD maps work, add
+`qcom,protection-domain = "msm/adsp/audio_pd"` to the Q6 service nodes, as
+sdm845 does. It was omitted on a false premise.
+
+## Needs your decision, Lance
+
+`719e34de5` on `ghfork/master` says *"msm8998 does not run the audio PD split --
+its firmware carries no PD maps."* **That is false** — joan ships six `.jsn` PD
+maps in `/firmware/image`. Amend the pushed commit, or fix it when the series is
+prepared for upstream? I did not rewrite pushed history.
+
+## Bring-up sequence on device
 
 ```sh
-# from nym-nest, as user@172.16.42.1 (sshpass -f /tmp/pmos-pass), sudo needs -tt
-scp ~/joan-images/staging/adspfw/* user@172.16.42.1:/tmp/fwpath/qcom/msm8998/joan/
+# after every phone reboot the USB net link must be rebuilt by hand:
+sudo ip link set enp0s29u1u5 up
+sudo ip addr add 172.16.42.2/24 dev enp0s29u1u5
+
+# then, from nym-nest (sshpass -f /tmp/pmos-pass, sudo needs -tt):
+scp ~/joan-images/staging/adspfw/* user@172.16.42.1:/tmp/adspfw/
 echo /tmp/fwpath > /sys/module/firmware_class/parameters/path
 echo start > /sys/class/remoteproc/remoteproc1/state
 ```
 
-## Traps that cost real time — do not repeat
+`~/joan-images/staging/fastboot-adsp.sh`-style orchestration exists at
+`/tmp/fastboot-adsp.sh` on nym-nest — it does Android → RAM boot → net → ADSP in
+one shot, ADSP started at 33 s.
 
-- **Check which staging dir a repack points at.** Two "fix" images were built from
-  a stale `staging/adsp-only` whose DTB predates the audio nodes; both boots tested
-  the wrong kernel and one produced a false "theory disproven".
-- **Validate a baseline before comparing against it.** ~20 boots went into a WLAN
-  bisect comparing my builds against a *prebuilt binary* I had never confirmed I
-  could rebuild. I couldn't.
-- **One change per boot.** Bundling ADSP + USB changes cost a power-cycle and made
-  the result unattributable.
-- **`=m` is the recurring killer.** A RAM boot has no module tree. Five separate
-  traps this session. Check this *first* when a subsystem is silently absent.
-- **Nested shell/python quoting through ssh keeps breaking.** Write a plain script
-  file, `scp` it, run it. Broke three times before I stopped hand-rolling it.
-- **`ollama run` backgrounded with no stdin hangs** and never sends a request —
-  `ollama ps` empty is the tell. Use the HTTP API.
+## Don'ts — each of these cost real time
+
+- **Don't `cp -a` a build dir and add `KCFLAGS`.** Read `.<obj>.cmd` first to see
+  what the dir was actually built with. Adding `-ffile-prefix-map` changed every
+  argv and cold-missed ccache: 2200 objects / 20+ min vs 5 objects / 7m40s in
+  place.
+- **Don't use `deferred_probe_timeout=0`.** It makes
+  `driver_deferred_probe_check_state()` return `-ETIMEDOUT` for genpd and iommu
+  lookups (`drivers/base/dd.c:292`). Use a large value — `300` worked. But the
+  default `10` *will* drop the sound card before a hand-started ADSP exists.
+- **Don't judge audio from an ADSP restart.** `echo stop` times out waiting for
+  shutdown and the PD listener then fails; only fresh boots are meaningful.
+- **Don't trust `grep -c "[p]attern"` for "is anything using this".** Your own
+  shell command line matches. Bit me again this session.
+- **Don't assume a `-dirty`-looking image is the one you think.** Check the
+  version string in the actual file; several neighbours were `-dirty` and the
+  working one was not.
 
 ## Unrelated but settled
 
-Qwen3.8-27B measured and **rejected for interactive use**: 2.99 tok/s vs 26.96 for
-`qwen3.6:35b-a3b` — 9× slower, matching the dense/MoE active-param ratio. Registered
-in both harnesses labelled dense/slow, batch-only. Recorded in memory
-`local_llm_tuning_skyforge.md`; do not re-derive.
+`build-snd-pdm` deleted (5.6 GB) with Lance's approval. A monthly `duperemove`
+pass on `/data` ran ~15 h during this session and made all disk timings noisy —
+check for it before blaming a build.
 
 Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-08-16

@@ -1,0 +1,30 @@
+uptime_at_start=33s
+adsp start issued at uptime 33s
+t+3s 769=absent
+t+6s 769=absent
+t+9s 769=absent
+t+12s 769=absent
+t+15s 769=absent
+t+18s 769=absent
+t+21s 769=absent
+t+24s 769=absent
+t+27s 769=absent
+t+30s 769=absent
+=== dmesg ===
+[   33.093152] EMBER-MARK-FAST-ADSP
+[   33.093305] remoteproc remoteproc1: powering up adsp
+[   33.093447] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   33.390928] remoteproc remoteproc1: remote processor adsp is now up
+[   33.397373] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   33.397911] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   33.505369] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   33.520107] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   34.408516] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   38.628673] PDR: msm/adsp/audio_pd register listener txn wait failed: -110
+[   52.018309] [drm:dpu_crtc_get_scanout_position] *ERROR* no encoder found for crtc 0
+[   53.907638] rfkill: input handler disabled
+=== cards ===
+--- no soundcards ---
+=== slimbus ===
+=== deferred ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found

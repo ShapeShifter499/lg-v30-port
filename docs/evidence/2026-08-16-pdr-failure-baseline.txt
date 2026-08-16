@@ -1,0 +1,46 @@
+=== kernel ===
+7.2.0-rc2-g5fbb6db354d9-dirty
+=== cmdline ===
+panic=5 ignore_loglevel pmos.force-partition-resize pmos_boot_uuid=a5d40a96-ddec-44ac-bc37-b5519a9da397 pmos_root_uuid=9a5df9d1-ee25-47b6-9b3a-a2602b939bd0 pmos_rootfsopts=defaults deferred_probe_timeout=0 log_buf_len=8M androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+=== PDR / slim / sound lines ===
+[    2.024690] remoteproc remoteproc0: 4080000.remoteproc is available
+[    2.041181] remoteproc remoteproc1: adsp is available
+[    2.042336] remoteproc remoteproc1: Direct firmware load for qcom/msm8998/joan/adsp.mdt failed with error -2
+[    2.042504] remoteproc remoteproc1: powering up adsp
+[    2.042996] remoteproc remoteproc1: Direct firmware load for qcom/msm8998/joan/adsp.mdt failed with error -2
+[    2.043125] remoteproc remoteproc1: request_firmware failed: -2
+[   32.588314] remoteproc remoteproc1: powering up adsp
+[   32.588469] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   32.589152] PDR: service lookup for avs/audio failed: -6
+[   32.880265] remoteproc remoteproc1: remote processor adsp is now up
+[   32.890708] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   32.891086] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   32.998856] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   33.003071] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   37.087767] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   37.087921] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   37.115703] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[ 7631.299082] EMBER-MARK-BEFORE-PDMAPPER
+=== deferred list ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found
+=== sound device bound? ===
+total 0
+-rw-r--r--    1 root     root          4096 Dec 31 18:24 driver_override
+-r--r--r--    1 root     root          4096 Dec 31 18:24 modalias
+lrwxrwxrwx    1 root     root             0 Dec 31 18:24 of_node -> ../../../firmware/devicetree/base/sound
+drwxr-xr-x    2 root     root             0 Dec 31 18:24 power
+lrwxrwxrwx    1 root     root             0 Dec 31 16:00 subsystem -> ../../../bus/platform
+-rw-r--r--    1 root     root          4096 Dec 31 16:00 uevent
+-r--r--r--    1 root     root          4096 Dec 31 18:24 waiting_for_supplier
+=== q6 platform devices ===
+171c0000.slim-ngd
+17300000.remoteproc:glink-edge:apr:service@4:dais
+17300000.remoteproc:glink-edge:apr:service@7:dais
+17300000.remoteproc:glink-edge:apr:service@8:routing
+qcom,slim-ngd.1
+sound
+=== drivers bound ===
+q6asm-dai: 17300000.remoteproc:glink-edge:apr:service@7:dais 
+q6afe-dai: 17300000.remoteproc:glink-edge:apr:service@4:dais 
+q6routing: 17300000.remoteproc:glink-edge:apr:service@8:routing 
+msm-snd-sdm845: 

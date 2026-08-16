@@ -1,0 +1,29 @@
+=== slim-ngd driver binding ===
+
+171c0000.slim-ngd -> qcom,slim-ngd-ctrl
+qcom,slim-ngd.1 -> qcom,slim-ngd
+=== remoteproc state ===
+running
+=== FULL dmesg from ADSP start ===
+[  391.359826] EMBER-MARK-ADSP-START
+[  391.360157] remoteproc remoteproc1: powering up adsp
+[  391.360312] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[  391.724584] remoteproc remoteproc1: remote processor adsp is now up
+[  391.733032] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[  391.733630] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[  391.763426] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[  391.839628] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[  391.843889] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[  392.735976] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  393.759935] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+=== boot-time slim/pdr/apr lines (before ADSP) ===
+[    0.195731] Advanced Linux Sound Architecture Driver Initialized.
+[    4.181803]   No soundcards found.
+[  316.388778] platform sound: deferred probe pending: msm-snd-sdm845: MultiMedia1: error getting cpu dai name
+[  391.733032] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[  391.733630] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[  391.763426] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[  391.839628] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[  391.843889] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[  392.735976] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  393.759935] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout

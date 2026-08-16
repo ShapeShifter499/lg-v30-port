@@ -1,0 +1,42 @@
+=== kernel/cmdline ===
+7.2.0-rc2-g7187fbbb5675
+panic=5 ignore_loglevel pmos.force-partition-resize pmos_boot_uuid=a5d40a96-ddec-44ac-bc37-b5519a9da397 pmos_root_uuid=9a5df9d1-ee25-47b6-9b3a-a2602b939bd0 pmos_rootfsopts=defaults log_buf_len=8M deferred_probe_timeout=300 androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+=== stage firmware ===
+adsp.b00 adsp.b01 adsp.b02 adsp.b03 adsp.b04 adsp.b05 adsp.b06 adsp.b08 adsp.b09 adsp.b11 adsp.mdt 
+firmware_class.path=/tmp/fwpath
+=== PRE-ADSP: locator domains via qrtr-lookup ===
+  Service Version Instance Node  Port
+=== PRE-ADSP: deferred list ===
+sound	msm-snd-sdm845: MultiMedia1: error getting cpu dai name
+=== PRE-ADSP: pd mapper / pdr lines ===
+=== starting ADSP ===
+rproc start rc=0
+=== POST: dmesg since mark ===
+[  391.359826] EMBER-MARK-ADSP-START
+[  391.360157] remoteproc remoteproc1: powering up adsp
+[  391.360312] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[  391.724584] remoteproc remoteproc1: remote processor adsp is now up
+[  391.733032] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[  391.733630] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[  391.763426] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[  391.839628] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[  391.843889] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[  392.735976] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  393.759935] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+=== POST: ALSA cards ===
+--- no soundcards ---
+--- aplay -l ---
+aplay: device_list:279: no soundcards found...
+=== POST: deferred list ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found
+=== POST: sound driver bound? ===
+ls: /sys/devices/platform/sound/driver: No such file or directory
+=== POST: slimbus devices ===
+=== POST: qrtr-lookup ===
+  Service Version Instance Node  Port
+       64       1        1    1 16390 Service registry locator service
+       15       1        8    5     2 Test service
+       66       1       74    5     3 Service registry notification service
+       43       2       20    5     6 Subsystem control service
+       24       1        1    5     7 Thermal mitigation device service
+       15       1        0    5     9 Test service
