@@ -115,9 +115,21 @@ one shot, ADSP started at 33 s.
 
 ## Unrelated but settled
 
-`build-snd-pdm` deleted (5.6 GB) with Lance's approval. A monthly `duperemove`
-pass on `/data` ran ~15 h during this session and made all disk timings noisy —
-check for it before blaming a build.
+`build-snd-pdm` deleted (5.6 GB) with Lance's approval.
+
+The monthly `duperemove` pass was running for the whole session (started
+2026-08-15 07:12; `/home` ~9 h, `/data` still going at 29.5 h) and made all disk
+timings noisy — **check `systemctl is-active duperemove.service` before blaming a
+build.** It is doing real work, not spinning: `/data/buildcache/kbuild` is
+**661 GB logical across 85 build trees**, while the whole `/data` filesystem
+occupies only 457 GB — so sharing has already reclaimed 200 GB+, and `/data`
+used fell 486 → 457 GB over ~5 h of this session.
+
+Two improvements not yet made, both need Lance:
+- the wrapper `/usr/local/sbin/duperemove-run.sh` passes no `-q`, so it logged
+  **3.1 M journal lines** (1.5 GB of journal) to the same disk it was deduping.
+- 85 kernel build trees is the actual driver of runtime; pruning dead ones would
+  shorten every future pass.
 
 Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-08-16
