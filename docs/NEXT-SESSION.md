@@ -32,9 +32,9 @@ at t+10 s. Full writeup: `docs/ember-wlan-confound-confirmed-2026-08-16.md`.
 The driver confirms the config itself:
 `kconfig debug 0 debugfs 0 tracing 0 dfs 0 testmode 0`.
 
-Bonus, **one boot only**: `fatal_error_lines=0` over 160 s, where the Aug-14
-baseline crashed the modem every 20-28 s. Likely `519646f01` (withhold 5845 MHz),
-which post-dates the Aug-14 working image. Wants 2-3 more boots to confirm.
+Modem crash **closed**: 0 fatal errors over a 56-min window with 6 repeated 5 GHz
+scans (`max_freq=5785` every time). `519646f01` (withhold 5845 MHz) confirmed —
+the Aug-14 baseline crashed every 20-28 s; 3362 s covers ~120-170 intervals.
 
 **Remaining WLAN work** — the lane is reopened, not finished:
 1. Confirm the modem-crash fix with a longer window and a repeated 5 GHz scan.

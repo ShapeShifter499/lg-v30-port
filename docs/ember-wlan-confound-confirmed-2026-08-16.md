@@ -45,20 +45,41 @@ needs one confirming boot." That boot is done and it is positive.
   image had them `=m` — ~90 symbols of difference beyond the two ath10k ones.
   WLAN works anyway, so those changes are cleared of suspicion too.
 
-## Bonus, one boot only: no modem crash
+## The modem crash is fixed, and the mechanism is directly evidenced
 
-`fatal_error_lines=0` over 160 s of uptime, with the modem `running` throughout.
+First observation was `fatal_error_lines=0` over 160 s. That was too short to
+claim anything, so the same boot was held open and re-tested with **six repeated
+5 GHz passive scans over a 56-minute window** — repeating the exact trigger Aurel
+root-caused (channel 169 / 5845 MHz).
 
-The Aug-14 working run crashed the modem every **20-28 s**
-(`err_qdi.c:450:EX:wlan_process`), logged in `ember-wifi-working-2026-08-14.md`
-as a known-not-done. 160 s covers six to eight expected crash intervals, so this
-is meaningful but it is **one boot** — not a claim that the defect is closed.
+```
+uptime_start=3031s   mss=running   fatal_at_start=0   recover_at_start=0
+scan 1  bss=76  5GHz=28  max_freq=5785  fatal=0  mss=running
+scan 2  bss=77  5GHz=29  max_freq=5785  fatal=0  mss=running
+scan 3  bss=75  5GHz=29  max_freq=5785  fatal=0  mss=running
+scan 4  bss=76  5GHz=29  max_freq=5785  fatal=0  mss=running
+scan 5  bss=68  5GHz=28  max_freq=5785  fatal=0  mss=running
+scan 6  bss=83  5GHz=31  max_freq=5785  fatal=0  mss=running
+uptime_end=3362s   fatal_total=0   recover_total=0   mss=running
+```
 
-The plausible cause is `519646f01` ("wifi: ath10k: withhold 5845 MHz from the
-WCN3990 channel list"), which post-dates `d05e70c5e484` and so was *not* in the
-Aug-14 working image. `aurel-handoff-2026-08-15-…` root-caused the fatal error to
-scanning channel 169 / 5845 MHz. That fits exactly. Confirming it wants a couple
-more boots and a longer window.
+The Aug-14 baseline crashed every **20-28 s** (`err_qdi.c:450:EX:wlan_process`).
+3362 s covers roughly **120-170 expected crash intervals with zero crashes**, and
+zero recoveries, while scanning repeatedly and successfully on 5 GHz.
+
+The mechanism is not inferred, it is visible: **`max_freq=5785` on every scan.**
+5845 MHz never appears in any result, and `grep 'freq: 58[0-9]+'` for anything
+above 5785 returns nothing — `519646f01` ("wifi: ath10k: withhold 5845 MHz from
+the WCN3990 channel list") is withholding exactly the channel that took the
+firmware down, and 5 GHz scanning still works without it.
+
+That commit post-dates `d05e70c5e484`, which is why the Aug-14 image crashed and
+this one does not. The known-not-done in `ember-wifi-working-2026-08-14.md` is
+closed.
+
+Caveat kept honest: this is **one boot** held open for 56 minutes, not six
+separate boots. It rules out a short-window fluke decisively; it does not rule
+out a boot-to-boot nondeterminism that happens to have missed this boot.
 
 ## Method notes worth keeping
 

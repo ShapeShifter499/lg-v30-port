@@ -1,0 +1,53 @@
+uptime_start=3031s
+kernel=7.2.0-rc2-g7187fbbb5675
+mss=running
+wlan0_present=1
+fatal_at_start=0
+recover_at_start=0
+--- scan 1 (t=3031s) ---
+bss=76
+bss_5ghz=28
+max_freq=5785
+fatal=0  mss=running
+--- scan 2 (t=3096s) ---
+bss=77
+bss_5ghz=29
+max_freq=5785
+fatal=0  mss=running
+--- scan 3 (t=3161s) ---
+bss=75
+bss_5ghz=29
+max_freq=5785
+fatal=0  mss=running
+--- scan 4 (t=3226s) ---
+bss=76
+bss_5ghz=29
+max_freq=5785
+fatal=0  mss=running
+--- scan 5 (t=3292s) ---
+bss=68
+bss_5ghz=28
+max_freq=5785
+fatal=0  mss=running
+--- scan 6 (t=3357s) ---
+bss=83
+bss_5ghz=31
+max_freq=5785
+fatal=0  mss=running
+=== final ===
+uptime_end=3362s
+fatal_total=0
+recover_total=0
+mss=running
+--- any 5845/channel-169 in scan results (should be NONE) ---
+--- crash signature lines, if any ---
+--- ath10k tail ---
+[   37.645780] ath10k_snoc 18800000.wifi: qmi not waiting for msa_ready indicator
+[   41.196592] ath10k_snoc 18800000.wifi: wcn3990 hw1.0 target 0x00000008 chip_id 0x00000000 sub 0000:0000
+[   41.196625] ath10k_snoc 18800000.wifi: kconfig debug 0 debugfs 0 tracing 0 dfs 0 testmode 0
+[   41.196638] ath10k_snoc 18800000.wifi: firmware ver  api 5 features wowlan,mgmt-tx-by-reference,non-bmi crc32 b3d4b790
+[   41.249876] ath10k_snoc 18800000.wifi: htt-ver 3.71 wmi-op 4 htt-op 3 cal file max-sta 32 raw 0 hwcrypto 1
+[   41.320588] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+DONE_STABILITY
+
+[exited with code 0]
