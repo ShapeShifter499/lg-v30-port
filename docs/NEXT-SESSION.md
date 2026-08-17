@@ -1,5 +1,17 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-17 follow-up (Aurel) — READ FIRST.** Four RAM boots advanced Lane B
+and changed the problem statement; the wall is no longer "769 never
+registers". Read these before anything else:
+`docs/aurel-2026-08-17-qmi-experiment-matrix.md` (results matrix +
+conclusions) and `docs/aurel-2026-08-17-adsp-qmi-769-analysis.md` (static
+analysis). One-line summary: 769 registers ~6 s after ADSP start in 3/3
+boots with 7187fbbb5 present (0/1 without it); the NGD driver reaches
+select-instance with the re-arm patch but the ADSP never answers it and its
+QMI/glink edge wedges on its own 2-4 min after boot. Evidence:
+`docs/evidence/2026-08-17-qmi-boots/`. Ledger: K175/K176.
+The original Ember handoff follows, preserved below.
+
 - **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16 (session C)
 - **Full detail:** `docs/ember-handoff-2026-08-16b-pd-mapper-fixed-qmi-is-next.md`
 - **WLAN detail:** `docs/ember-wlan-delta-recovered-2026-08-16.md` →

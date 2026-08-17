@@ -7887,3 +7887,63 @@ Date: 2026-08-13
 
 Assisted-by: Hermes-Agent:xai-oauth/grok-4.6
 Date: 2026-08-15
+
+### K175 — qcom-ngd-ctrl: re-arm up_worker on QMI server arrival (device-tested, 2026-08-17)
+
+- Handle: uncommitted patch `out/qmi-rearm-upwork-2026-08-17.patch`
+  (sha256 `2aae35ef7cb32b018f61920615177eb2718cff348f0aea2302a6a9b6275e5059`),
+  applied to `ghfork/joan/latest-clean-test` `7187fbbb5`. Combined variant
+  with the 3 s timeout: `out/qmi-rearm-plus-3s-tout-2026-08-17.patch`
+  (sha256 `abe25c77c196a32a56271d2b274df81145a7dd83332a86afce582a2a51987013`).
+- Class: `upstream-candidate` shape, device-tested.
+- File: `drivers/slimbus/qcom-ngd-ctrl.c`.
+- Purpose: the NGD up worker is scheduled only by the lpass SSR event and
+  PDR state-UP, and waits exactly 1 s for QMI service 769. On joan 769
+  registers ~6 s after remoteproc-up, so the window closes before the
+  server exists and NOTHING ever re-triggers the worker
+  (`qmi_new_server()` only completes the wait; it does not re-arm).
+  Fix: schedule `ngd_up_work` from `qcom_slim_ngd_qmi_new_server()` when
+  the controller is still DOWN, and re-check `state != DOWN` under
+  `ssr_lock` inside the worker so a concurrent re-arm cannot double-enable.
+- Verification: three RAM-only boots (2026-08-17, images `boot-joan-qmia.img`
+  `b5aa5619…`, `boot-joan-qmit.img` `c4f1349f…`) reached
+  `qcom_slim_qmi_init()` / select-instance, which was previously
+  unreachable when 769 arrived after the window. Evidence:
+  `docs/evidence/2026-08-17-qmi-boots/`.
+- Status: keep; the fix is correct independent of the ADSP-side failure it
+  exposed. Candidate for the upstream series.
+- Public/PR disposition: `needs cleanup` — commit message/trailers and the
+  lock treatment for the state read in new_server pending.
+
+### K176 — SLIMbus QMI 3 s response timeout (LG W/A) + ADSP QMI disease (2026-08-17)
+
+- Handle: same combined patch as K175's second artifact.
+- Class: `upstream-candidate` (timeout value), paired with an open ADSP-side
+  investigation.
+- File: `drivers/slimbus/qcom-ngd-ctrl.c` (`SLIMBUS_QMI_RESP_TOUT`
+  1000 -> 3000).
+- Purpose: LG's downstream carries `SLIM_QMI_RESP_TOUT 3000` under
+  `CONFIG_MACH_LGE` ("QMI response timeout of 3s (LGE W/A)") — mainline's
+  1 s loses the race with the ADSP's init on joan.
+- Verification: Boot B/C (qmit image) showed select-instance STILL times
+  out at 3 s — the ADSP's slimbus task is wedged, not slow. The value is
+  correct to carry, but insufficient alone.
+- Also tested and recorded (negative evidence, same session):
+  - pd_mapper revert control (qmir image, `5fe1fea2…`): with 7187fbbb5
+    reverted the ADSP registers NO QMI services at all (no 769, no
+    servreg-notif) while APR is healthy. Conclusion: 7187fbbb5 HELPS QMI
+    registration; do not revert.
+  - modem-first boot (qmit image, Boot C): modem up with TIME service
+    before ADSP start changes nothing — the modem does not gate the ADSP
+    SLIMbus path.
+  - The ADSP's QMI/glink edge wedges on its own 2-4 min after boot in all
+    four boots (glink "intent request timed out", repeating); kernel QMI
+    traffic accelerates it (~114 s vs ~231 s with none). rproc stays
+    "running" (no SMP2P fatal). This is the actual wall, below the driver.
+- Status: open. Full writeup: `docs/aurel-2026-08-17-qmi-experiment-matrix.md`
+  and `docs/aurel-2026-08-17-adsp-qmi-769-analysis.md`.
+- Public/PR disposition: `blocked` on the ADSP-side understanding; the
+  timeout alone is not a fix and must not be presented as one.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17

@@ -1,0 +1,125 @@
+uptime_at_start=31s
+=== start rmtfs (read-only, syncs mss rproc) ===
+rmtfs=running
+=== start modem ===
+mss=running time22=PRESENT
+modem up at uptime 33s
+=== stage ADSP fw + start ADSP ===
+adsp start issued at uptime 33s
+t+3s 769=absent
+t+6s 769=PRESENT
+t+9s 769=PRESENT
+t+12s 769=PRESENT
+t+15s 769=PRESENT
+t+18s 769=PRESENT
+t+21s 769=PRESENT
+t+24s 769=PRESENT
+t+27s 769=PRESENT
+t+30s 769=PRESENT
+t+33s 769=PRESENT
+t+36s 769=PRESENT
+t+39s 769=PRESENT
+t+42s 769=PRESENT
+t+45s 769=PRESENT
+t+48s 769=PRESENT
+t+51s 769=PRESENT
+t+54s 769=PRESENT
+t+57s 769=PRESENT
+t+60s 769=PRESENT
+t+63s 769=PRESENT
+t+66s 769=PRESENT
+t+69s 769=PRESENT
+Terminated
+t+72s 769=PRESENT
+=== full qrtr-lookup ===
+  Service Version Instance Node  Port
+       66       1      180    0     1 Service registry notification service
+       43       2       18    0     4 Subsystem control service
+       15       1        0    0    20 Test service
+       51       1        2    0    21 CoreSight remote tracing service
+       21       1        0    0    22 Modem embedded file system service
+       24       1        0    0    23 Thermal mitigation device service
+       23       1        0    0    24 Thermal sensors service
+       22       1        0    0    25 Time service
+       36       1        0    0    27 Persistent device configuration service
+       49       1        2    0    28 IPA control service
+       54       1        0    0    32 <unknown>
+       17       1        0    0    33 Specific absorption rate service
+     4098       0        0    0    34 <unknown>
+       34       1        0    0    36 Coexistence service
+       41       1        1    0    37 RF radiated performance enhancement service
+       55       1        2    0    46 QMI-SLIM service
+        9       2        0    0    48 Voice service
+        3       1        0    0    50 Network Access Service
+       12       1        0    0    51 Phonebook Management service
+       10       2        0    0    52 Card Application Toolkit service (v2)
+        1       1        0    0    53 Wireless Data Service
+        4       1        0    0    54 Quality Of Service service
+       26       1        0    0    55 Wireless data administrative service
+        7       1        0    0    56 Authentication service
+        8       1        0    0    57 AT service
+       29       1        0    0    58 Circuit switched videotelephony service
+       11       1        0    0    59 User Identity Module service
+       47       1        0    0    60 Data Port Mapper service
+        5       1        0    0    61 Wireless Messaging Service
+       42       1        0    0    62 Data system determination service
+        2       1        0    0    63 Device Management Service
+       48       1        0    0    64 QMI DFS service
+       68       1        0    0    65 <unknown>
+       16       2        0    0    66 Location service (~ PDS v2)
+      800       2        1    0    70 <unknown>
+      704       2        1    0    71 <unknown>
+      701       2        1    0    72 <unknown>
+      705       2        1    0    73 <unknown>
+      702       2        1    0    74 <unknown>
+      703       2        1    0    75 <unknown>
+      707       2        1    0    76 <unknown>
+      706       2        1    0    77 <unknown>
+       71       1        0    0    78 UIMHTTP service
+       14       1        0    1    14 Remote file system service
+       64       1        1    1 16390 Service registry locator service
+       15       1        8    5     2 Test service
+       66       1       74    5     3 Service registry notification service
+       43       2       20    5     6 Subsystem control service
+       24       1        1    5     7 Thermal mitigation device service
+       15       1        0    5     9 Test service
+      769       1        0    Terminated
+=== dmesg since modem mark (slim/pdr/qmi/apr/rproc/wcd/glink) ===
+[   33.975566] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   33.976060] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   33.998564] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[   34.088771] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   34.094829] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   46.048099] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   46.048227] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   46.075672] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   47.103513] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  114.143956]  17300000.remoteproc:glink-edge: intent request timed out
+[  127.199436]  17300000.remoteproc:glink-edge: intent request timed out
+=== cards ===
+--- no soundcards ---
+=== slimbus devices ===
+=== deferred ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found
+=== rproc states ===
+/sys/class/remoteproc/remoteproc0/state: running
+/sys/class/remoteproc/remoteproc1/state: running
+=== late re-check: +60s ===
+  Service Version Instance Node  Port
+       66       1      180    0     1 Service registry notification service
+       22       1        0    0    25 Time service
+      769       1        0    
+Terminated
+=== dmesg tail after late wait ===
+[   33.976060] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   34.088771] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   34.094829] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   46.048099] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   46.048227] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   46.075672] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   47.103513] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  114.143956]  17300000.remoteproc:glink-edge: intent request timed out
+[  127.199436]  17300000.remoteproc:glink-edge: intent request timed out
+[  197.343309]  17300000.remoteproc:glink-edge: intent request timed out
+=== save full dmesg since modem mark ===
+18 /tmp/dmesg-since-mark.txt

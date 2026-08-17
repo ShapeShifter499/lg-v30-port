@@ -1,0 +1,62 @@
+uptime_at_start=32s
+adsp start issued at uptime 32s
+t+3s 769=absent
+t+6s 769=PRESENT
+t+9s 769=PRESENT
+t+12s 769=PRESENT
+t+15s 769=PRESENT
+t+18s 769=PRESENT
+t+21s 769=PRESENT
+t+24s 769=PRESENT
+t+27s 769=PRESENT
+t+30s 769=PRESENT
+t+33s 769=PRESENT
+t+36s 769=PRESENT
+t+39s 769=PRESENT
+t+42s 769=PRESENT
+t+45s 769=PRESENT
+t+48s 769=PRESENT
+t+51s 769=PRESENT
+t+54s 769=PRESENT
+t+57s 769=PRESENT
+t+60s 769=PRESENT
+t+63s 769=PRESENT
+t+66s 769=PRESENT
+t+69s 769=PRESENT
+t+72s 769=PRESENT
+=== full qrtr-lookup (t+90s) ===
+  Service Version Instance Node  Port
+Terminated
+=== dmesg since mark (slim/pdr/qmi/apr/rproc/glink/wcd) ===
+[   32.839079] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   32.840165] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   32.872568] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[   32.952235] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   32.956343] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   45.024297] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   45.024430] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   45.044475] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   46.048938] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[  115.936586]  17300000.remoteproc:glink-edge: intent request timed out
+=== late re-check: +60s ===
+  Service Version Instance Node  Port
+Terminated
+=== dmesg tail after late wait ===
+[    0.000000] Linux version 7.2.0-rc2-qmia-g7187fbbb5675-dirty (kumo02@nym-skyforge) (aarch64-linux-gnu-gcc (GCC) 16.1.0, GNU ld (GNU Binutils) 2.46.1) #6 SMP PREEMPT Mon Aug 17 02:25:36 PDT 2026
+[    4.148307] CPU: 7 UID: 0 PID: 1 Comm: swapper/0 Not tainted 7.2.0-rc2-qmia-g7187fbbb5675-dirty #6 PREEMPT 
+[   11.260383] [pmOS-rd]: modprobe: FATAL: Module ext4 not found in directory /lib/modules/7.2.0-rc2-qmia-g7187fbbb5675-dirty
+[   11.348815] [pmOS-rd]: modprobe: FATAL: Module ext4 not found in directory /lib/modules/7.2.0-rc2-qmia-g7187fbbb5675-dirty
+[   45.024297] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   45.024430] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   45.044475] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   46.048938] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+=== cards ===
+--- no soundcards ---
+=== slimbus devices ===
+=== deferred ===
+sound	msm-snd-sdm845: SLIM Playback: codec dai not found
+=== rproc states ===
+/sys/class/remoteproc/remoteproc0/state: offline
+/sys/class/remoteproc/remoteproc1/state: running
+=== save full dmesg since mark ===
+16 /tmp/dmesg-since-mark.txt

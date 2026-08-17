@@ -1,0 +1,12 @@
+[   32.943984] AUREL-MARK-ADSP
+[   32.944151] remoteproc remoteproc1: powering up adsp
+[   32.944270] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   32.945191] PDR: service lookup for avs/audio failed: -6
+[   33.160332] remoteproc remoteproc1: remote processor adsp is now up
+[   33.163325] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   33.163915] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   33.273118] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   33.277943] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   34.180074] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   45.233424] [drm:dpu_crtc_get_vblank_counter] *ERROR* no encoder found for crtc 0
+[   50.471964] rfkill: input handler disabled

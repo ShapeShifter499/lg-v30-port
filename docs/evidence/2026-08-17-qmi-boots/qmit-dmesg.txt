@@ -1,0 +1,16 @@
+[   32.630101] AUREL-MARK-ADSP
+[   32.630329] remoteproc remoteproc1: powering up adsp
+[   32.630533] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   32.832600] remoteproc remoteproc1: remote processor adsp is now up
+[   32.839079] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   32.840165] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   32.872568] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[   32.952235] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   32.956343] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   45.024297] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   45.024430] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   45.044475] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   46.048938] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   53.299830] rfkill: input handler disabled
+[  115.936586]  17300000.remoteproc:glink-edge: intent request timed out
+[  186.080785]  17300000.remoteproc:glink-edge: intent request timed out
