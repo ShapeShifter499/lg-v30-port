@@ -1,15 +1,28 @@
 # LG V30 (joan) — next session start here
 
-**2026-08-17 follow-up (Aurel) — READ FIRST.** Four RAM boots advanced Lane B
-and changed the problem statement; the wall is no longer "769 never
-registers". Read these before anything else:
-`docs/aurel-2026-08-17-qmi-experiment-matrix.md` (results matrix +
-conclusions) and `docs/aurel-2026-08-17-adsp-qmi-769-analysis.md` (static
-analysis). One-line summary: 769 registers ~6 s after ADSP start in 3/3
-boots with 7187fbbb5 present (0/1 without it); the NGD driver reaches
-select-instance with the re-arm patch but the ADSP never answers it and its
-QMI/glink edge wedges on its own 2-4 min after boot. Evidence:
-`docs/evidence/2026-08-17-qmi-boots/`. Ledger: K175/K176.
+**2026-08-17 evening (Aurel) — READ FIRST: Lane B root cause FOUND, sound card UP.**
+Five boots (E–I) took Lane B from "QMI wedge mystery" to a registered
+`LG-V30` ALSA card. The wall was: mainline's q6afe/q6asm probes send
+q6core FWK_VERSION/SVC_VERSION APR commands — mainline-only, sdm845-era
+messages the msm8998 firmware mishandles — which wedges the ADSP's
+QMI/glink transport ~2 s later. Symptoms followed: select-instance
+unanswered, no RX_DONE, the 30-intent pool draining (the 2-4 min
+"wedge" = exactly 30 AP->ADSP messages with zero returns).
+Fix (debug-gated): `q6core.skip_versions=1` (or `apr.skip_devices=1`).
+With it: ADSP alive indefinitely, SLIM SAT completes, WCD9340 enumerates
+(chip 0x108), `LG-V30` card + MM1/MM2 PCMs register.
+Full story: `docs/aurel-2026-08-17-qmi-death-window.md`; evidence in
+`docs/evidence/2026-08-17-qmi-boots/` (boots E–I); ledger K175–K181.
+Patches v1–v5 in `out/` (gitignored; sha256s in ledger). Kernel tree is
+DIRTY with the v5 debug stack (breadcrumbs + gates); restore canonical
+when the upstream-shaped fix lands (DT-gate the version commands).
+**Next: playback path** — SLIM Playback/Capture dai-links are dropped
+("codec dai not found" despite wcd934x dais registered; codec is in the
+card as aux only) and aplay on MM1/MM2 fails silently EINVAL. Start at
+sdm845_snd_parse_of codec-dai resolution + probe order vs the mfd child.
+Also queued: upstream-shaped q6core fix; WLAN re-confirmation boots;
+cellular lane (IPA data / SMS / native-IMS research per Lance 2026-08-17).
+
 The original Ember handoff follows, preserved below.
 
 - **From:** Ember Nymbrand (agent-ember) · Claude-Code:claude-opus-5 · 2026-08-16 (session C)
