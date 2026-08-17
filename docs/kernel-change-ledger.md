@@ -8132,3 +8132,26 @@ Date: 2026-08-17
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
 Date: 2026-08-17
+
+## Boots M/N (2026-08-17 night, playback-crash hunt; K189-K191)
+
+- K189: Boot M: audio-routing added to joan DT copied from db845c —
+  WRONG pair: "SpkrLeft IN" is the WSA881x widget (db845c-only); the
+  failed of_dapm_route add fails the whole card instantiation. Fix:
+  "Left Spk", "SPK1 OUT" (the machine's own pin). Boot N: card up,
+  zero route failures.
+- K190: Boot N: full mixer sequence + aplay of a 6s 1kHz tone —
+  playback STARTED and the kernel crashed to the bootloader mid-play.
+  /tmp evidence died (tmpfs). The crash is the playback data path
+  itself (Boot L's post-play crash = same root cause, different
+  timing).
+- K191: Netconsole for the panic capture: CONFIG_NETCONSOLE=y +
+  DYNAMIC; cmdline netconsole=6665@172.16.42.1/usb0,6666@
+  172.16.42.2/92:e9:43:17:eb:60. The config episode (scripts/config +
+  interrupted olddefconfig) scrambled the Kconfig state -> a near-full
+  rebuild; MODULES=n forced the m->y conversion to resolve the
+  DRM_KMS_HELPER link errors (RAM boot never loads modules anyway).
+  Boot O queued.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17
