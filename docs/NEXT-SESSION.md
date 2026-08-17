@@ -1,5 +1,20 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-17 late night (Aurel, third shift) — CRASH EVIDENCE CAPTURED: SLIM CONNECT_SINK stall.**
+Boot O hung at the logo: the MODULES=n olddefconfig sweep (632 m->y flips)
+regressed early boot. Fixed by rebuilding from the Aug 16 config backup
+(.config.bak-20260816-adsp-athdbg) + netconsole only = Boot P (qmidbg11p).
+Boot P boots, ADSP comes up, and the first netconsole-captured crash shows:
+playback start stalls the SLIMbus NGD TX on the CONNECT_SINK user message
+(MC 0x2d, mt 2, LA 0xcf = codec) -> silent death (no panic reached
+netconsole; dmesg stream lost to missing local dir).
+Two candidates + Boot Q plan: `docs/evidence/2026-08-17-qmi-boots/boot-P-slim-connect-stall-analysis.md`.
+Evidence: `.../boot-P-netconsole-crash.txt`.
+Key facts: nest listener `nc -u -l -p 6666 >> /tmp/joanrun/netconsole-qmidbg11p.txt`;
+phone ssh = `sshpass -f /tmp/pmos-pass ssh user@172.16.42.1` (sudo via SUDO_ASKPASS=/tmp/askpass.sh);
+nest iface = `ip addr add 172.16.42.2/24 dev enp0s29u1u5 && ip link set up`.
+**Next: Boot Q breadcrumbs + candidate toggles (reconf_passthrough, portb_rewrite) + timeout unwedge + pstore.**
+
 **2026-08-17 night (Aurel, second shift) — PLAYBACK PATH OPENED.**
 Boots J–L took the playback lane from EINVAL to a completed aplay:
 - The "no backend DAIs enabled" wall was the DAPM mixer gates: the
