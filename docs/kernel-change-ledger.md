@@ -8097,3 +8097,38 @@ Date: 2026-08-17
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
 Date: 2026-08-17
+
+## Boots J-L (2026-08-17, playback lane; K182-K188)
+
+- K182: Boot J (qmidbg6j, v6 DAPM breadcrumbs). dpcm walk from the FE
+  finds exactly MM_DL1 and stops; route-add breadcrumbs zero; mixer
+  widgets exist (74). Proved the walk needs connected mixer paths.
+- K183: Root cause of "no backend DAIs enabled": q6routing intercon
+  routes ARE present (routing comp = every link's platform, probed);
+  the FE walk stops because the mixer input paths start disconnected
+  (path->connect = 0 until the mixer input is enabled). The error text
+  ("possibly missing ALSA mixer-based routing or UCM profile") was
+  literal. Fix: amixer enable "SLIMBUS_0_RX Audio Mixer MultiMedia1".
+  aux-devs=<&q6routing> DTS experiment tried and reverted (redundant).
+- K184: With the mixer on, aplay open succeeds; next wall: AFE port
+  start cmd 0x100e5 error 0x9 on port 0x4000. Breadcrumb shows
+  slimbus_dev_id=0 and ch=0 in the port cfg.
+- K185: Fix 1: q6afe_slim_port_prepare() now sets
+  slimbus_dev_id=AFE_SLIMBUS_DEVICE_1 (mainline never set it; 8998 fw
+  validates it; downstream sets DEVICE_1). Patch v8/v9 + slim cfg
+  breadcrumb (JOAN-DBG: slim port ...).
+- K186: Fix 2: the codec's SLIM channel list is empty until "SLIM RX0
+  MUX" selects an AIF (wcd934x_slim_rx_mux_put links the rx_chs into
+  the dai's ch list). With mux=ZERO the machine's
+  sdm845_slim_snd_hw_params got 0 channels -> empty CPU dai map -> fw
+  rejects the port. Fix: amixer cset 'SLIM RX0 MUX' AIF1_PB.
+- K187: Boot L (qmidbg8l, v9): aplay -D hw:0,0 48k stereo /dev/zero
+  COMPLETED (3 s) — first fully-open FE->BE->AFE path. Phone then
+  crashed to the bootloader (teardown path suspect; RAM boot = no
+  evidence). Details: docs/evidence/2026-08-17-qmi-boots/boot-L-playback-opened.md
+- K188: Patches banked v6 (0b586967->v6 2bd5e276d...), v7 (2a4cd514e...),
+  v8 (2b19d41f...), v9 (2b19d41f... same content, DTS revert). Boots:
+  qmidbg6j f17e5186..., qmidbg7k be308e09..., qmidbg8l 19e6d50d...
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17

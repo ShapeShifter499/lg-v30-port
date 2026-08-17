@@ -1,25 +1,30 @@
 # LG V30 (joan) — next session start here
 
-**2026-08-17 evening (Aurel) — READ FIRST: Lane B root cause FOUND, sound card UP.**
-Five boots (E–I) took Lane B from "QMI wedge mystery" to a registered
-`LG-V30` ALSA card. The wall was: mainline's q6afe/q6asm probes send
-q6core FWK_VERSION/SVC_VERSION APR commands — mainline-only, sdm845-era
-messages the msm8998 firmware mishandles — which wedges the ADSP's
-QMI/glink transport ~2 s later. Symptoms followed: select-instance
-unanswered, no RX_DONE, the 30-intent pool draining (the 2-4 min
-"wedge" = exactly 30 AP->ADSP messages with zero returns).
-Fix (debug-gated): `q6core.skip_versions=1` (or `apr.skip_devices=1`).
-With it: ADSP alive indefinitely, SLIM SAT completes, WCD9340 enumerates
-(chip 0x108), `LG-V30` card + MM1/MM2 PCMs register.
-Full story: `docs/aurel-2026-08-17-qmi-death-window.md`; evidence in
-`docs/evidence/2026-08-17-qmi-boots/` (boots E–I); ledger K175–K181.
-Patches v1–v5 in `out/` (gitignored; sha256s in ledger). Kernel tree is
-DIRTY with the v5 debug stack (breadcrumbs + gates); restore canonical
-when the upstream-shaped fix lands (DT-gate the version commands).
-**Next: playback path** — SLIM Playback/Capture dai-links are dropped
-("codec dai not found" despite wcd934x dais registered; codec is in the
-card as aux only) and aplay on MM1/MM2 fails silently EINVAL. Start at
-sdm845_snd_parse_of codec-dai resolution + probe order vs the mfd child.
+**2026-08-17 night (Aurel, second shift) — PLAYBACK PATH OPENED.**
+Boots J–L took the playback lane from EINVAL to a completed aplay:
+- The "no backend DAIs enabled" wall was the DAPM mixer gates: the
+  intercon routes exist (routing comp = every link's platform), but the
+  FE walk stops because mixer input paths start disconnected. Enable
+  `SLIMBUS_0_RX Audio Mixer MultiMedia1` (amixer) and the FE opens.
+  A UCM profile automates this on real systems.
+- The AFE port start error 0x9 needed TWO fixes: kernel sets
+  `slimbus_dev_id = AFE_SLIMBUS_DEVICE_1` in q6afe_slim_port_prepare
+  (v9 patch; mainline left it 0), and `SLIM RX0 MUX` = `AIF1_PB` so the
+  codec exposes its SLIM channels to the machine driver (else the CPU
+  dai channel map stays empty and the firmware rejects the port).
+- With all three: `aplay hw:0,0 48k stereo` completes. The phone then
+  crashed (fell to the bootloader) — teardown path suspect (BE shutdown /
+  port stop / slimbus teardown), evidence lost with the RAM boot.
+- Still missing for AUDIBLE sound: joan DT has no `audio-routing`
+  (db845c has it) and the codec-side mixer sequence (RX INT0_1 MIX1 INP0
+  = RX0, RX INT0 DEM MUX = CLSH_DSM_OUT, SPK PA) — see Boot L notes.
+- DAC (ES9218P): headphone-path-only, mainline has es9218p.c; separate
+  lane later, not part of any current wall.
+Details: `docs/evidence/2026-08-17-qmi-boots/boot-L-playback-opened.md`;
+patches v6–v9 in out/ (v9 sha256 2b19d41f...); ledger K182+ to be
+appended. Kernel tree DIRTY with the v9 debug stack (breadcrumbs + gates
++ dev-id fix).
+**Next: teardown-crash hunt + codec-side DAPM for first audible sound.**
 Also queued: upstream-shaped q6core fix; WLAN re-confirmation boots;
 cellular lane (IPA data / SMS / native-IMS research per Lance 2026-08-17).
 
