@@ -1,0 +1,232 @@
+uptime_at_start=33s
+adsp start issued at uptime 33s
+t+5s 769=absent
+t+10s 769=absent
+t+15s 769=absent
+t+20s 769=absent
+t+25s 769=absent
+t+30s 769=absent
+t+35s 769=absent
+t+40s 769=absent
+t+45s 769=absent
+t+50s 769=absent
+t+55s 769=absent
+t+60s 769=absent
+t+65s 769=absent
+t+70s 769=absent
+t+75s 769=absent
+t+80s 769=absent
+t+85s 769=absent
+t+90s 769=absent
+t+95s 769=absent
+t+100s 769=absent
+t+105s 769=absent
+t+110s 769=absent
+t+115s 769=absent
+t+120s 769=absent
+--- breadcrumbs at t+120s ---
+[   43.689446]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   48.757849]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   53.805611]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   58.860076]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   63.919711]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   68.962123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   74.012204]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   79.092474]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   84.144024]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   89.196600]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   94.238062]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   99.307888]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  104.354048]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  109.419096]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  114.487296]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  119.536499]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  124.589047]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  129.650192]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  134.711429]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  139.758588]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  144.814605]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  149.877755]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+--- rx_done rx summary ---
+40
+0
+t+125s 769=absent
+t+130s 769=absent
+t+135s 769=absent
+t+140s 769=absent
+t+145s 769=absent
+t+150s 769=absent
+t+155s 769=absent
+t+160s 769=absent
+t+165s 769=absent
+t+170s 769=absent
+t+175s 769=absent
+t+180s 769=absent
+t+185s 769=absent
+t+190s 769=absent
+t+195s 769=absent
+t+200s 769=absent
+t+205s 769=absent
+t+210s 769=absent
+t+215s 769=absent
+t+220s 769=absent
+t+225s 769=absent
+t+230s 769=absent
+t+235s 769=absent
+t+240s 769=absent
+--- breadcrumbs at t+240s ---
+[  165.294535]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  170.355354]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  175.410194]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  180.465423]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  185.532109]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  190.599305]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  195.686792]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  200.750896]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  205.809819]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  210.860341]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  215.924435]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  220.994605]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  226.053989]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  231.118782]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  236.178494]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  241.230123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  246.287718]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  251.364572]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  256.447973]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  261.502956]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  266.553493]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  271.622278]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+--- rx_done rx summary ---
+64
+0
+t+245s 769=absent
+t+250s 769=absent
+t+255s 769=absent
+t+260s 769=absent
+t+265s 769=absent
+t+270s 769=absent
+t+275s 769=absent
+t+280s 769=absent
+t+285s 769=absent
+t+290s 769=absent
+t+295s 769=absent
+t+300s 769=absent
+t+305s 769=absent
+t+310s 769=absent
+t+315s 769=absent
+t+320s 769=absent
+t+325s 769=absent
+t+330s 769=absent
+t+335s 769=absent
+t+340s 769=absent
+t+345s 769=absent
+t+350s 769=absent
+--- final lookup ---
+  Service Version Instance Node  Port
+       64       1        1    1 16390 Service registry locator service
+       15       1        8    5     2 Test service
+       66       1       74    5     3 Service registry notification service
+       43       2       20    5     6 Subsystem control service
+       24       1        1    5     7 Thermal mitigation device service
+       15       1        0    5     8 Test service
+      769       1        0    5    12 SLIMbus control service
+--- all JOAN-DBG (grep counts) ---
+146
+87
+30
+0
+--- rproc states ---
+/sys/class/remoteproc/remoteproc0/state: offline
+/sys/class/remoteproc/remoteproc1/state: running
+--- dmesg since mark (tail 90) ---
+[   34.848506] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   36.410176]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.453039]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.454455]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[   37.580811]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.581016]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[   37.581033]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[   37.581439]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.581978]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.583812]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 3 reuse 1)
+[   37.706184]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   37.706352]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 4 reuse 1)
+[   38.645800]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   39.135528]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   43.657208]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+[   43.689446]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   48.757849]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   53.805611]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   55.920368] rfkill: input handler disabled
+[   58.860076]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   63.919711]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   68.962123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   74.012204]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   79.092474]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   84.144024]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   89.196600]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   94.238062]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[   99.307888]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  104.354048]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  109.419096]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  114.487296]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  119.536499]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  124.589047]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  129.650192]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  134.711429]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  139.758588]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  144.814605]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  149.877755]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  155.191377]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  160.250537]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  165.294535]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  170.355354]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  175.410194]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  180.465423]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  185.532109]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  190.599305]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  195.686792]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  200.750896]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  205.809819]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  210.860341]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  215.924435]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  220.994605]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  226.053989]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  231.118782]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  236.178494]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  241.230123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  246.287718]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  251.364572]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  256.447973]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  261.502956]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  266.553493]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  271.622278]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  276.966521]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  282.027118]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  287.084376]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  292.162809]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  297.231779]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  302.287556]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  307.353049]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  312.407797]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  316.384804] qnoc-msm8998 17900000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.384843] qnoc-msm8998 1000000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.384855] qnoc-msm8998 1500000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.384866] qnoc-msm8998 1620000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.384880] qnoc-msm8998 1700000.interconnect: sync_state() pending due to 1e40000.ipa
+[  317.469159]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  322.537784]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  327.608004]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  332.671824]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  337.731864]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  342.789544]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  347.847662]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  352.902862]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  357.964532]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  363.043784]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  368.114772]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  373.185048]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  378.267636]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  383.330802]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)
+[  388.399797]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 116 reuse 1)

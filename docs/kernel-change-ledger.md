@@ -7947,3 +7947,153 @@ Date: 2026-08-15
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
 Date: 2026-08-17
+
+### K177 — JOAN-DBG breadcrumb instrumentation (debug-only, class: debug)
+- Tree: linux-mainline-v30-usb-otg @ 7187fbbb5 + K175/K176 applied.
+- dev_info breadcrumbs for boot-time death-window capture:
+  - qcom_glink_native.c: edge+channel name on rx_open/rx_close; channel
+    name + lcid in the intent-request timeout error; rate-limited log of
+    remote intent-req grants.
+  - net/qrtr/smd.c: IPCRTR channel up/down with parent edge name.
+  - pdr_interface.c: notifier new/del server + register-listener result.
+  - qcom-ngd-ctrl.c: QMI server up/down, up_worker proceeding/result.
+- Artifact: out/qmi-rearm-3s-breadcrumbs-2026-08-17.patch
+  sha256 = dcd5c8e92a8b12463c9a0ccf494bd70fb38c01ba0eaa9d762f3ed936dcb2c2a5
+  (verify: sha256sum out/qmi-rearm-3s-breadcrumbs-2026-08-17.patch)
+- Built as boot-joan-qmidbg.img sha256 f27dbac18129155212f88c6c19b076993663d2ac73f5ebe206cfad75ed95c414
+  (release 7.2.0-rc2-g7187fbbb5675-dirty, canonical LOCALVERSION).
+- Boot E results (evidence/2026-08-17-qmi-boots/qmidbg-dmesg-full.txt):
+  - 769 up at t+0.5s; up_worker proceeds; select-instance sent ~t+9.7s,
+    unanswered, 3s timeout (-110).
+  - No del_server/channel-close breadcrumbs ever fire: the ADSP goes
+    silent without closing anything.
+  - From ~t+83s, EVERY AP send on IPCRTR blocks 10s and times out
+    (25 timeouts; repeating "intent request timed out" = observer's own
+    QRTR lookups via the ns broadcast path).
+  - APR/fastrpc/glink_ssr channels on the same edge stay healthy.
+  - Mystery: "QMI wait timeout" at 44.768s requires reinit_completion()
+    (only del_server does that) yet no del_server breadcrumb — needs the
+    intent-accounting boot to explain.
+  - Mainline default rx-intent pool for DTS-less channels = 5 x 1 KiB
+    (qcom_glink_announce_create defaults). IPCRTR gets only this pool.
+- Status: analysis doc in progress; intent-accounting follow-up boot next.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17
+
+### K178 — JOAN-DBG intent accounting + gates (debug-only, class: debug)
+- Tree: 7187fbbb5 + K175/K176 + K177 breadcrumbs. Adds:
+  - glink: log every remote intent grant (liid/size), every AP rx_done sent,
+    every inbound data rx (rate-limited), rx_done RECEIVED from remote,
+    version negotiation rx/ack (remote version+features), riids count at
+    each intent-request timeout; advertise-to-remote log.
+  - cmdline gates: slimbus.skip_select=1 (skip slim-ngd enable entirely),
+    pdr_interface.skip_listener=1 (skip PDR register-listener).
+- Artifacts:
+  out/qmi-rearm-3s-breadcrumbs-v2-2026-08-17.patch sha256 0b58696700b158d5d7c8d236cf6adbed7559bf3e2b1b59ac9a9e0dd1ff6c6180
+  out/qmi-rearm-3s-breadcrumbs-v3-2026-08-17.patch sha256 fb87ff045081be0fe6c29783a04f6899a8189ec68c628a22a33aed52597a0e05
+- Boot F (qmidbg2, v2 breadcrumbs) findings:
+  - ADSP grants EXACTLY 30 intents at IPCRTR open (16x128B, 8x512B,
+    5x1152B, 1x8320B), then never grants another (all RX_INTENT_REQ
+    unanswered) and never sends a single RX_DONE.
+  - AP advertises 5x1024B (announce_create default); ADSP->AP recycling
+    works flawlessly (rx_done sent reuse=1 for every message).
+  - Pool drains 1 intent per AP->ADSP message; first intent-request
+    timeout at 119.78s kernel (~86s post-ADSP) = the 31st send. Every
+    timeout shows riids left 30 (all consumed, none returned).
+  - ADSP's last message to AP: ~33.5s (PDR indication + 769 announce);
+    total silence thereafter. select-instance sent ~42.5s is a victim,
+    not the trigger: the freeze predates it by ~9s.
+  - Wedge timing in ALL boots (Boots A-F) = ~30 AP->ADSP messages
+    (observer ns-broadcast polls + QMI sends) — the observer itself
+    drains the pool. Root disease: ADSP freezes its IPCRTR service at
+    ~33.5s and never returns intents.
+  - Wire protocol checked: cmd enums 0-9/11-15 match downstream
+    (mainline reserves 10 for ZERO_COPY_TX_DATA); RX_DONE wire struct
+    identical; READ_NOTIF handled by both; version negotiation v1 on
+    both sides (downstream advertises TRACER_PKT_FEATURE only, mainline
+    INTENT_REUSE — remote's ack features to be observed in Boot G).
+- Firmware RE started: adsp.mdt + b00-b11 banked in fw/adsp/;
+  merge_mdt.py rebuilds a monolithic ELF (12,279,808 bytes); firmware's
+  glink core strings in b05 incl. "Could not notify RX Done in channel
+  %s@%s", "Dropping intent req (size=%d) for unknown channel(rcid=%d)";
+  tasks: audio_pd, servreg, slimbus_qmi, lpass_q6core, qmi_fw.
+- Next: Boot G (qmidbg3g, both gates) liveness test; then Ghidra 10.4
+  (has Hexagon) disassembly of the intent path.
+- Status: open.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17
+
+### K179 — Boot G (qmidbg3g) result: freeze is NOT select-instance/PDR
+- v3 kernel, both gates ON (slimbus.skip_select=1 pdr_interface.skip_listener=1).
+- ADSP sends exactly 5 RX_DONE_W_REUSE in the first 5 ms of IPCRTR open
+  (31.208-31.213), then never again. Freeze onset 31.213025 s — 20 us
+  before the first APR announcement (4:3 at 31.213045).
+- ADSP's APR side ALIVE after freeze: answers q6afe/q6asm
+  get_svc_api_info at ~31.33 s. Only IPCRTR/QMI side freezes.
+- Gates removed traffic: first intent-request timeout delayed to 168.2 s
+  (vs 119.8 s Boot F); 44 timeouts; pool exhaustion = exactly 30 AP->ADSP
+  messages with zero returns.
+- lpass version negotiation: remote 1/0x7, ack 1/0x1 (INTENT_REUSE). OK.
+- Discriminator queued: Boot H apr.skip_devices=1 (image qmidbg4h
+  sha256 004464654252b28e02586a2a94c2073a3496f560e27819a624599af77f95ad70).
+- Status: open; firmware RE running in parallel.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17
+
+### K180 — Boot H (qmidbg4h, apr.skip_devices=1): FREEZE CAUSE FOUND
+- ADSP stays FULLY ALIVE with APR device registration gated: rx_done
+  received every poll through 388.8 s; 0 intent-request timeouts;
+  intent pool recycles indefinitely.
+- With the QMI alive: select-instance ANSWERED in 15 ms (SLIM SAT: Rcvd
+  master capability at 33.760), SLIM controller registered, WCD9340
+  enumerated (217:250:0:0 + 217:250:1:0, chip id 0x108/0x1). FIRST full
+  SLIMbus bring-up in any controlled boot.
+- So the freeze trigger is the mainline APR interaction. Candidates in
+  the freeze window (31.213-33.44): the q6core FWK_VERSION/SVC_VERSION
+  APR commands sent by mainline q6afe/q6asm probes at ~31.33 s
+  (downstream qdsp6v2 NEVER sends these — no get_svc_api_info at all in
+  downstream; it's an sdm845+-era feature). 2 x 1 s version-fetch waits
+  end ~33.33 s — bracketing the freeze precisely.
+- Next: Boot I = devices registered + q6core.skip_versions=1 gate —
+  expect ADSP alive + SLIMbus + snd card.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17
+
+### K181 — Boot I (qmidbg5i, q6core.skip_versions=1): FIX CONFIRMED + SOUND CARD UP
+- Image sha256 3c8e102f72ff7bf826db9f971d31c201b6bbce4fe088c9c818044e3e29285f3b.
+- ADSP stays fully alive with only the q6core fwk/svc version commands
+  gated: rx_done received every poll through 388.4 s; APR devices
+  registered, q6afe/q6asm/q6adm/q6core bound, PDR + select-instance all
+  ON. The version commands are the freeze trigger, confirmed.
+- SOUND CARD REGISTERED: "LG-V30" (sdm845-sndcard); /dev/snd controlC0,
+  pcmC0D0/1 capture+playback; SLIMbus 217:250:0:0 + 1:0; WCD9340 chip id
+  0x108; SLIM SAT master capability received; controller registered.
+- Open items for next session (playback path):
+  - Card exposes only MM1/MM2 FE PCMs; SLIM Playback/Capture dai-links
+    were dropped with "codec dai not found" (deferred-probe msg) despite
+    wcd934x_rx1..tx4 dais being registered. The codec is in the card as
+    an aux component only. Suspect: sdm845_snd_parse_of codec-dai
+    resolution (of_node of the mfd child) vs link parse timing — needs
+    the parse code + probe-order trace.
+  - aplay on hw:0,0/0,1 fails EINVAL with NO kernel log (silent
+    failure in the FE open chain — q6asm/sdm845 startup path).
+  - wcd934x "mux has no paths" DAPM warnings (benign, common).
+- Patch v5: out/qmi-rearm-3s-breadcrumbs-v5-2026-08-17.patch
+  sha256 12836dfd00eda9e823abdd75dd3997b02387ffeca95a6dab29bcb9b309c96ef1
+  (contains apr.skip_devices + q6core.skip_versions debug gates on top of
+  K175-K177 + intent accounting).
+- Upstream-shaped fix TODO: make the q6core fwk/svc version APR commands
+  skippable per platform (DT flag on the apr/q6core device, or gate on
+  the 8998 firmware's service version) so sdm845+ behavior is unchanged.
+- Firmware RE: Ghidra 11.4.3 + Hexagon_U extension; merged ELF analyzed;
+  decompiled FUN_f00f470c (intent-req drop), FUN_f00f584c (rx_done
+  notify loop), FUN_f00f614c (queue RX intent). The firmware's rx_done
+  notify iterates a done-list and logs "Could not notify RX Done" on
+  transport failure — post-mortem documented in fw/ workspace.
+
+Assisted-by: Hermes-Agent:deepseek/deepseek-v4-pro
+Date: 2026-08-17

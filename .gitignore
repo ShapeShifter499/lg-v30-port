@@ -14,3 +14,9 @@ firmware/zap/
 firmware/wcn/
 initramfs/root/lib/firmware/qcom/a530_*.fw
 initramfs/root/lib/firmware/qcom/a540_*
+
+# Local firmware RE workspace (binaries stay out of git; scripts only)
+fw/adsp/
+fw/adsp-merged.elf
+fw/adsp-proj.gpr
+fw/adsp-proj.rep/

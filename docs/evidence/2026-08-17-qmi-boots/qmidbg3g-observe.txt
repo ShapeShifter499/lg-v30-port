@@ -1,0 +1,165 @@
+uptime_at_start=30s
+adsp start issued at uptime 31s
+t+5s 769=absent
+t+10s 769=absent
+t+15s 769=absent
+t+20s 769=absent
+t+25s 769=absent
+t+30s 769=absent
+t+35s 769=absent
+t+40s 769=absent
+t+45s 769=absent
+t+50s 769=absent
+t+55s 769=absent
+t+60s 769=absent
+t+65s 769=absent
+t+70s 769=absent
+t+75s 769=absent
+t+80s 769=absent
+t+85s 769=absent
+t+90s 769=absent
+t+95s 769=absent
+t+100s 769=absent
+t+105s 769=absent
+t+110s 769=absent
+t+115s 769=absent
+t+120s 769=absent
+--- breadcrumbs at t+120s ---
+[   31.339866]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 5 size 512)
+[   31.339881]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 6 size 512)
+[   31.339897]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 7 size 512)
+[   31.339914]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 8 size 512)
+[   31.339929]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 9 size 512)
+[   31.339944]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 10 size 512)
+[   31.339958]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 11 size 512)
+[   31.339973]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 12 size 512)
+[   31.339988]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 13 size 512)
+[   31.340003]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 14 size 512)
+[   31.340017]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 15 size 512)
+[   31.340032]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 16 size 512)
+[   31.340047]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 17 size 512)
+[   31.340061]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 18 size 512)
+[   31.340077]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 19 size 512)
+[   31.340098]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 20 size 512)
+[   31.340177]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_apps2' opened by remote (lcid 0 rcid 6)
+[   31.340674]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 6 size 60)
+[   31.340694]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx-intent req from remote (size 60, granted 1)
+[   31.340798]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 21 size 40)
+[   31.340815]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx-intent req from remote (size 40, granted 1)
+[   43.517249] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: up_worker entering wait (state 3)
+--- rx_done rx summary ---
+5
+0
+t+125s 769=absent
+Terminated
+t+130s lookup=HANG
+Terminated
+t+135s lookup=HANG
+Terminated
+t+140s lookup=HANG
+Terminated
+t+145s lookup=HANG
+Terminated
+t+150s lookup=HANG
+Terminated
+t+155s lookup=HANG
+Terminated
+t+160s lookup=HANG
+Terminated
+t+165s lookup=HANG
+Terminated
+t+170s lookup=HANG
+Terminated
+t+175s lookup=HANG
+Terminated
+t+180s lookup=HANG
+Terminated
+t+185s lookup=HANG
+Terminated
+t+190s lookup=HANG
+Terminated
+t+195s lookup=HANG
+Terminated
+t+200s lookup=HANG
+Terminated
+t+205s lookup=HANG
+Terminated
+t+210s lookup=HANG
+Terminated
+t+215s lookup=HANG
+Terminated
+t+220s lookup=HANG
+Terminated
+t+225s lookup=HANG
+Terminated
+t+230s lookup=HANG
+Terminated
+t+235s lookup=HANG
+Terminated
+t+240s lookup=HANG
+--- breadcrumbs at t+240s ---
+[  183.260725]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  198.365410]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  213.468794]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  228.573106]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  243.676866]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  258.780834]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  273.885039]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  288.988648]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  304.093283]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  319.196596]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  334.301120]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  349.404438]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  364.508512]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  379.612864]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  394.716929]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  409.820821]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  424.924726]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  440.028355]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  455.132977]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  470.236377]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  485.340845]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+[  500.444425]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out (riids left 30, want 52)
+--- rx_done rx summary ---
+5
+23
+Terminated
+t+245s lookup=HANG
+Terminated
+t+250s lookup=HANG
+Terminated
+t+255s lookup=HANG
+Terminated
+t+260s lookup=HANG
+Terminated
+t+265s lookup=HANG
+Terminated
+t+270s lookup=HANG
+Terminated
+t+275s lookup=HANG
+Terminated
+t+280s lookup=HANG
+Terminated
+t+285s lookup=HANG
+Terminated
+t+290s lookup=HANG
+Terminated
+t+295s lookup=HANG
+Terminated
+t+300s lookup=HANG
+Terminated
+t+305s lookup=HANG
+Terminated
+t+310s lookup=HANG
+Terminated
+t+315s lookup=HANG
+Terminated
+t+320s lookup=HANG
+Terminated
+t+325s lookup=HANG
+Terminated
+t+330s lookup=HANG
+Terminated
+t+335s lookup=HANG
+Terminated
+t+340s lookup=HANG

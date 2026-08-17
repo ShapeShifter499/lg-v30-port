@@ -1,0 +1,57 @@
+[   31.035613] AUREL-MARK-ADSP
+[   31.035797] remoteproc remoteproc1: powering up adsp
+[   31.035926] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   31.438996] remoteproc remoteproc1: remote processor adsp is now up
+[   31.439040]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'fastrpcglink-apps-dsp' opened by remote (lcid 0 rcid 1)
+[   31.439501]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' opened by remote (lcid 0 rcid 2)
+[   31.439803] qcom_smd_qrtr 17300000.remoteproc:glink-edge.IPCRTR.-1.-1: JOAN-DBG: IPCRTR channel up on 17300000.remoteproc:glink-edge
+[   31.439879]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'LOOPBACK_CTL_LPASS' opened by remote (lcid 0 rcid 3)
+[   31.439978]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' opened by remote (lcid 0 rcid 4)
+[   31.443097] JOAN-DBG: PDR notifier: new server svc 66 inst 74 node 5 port 3
+[   31.444113]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' opened by remote (lcid 0 rcid 5)
+[   31.444711] JOAN-DBG: PDR: register listener OK for msm/adsp/audio_pd, curr_state 0x7fffffff
+[   31.445727] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   31.446056] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   31.479332] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[   31.495737] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: SLIMbus QMI server up node 5 port 11 (state 3)
+[   31.495964] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: up_worker proceeding (state 3, server 5:11)
+[   31.556796] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   31.562915] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   31.569643]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_apps2' opened by remote (lcid 0 rcid 6)
+[   31.569854]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx-intent req from remote (size 40, granted 1)
+[   43.744226] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI TXN wait fail: -110
+[   43.744356] qcom,slim-ngd-ctrl 171c0000.slim-ngd: failed to select h/w instance
+[   43.757254] qcom,slim-ngd-ctrl 171c0000.slim-ngd: qmi init fail, ret:-110, state:3
+[   44.768250] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   51.281466] rfkill: input handler disabled
+[  114.656688]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  127.712417]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  140.768282]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  153.824176]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  166.880353]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  179.936086]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  193.249115]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  208.352452]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  223.457047]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  238.560385]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  253.664375]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  268.768380]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  283.871923]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  298.976639]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  314.336350]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  316.387980] platform sound: deferred probe pending: msm-snd-sdm845: SLIM Playback: codec dai not found
+[  316.388072] qnoc-msm8998 17900000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.388159] qnoc-msm8998 1000000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.388192] qnoc-msm8998 1500000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.388204] qnoc-msm8998 1620000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.388215] qnoc-msm8998 1700000.interconnect: sync_state() pending due to 1e40000.ipa
+[  329.439814]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  344.543740]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  359.647845]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  374.751668]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  389.856139]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  404.959705]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  420.063659]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  435.168051]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  450.271772]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
+[  465.375675]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' (lcid 1) intent request timed out
