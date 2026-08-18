@@ -1,5 +1,31 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-18 (Aurel, seventh shift) — PGD-write kill PROVEN and removed; stream links; crash persists at trigger (20e evidence in flight).**
+- Boot 20c/20d used the PHONE-SIDE persistent SD-root dmesg logger (sync-per-
+  line). Evidence: docs/evidence/2026-08-18-persistent-log/.
+- Boot 20d dump_stack proved the kill chain: aplay trigger ->
+  slim_stream_prepare (first USR CONNECT) -> joan pipe bring-up ->
+  ADDR_QUERY (fine) -> FIRST app-side writel to PGD_PORT_CFGn (0x14000)
+  HANGS the CPU while the ADSP's audio machinery is live. Silent, no panic,
+  SoC reset to Android. ADSP owns the PGD block; app-side PGD register
+  writes are RETIRED for good (also explains Boots R/S/T).
+- Boot 20e (f173f0394): removed the PGD writes; keep pgdla discovery +
+  USR CONNECT_SRC/SINK posts. The stream now LINKS (mixer set => BE found;
+  q6slim_hw_params + q6afe_dai_prepare fire) — the "no backend DAEs" error
+  is only daemon-opens-before-mixer ordering, NOT a topology bug.
+- 20e still dies during aplay1 (no "aplay1 rc=" in joan-mixer2.txt);
+  first two 20e evidence pulls were eaten by ext4 journal rollback after
+  the crash. 20e-r3 uses mount -o sync + INCREMENTAL dmesg -c logger
+  (full-buffer dumps were too slow to reach the crash point).
+- Fixed recipe for phone-side evidence: remount,rw,sync; rm logs; detached
+  seq script (setsid) + dmesg -c loop to /var/log/joan-aplay.log.
+- Tooling: nest ~/joan-images/staging/qmidbg20e/{repack-qmidbg20e.sh,
+  boot-test-20e.sh, joan-audio-seq.sh}; image boot-joan-qmidbg20e.img
+  (sha256 93f755d2d0055d2688d16cded2033673fd16b549d8958729a9d652106a349726).
+- Next: analyze 20e-r3 crash point; likely walls after the PGD fix: the
+  USR pipe-connect handling on the ADSP side (connect w/o app-side port
+  programming), or the ADSP watchdog on the same stream path.
+
 **2026-08-18 (Aurel, sixth shift) — Boot X ran: core blocks hang on READ; controller is V2 NGD; pivot to message path.**
 - Boot X (qmidbg19x, STRICT_DEVMEM=n, pgd_enable=0): userspace read-probe before
   ADSP start. 0x171c0004 (COMP_CFG_V2) reads OK = 0x0; 0x171c0200 (MGR_CFG)
