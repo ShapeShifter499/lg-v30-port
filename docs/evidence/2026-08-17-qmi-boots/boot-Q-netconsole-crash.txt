@@ -1,0 +1,60 @@
+[  375.968128] netconsole: network logging started
+[  377.234022]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.235375]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 5 len 48)
+[  377.235540]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[  377.391326]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.391373]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 1 len 48)
+[  377.391435]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[  377.437852]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.439185]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 2 len 48)
+[  377.439294]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[  377.581058]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.581169]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 3 len 48)
+[  377.581224]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 3 reuse 1)
+[  377.584591]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.584616]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 4 len 52)
+[  377.584721]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 4 reuse 1)
+[  377.585945]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 5 len 48)
+[  377.586046]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[  377.586471]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.716762]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.716783]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 1 len 48)
+[  377.716898]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[  377.901019]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[  377.902280]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 2 len 48)
+[  377.902493]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[  377.906499] JOAN-DBG: slim port 16384 cfg: dev 1 rate 48000 width 16 ch 1 fmt 0 map 144/0/0/0
+[  377.906714]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.906912]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 1 len 40)
+[  377.906994]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 1 reuse 1)
+[  377.907237]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.922831]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 2 len 40)
+[  377.922971]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 2 reuse 1)
+[  377.924092]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.924342]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 3 reuse 1)
+[  377.924960]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.926865]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 4 reuse 1)
+[  377.927322]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.930805]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 5 reuse 1)
+[  377.931530]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.934402]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 6 reuse 1)
+[  377.935041]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.935230]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 7 reuse 1)
+[  377.936298]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 12 reuse 1)
+[  377.936437]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 13 reuse 1)
+[  379.012002] qcom,slim-ngd qcom,slim-ngd.1: TX timed out:MC:0x2d,mt:0x2
+[  379.012037] JOAN-DBG: tx timeout state tx_head=7 tx_tail=7
+[  379.012053] JOAN-DBG: ngd int_stat=0x0 int_en=0xfe000000 rx_msgq_cfg=0x10000
+[  379.012068] JOAN-DBG: pgd port 0 cfg=0x0 stat=0x72
+[  379.012082] JOAN-DBG: pgd port 1 cfg=0x0 stat=0x82
+[  379.012096] JOAN-DBG: pgd port 2 cfg=0x0 stat=0x92
+[  379.012109] JOAN-DBG: pgd port 3 cfg=0x0 stat=0xa2
+[  379.012123] JOAN-DBG: pgd port 4 cfg=0x0 stat=0xb2
+[  379.012136] JOAN-DBG: pgd port 5 cfg=0x0 stat=0xc2
+[  379.012156] qcom,slim-ngd qcom,slim-ngd.1: Tx:MT:0x2, MC:0x2d, LA:0xcf failed:-110
+[  380.378090] qcom_q6v5_pas 17300000.remoteproc: watchdog received: SFR Init: wdog or kernel error suspected.
+[  380.378128] remoteproc remoteproc1: crash detected in adsp: type watchdog
+[  380.378668] remoteproc remoteproc1: handling crash #1 in adsp
+[  380.378769] remoteproc remoteproc1: recovering adsp
+[  380.448780] qcom-soundwire wcd934x-soundwire.2.auto: swrm_wait_for_frame_gen_enabled: link status not disconnected
+[  380.448806] qcom-soundwire wcd934x-soundwire.2.auto: link failed to connect

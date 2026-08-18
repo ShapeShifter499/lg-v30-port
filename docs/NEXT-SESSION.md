@@ -1,5 +1,23 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-17 night (Aurel, fourth shift) — PGD writes HANG; next: downstream init-sequence port.**
+Boots Q/R/S/T mapped the CONNECT_SINK wall to the missing PGD programming:
+- Q: port-level PGD_PORT_CFGn writes are IGNORED (cfg reads back 0); connect
+  stalls; ADSP watchdogs 1.3s later ("crash detected in adsp: type watchdog") = the kill.
+- R/S/T: the PGD_CFG (0x800) + PGD_OWN_EEn (0x300C+4*ee, 0x3F<<17) enable/ownership
+  writes HANG the controller (write never completes, no soundcard, progressive wedge).
+  Downstream does them inside a full init sequence (framer→MGR→INTF→PGD→COMP enables)
+  that mainline's qcom_slim_ngd_setup lacks.
+- Boot U (qmidbg16u): pgd_enable param default OFF (stable); experiments cmdline-driven.
+- Stats: apps-ch-pipes 0x1f80 (bus ports 7-12, port_b identity for 0-5); PGD stat shows
+  pipes 7-12 auto-assigned; params live at /sys/module/slim_qcom_ngd_ctrl/parameters/.
+- Next: code-study the downstream init order (slim-msm-ctrl.c enable path vs mainline
+  setup/power_up), find the prerequisite write, one-boot A/B with netconsole.
+- Also watch: no-playback wedge appeared on R/S/T but not Q (correlates with the PGD
+  writes — confirm gated-off on U).
+Details: `docs/evidence/2026-08-17-qmi-boots/boot-RST-pgd-writes-hang.md` +
+`boot-Q-adsp-watchdog-pgd-ownership.md` + `boot-P-slim-connect-stall-analysis.md`.
+
 **2026-08-17 late night (Aurel, third shift) — CRASH EVIDENCE CAPTURED: SLIM CONNECT_SINK stall.**
 Boot O hung at the logo: the MODULES=n olddefconfig sweep (632 m->y flips)
 regressed early boot. Fixed by rebuilding from the Aug 16 config backup
