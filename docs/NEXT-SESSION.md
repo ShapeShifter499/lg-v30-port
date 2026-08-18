@@ -1,27 +1,28 @@
 # LG V30 (joan) — next session start here
 
-**2026-08-17/18 (Aurel, fifth shift) — COMP_CFG write HANGS regardless of order; next: read-probe the region.**
-- Boot V: full downstream init sequence (pgd_enable=1, netconsole attached BEFORE
-  the ADSP start) — step 1 (COMP_CFG=1 at 0x4) hard-hangs the writing CPU. RCU
-  stall captured: CPUs 3+4 unresponsive to NMI at t+112s, backtraces at 132s;
-  the rest of the system limps (UI/USB/ssh survive until the stall spreads).
-  This is the mechanism behind all the Boots R/S/T wedges.
-- Boot W: sequence moved BEFORE qcom_slim_ngd_setup (downstream order) — same
-  hang. Order is NOT the fix.
-- Clock theory DEAD: mainline has no slimbus clock in gcc-msm8998.c AND
-  gcc-sdm845.c (db845c works upstream without one); the downstream 8998 clock
-  tree registers no slim clock at all.
-- Zone map so far: NGD block (0x1000+) works; PGD_PORTn (0x14000+) writes are
-  silently IGNORED (Boot Q); COMP/MGR/FRM/INTF/PGD (0x0-0xfff) writes HANG.
-  Three behaviors = likely TZ/XPU carve-out OR per-sub-block clocking.
-- NEXT (Boot X): READ-probe the region. STRICT_DEVMEM=n + busybox devmem,
-  userspace-only, per-probe timeout guards, run BEFORE the ADSP start:
-  read (then write-back) at 0x171c0004/0x200/0x400/0x600/0x800/0x1000
-  (known-good)/0x3000/0x14000. Reads hang => unclocked/protected region;
-  reads OK but writes hang => trust/protocol issue.
-- Evidence: boot-V-netconsole-stall.txt + boot-V-comp-cfg-cpu-hang.md.
-- Boots U/V/W images all staged on the nest; params live at
-  /sys/module/slim_qcom_ngd_ctrl/parameters/ (pgd_enable default off).
+**2026-08-18 (Aurel, sixth shift) — Boot X ran: core blocks hang on READ; controller is V2 NGD; pivot to message path.**
+- Boot X (qmidbg19x, STRICT_DEVMEM=n, pgd_enable=0): userspace read-probe before
+  ADSP start. 0x171c0004 (COMP_CFG_V2) reads OK = 0x0; 0x171c0200 (MGR_CFG)
+  read wedges the system permanently (SIGKILL can't recover; USB died; no
+  netconsole output). Control run: garbage unmapped reads hang cores only
+  transiently (recover after SIGKILL) => the 0x200 wedge is register-specific.
+- Downstream register map (android_kernel_lge_msm8998/drivers/slimbus/slim-msm.h):
+  V1 vs V2 offset layouts via CFG_PORT(). All observed behaviors match V2
+  (COMP_CFG=4, TRUST=0x3000, PGD_CFG=0x800, OWN=0x300C, PGD_PORT_CFGn=0x14000).
+- The component-init sequence (Boots R-W) came from slim-msm-ctrl.c — the
+  NON-NGD manager driver. msm8998.dtsi binds qcom,slim-ngd for slim@171c0000,
+  and downstream slim-msm-ngd.c never writes COMP_CFG/MGR_CFG. The core is
+  ADSP-owned; app-CPU MMIO to 0x200+ hangs BY DESIGN. Boots R-W direction REJECTED.
+- NEXT (Boot Y): confirm version register (base+0x0, first-page safe) on the
+  same qmidbg19x image; then pivot to the ADSP message path: restore the
+  dropped reconfigure messages (MC 0x40-0x5F, the parked Boot Q candidate) and
+  study slim-msm-ngd.c port-assign flow vs mainline qcom_slim_ngd_ctrl.c.
+  CONNECT_SINK stall most consistent with port_b programming never reaching
+  the ADSP manager.
+- Evidence: docs/evidence/2026-08-17-qmi-boots/boot-X-readprobe.md.
+- Tooling staged on nest: ~/joan-images/staging/qmidbg19x/{devprobe,probe-x.sh,
+  nest-bootx.sh,repack-qmidbg19x.sh}; image boot-joan-qmidbg19x.img
+  (sha256 f2fd7f28...).
 
 **2026-08-17 night (Aurel, fourth shift) — PGD writes HANG; next: downstream init-sequence port.**
 Boots Q/R/S/T mapped the CONNECT_SINK wall to the missing PGD programming:
