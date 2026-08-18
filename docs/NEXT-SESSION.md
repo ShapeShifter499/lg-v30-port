@@ -1,5 +1,30 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-18 (Aurel, eighth shift) — PGD laddr discovered (0xc4); pipe connects clean; ADSP wedge persists ~0.2s after stream setup.**
+- Boots 20e r3/r4, 20f, 20g, 20h (evidence: docs/evidence/
+  2026-08-18-persistent-log/boot-20e-to-20h-pgdla-and-qmi-gap.md).
+- PGD discovery FIXED: call ctrl->get_laddr() directly (downstream-style);
+  slim_get_logical_addr() short-circuits on the cached laddr and the
+  result-code-vs-address bug sent connects to LA 0. ADSP answers
+  pgdla = 0xc4; all 12 USR pipe connects post with ZERO bus errors.
+- Bring-up now fires on bus RE-activation (runtime_resume, prev_state !=
+  DOWN) via the ngd_master workqueue (direct call would deadlock under
+  RPM_RESUMING). The wake power_up takes the NGD_STATUS LADDR early-return
+  path — hooks at the reconf-wait tail are unreachable.
+- Death persists: silent SoC reset ~1.3 s after stream setup (AFE port
+  cfg + codec IFC writes), racing ahead of the PCM trigger. Autosuspend
+  is NOT the cause (r4 died without a suspend cycle; the sysfs
+  autosuspend_delay_ms file errors EIO on this device anyway).
+- Top leads: unanswered ADSP QMI indication (IPCRTR len 48) at stream
+  setup; codec-side SLIM PGD port int enables (wcd934x enable_slim);
+  downstream's SPS/BAM pipe setup (msm_slim_connect_pipe_port) that
+  mainline lacks; ADSP ramdump unreachable (silent hw reset).
+- Evidence rig (works): SD root mount -o sync + INCREMENTAL dmesg -c
+  logger + detached setsid seq script. ssh -tt WITHOUT -n when piping
+  the sudo password ( -n eats stdin -> sudo hangs ).
+- Images on nest: boot-joan-qmidbg20h.img (7545489b...) latest; staging
+  ~/joan-images/staging/qmidbg20h/ with repack + boot-test + seq scripts.
+
 **2026-08-18 (Aurel, seventh shift) — PGD-write kill PROVEN and removed; stream links; crash persists at trigger (20e evidence in flight).**
 - Boot 20c/20d used the PHONE-SIDE persistent SD-root dmesg logger (sync-per-
   line). Evidence: docs/evidence/2026-08-18-persistent-log/.
