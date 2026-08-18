@@ -1,0 +1,580 @@
+[   90.556414] netconsole: network logging started
+[   90.611864] remoteproc remoteproc1: powering up adsp
+[   90.612658] remoteproc remoteproc1: Booting fw image qcom/msm8998/joan/adsp.mdt, size 7260
+[   90.957126]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass remote version 1 features 0x7
+[   90.957201] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: up_worker entering wait (state 3)
+[   90.957313]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass remote version ack 1 features 0x1 (ours 0x1)
+[   90.957442]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'fastrpcglink-apps-dsp' opened by remote (lcid 0 rcid 1)
+[   90.957479] remoteproc remoteproc1: remote processor adsp is now up
+[   90.958300]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' opened by remote (lcid 0 rcid 2)
+[   90.959023]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 0 size 128)
+[   90.959066]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 1 size 128)
+[   90.959085] qcom_smd_qrtr 17300000.remoteproc:glink-edge.IPCRTR.-1.-1: JOAN-DBG: IPCRTR channel up on 17300000.remoteproc:glink-edge
+[   90.959109]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 1 size 1024)
+[   90.959120]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 2 size 128)
+[   90.959148]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 2 size 1024)
+[   90.959169]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 3 size 128)
+[   90.959189]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 3 size 1024)
+[   90.959204]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 4 size 1024)
+[   90.959219]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent advertised to remote (liid 5 size 1024)
+[   90.959230]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 4 size 128)
+[   90.959314]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 5 size 128)
+[   90.959379]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 6 size 128)
+[   90.959407]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'LOOPBACK_CTL_LPASS' opened by remote (lcid 0 rcid 3)
+[   90.959422]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 7 size 128)
+[   90.959461]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 8 size 128)
+[   90.959500]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 9 size 128)
+[   90.959535]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 10 size 128)
+[   90.959575]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 11 size 128)
+[   90.959615]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 12 size 128)
+[   90.959653]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 13 size 128)
+[   90.959684]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 14 size 128)
+[   90.959723]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 15 size 128)
+[   90.959761]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 16 size 512)
+[   90.959804]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 17 size 512)
+[   90.959837]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 18 size 512)
+[   90.959873]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 19 size 512)
+[   90.959911]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 20 size 512)
+[   90.959950]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 21 size 512)
+[   90.959984]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 22 size 512)
+[   90.960004]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' opened by remote (lcid 0 rcid 4)
+[   90.960022]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 23 size 512)
+[   90.960062]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 24 size 1152)
+[   90.960097]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 25 size 1152)
+[   90.960137]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 26 size 1152)
+[   90.960168]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 27 size 1152)
+[   90.960205]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 28 size 1152)
+[   90.960242]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' intent granted by remote (liid 29 size 8320)
+[   90.960340]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 1 len 52)
+[   90.960438]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[   90.961005]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   90.961104]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 2 len 52)
+[   90.961186]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 3 len 52)
+[   90.961249]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 4 len 52)
+[   90.961322]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 5 len 52)
+[   90.961392]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 1 reuse 1)
+[   90.961488]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[   90.961520]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 3 reuse 1)
+[   90.961602]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' intent advertised to remote (liid 1 size 1024)
+[   90.961645]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' intent advertised to remote (liid 2 size 1024)
+[   90.961637] JOAN-DBG: PDR notifier: new server svc 66 inst 74 node 5 port 3
+[   90.961666]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' intent advertised to remote (liid 3 size 1024)
+[   90.961709]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' intent advertised to remote (liid 4 size 1024)
+[   90.961742]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'glink_ssr' intent advertised to remote (liid 5 size 1024)
+[   90.961880]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' opened by remote (lcid 0 rcid 5)
+[   90.962013]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 4 reuse 1)
+[   90.962047]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[   90.962361]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 1 len 52)
+[   90.962433]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 2 len 56)
+[   90.962463]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 3 len 60)
+[   90.962481]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   90.963025]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 30 size 128)
+[   90.963056]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 31 size 128)
+[   90.963070]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 32 size 128)
+[   90.963086]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 33 size 128)
+[   90.963106]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 34 size 128)
+[   90.963177]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 35 size 128)
+[   90.963195]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 36 size 128)
+[   90.963216]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 37 size 128)
+[   90.963232]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 38 size 128)
+[   90.963248]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 39 size 128)
+[   90.963264]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 40 size 128)
+[   90.963306]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 41 size 128)
+[   90.963321]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 42 size 128)
+[   90.963339]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 43 size 128)
+[   90.963353]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 44 size 128)
+[   90.963368]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 45 size 128)
+[   90.963389] JOAN-DBG: PDR: register listener OK for msm/adsp/audio_pd, curr_state 0x7fffffff
+[   90.963393]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 46 size 128)
+[   90.963414]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 47 size 128)
+[   90.963441]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 48 size 128)
+[   90.963466]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 49 size 128)
+[   90.963490]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 50 size 128)
+[   90.963556]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 51 size 128)
+[   90.963583]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 52 size 128)
+[   90.963597]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 53 size 128)
+[   90.963620]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 54 size 128)
+[   90.963636]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 55 size 128)
+[   90.963654]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 56 size 128)
+[   90.963668]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 57 size 128)
+[   90.963682]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 58 size 128)
+[   90.963717]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 59 size 128)
+[   90.963734]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 60 size 128)
+[   90.963758]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 61 size 128)
+[   90.963773]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 62 size 128)
+[   90.963799]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 63 size 128)
+[   90.963823]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 64 size 128)
+[   90.963850]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 65 size 128)
+[   90.963875]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 66 size 128)
+[   90.963891]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 67 size 128)
+[   90.963924]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 68 size 128)
+[   90.963940]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 69 size 128)
+[   90.963977]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 70 size 128)
+[   90.963996]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 71 size 128)
+[   90.964011]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 72 size 128)
+[   90.964041]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 73 size 128)
+[   90.964060]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 74 size 128)
+[   90.964086]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 75 size 128)
+[   90.964123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 76 size 128)
+[   90.964138]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 77 size 128)
+[   90.964167]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 78 size 128)
+[   90.964194]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 79 size 128)
+[   90.964210]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 80 size 128)
+[   90.964243]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 81 size 128)
+[   90.964297]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 82 size 128)
+[   90.964313]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 83 size 128)
+[   90.964328]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 84 size 128)
+[   90.964345]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 85 size 128)
+[   90.964362]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 86 size 128)
+[   90.964402]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 87 size 128)
+[   90.964419]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 88 size 128)
+[   90.964440]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 89 size 128)
+[   90.964476]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 90 size 128)
+[   90.964493]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 91 size 128)
+[   90.964517]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 92 size 128)
+[   90.964544]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 93 size 128)
+[   90.964584]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 94 size 512)
+[   90.964605]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 95 size 512)
+[   90.964637]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 96 size 512)
+[   90.964659]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 97 size 512)
+[   90.964674]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 98 size 512)
+[   90.964701]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 99 size 512)
+[   90.964716]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 100 size 512)
+[   90.964754]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 101 size 512)
+[   90.964768]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 102 size 512)
+[   90.964799]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 103 size 512)
+[   90.964821]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 104 size 512)
+[   90.964864]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 105 size 512)
+[   90.964883]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 106 size 512)
+[   90.964898]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 107 size 512)
+[   90.964916]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 108 size 512)
+[   90.964952]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 109 size 512)
+[   90.964970]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 110 size 512)
+[   90.965012]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 111 size 512)
+[   90.965032]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 112 size 512)
+[   90.965046]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 113 size 512)
+[   90.965077]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 114 size 512)
+[   90.965094]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 115 size 512)
+[   90.965145]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 116 size 512)
+[   90.965161]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 117 size 512)
+[   90.965175]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 118 size 512)
+[   90.965203]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 119 size 512)
+[   90.965218]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 120 size 512)
+[   90.965247]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 121 size 512)
+[   90.965271]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 122 size 512)
+[   90.965296]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 123 size 512)
+[   90.965324]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 124 size 512)
+[   90.965344]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 125 size 512)
+[   90.965371]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 126 size 1024)
+[   90.965397]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 127 size 1024)
+[   90.965424]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 128 size 1024)
+[   90.965471]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 129 size 1024)
+[   90.965503]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 130 size 1024)
+[   90.965519]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 131 size 1024)
+[   90.965537]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 132 size 1024)
+[   90.965551]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 133 size 1024)
+[   90.965570]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 134 size 1024)
+[   90.965602]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 135 size 1024)
+[   90.965626]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 136 size 1024)
+[   90.965646]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 137 size 1024)
+[   90.965674]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 138 size 1024)
+[   90.965693]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 139 size 1024)
+[   90.965722]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 140 size 1024)
+[   90.965749]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 141 size 1024)
+[   90.965767]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 142 size 4096)
+[   90.965803]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 143 size 4096)
+[   90.965824]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 144 size 4096)
+[   90.965845]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent granted by remote (liid 145 size 4096)
+[   90.965895]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[   90.965926]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[   90.965965]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 3 reuse 1)
+[   90.966123]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   90.966201]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 1 reuse 1)
+[   90.966429]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 4 len 64)
+[   90.966545]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 4 reuse 1)
+[   90.966857]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   90.969819] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:3
+[   90.975065] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:4
+[   90.981278] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:7
+[   90.995548]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' data rx (liid 5 len 52)
+[   90.995913] PDR: Indication received from msm/adsp/audio_pd, state: 0x1fffffff, trans-id: 1
+[   90.996342]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   90.997742] qcom,apr 17300000.remoteproc:glink-edge.apr_audio_svc.-1.-1: Adding APR/GPR dev: aprsvc:service:4:8
+[   91.002858]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 1 size 512)
+[   91.002966]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 2 size 512)
+[   91.002989]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 3 size 512)
+[   91.003009]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 4 size 512)
+[   91.003027]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 5 size 512)
+[   91.003045]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 6 size 512)
+[   91.003064]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 7 size 512)
+[   91.003082]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 8 size 512)
+[   91.003099]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 9 size 512)
+[   91.003118]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 10 size 512)
+[   91.003136]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 11 size 512)
+[   91.003154]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 12 size 512)
+[   91.003173]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 13 size 512)
+[   91.003192]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 14 size 512)
+[   91.003214]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 15 size 512)
+[   91.003231]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 16 size 512)
+[   91.003246]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 17 size 512)
+[   91.003261]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 18 size 512)
+[   91.003277]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 19 size 512)
+[   91.003293]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' intent advertised to remote (liid 20 size 512)
+[   91.003409]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_apps2' opened by remote (lcid 0 rcid 6)
+[   91.003570]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[   91.003588]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 1 reuse 1)
+[   91.003602]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 2 reuse 1)
+[   91.012644] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: SLIMbus QMI server up node 5 port 11 (state 3)
+[   91.012655]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 3 reuse 1)
+[   91.012818] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: up_worker wait returned (state 3)
+[   91.013009] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: up_worker proceeding (state 3, server 5:11)
+[   91.013639]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   91.013883]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 4 reuse 1)
+[   91.014040] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-DBG: power_up entered (state 3)
+[   91.015477]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done received from remote (liid 0 reuse 1)
+[   91.020566]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'IPCRTR' rx_done sent (liid 5 reuse 1)
+[   91.031268] qcom,slim-ngd-ctrl 171c0000.slim-ngd: SLIM SAT: Rcvd master capability
+[  112.036348] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  112.036544] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=2617
+[  112.036673] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=2617
+[  112.036797] rcu: 	(detected by 6, t=5252 jiffies, g=16389, q=831 ncpus=8)
+[  112.036873] Sending NMI from CPU 6 to CPUs 3:
+[  122.047172] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  122.047249] Sending NMI from CPU 6 to CPUs 4:
+[  132.057534] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  132.057579] rcu: rcu_preempt kthread starved for 2495 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=7
+[  132.057772] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  132.057827] rcu: RCU grace-period kthread stack dump:
+[  132.057878] task:rcu_preempt     state:I stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  132.057996] Call trace:
+[  132.058049]  __switch_to+0xf8/0x1e0 (T)
+[  132.058185]  __schedule+0x3dc/0x107c
+[  132.058284]  schedule+0x34/0xe0
+[  132.058378]  schedule_timeout+0x80/0x120
+[  132.058464]  rcu_gp_fqs_loop+0x124/0x848
+[  132.058556]  rcu_gp_kthread+0x2c8/0x2e8
+[  132.058639]  kthread+0x12c/0x140
+[  132.058713]  ret_from_fork+0x10/0x20
+[  132.058791] rcu: Stack dump where RCU GP kthread last ran:
+[  132.058845] Sending NMI from CPU 6 to CPUs 7:
+[  132.058945] NMI backtrace for cpu 7
+[  132.059060] CPU: 7 UID: 0 PID: 3550 Comm: pgrep Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  132.059126] Tainted: [W]=WARN
+[  132.059143] Hardware name: LG V30 (US998) (DT)
+[  132.059167] pstate: 20000000 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  132.059209] pc : 0000ffff89b48270
+[  132.059227] lr : 0000aaaae45dbff4
+[  132.059243] sp : 0000fffff541ff80
+[  132.059258] x29: 0000fffff5420630 x28: 0000000000000000 x27: 0000000000000000
+[  132.059321] x26: 0000000000000001 x25: 0000000000000020 x24: 0000aaaae45e5000
+[  132.059379] x23: 0000aaaae461f000 x22: 0000fffff5420010 x21: 00000000000100a0
+[  132.059433] x20: 0000fffff5420018 x19: 0000aaaae4620e60 x18: 0000ffff89bf2350
+[  132.059484] x17: 0000ffff89b48270 x16: 0000aaaae461f540 x15: 0000ffff89bf2ba8
+[  132.059535] x14: 0000000000000000 x13: 0000000000000001 x12: 00000000000001ec
+[  132.059586] x11: 00000000000001f0 x10: 0000aaaae4620a60 x9 : 0000aaab20d5c108
+[  132.059638] x8 : 0000000000000010 x7 : 0000aaab20d5c1d0 x6 : 0000000000000000
+[  132.059689] x5 : 0000aaab20d5c1d0 x4 : 0000000000000000 x3 : 0000000000000000
+[  132.059739] x2 : 000000000000000c x1 : 0000fffff5420048 x0 : 0000aaaae4620a70
+[  147.733003] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.479205] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.512189] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.545418] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.711199] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.827258] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.959842] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  148.993071] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  149.109169] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  149.357835] [drm:dpu_crtc_frame_event_cb] *ERROR* crtc85 event 1 overflow
+[  195.060201] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  195.060334] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=10188
+[  195.060448] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=10188
+[  195.060560] rcu: 	(detected by 5, t=26008 jiffies, g=16389, q=2102 ncpus=8)
+[  195.060642] Sending NMI from CPU 5 to CPUs 3:
+[  205.070941] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  205.070978] Sending NMI from CPU 5 to CPUs 4:
+[  215.081263] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  215.081307] rcu: rcu_preempt kthread timer wakeup didn't happen for 5006 jiffies! g16389 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+[  215.081429] rcu: 	Possible timer handling issue on cpu=5 timer-softirq=1504
+[  215.081489] rcu: rcu_preempt kthread starved for 5007 jiffies! g16389 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=5
+[  215.081567] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  215.081621] rcu: RCU grace-period kthread stack dump:
+[  215.081671] task:rcu_preempt     state:I stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  215.081785] Call trace:
+[  215.081838]  __switch_to+0xf8/0x1e0 (T)
+[  215.081962]  __schedule+0x3dc/0x107c
+[  215.082059]  schedule+0x34/0xe0
+[  215.082153]  schedule_timeout+0x80/0x120
+[  215.082235]  rcu_gp_fqs_loop+0x124/0x848
+[  215.082327]  rcu_gp_kthread+0x2c8/0x2e8
+[  215.082411]  kthread+0x12c/0x140
+[  215.082486]  ret_from_fork+0x10/0x20
+[  215.082563] rcu: Stack dump where RCU GP kthread last ran:
+[  215.082626] CPU: 5 UID: 0 PID: 0 Comm: swapper/5 Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  215.082724] Tainted: [W]=WARN
+[  215.082774] Hardware name: LG V30 (US998) (DT)
+[  215.082827] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  215.082902] pc : cpuidle_enter_state+0xb8/0x720
+[  215.082992] lr : cpuidle_enter_state+0xb0/0x720
+[  215.083078] sp : ffff80008021bda0
+[  215.083130] x29: ffff80008021bda0 x28: 0000000000000000 x27: 0000000000000000
+[  215.083251] x26: 0000000000000000 x25: 0000000000000000 x24: 0000002d6a4251e0
+[  215.083365] x23: ffff000083823080 x22: 0000000000000001 x21: ffff0000f9bad978
+[  215.083477] x20: 0000002d6a7dc566 x19: 0000000000000001 x18: ffff38cdb49c7000
+[  215.083587] x17: ffff0000840f4f40 x16: 00000000000017f2 x15: ffffc7334530cc30
+[  215.083699] x14: ffffc733451d4100 x13: 0000000000000000 x12: ffff0000f9b9b100
+[  215.083808] x11: 0000000000000028 x10: 0000000012cf91c1 x9 : 00ffffffffffffff
+[  215.083921] x8 : 0000000000000015 x7 : ffffc733453c93c8 x6 : 0000000000000004
+[  215.084030] x5 : ffffc73342658200 x4 : 0000000000000004 x3 : 000000000682aaab
+[  215.084138] x2 : ffff38cdb49c7000 x1 : ffff0000f9baf400 x0 : 0000000000000000
+[  215.084248] Call trace:
+[  215.084299]  cpuidle_enter_state+0xb8/0x720 (P)
+[  215.084395]  cpuidle_enter+0x34/0x50
+[  215.084473]  do_idle+0x144/0x300
+[  215.084561]  cpu_startup_entry+0x34/0x40
+[  215.084644]  secondary_start_kernel+0x130/0x150
+[  215.084732]  __secondary_switched+0xc0/0xc4
+[  278.104090] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  278.104232] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=18024
+[  278.104346] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=18024
+[  278.104457] rcu: 	(detected by 6, t=46769 jiffies, g=16389, q=3166 ncpus=8)
+[  278.104532] Sending NMI from CPU 6 to CPUs 3:
+[  288.114831] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  288.114887] Sending NMI from CPU 6 to CPUs 4:
+[  298.125168] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  298.125223] rcu: rcu_preempt kthread starved for 2496 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=5
+[  298.125345] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  298.125396] rcu: RCU grace-period kthread stack dump:
+[  298.125444] task:rcu_preempt     state:R  running task     stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  298.125579] Call trace:
+[  298.125629]  __switch_to+0xf8/0x1e0 (T)
+[  298.125749]  __schedule+0x3dc/0x107c
+[  298.125846]  schedule+0x34/0xe0
+[  298.125941]  schedule_timeout+0x80/0x120
+[  298.126022]  rcu_gp_fqs_loop+0x124/0x848
+[  298.126110]  rcu_gp_kthread+0x2c8/0x2e8
+[  298.126190]  kthread+0x12c/0x140
+[  298.126261]  ret_from_fork+0x10/0x20
+[  298.126334] rcu: Stack dump where RCU GP kthread last ran:
+[  298.126382] Sending NMI from CPU 6 to CPUs 5:
+[  298.126525] NMI backtrace for cpu 5
+[  298.126587] CPU: 5 UID: 0 PID: 0 Comm: swapper/5 Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  298.126649] Tainted: [W]=WARN
+[  298.126665] Hardware name: LG V30 (US998) (DT)
+[  298.126683] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  298.126724] pc : cpuidle_enter_state+0xb8/0x720
+[  298.126792] lr : cpuidle_enter_state+0xb0/0x720
+[  298.126843] sp : ffff80008021bda0
+[  298.126860] x29: ffff80008021bda0 x28: 0000000000000000 x27: 0000000000000000
+[  298.126922] x26: 0000000000000000 x25: 0000000000000000 x24: 0000004569b6e1e1
+[  298.126976] x23: ffff000083823080 x22: 0000000000000001 x21: ffff0000f9bad978
+[  298.127029] x20: 0000004569b96e59 x19: 0000000000000001 x18: ffff38cdb49c7000
+[  298.127081] x17: ffff0000840f4f40 x16: 00000000000015eb x15: ffffc7334530cc30
+[  298.127133] x14: ffffc733451d4100 x13: 0000000000000000 x12: ffff0000f9b9b100
+[  298.127184] x11: 0000000000000028 x10: 0000000012cf91c1 x9 : 00ffffffffffffff
+[  298.127238] x8 : 0000000000000015 x7 : ffffc733453c93c8 x6 : 0000000000000004
+[  298.127289] x5 : ffffc73342658200 x4 : 0000000000000004 x3 : 000000000682aaab
+[  298.127339] x2 : ffff38cdb49c7000 x1 : ffff0000f9baf400 x0 : 0000000000000000
+[  298.127391] Call trace:
+[  298.127407]  cpuidle_enter_state+0xb8/0x720 (P)
+[  298.127470]  cpuidle_enter+0x34/0x50
+[  298.127511]  do_idle+0x144/0x300
+[  298.127560]  cpu_startup_entry+0x34/0x40
+[  298.127607]  secondary_start_kernel+0x130/0x150
+[  298.127659]  __secondary_switched+0xc0/0xc4
+[  316.395594] platform sound: deferred probe pending: msm-snd-sdm845: SLIM Playback: codec dai not found
+[  316.395794] qnoc-msm8998 17900000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.395808] qnoc-msm8998 1000000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.395820] qnoc-msm8998 1500000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.395832] qnoc-msm8998 1620000.interconnect: sync_state() pending due to 1e40000.ipa
+[  316.395844] qnoc-msm8998 1700000.interconnect: sync_state() pending due to 1e40000.ipa
+[  361.131944] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  361.132064] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=25839
+[  361.132173] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=25839
+[  361.132287] rcu: 	(detected by 5, t=67526 jiffies, g=16389, q=4439 ncpus=8)
+[  361.132363] Sending NMI from CPU 5 to CPUs 3:
+[  371.142655] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  371.142706] Sending NMI from CPU 5 to CPUs 4:
+[  381.152984] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  381.153026] rcu: rcu_preempt kthread starved for 2496 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=6
+[  381.153222] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  381.153276] rcu: RCU grace-period kthread stack dump:
+[  381.153323] task:rcu_preempt     state:R stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  381.153440] Call trace:
+[  381.153491]  __switch_to+0xf8/0x1e0 (T)
+[  381.153619]  __schedule+0x3dc/0x107c
+[  381.153723]  schedule+0x34/0xe0
+[  381.153822]  schedule_timeout+0x80/0x120
+[  381.153906]  rcu_gp_fqs_loop+0x124/0x848
+[  381.154000]  rcu_gp_kthread+0x2c8/0x2e8
+[  381.154086]  kthread+0x12c/0x140
+[  381.154158]  ret_from_fork+0x10/0x20
+[  381.154238] rcu: Stack dump where RCU GP kthread last ran:
+[  381.154286] Sending NMI from CPU 5 to CPUs 6:
+[  381.154433] NMI backtrace for cpu 6
+[  381.154495] CPU: 6 UID: 0 PID: 0 Comm: swapper/6 Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  381.154556] Tainted: [W]=WARN
+[  381.154571] Hardware name: LG V30 (US998) (DT)
+[  381.154591] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  381.154631] pc : cpuidle_enter_state+0xb8/0x720
+[  381.154698] lr : cpuidle_enter_state+0xb0/0x720
+[  381.154748] sp : ffff800080223da0
+[  381.154765] x29: ffff800080223da0 x28: 0000000000000000 x27: 0000000000000000
+[  381.154828] x26: 0000000000000000 x25: 0000000000000000 x24: 00000058be83a5fd
+[  381.154884] x23: ffff000083822880 x22: 0000000000000001 x21: ffff0000f9bd0978
+[  381.154937] x20: 00000058be92d3e5 x19: 0000000000000001 x18: ffff38cdb49ea000
+[  381.154988] x17: ffff0000840f4f40 x16: 00000000000017f4 x15: ffffc7334530cc30
+[  381.155041] x14: ffffc733451d4100 x13: 0000000000000000 x12: ffff0000f9bbe100
+[  381.155093] x11: 0000000000000028 x10: 0000000012cf91c1 x9 : 00ffffffffffffff
+[  381.155147] x8 : 0000000000000015 x7 : ffffc733453c93c8 x6 : 0000000000000004
+[  381.155198] x5 : ffffc73342658200 x4 : 0000000000000004 x3 : 000000000682aaab
+[  381.155248] x2 : ffff38cdb49ea000 x1 : ffff0000f9bd2400 x0 : 0000000000000000
+[  381.155300] Call trace:
+[  381.155315]  cpuidle_enter_state+0xb8/0x720 (P)
+[  381.155378]  cpuidle_enter+0x34/0x50
+[  381.155418]  do_idle+0x144/0x300
+[  381.155466]  cpu_startup_entry+0x38/0x40
+[  381.155514]  secondary_start_kernel+0x130/0x150
+[  381.155566]  __secondary_switched+0xc0/0xc4
+[  444.171840] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  444.171972] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=33537
+[  444.172100] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=33537
+[  444.172211] rcu: 	(detected by 6, t=88286 jiffies, g=16389, q=5379 ncpus=8)
+[  444.172286] Sending NMI from CPU 6 to CPUs 3:
+[  454.182581] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  454.182620] Sending NMI from CPU 6 to CPUs 4:
+[  464.192902] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  464.192939] rcu: rcu_preempt kthread starved for 2495 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=5
+[  464.193133] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  464.193187] rcu: RCU grace-period kthread stack dump:
+[  464.193237] task:rcu_preempt     state:I stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  464.193359] Call trace:
+[  464.193419]  __switch_to+0xf8/0x1e0 (T)
+[  464.193551]  __schedule+0x3dc/0x107c
+[  464.193655]  schedule+0x34/0xe0
+[  464.193754]  schedule_timeout+0x80/0x120
+[  464.193843]  rcu_gp_fqs_loop+0x124/0x848
+[  464.193938]  rcu_gp_kthread+0x2c8/0x2e8
+[  464.194020]  kthread+0x12c/0x140
+[  464.194093]  ret_from_fork+0x10/0x20
+[  464.194179] rcu: Stack dump where RCU GP kthread last ran:
+[  464.194230] Sending NMI from CPU 6 to CPUs 5:
+[  464.194376] NMI backtrace for cpu 5
+[  464.194436] CPU: 5 UID: 0 PID: 0 Comm: swapper/5 Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  464.194502] Tainted: [W]=WARN
+[  464.194519] Hardware name: LG V30 (US998) (DT)
+[  464.194539] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  464.194580] pc : cpuidle_enter_state+0xb8/0x720
+[  464.194648] lr : cpuidle_enter_state+0xb0/0x720
+[  464.194700] sp : ffff80008021bda0
+[  464.194717] x29: ffff80008021bda0 x28: 0000000000000000 x27: 0000000000000000
+[  464.194784] x26: 0000000000000000 x25: 0000000000000000 x24: 0000006c14114919
+[  464.194838] x23: ffff000083823080 x22: 0000000000000001 x21: ffff0000f9bad978
+[  464.194892] x20: 0000006c1423c5c4 x19: 0000000000000001 x18: ffff38cdb49c7000
+[  464.194945] x17: ffff0000840f4f40 x16: 00000000000017f4 x15: ffffc7334530cc30
+[  464.194997] x14: ffffc733451d4100 x13: 0000000000000000 x12: ffff0000f9b9b100
+[  464.195047] x11: 0000000000000028 x10: 0000000012cf91c1 x9 : 00ffffffffffffff
+[  464.195102] x8 : 0000000000000015 x7 : ffffc733453c93c8 x6 : 0000000000000004
+[  464.195153] x5 : ffffc73342658200 x4 : 0000000000000004 x3 : 000000000682aaab
+[  464.195204] x2 : ffff38cdb49c7000 x1 : ffff0000f9baf400 x0 : 0000000000000000
+[  464.195256] Call trace:
+[  464.195273]  cpuidle_enter_state+0xb8/0x720 (P)
+[  464.195337]  cpuidle_enter+0x34/0x50
+[  464.195378]  do_idle+0x144/0x300
+[  464.195428]  cpu_startup_entry+0x38/0x40
+[  464.195477]  secondary_start_kernel+0x130/0x150
+[  464.195530]  __secondary_switched+0xc0/0xc4
+[  527.215711] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  527.215827] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=38800
+[  527.215946] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=38800
+[  527.216057] rcu: 	(detected by 6, t=109047 jiffies, g=16389, q=6445 ncpus=8)
+[  527.216131] Sending NMI from CPU 6 to CPUs 3:
+[  537.226421] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  537.226461] Sending NMI from CPU 6 to CPUs 4:
+[  547.236742] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  547.236783] rcu: rcu_preempt kthread starved for 2495 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=5
+[  547.236950] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  547.237003] rcu: RCU grace-period kthread stack dump:
+[  547.237050] task:rcu_preempt     state:I stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  547.237162] Call trace:
+[  547.237213]  __switch_to+0xf8/0x1e0 (T)
+[  547.237299]  __schedule+0x3dc/0x107c
+[  547.237404]  schedule+0x34/0xe0
+[  547.237499]  schedule_timeout+0x80/0x120
+[  547.237582]  rcu_gp_fqs_loop+0x124/0x848
+[  547.237669]  rcu_gp_kthread+0x2c8/0x2e8
+[  547.237751]  kthread+0x12c/0x140
+[  547.237824]  ret_from_fork+0x10/0x20
+[  547.237898] rcu: Stack dump where RCU GP kthread last ran:
+[  547.237949] Sending NMI from CPU 6 to CPUs 5:
+[  547.238034] NMI backtrace for cpu 5
+[  547.238092] CPU: 5 UID: 0 PID: 3688 Comm: pgrep Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  547.238156] Tainted: [W]=WARN
+[  547.238174] Hardware name: LG V30 (US998) (DT)
+[  547.238193] pstate: 20000000 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  547.238234] pc : 0000ffffb7224c9c
+[  547.238252] lr : 0000ffffb7224be8
+[  547.238267] sp : 0000ffffca72bf90
+[  547.238282] x29: 0000ffffca72bf90 x28: 0000000000000000 x27: 0000aaaac8600e60
+[  547.238346] x26: 000000000000002e x25: 0000000000000020 x24: 0000ffffca72c087
+[  547.238401] x23: 0000aaaac85ff000 x22: 0000ffffca72c040 x21: 00000000000100a0
+[  547.238454] x20: 0000ffffca72c049 x19: 0000aaaac8600e60 x18: 0000ffffb7288350
+[  547.238506] x17: 0000ffffb7224bd8 x16: 0000aaaac85ffde0 x15: 0000ffffb7288ba8
+[  547.238557] x14: 0000000000000000 x13: 000000000000002e x12: 0000000000000000
+[  547.238608] x11: 0000ffffb7265fe0 x10: 000000007fffffff x9 : 0000ffffb7288d28
+[  547.238662] x8 : 0000000000000039 x7 : fefefefefefefeff x6 : 2828282828282828
+[  547.238714] x5 : 594e4043ff071d1b x4 : 01000002ff070103 x3 : 7267696d28203634
+[  547.238767] x2 : 0000ffffca72c079 x1 : 0000000000000028 x0 : 0000000000000036
+[  610.239585] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  610.239712] rcu: 	3-...0: (1 GPs behind) idle=2c34/1/0x4000000000000000 softirq=4063/4064 fqs=46600
+[  610.239831] rcu: 	4-...0: (1 GPs behind) idle=08e4/1/0x4000000000000000 softirq=5513/5514 fqs=46600
+[  610.239943] rcu: 	(detected by 6, t=129803 jiffies, g=16389, q=7350 ncpus=8)
+[  610.240018] Sending NMI from CPU 6 to CPUs 3:
+[  620.250315] After 10 seconds, these CPUS still haven't responded to the NMI: 3
+[  620.250376] Sending NMI from CPU 6 to CPUs 4:
+[  630.260661] After 10 seconds, these CPUS still haven't responded to the NMI: 4
+[  630.260705] rcu: rcu_preempt kthread starved for 2495 jiffies! g16389 f0x0 RCU_GP_DOING_FQS(6) ->state=0x0 ->cpu=5
+[  630.260900] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+[  630.260953] rcu: RCU grace-period kthread stack dump:
+[  630.261001] task:rcu_preempt     state:I stack:0     pid:15    tgid:15    ppid:2      task_flags:0x208040 flags:0x00000010
+[  630.261113] Call trace:
+[  630.261165]  __switch_to+0xf8/0x1e0 (T)
+[  630.261289]  __schedule+0x3dc/0x107c
+[  630.261386]  schedule+0x34/0xe0
+[  630.261458]  schedule_timeout+0x80/0x120
+[  630.261599]  rcu_gp_fqs_loop+0x124/0x848
+[  630.261663]  rcu_gp_kthread+0x2c8/0x2e8
+[  630.261749]  kthread+0x12c/0x140
+[  630.261820]  ret_from_fork+0x10/0x20
+[  630.261895] rcu: Stack dump where RCU GP kthread last ran:
+[  630.261946] Sending NMI from CPU 6 to CPUs 5:
+[  630.262029] NMI backtrace for cpu 5
+[  630.262092] CPU: 5 UID: 0 PID: 3714 Comm: pgrep Tainted: G        W           7.2.0-rc2-g29234a4d22a0-dirty #26 PREEMPT 
+[  630.262155] Tainted: [W]=WARN
+[  630.262172] Hardware name: LG V30 (US998) (DT)
+[  630.262191] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  630.262233] pc : __refill_obj_stock+0x4/0x214
+[  630.262303] lr : __memcg_slab_free_hook+0xcc/0x220
+[  630.262341] sp : ffff80008b973ca0
+[  630.262358] x29: ffff80008b973ca0 x28: ffff0000f9bb0680 x27: ffff000080014d00
+[  630.262422] x26: ffff0000875542c0 x25: ffff80008b973d20 x24: fffffdffc2147880
+[  630.262477] x23: 00000000ffffffd8 x22: ffffc73345a584f8 x21: ffff80008b973d28
+[  630.262532] x20: ffff0000851e2000 x19: ffff000081290000 x18: 0000000000000000
+[  630.262586] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+[  630.262636] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+[  630.262685] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
+[  630.262735] x8 : ffff0000f9bb0680 x7 : ffff0000875542c0 x6 : 0000000000000d00
+[  630.262786] x5 : 0000000000000000 x4 : ffff0000f9bb0680 x3 : 0000000000000001
+[  630.262836] x2 : 0000000000000028 x1 : ffff0000f9bb0680 x0 : ffff0000875542c0
+[  630.262889] Call trace:
+[  630.262906]  __refill_obj_stock+0x4/0x214 (P)
+[  630.262974]  kfree+0x334/0x3e0
+[  630.263018]  single_release+0x3c/0x50
+[  630.263083]  __fput+0xd4/0x2f8
+[  630.263136]  fput_close_sync+0x38/0x108
+[  630.263188]  __arm64_sys_close+0x38/0x88
+[  630.263231]  invoke_syscall.constprop.0+0x40/0x108
+[  630.263289]  el0_svc_common.constprop.0+0x38/0xd8
+[  630.263342]  do_el0_svc+0x1c/0x28
+[  630.263391]  el0_svc+0x38/0x1d0
+[  630.263440]  el0t_64_sync_handler+0xa0/0xe4
+[  630.263490]  el0t_64_sync+0x198/0x19c
