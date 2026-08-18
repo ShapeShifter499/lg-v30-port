@@ -13,12 +13,13 @@
   NON-NGD manager driver. msm8998.dtsi binds qcom,slim-ngd for slim@171c0000,
   and downstream slim-msm-ngd.c never writes COMP_CFG/MGR_CFG. The core is
   ADSP-owned; app-CPU MMIO to 0x200+ hangs BY DESIGN. Boots R-W direction REJECTED.
-- NEXT (Boot Y): confirm version register (base+0x0, first-page safe) on the
-  same qmidbg19x image; then pivot to the ADSP message path: restore the
-  dropped reconfigure messages (MC 0x40-0x5F, the parked Boot Q candidate) and
-  study slim-msm-ngd.c port-assign flow vs mainline qcom_slim_ngd_ctrl.c.
-  CONNECT_SINK stall most consistent with port_b programming never reaching
-  the ADSP manager.
+- NEXT (Boot Y/Z): code study DONE — mainline never reads the ADSP's QMI
+  requests (svc 0x0301 rx side missing; downstream drains them and programs
+  pipe ports on request). Port downstream's QMI recv path (kworker +
+  QMI_RECV_MSG + rx handlers) + pipe-port connect (PGD_PORT_CFGn/BLKn/TRANn,
+  port_b rewrite, pgdla get_laddr) into qcom-ngd-ctrl.c. Reconfigure-range
+  drop is CORRECT NGD behavior — reconf_passthrough retired as dead end.
+  See docs/evidence/2026-08-17-qmi-boots/boot-Y-codestudy-qmi-rx-gap.md.
 - Evidence: docs/evidence/2026-08-17-qmi-boots/boot-X-readprobe.md.
 - Tooling staged on nest: ~/joan-images/staging/qmidbg19x/{devprobe,probe-x.sh,
   nest-bootx.sh,repack-qmidbg19x.sh}; image boot-joan-qmidbg19x.img
