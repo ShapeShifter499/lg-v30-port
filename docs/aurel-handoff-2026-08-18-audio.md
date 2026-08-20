@@ -89,11 +89,13 @@ Gotchas:
 ## Tooling locations
 
 - Kernel: ~/vibe-coding-projects/coding/linux-mainline-v30-usb-otg
-  branch joan/usb3-otg-bringup (HEAD 88173e4fe + qmi breadcrumb).
+  branch joan/usb3-otg-bringup (HEAD 0d00bab2b, includes the qmi
+  breadcrumb).
   Build: make ARCH=arm64 O=/data/buildcache/kbuild/build-adsp-only
   CROSS_COMPILE="ccache aarch64-linux-gnu-" -j12 Image.gz dtbs.
 - GitHub ShapeShifter499/linux-lg-v30-joan: joan/latest-clean-test =
-  full history; master = proven fixes (6fc576542).
+  0d00bab2b (full history, incl. qmi breadcrumb); master = proven fixes
+  (6fc576542).
 - nest: ~/joan-images/staging/qmidbg20i/{repack,boot-test,seq} +
   /tmp/readback-20i.sh; latest image boot-joan-qmidbg20i.img
   (cf8dbfb1...).
