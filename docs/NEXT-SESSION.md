@@ -1,5 +1,40 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21e (Ember) — *** WORKING STEREO AUDIO ON JOAN *** through the ES9218P Quad DAC.**
+Kernel `ghfork/joan/latest-clean-test` `50ed1c09e`.
+- **Working chain:** aplay → q6asm → ADM → AFE **QUATERNARY** MI2S → gpio58/59/61
+  → **ES9218P** (our reverse-engineered driver) → headphone jack. Both channels
+  clean, correct left/right orientation (verified with a spoken channel clip),
+  real-time playback.
+- **Two bugs fixed this session, both mine, both one-liners in effect:**
+  1. **Wrong port.** The DAC is on QUATERNARY MI2S, not tertiary. I inferred
+     tertiary from downstream's `dai_mi2s2` having SD1 as an output instead of
+     reading the dai-link that NAMES the codec (`LPASS_BE_QUAT_MI2S_RX` /
+     `msm-dai-q6-mi2s.3` → `es9218-codec.1-0048`, under `CONFIG_SND_USE_QUAT_MI2S`
+     which every joan defconfig sets). Cost ~4 boots + a tertiary implementation
+     joan does not use.
+  2. **Wrong register field.** Serial word length is **bit 7** of the input-select
+     register and LG writes the WHOLE byte (0x00 = 16-bit, 0x80 = 24/32-bit). We
+     were writing bits 1:0, so the register kept its 0x8c reset value = 32-bit
+     while 16-bit frames arrived. That single field caused BOTH the crackle
+     (frame misalignment) and the underruns (6 s file returning in 2-3 s).
+- **Decisive instruments, use these first next time:**
+  - DAC `DPLL_NUMBER` regs **0x42-0x45**, read WHILE PLAYING. `0x00000000` = no
+    input clock at all (wrong port / dead clock); non-zero = locked. This would
+    have caught the wrong port in one boot.
+  - **Play duration vs file duration.** A 6 s file returning in 2-3 s is underrun,
+    not a routing fault. Cheap, needs no instrumentation.
+- **Volume safety:** control 255 on `Headphone Playback Volume` is 0 dB on a
+  headphone amp and was painfully loud. Keep test sweeps at or below ~210.
+- Still open / next: cap a sane default volume in the driver; wire the ES9218P
+  properly into DAPM/jack detection; the WCD9340 analog outs remain unused on
+  this board; loudspeaker (TFA9872 on quaternary TDM / i2c_7) is untouched and
+  needs its firmware container loaded from joan's own partition.
+- Tooling: `docs/tools/` has gpiohold.c and the codec setup recipe. Channel-test
+  and tone clips were generated locally with espeak-ng (installed on skyforge
+  this session).
+
+
 **2026-08-21d (Ember) — AFE I2S payload diffed against downstream: composition logic is CORRECT by inspection. Runtime capture still owed.**
 Kernel `58d3cb4eb`.
 - **`set_sysclk` is NOT silently failing.** Added error logging (`2ff3b6eec`);
