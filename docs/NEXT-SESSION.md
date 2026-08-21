@@ -265,8 +265,11 @@ Boots J–L took the playback lane from EINVAL to a completed aplay:
 - Still missing for AUDIBLE sound: joan DT has no `audio-routing`
   (db845c has it) and the codec-side mixer sequence (RX INT0_1 MIX1 INP0
   = RX0, RX INT0 DEM MUX = CLSH_DSM_OUT, SPK PA) — see Boot L notes.
-- DAC (ES9218P): headphone-path-only, mainline has es9218p.c; separate
-  lane later, not part of any current wall.
+- DAC (ES9218P): headphone-path-only. **CORRECTION 2026-08-21: es9218p.c is
+  NOT in mainline** -- there is no ES9218P support upstream at all. The file
+  in our tree is OUR reverse-engineered port (local commit `dbd7d8f4d`,
+  Lance-approved, a deliverable): a never-probed skeleton with
+  `CONFIG_SND_SOC_ES9218P` unset.
 Details: `docs/evidence/2026-08-17-qmi-boots/boot-L-playback-opened.md`;
 patches v6–v9 in out/ (v9 sha256 2b19d41f...); ledger K182+ to be
 appended. Kernel tree DIRTY with the v9 debug stack (breadcrumbs + gates

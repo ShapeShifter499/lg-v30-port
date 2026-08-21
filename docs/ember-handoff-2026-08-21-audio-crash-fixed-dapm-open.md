@@ -152,9 +152,14 @@ seconds (the phone has `CONFIG_GPIO_CDEV=y`, no `GPIO_SYSFS`, and no libgpiod).
    (tertiary → ES9218P, quaternary → TFA98xx). Mainline has `snd-soc-tfa989x`
    for some TFA parts — check whether joan's is covered.
 4. Fix the gpio-hog no-op, or bind the pins from the ES9218P driver instead.
-5. ES9218P driver (`dbd7d8f4d`, local, Lance-approved RE work): never probed,
+5. ES9218P driver (`dbd7d8f4d`): **not in mainline** -- there is no ES9218P
+   support upstream at all. This is our own reverse-engineered port, approved
+   by Lance and a deliverable in its own right (the goal is the Quad DAC
+   working in mainline, not merely bypassed). Never probed,
    `CONFIG_SND_SOC_ES9218P` not enabled. Bringing it up is the proper home for
-   the mode pins and for HiFi mode.
+   the mode pins and for HiFi mode. Bypass-first was a sequencing choice -- it
+   isolates the WCD DAPM chain from an unproven driver, and LPB is a transition
+   the driver must implement anyway -- not a way around the driver.
 
 ## Rig notes
 
