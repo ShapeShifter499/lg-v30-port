@@ -1,5 +1,46 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21b (Ember) — codec DAPM lane opened. Chain proven ON end to end; still not audible; topology question is the blocker.**
+Handoff: `docs/ember-handoff-2026-08-21-audio-crash-fixed-dapm-open.md`.
+Kernel `ghfork/joan/latest-clean-test` `2fac70c23`.
+- **START HERE: the corrected-gain configuration has never been listened to.**
+  Run `docs/tools/joan-codec-dapm-setup.sh` + `docs/tools/tone-440L-660R-6s.wav`
+  and listen. It may simply work.
+- **My gain bug, do not repeat:** `SOC_SINGLE_S8_TLV("RXn Digital Volume",
+  …, -84, 40, …)` — the control value is an OFFSET FROM -84 dB. `0` = -84 dB =
+  silence; **84 = 0 dB**. A whole listening pass was spent at -84 dB.
+- **Stereo FIXED:** setting `SLIM RX1 MUX` = AIF1_PB as well as RX0 takes the
+  AFE port from `ch 1 map 144` to `ch 2 map 144/145`.
+- **Measured working (not assumed):** with a tone playing, the whole codec DAPM
+  chain reads On from `AIF1 PB` through `HPHL PA` to `HPHL`; `ANA_HPH`=0xf0
+  (both PAs + both DACs), `ANA_EAR`=0xa0, `ANA_RX_SUPPLIES`=0xc1,
+  `RX0/RX1_RX_PATH_CTL`=0x24 (enabled, unmuted, 48 kHz). SLIMbus stream really
+  is established (CONNECT_SINK, DEF_ACT_CHAN, RECONFIG_NOW, no bus errors).
+  Everything the codec can do, it is doing.
+- **The open question is topological:** joan may not connect the WCD9340's
+  analog outputs to any transducer. Headphone goes via **ES9218P** (i2c_1 0x48,
+  fed by tertiary MI2S); loudspeaker via **TFA98xx** (i2c_7 0x34, quaternary
+  MI2S); and downstream's `qcom,audio-routing` for joan lists **only mic
+  paths**. Settle this with a teardown photo / service manual / stock
+  `mixer_paths_*.xml` before writing more code.
+- **ES9218P Low Power Bypass** (WCD analog → jack): power `&pm8998_gpios 10`
+  HIGH, hifi_mode2 `&pm8998_gpios 12` HIGH, reset `&pmi8998_gpios 2` LOW.
+  PMIC DT numbering is 1-based and matches downstream (`of_xlate` subtracts
+  `PMIC_GPIO_PHYSICAL_OFFSET`).
+- **OPEN BUG: the DT gpio-hogs silently do nothing.** Nodes are in the live DT;
+  the pins stay inputs; nothing logged. Use `docs/tools/gpiohold.c` (static
+  aarch64, GPIO_CDEV) until fixed — the phone has no GPIO_SYSFS and no libgpiod.
+- **Workflow win:** boot 24a survived the whole session, so the codec was poked
+  live over ssh with no reboots. Dump DAPM **while playing** — an idle dump
+  shows everything Off and proves nothing. Widgets:
+  `/sys/kernel/debug/asoc/LG-V30/wcd934x-codec.0.auto/dapm/`; codec regmap:
+  `/sys/kernel/debug/regmap/217:250:1:0/registers`; `mount -t debugfs none
+  /sys/kernel/debug` first.
+- **ES9218P driver** (`dbd7d8f4d`) is OUR reverse-engineered port, Lance-approved
+  and a deliverable — it is NOT in mainline. Never probed;
+  `CONFIG_SND_SOC_ES9218P` not enabled. It is the proper home for the mode pins.
+
+
 **2026-08-21 (Ember) — AUDIO CRASH FIXED. Root cause: q6asmdai had no `iommus`, so the DSP was given an unmapped physical address. PCM playback now runs end to end.**
 - Boots 21a/21b/22a/23a. Root-cause + fix evidence:
   docs/evidence/2026-08-21-runtime-pm/boot-22a-23a-adsp-smmu-root-cause-and-fix.md
