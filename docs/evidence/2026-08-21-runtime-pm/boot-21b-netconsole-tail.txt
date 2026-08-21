@@ -1,0 +1,300 @@
+[   38.904607] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=249
+[   38.904791] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.905272] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.906031] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.906484] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.906667] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.907136] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.907887] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.908434] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=249
+[   38.908610] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.909076] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.909838] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.910291] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.910470] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.910947] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.911722] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.912184] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.912453] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.913077] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.913846] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.914416] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.914589] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.914798] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.915534] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.916030] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.916208] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.916447] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=249
+[   38.917219] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.917771] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.917961] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.918482] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.919260] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.919826] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.920023] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.920217] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.924681] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.925073] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.925197] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.925284] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.925906] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.925978] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.925995] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.926090] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   38.926706] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   38.926853] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   38.926880] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xcf
+[   38.926968] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xcf time_left=250
+[   39.028378] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   39.028699] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   39.028720] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xcf
+[   39.029197] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xcf time_left=250
+[   39.838739]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+[   39.838929]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 1: dpcm_path_get found 2 widgets
+[   39.839020]  MultiMedia1: JOAN-DBG:   w[0] = MM_UL1 (id 25)
+[   39.839091]  MultiMedia1: JOAN-DBG:   w[1] = MultiMedia1 Mixer (id 5)
+[   39.841688]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 1: dpcm_path_get found 2 widgets
+[   39.841921]  MultiMedia1: JOAN-DBG:   w[0] = MM_UL1 (id 25)
+[   39.842028]  MultiMedia1: JOAN-DBG:   w[1] = MultiMedia1 Mixer (id 5)
+[   39.844453]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 1: dpcm_path_get found 2 widgets
+[   39.844598]  MultiMedia1: JOAN-DBG:   w[0] = MM_UL1 (id 25)
+[   39.844685]  MultiMedia1: JOAN-DBG:   w[1] = MultiMedia1 Mixer (id 5)
+[   39.848013]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 0: dpcm_path_get found 1 widgets
+[   39.848232]  MultiMedia1: JOAN-DBG:   w[0] = MM_DL1 (id 24)
+[   39.848312]  MultiMedia1: JOAN-DBG: FE path MultiMedia1 Playback -> MM_DL1 (connect 1)
+[   39.848486]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> USB_RX Audio Mixer (connect 0)
+[   39.848583]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_7 Audio Mixer (connect 0)
+[   39.848661]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_6 Audio Mixer (connect 0)
+[   39.848730]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_5 Audio Mixer (connect 0)
+[   39.848810]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_4 Audio Mixer (connect 0)
+[   39.848886]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_3 Audio Mixer (connect 0)
+[   39.848961]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_2 Audio Mixer (connect 0)
+[   39.849033]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.849108]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.849186]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.849264]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.849336]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_7 Audio Mixer (connect 0)
+[   39.849394]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_6 Audio Mixer (connect 0)
+[   39.849466]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_5 Audio Mixer (connect 0)
+[   39.849539]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_4 Audio Mixer (connect 0)
+[   39.849612]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_3 Audio Mixer (connect 0)
+[   39.849688]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_2 Audio Mixer (connect 0)
+[   39.849748]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_1 Audio Mixer (connect 0)
+[   39.849820]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_0 Audio Mixer (connect 0)
+[   39.849893]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.849966]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.850039]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.850111]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.850183]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.850256]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.850330]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.850402]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.850475]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.850549]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.850623]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.850696]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.850769]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.850841]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.850918]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.850990]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.851068]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_7 Audio Mixer (connect 0)
+[   39.851142]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_6 Audio Mixer (connect 0)
+[   39.851214]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_5 Audio Mixer (connect 0)
+[   39.851286]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_4 Audio Mixer (connect 0)
+[   39.851360]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_3 Audio Mixer (connect 0)
+[   39.851432]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_2 Audio Mixer (connect 0)
+[   39.851507]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_1 Audio Mixer (connect 0)
+[   39.851579]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_0 Audio Mixer (connect 0)
+[   39.851657]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_7 Audio Mixer (connect 0)
+[   39.851731]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_6 Audio Mixer (connect 0)
+[   39.851804]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_5 Audio Mixer (connect 0)
+[   39.851881]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_4 Audio Mixer (connect 0)
+[   39.851953]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_3 Audio Mixer (connect 0)
+[   39.852025]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_2 Audio Mixer (connect 0)
+[   39.852098]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_1 Audio Mixer (connect 0)
+[   39.852183]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_0 Audio Mixer (connect 0)
+[   39.852256]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRI_MI2S_RX Audio Mixer (connect 0)
+[   39.852383]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_MI2S_RX Audio Mixer (connect 0)
+[   39.852468]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_MI2S_RX Audio Mixer (connect 0)
+[   39.852549]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_MI2S_RX Audio Mixer (connect 0)
+[   39.852631]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_MI2S_RX Audio Mixer (connect 0)
+[   39.852705]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_6_RX Audio Mixer (connect 0)
+[   39.852778]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_5_RX Audio Mixer (connect 0)
+[   39.852851]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_4_RX Audio Mixer (connect 0)
+[   39.852927]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_3_RX Audio Mixer (connect 0)
+[   39.853005]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_2_RX Audio Mixer (connect 0)
+[   39.853078]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_1_RX Audio Mixer (connect 0)
+[   39.853156]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_0_RX Audio Mixer (connect 0)
+[   39.853230]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> DISPLAY_PORT_RX Audio Mixer (connect 0)
+[   39.853308]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> HDMI Mixer (connect 0)
+[   39.855756]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 0: dpcm_path_get found 1 widgets
+[   39.855980]  MultiMedia1: JOAN-DBG:   w[0] = MM_DL1 (id 24)
+[   39.856080]  MultiMedia1: JOAN-DBG: FE path MultiMedia1 Playback -> MM_DL1 (connect 1)
+[   39.856159]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> USB_RX Audio Mixer (connect 0)
+[   39.856248]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_7 Audio Mixer (connect 0)
+[   39.856398]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_6 Audio Mixer (connect 0)
+[   39.856487]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_5 Audio Mixer (connect 0)
+[   39.856565]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_4 Audio Mixer (connect 0)
+[   39.856649]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_3 Audio Mixer (connect 0)
+[   39.856742]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_2 Audio Mixer (connect 0)
+[   39.856816]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.856894]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.856972]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.857046]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.857120]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_7 Audio Mixer (connect 0)
+[   39.857198]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_6 Audio Mixer (connect 0)
+[   39.857275]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_5 Audio Mixer (connect 0)
+[   39.857347]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_4 Audio Mixer (connect 0)
+[   39.857420]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_3 Audio Mixer (connect 0)
+[   39.857492]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_2 Audio Mixer (connect 0)
+[   39.857565]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_1 Audio Mixer (connect 0)
+[   39.857638]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_0 Audio Mixer (connect 0)
+[   39.857714]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.857786]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.857852]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.857923]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.857980]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.858054]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.858131]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.858207]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.858279]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.858352]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.858430]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.858503]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.858577]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.858656]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.858736]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.858810]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.858882]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_7 Audio Mixer (connect 0)
+[   39.858956]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_6 Audio Mixer (connect 0)
+[   39.859038]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_5 Audio Mixer (connect 0)
+[   39.859104]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_4 Audio Mixer (connect 0)
+[   39.859170]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_3 Audio Mixer (connect 0)
+[   39.859243]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_2 Audio Mixer (connect 0)
+[   39.859316]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_1 Audio Mixer (connect 0)
+[   39.859394]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_0 Audio Mixer (connect 0)
+[   39.859467]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_7 Audio Mixer (connect 0)
+[   39.859544]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_6 Audio Mixer (connect 0)
+[   39.859625]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_5 Audio Mixer (connect 0)
+[   39.859698]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_4 Audio Mixer (connect 0)
+[   39.859771]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_3 Audio Mixer (connect 0)
+[   39.859845]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_2 Audio Mixer (connect 0)
+[   39.859925]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_1 Audio Mixer (connect 0)
+[   39.859998]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_0 Audio Mixer (connect 0)
+[   39.860071]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRI_MI2S_RX Audio Mixer (connect 0)
+[   39.860149]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_MI2S_RX Audio Mixer (connect 0)
+[   39.860222]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_MI2S_RX Audio Mixer (connect 0)
+[   39.860294]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_MI2S_RX Audio Mixer (connect 0)
+[   39.860442]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_MI2S_RX Audio Mixer (connect 0)
+[   39.860518]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_6_RX Audio Mixer (connect 0)
+[   39.860599]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_5_RX Audio Mixer (connect 0)
+[   39.860673]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_4_RX Audio Mixer (connect 0)
+[   39.860755]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_3_RX Audio Mixer (connect 0)
+[   39.860826]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_2_RX Audio Mixer (connect 0)
+[   39.860897]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_1_RX Audio Mixer (connect 0)
+[   39.860969]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_0_RX Audio Mixer (connect 0)
+[   39.861040]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> DISPLAY_PORT_RX Audio Mixer (connect 0)
+[   39.861117]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> HDMI Mixer (connect 0)
+[   39.863445]  MultiMedia1: JOAN-DBG: FE MultiMedia1 stream 0: dpcm_path_get found 1 widgets
+[   39.863663]  MultiMedia1: JOAN-DBG:   w[0] = MM_DL1 (id 24)
+[   39.863747]  MultiMedia1: JOAN-DBG: FE path MultiMedia1 Playback -> MM_DL1 (connect 1)
+[   39.863827]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> USB_RX Audio Mixer (connect 0)
+[   39.863904]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_7 Audio Mixer (connect 0)
+[   39.863960]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_6 Audio Mixer (connect 0)
+[   39.864053]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_5 Audio Mixer (connect 0)
+[   39.864123]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_4 Audio Mixer (connect 0)
+[   39.864206]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_3 Audio Mixer (connect 0)
+[   39.864278]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_2 Audio Mixer (connect 0)
+[   39.864438]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.864522]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> RX_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.864598]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_1 Audio Mixer (connect 0)
+[   39.864676]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> WSA_CODEC_DMA_RX_0 Audio Mixer (connect 0)
+[   39.864743]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_7 Audio Mixer (connect 0)
+[   39.864811]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_6 Audio Mixer (connect 0)
+[   39.864884]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_5 Audio Mixer (connect 0)
+[   39.864963]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_4 Audio Mixer (connect 0)
+[   39.865051]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_3 Audio Mixer (connect 0)
+[   39.865128]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_2 Audio Mixer (connect 0)
+[   39.865202]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_1 Audio Mixer (connect 0)
+[   39.865276]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_TDM_RX_0 Audio Mixer (connect 0)
+[   39.865349]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.865423]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.865496]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.865573]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.865639]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.865704]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.865770]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.865827]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.865900]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_7 Audio Mixer (connect 0)
+[   39.865976]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_6 Audio Mixer (connect 0)
+[   39.866055]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_5 Audio Mixer (connect 0)
+[   39.866129]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_4 Audio Mixer (connect 0)
+[   39.866202]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_3 Audio Mixer (connect 0)
+[   39.866274]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_2 Audio Mixer (connect 0)
+[   39.866371]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_1 Audio Mixer (connect 0)
+[   39.866438]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_TDM_RX_0 Audio Mixer (connect 0)
+[   39.866484]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_7 Audio Mixer (connect 0)
+[   39.866561]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_6 Audio Mixer (connect 0)
+[   39.866635]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_5 Audio Mixer (connect 0)
+[   39.866718]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_4 Audio Mixer (connect 0)
+[   39.866791]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_3 Audio Mixer (connect 0)
+[   39.866864]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_2 Audio Mixer (connect 0)
+[   39.866937]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_1 Audio Mixer (connect 0)
+[   39.867009]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_TDM_RX_0 Audio Mixer (connect 0)
+[   39.867080]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_7 Audio Mixer (connect 0)
+[   39.867154]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_6 Audio Mixer (connect 0)
+[   39.867227]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_5 Audio Mixer (connect 0)
+[   39.867300]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_4 Audio Mixer (connect 0)
+[   39.867372]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_3 Audio Mixer (connect 0)
+[   39.867447]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_2 Audio Mixer (connect 0)
+[   39.867523]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_1 Audio Mixer (connect 0)
+[   39.867598]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRIMARY_TDM_RX_0 Audio Mixer (connect 0)
+[   39.867670]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> PRI_MI2S_RX Audio Mixer (connect 0)
+[   39.867736]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SEC_MI2S_RX Audio Mixer (connect 0)
+[   39.867802]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> TERT_MI2S_RX Audio Mixer (connect 0)
+[   39.867868]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUIN_MI2S_RX Audio Mixer (connect 0)
+[   39.867934]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> QUAT_MI2S_RX Audio Mixer (connect 0)
+[   39.867990]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_6_RX Audio Mixer (connect 0)
+[   39.868064]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_5_RX Audio Mixer (connect 0)
+[   39.868140]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_4_RX Audio Mixer (connect 0)
+[   39.868217]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_3_RX Audio Mixer (connect 0)
+[   39.868291]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_2_RX Audio Mixer (connect 0)
+[   39.868489]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_1_RX Audio Mixer (connect 0)
+[   39.868552]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> SLIMBUS_0_RX Audio Mixer (connect 0)
+[   39.868627]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> DISPLAY_PORT_RX Audio Mixer (connect 0)
+[   39.868687]  MultiMedia1: JOAN-DBG:   2nd MM_DL1 -> HDMI Mixer (connect 0)
+[   53.095364] rfkill: input handler disabled
+[   56.460580] EXT4-fs (mmcblk0p2): re-mounted 9a5df9d1-ee25-47b6-9b3a-a2602b939bd0.
+[   58.543640] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xce
+[   58.544053] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xce time_left=250
+[   58.544151] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xce
+[   58.544505] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xce time_left=249
+[   58.544654] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xce
+[   58.544851] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xce time_left=250
+[   58.544954] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xce
+[   58.545155] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xce time_left=250
+[   58.545283] JOAN-DBG: q6slim_hw_params dai id 2 rate 48000 fmt 2
+[   58.545698] JOAN-DBG: q6afe_dai_prepare dai id 2 started 0
+[   58.545796] JOAN-DBG: slim port 16384 cfg: dev 1 rate 48000 width 16 ch 1 fmt 0 map 144/0/0/0
+[   58.546151]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.546328] qcom_glink_rx_data: 5 callbacks suppressed
+[   58.546336]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 1 len 40)
+[   58.546901]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 1 reuse 1)
+[   58.546938]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.562158]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 2 len 40)
+[   58.562321]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 2 reuse 1)
+[   58.565839]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.566042]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 3 len 36)
+[   58.566167]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 3 reuse 1)
+[   58.566934]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.568854]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 4 len 40)
+[   58.569112]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 4 reuse 1)
+[   58.569623]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.572983]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 5 len 40)
+[   58.573494]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 5 reuse 1)
+[   58.573870]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.576596]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 6 len 40)
+[   58.576786]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 6 reuse 1)
+[   58.577459]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[   58.577597]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 7 len 40)
+[   58.577866]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 7 reuse 1)

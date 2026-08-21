@@ -1,0 +1,66 @@
+== seq start 106 ==
+== runtime-PM node survey (parent EIO is EXPECTED, child is the real one) ==
+file=/sys/devices/platform/soc@0/171c0000.slim-ngd/power/autosuspend_delay_ms
+  delay=cat: read error: I/O error
+  control=auto status=unsupported
+  suspended_time=0 active_time=0
+file=/sys/devices/platform/soc@0/171c0000.slim-ngd/dma:rx/power/autosuspend_delay_ms
+  delay=cat: read error: I/O error
+  control=auto status=unsupported
+  suspended_time=0 active_time=0
+file=/sys/devices/platform/soc@0/171c0000.slim-ngd/dma:tx/power/autosuspend_delay_ms
+  delay=cat: read error: I/O error
+  control=auto status=unsupported
+  suspended_time=0 active_time=0
+file=/sys/devices/platform/soc@0/171c0000.slim-ngd/qcom,slim-ngd.1/power/autosuspend_delay_ms
+  delay=600000
+  control=auto status=active
+  suspended_time=83950 active_time=22498
+== module params ==
+  autosuspend_ms=600000
+  keep_dma=N
+  pm_dbg=Y
+  joan_pipes=N
+  pgd_enable=N
+== mixer ==
+numid=239,iface=MIXER,name='SLIMBUS_0_RX Audio Mixer MultiMedia1'
+  ; type=BOOLEAN,access=rw------,values=1
+  : values=off
+numid=98,iface=MIXER,name='SLIM RX0 MUX'
+  ; type=ENUMERATED,access=rw------,values=1,items=5
+  : values=0
+  ; type=BOOLEAN,access=rw------,values=1
+  : values=on
+  ; type=ENUMERATED,access=rw------,values=1,items=5
+  : values=1
+  ; type=BOOLEAN,access=rw------,values=1
+  : values=on
+  ; type=ENUMERATED,access=rw------,values=1,items=5
+  : values=1
+== aplay1 start 108 ==
+Playing raw data '/dev/zero' : Signed 16 bit Little Endian, Rate 48000 Hz, Stereo
+Hardware PCM card 0 'LG-V30' device 0 subdevice 0
+Its setup is:
+  stream       : PLAYBACK
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 2
+  rate         : 48000
+  exact rate   : 48000 (48000/1)
+  msbits       : 16
+  buffer_size  : 24960
+  period_size  : 6240
+  period_time  : 130000
+  tstamp_mode  : ENABLE
+  tstamp_type  : MONOTONIC
+  period_step  : 1
+  avail_min    : 6240
+  period_event : 0
+  start_threshold  : 24960
+  stop_threshold   : 24960
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 7025615418697973760
+  appl_ptr     : 0
+  hw_ptr       : 0

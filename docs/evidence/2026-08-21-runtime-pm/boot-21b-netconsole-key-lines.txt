@@ -1,0 +1,6 @@
+[   27.704638] netconsole: network logging started
+[   34.582982] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-PM: runtime_resume enter (state 3)
+[   34.591397] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-PM: init_dma enter (rx=0000000000000000 tx=0000000000000000)
+[   34.594952] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-PM: init_dma done ret=0
+[   34.595863] qcom,slim-ngd-ctrl 171c0000.slim-ngd: JOAN-PM: runtime_resume done ret=0 state=0 prev=3
+[   36.836528] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout

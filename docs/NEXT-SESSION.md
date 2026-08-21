@@ -1,5 +1,55 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21 (Ember) — runtime PM RETIRED; SPS/BAM lead rejected from source; netconsole was dead all along and is now live.**
+- Boots 21a + 21b (evidence: docs/evidence/2026-08-21-runtime-pm/, analysis:
+  docs/ember-2026-08-21-audio-runtime-pm-and-sps-deadend.md).
+- **Lead #1 (port downstream's SPS/BAM pipe setup) is REJECTED from source.**
+  Downstream runs `msm_slim_connect_pipe_port()` only when the connect targets
+  the APPS PGD (`slim-msm-ngd.c:658`, `wbuf[0] == dev->pgdla`, and `wbuf[0]` is
+  `txn->la` at `:577`). Our connects target the codec (0xcf/0xce), so downstream
+  does no SPS/BAM setup on this path either. The apps BAM data pipes are not in
+  the audio path at all — data is ADSP<->codec, the apps NGD is control-only.
+  Same reasoning retires `joan_pipe_bringup`; run with `joan_pipes=0`.
+- **Runtime PM is RETIRED as the killer**, this time on real evidence. The
+  earlier ruling-out was invalid: the sysfs check read the PARENT device
+  (`171c0000.slim-ngd`), which never calls `pm_runtime_use_autosuspend()`, so
+  `-EIO` was the expected answer and every raise to 5000 ms wrote nothing. The
+  live node is the child pdev `qcom,slim-ngd.1`. With
+  `slim_qcom_ngd_ctrl.autosuspend_ms=600000` the bus stayed `active` across the
+  whole run — four `JOAN-PM` breadcrumbs in 12677 lines, all from the initial
+  DOWN->AWAKE resume, zero suspends, zero `exit_dma` — **and it died anyway, in
+  the same place.** So the 100 ms autosuspend, the `exit_dma()` -> `BAM_P_RST`
+  teardown of the ADSP-owned BAM, and the QMI power-down vote all go.
+- **netconsole had never worked.** Not the MAC: `netpoll: netconsole: usb0
+  doesn't exist, aborting` at 3.05 s — the cmdline initcall runs long before the
+  USB gadget. Its silence carried no information on any prior boot. Fixed by
+  configuring it via configfs at runtime with nest's live MAC (pmOS randomises
+  the CDC host MAC every boot), and the run now positive-controls the channel
+  through `/dev/kmsg` before spending the audio sequence. Recipe in the 21b doc.
+- **Where it dies, now measured by two independent channels that agree
+  exactly:** 32 ms after `slim port 16384 cfg`, on the seventh `apr_audio_svc`
+  response. The apps kernel acks it (`rx_done sent liid 7`) and then emits
+  nothing — no fault, no warning, no panic — through a synchronous, unbuffered
+  channel. Remaining space: the ADSP faulting on the AFE port start (hardware
+  watchdog; the remoteproc "crash detected in adsp" path never fires), or an
+  apps-side MMIO wedge we have not identified.
+- **Two new leads from the log:** (a) the AFE slim port is configured for ONE
+  channel on a stereo stream (`ch 1 map 144/0/0/0`) — only `SLIM RX0 MUX` is
+  routed, so stereo needs RX1 too; (b) wcd934x prepares and enables its slim
+  stream from the DAI **trigger**, not `.prepare`, so the ADSP is told to start
+  the AFE SLIMbus port before the codec has defined or activated the channel it
+  is meant to drive. Ordering is now a first-class suspect.
+- **Next (one rebuild, one boot):** log the APR packet header (opcode, svc,
+  token) on rx so we know *which* command's response is the seventh, plus a
+  20 ms param-gated heartbeat to settle whether the apps CPU outlives the ADSP.
+- Tooling: nest `~/joan-images/staging/qmidbg21a/` — repack-qmidbg21{a,b}.sh,
+  boot-test-21{a,b}.sh, joan-audio-seq.sh, reboot-readback-21a.sh. Images
+  boot-joan-qmidbg21a.img (e1b27b83...) and 21b (46665c21...).
+- Rig gotchas added: the boot-test must wait for `sys.boot_completed` before
+  `dumpsys battery`; and if the phone is left in pmOS, reboot it to Android
+  before a new run (fastboot is only reachable from there).
+
+
 **2026-08-18 (Aurel, eighth shift) — PGD laddr discovered (0xc4); pipe connects clean; ADSP wedge persists ~0.2s after stream setup.**
 - Boots 20e r3/r4, 20f, 20g, 20h (evidence: docs/evidence/
   2026-08-18-persistent-log/boot-20e-to-20h-pgdla-and-qmi-gap.md).

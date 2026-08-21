@@ -1,0 +1,33 @@
+[  108.176936] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xce
+[  108.177053] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xce time_left=250
+[  108.177091] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xce
+[  108.177209] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xce time_left=250
+[  108.177240] JOAN-DBG: posting mc=0x60 mt=0x0 la=0xce
+[  108.177292] JOAN-DBG: posted mc=0x60 mt=0x0 la=0xce time_left=250
+[  108.177324] JOAN-DBG: posting mc=0x68 mt=0x0 la=0xce
+[  108.177381] JOAN-DBG: posted mc=0x68 mt=0x0 la=0xce time_left=250
+[  108.177426] JOAN-DBG: q6slim_hw_params dai id 2 rate 48000 fmt 2
+[  108.177519] JOAN-DBG: q6afe_dai_prepare dai id 2 started 0
+[  108.177552] JOAN-DBG: slim port 16384 cfg: dev 1 rate 48000 width 16 ch 1 fmt 0 map 144/0/0/0
+[  108.177729]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.177897] qcom_glink_rx_data: 5 callbacks suppressed
+[  108.177904]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 1 len 40)
+[  108.177993]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 1 reuse 1)
+[  108.178137]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.193314]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 2 len 40)
+[  108.193473]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 2 reuse 1)
+[  108.194016]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.194227]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 3 len 36)
+[  108.194274]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 3 reuse 1)
+[  108.194431]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.196286]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 4 len 40)
+[  108.196391]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 4 reuse 1)
+[  108.196583]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.199906]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 5 len 40)
+[  108.200129]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 5 reuse 1)
+[  108.200458]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.203390]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 6 len 40)
+[  108.203543]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 6 reuse 1)
+[  108.203750]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done received from remote (liid 30 reuse 1)
+[  108.203908]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' data rx (liid 7 len 40)
+[  108.203955]  17300000.remoteproc:glink-edge: JOAN-DBG: edge lpass channel 'apr_audio_svc' rx_done sent (liid 7 reuse 1)
