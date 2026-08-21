@@ -1,5 +1,52 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21 (Ember) — AUDIO CRASH FIXED. Root cause: q6asmdai had no `iommus`, so the DSP was given an unmapped physical address. PCM playback now runs end to end.**
+- Boots 21a/21b/22a/23a. Root-cause + fix evidence:
+  docs/evidence/2026-08-21-runtime-pm/boot-22a-23a-adsp-smmu-root-cause-and-fix.md
+- **THE FIX** (kernel `ab99261d5`): `q6asmdai { iommus = <&lpass_q6_smmu 1>; }`
+  in msm8998.dtsi + `&lpass_q6_smmu { status = "okay"; }` in the joan DTS.
+  `q6asm_dai_probe()` reads `iommus` to recover the audio SID and puts it in
+  bits [63:32] of the buffer address it hands the DSP (`q6asm-dai.c:452`).
+  Without it `sid = -1`, the buffer is allocated against a device attached to
+  no IOMMU, and the DSP gets a bare physical address. The mem-map command
+  still succeeds (the ADSP only records the address); the fault lands on the
+  first `ASM_DATA_CMD_WRITE_V2`, and a Q6 translation fault on msm8998 is a
+  silent SoC reset handled below the kernel. SID 1 is confirmed twice:
+  sdm845 `apps_smmu 0x1821` (& 0xF == 1) and downstream `msm-audio.dtsi:448`
+  `qcom,msm-audio-ion iommus = <&lpass_q6_smmu 1>`.
+- **Boot 23a result:** `aplay1 rc=0`, `aplay2 rc=0`, phone alive to the end.
+  156 `ASM_DATA_EVENT_WRITE_DONE_V2`, 2 `ASM_SESSION_CMD_RUN_V2`, six wall
+  seconds per five-second clip (real time, so the port clocks at 48 kHz),
+  clean `SHARED_MEM_UNMAP` + `ADM_CMD_DEVICE_CLOSE_V5` teardown. That also
+  retires the separate teardown-crash suspect open since 2026-08-17.
+- **NOT yet audible.** aplay fed /dev/zero. The analog path is still open:
+  the AFE port is configured for ONE channel (`ch 1 map 144/0/0/0`, only
+  `SLIM RX0 MUX` routed — stereo needs RX1); joan's DT has no
+  `audio-routing`; the codec logs many `ASoC: mux ... has no paths`
+  (RX INT0-7 MIX2 INP, CDC_IF TX9/10/11/13); and the codec chain
+  (RX INT0_1 MIX1 INP0 = RX0, RX INT0 DEM MUX = CLSH_DSM_OUT, SPK PA) has
+  never been set up. **Next lane is codec/DAPM, not SLIMbus or ADSP.**
+- How it was found: an `apr.apr_hb_ms` heartbeat (kernel `6fd85e81c`) showed
+  that the log "ending" at the seventh APR response was really 320 ms of
+  nothing printing while aplay filled its buffer — 18 heartbeats run through
+  that gap. `apr.apr_dbg` then named every command. Both default off.
+- Retired along the way, all with evidence: downstream SPS/BAM pipe setup
+  (rejected from source — downstream gates it on `wbuf[0] == dev->pgdla` and
+  our connects target the codec); `joan_pipe_bringup`; and the whole of
+  runtime PM (boots 21a/21b pinned the bus awake and it died identically).
+  None of them were ever in the data path.
+- **Rig: netconsole had never worked** — `netpoll: netconsole: usb0 doesn't
+  exist, aborting` at 3.05 s, the cmdline initcall runs long before the USB
+  gadget. Configure it via configfs after usb0 is up, with nest's live MAC
+  (randomised every boot), and positive-control it through `/dev/kmsg`
+  before spending a run. Recipe in the 21b evidence doc.
+- Also fixed in the rig: wait for `sys.boot_completed` before `dumpsys
+  battery`; if the phone is left in pmOS, reboot it to Android first
+  (fastboot is only reachable from there).
+- Tooling: nest `~/joan-images/staging/qmidbg2{1a,2a,3a}/`. Working image
+  **boot-joan-qmidbg23a.img** (sha256 14191725865477df01c56f21ce42f3590a7bfd13839ae5f41a32bcc751733d33).
+
+
 **2026-08-21 (Ember) — runtime PM RETIRED; SPS/BAM lead rejected from source; netconsole was dead all along and is now live.**
 - Boots 21a + 21b (evidence: docs/evidence/2026-08-21-runtime-pm/, analysis:
   docs/ember-2026-08-21-audio-runtime-pm-and-sps-deadend.md).

@@ -1,0 +1,342 @@
+[   36.136352] platform 17300000.remoteproc:glink-edge:apr:service@7:dais: Adding to iommu group 4
+[   60.018731] JOAN-APR tx opcode=0x100ef svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=84 ret=0
+[   60.019064] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   60.019080] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   60.019109] JOAN-APR tx opcode=0x100e5 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   60.034569] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   60.034616] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   60.035156] JOAN-APR tx opcode=0x10d92 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=40 ret=0
+[   60.035674] JOAN-APR rx opcode=0x10d93 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=36 -> dispatch
+[   60.035709] JOAN-APR rx opcode=0x10d93 token=0x100 dispatch returned
+[   60.035768] JOAN-APR tx opcode=0x10db3 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=36 ret=0
+[   60.037841] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   60.037863] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   60.038412] JOAN-APR tx opcode=0x10326 svc=8->8 dom=5->4 port=0x4000->0x4000 token=0x20000 size=48 ret=0
+[   60.041954] JOAN-APR rx opcode=0x10329 svc=8->8 mt=1 port=0x4000->0x4000 token=0x20000 size=40 -> dispatch
+[   60.041970] JOAN-APR rx opcode=0x10329 token=0x20000 dispatch returned
+[   60.042565] JOAN-APR tx opcode=0x10325 svc=8->8 dom=5->4 port=0x0->0x0 token=0x0 size=36 ret=0
+[   60.045772] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x0 token=0x0 size=40 -> dispatch
+[   60.045815] JOAN-APR rx opcode=0x110e8 token=0x0 dispatch returned
+[   60.045834] JOAN-APR tx opcode=0x10d98 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=44 ret=0
+[   60.046174] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   60.046195] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   60.330622] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   60.330710] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   60.330780] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   60.330829] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   60.330873] JOAN-APR tx opcode=0x10daa svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=32 ret=0
+[   60.332952] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   60.332979] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   60.434318] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   60.434342] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   60.564263] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   60.564339] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   60.564418] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   60.694385] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   60.694483] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   60.694565] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   60.824391] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   60.824430] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   60.824776] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   60.954333] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   60.954389] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   60.954499] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   61.084252] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   61.084392] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   61.084841] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   61.214246] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   61.214339] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   61.215042] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   61.344643] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   61.344994] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   61.345389] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   61.474303] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   61.474368] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   61.474934] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   61.604326] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   61.604374] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   61.605105] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   61.734567] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   61.734676] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   61.735406] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   61.864294] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   61.864356] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   61.864906] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   61.994287] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   61.994324] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   61.995069] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   62.124354] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   62.124463] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   62.125289] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   62.254253] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   62.254309] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   62.255239] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   62.384356] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   62.384413] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   62.384984] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   62.514233] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   62.514285] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   62.515212] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   62.644455] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   62.644491] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   62.644916] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   62.774270] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   62.774356] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   62.775287] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   62.904338] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   62.904377] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   62.905302] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   63.034681] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   63.034822] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   63.035593] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   63.164336] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   63.164384] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   63.165196] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   63.294541] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   63.294646] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   63.296047] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   63.424454] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   63.424499] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   63.425439] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   63.554361] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   63.554456] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   63.555092] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   63.684485] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   63.684667] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   63.684908] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   63.814266] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   63.814359] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   63.814551] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   63.944449] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   63.944490] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   63.944669] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   64.074294] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   64.074410] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   64.074694] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   64.204832] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   64.205000] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   64.205334] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   64.334584] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   64.334798] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   64.335051] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   64.464394] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   64.464459] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   64.464695] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   64.594545] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   64.594687] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   64.594872] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   64.724391] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   64.724452] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   64.724548] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   64.854723] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   64.854795] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   64.855031] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   64.984461] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   64.984499] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   64.984673] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   65.114476] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   65.114526] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   65.244498] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   65.244645] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   65.374806] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   65.375005] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   65.949105] JOAN-APR tx opcode=0x10bdb svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=20 ret=0
+[   65.949566] JOAN-APR tx opcode=0x100e6 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   65.957601] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   65.957669] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   65.957801] JOAN-APR tx opcode=0x10bcd svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=20 ret=0
+[   65.961881] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   65.962018] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   65.962106] JOAN-APR tx opcode=0x10d94 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=24 ret=0
+[   65.962742] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=40 -> dispatch
+[   65.962790] JOAN-APR rx opcode=0x110e8 token=0x100 dispatch returned
+[   65.962840] JOAN-APR tx opcode=0x10327 svc=8->8 dom=5->4 port=0x2->0x0 token=0x20000 size=20 ret=0
+[   65.966094] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x2 token=0x20000 size=40 -> dispatch
+[   65.966256] JOAN-APR rx opcode=0x110e8 token=0x20000 dispatch returned
+[   66.008417] JOAN-APR tx opcode=0x100ef svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=84 ret=0
+[   66.008859] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   66.008909] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   66.008976] JOAN-APR tx opcode=0x100e5 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   66.014660] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   66.014708] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   66.015113] JOAN-APR tx opcode=0x10d92 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=40 ret=0
+[   66.015571] JOAN-APR rx opcode=0x10d93 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=36 -> dispatch
+[   66.015607] JOAN-APR rx opcode=0x10d93 token=0x100 dispatch returned
+[   66.015654] JOAN-APR tx opcode=0x10db3 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=36 ret=0
+[   66.017652] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   66.017729] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   66.017798] JOAN-APR tx opcode=0x10326 svc=8->8 dom=5->4 port=0x4000->0x4000 token=0x20000 size=48 ret=0
+[   66.021313] JOAN-APR rx opcode=0x10329 svc=8->8 mt=1 port=0x4000->0x4000 token=0x20000 size=40 -> dispatch
+[   66.021348] JOAN-APR rx opcode=0x10329 token=0x20000 dispatch returned
+[   66.021408] JOAN-APR tx opcode=0x10325 svc=8->8 dom=5->4 port=0x0->0x0 token=0x0 size=36 ret=0
+[   66.024486] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x0 token=0x0 size=40 -> dispatch
+[   66.024515] JOAN-APR rx opcode=0x110e8 token=0x0 dispatch returned
+[   66.024574] JOAN-APR tx opcode=0x10d98 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=44 ret=0
+[   66.024925] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   66.024961] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   66.227040] JOAN-APR tx opcode=0x100e6 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   66.233148] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   66.233312] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   66.234118] JOAN-APR tx opcode=0x10bcd svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=20 ret=0
+[   66.236733] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   66.236774] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   66.237724] JOAN-APR tx opcode=0x10d94 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=24 ret=0
+[   66.238053] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=40 -> dispatch
+[   66.238086] JOAN-APR rx opcode=0x110e8 token=0x100 dispatch returned
+[   66.238629] JOAN-APR tx opcode=0x10327 svc=8->8 dom=5->4 port=0x2->0x0 token=0x20000 size=20 ret=0
+[   66.241302] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x2 token=0x20000 size=40 -> dispatch
+[   66.241333] JOAN-APR rx opcode=0x110e8 token=0x20000 dispatch returned
+[   71.209925] JOAN-APR tx opcode=0x100ef svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=84 ret=0
+[   71.210551] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   71.210625] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   71.210695] JOAN-APR tx opcode=0x100e5 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   71.216672] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   71.216782] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   71.217454] JOAN-APR tx opcode=0x10d92 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=40 ret=0
+[   71.217965] JOAN-APR rx opcode=0x10d93 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=36 -> dispatch
+[   71.218026] JOAN-APR rx opcode=0x10d93 token=0x100 dispatch returned
+[   71.218088] JOAN-APR tx opcode=0x10db3 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=36 ret=0
+[   71.220230] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   71.220272] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   71.220360] JOAN-APR tx opcode=0x10326 svc=8->8 dom=5->4 port=0x4000->0x4000 token=0x20000 size=48 ret=0
+[   71.224052] JOAN-APR rx opcode=0x10329 svc=8->8 mt=1 port=0x4000->0x4000 token=0x20000 size=40 -> dispatch
+[   71.224146] JOAN-APR rx opcode=0x10329 token=0x20000 dispatch returned
+[   71.224235] JOAN-APR tx opcode=0x10325 svc=8->8 dom=5->4 port=0x0->0x0 token=0x0 size=36 ret=0
+[   71.227564] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x0 token=0x0 size=40 -> dispatch
+[   71.227654] JOAN-APR rx opcode=0x110e8 token=0x0 dispatch returned
+[   71.227860] JOAN-APR tx opcode=0x10d98 svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=44 ret=0
+[   71.228209] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   71.228227] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   71.467165] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   71.467651] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   71.468053] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   71.468380] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   71.468807] JOAN-APR tx opcode=0x10daa svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=32 ret=0
+[   71.470464] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   71.470520] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   71.572431] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   71.572512] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   71.702293] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   71.702375] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   71.704630] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   71.832373] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   71.832464] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   71.833270] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   71.962406] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   71.962574] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   71.962679] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   72.092372] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   72.092460] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   72.092631] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   72.222276] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   72.222314] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   72.222762] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   72.352154] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   72.352191] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   72.352366] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   72.482243] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   72.482544] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   72.482817] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   72.612290] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   72.612364] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   72.612512] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   72.742251] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   72.742350] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   72.742655] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   72.872189] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   72.872286] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   72.872374] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   73.002410] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   73.002589] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   73.002799] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   73.132453] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   73.132482] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   73.132743] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   73.262746] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   73.262796] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   73.262961] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   73.392466] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   73.392508] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   73.392689] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   73.522525] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   73.522668] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   73.523440] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   73.652740] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   73.652815] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   73.653036] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   73.782299] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   73.782378] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   73.782886] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   73.912281] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   73.912332] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   73.912528] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   74.042227] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   74.042272] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   74.043168] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   74.172268] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   74.172353] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   74.173390] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   74.302697] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   74.302764] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   74.303812] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   74.432444] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   74.432569] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   74.432820] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   74.562676] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   74.562820] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   74.563435] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   74.692780] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   74.692917] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   74.693150] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   74.822635] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   74.822792] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   74.823002] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   74.952993] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   74.953147] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   74.953389] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   75.082463] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   75.082614] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   75.082818] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   75.212210] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   75.212246] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   75.212506] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   75.342482] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   75.342641] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   75.343227] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   75.472438] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   75.472489] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   75.472611] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   75.602359] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   75.602553] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   75.602727] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   75.732261] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   75.732306] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   75.732709] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800003 size=52 ret=0
+[   75.862396] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   75.862640] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   75.862812] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800000 size=52 ret=0
+[   75.992382] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   75.992445] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   75.992596] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800001 size=52 ret=0
+[   76.122551] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800003 size=48 -> dispatch
+[   76.122713] JOAN-APR rx opcode=0x10d99 token=0x61800003 dispatch returned
+[   76.122899] JOAN-APR tx opcode=0x10dab svc=7->7 dom=5->4 port=0x101->0x101 token=0x61800002 size=52 ret=0
+[   76.252390] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800000 size=48 -> dispatch
+[   76.252459] JOAN-APR rx opcode=0x10d99 token=0x61800000 dispatch returned
+[   76.382343] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800001 size=48 -> dispatch
+[   76.382409] JOAN-APR rx opcode=0x10d99 token=0x61800001 dispatch returned
+[   76.512465] JOAN-APR rx opcode=0x10d99 svc=7->7 mt=0 port=0x101->0x101 token=0x61800002 size=48 -> dispatch
+[   76.512551] JOAN-APR rx opcode=0x10d99 token=0x61800002 dispatch returned
+[   77.117167] JOAN-APR tx opcode=0x10bdb svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=20 ret=0
+[   77.117699] JOAN-APR tx opcode=0x100e6 svc=4->4 dom=5->4 port=0x0->0x0 token=0x2 size=24 ret=0
+[   77.127528] JOAN-APR rx opcode=0x110e8 svc=4->4 mt=1 port=0x0->0x0 token=0x2 size=40 -> dispatch
+[   77.127653] JOAN-APR rx opcode=0x110e8 token=0x2 dispatch returned
+[   77.127797] JOAN-APR tx opcode=0x10bcd svc=7->7 dom=5->4 port=0x101->0x101 token=0x1 size=20 ret=0
+[   77.131776] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x101->0x101 token=0x1 size=40 -> dispatch
+[   77.131898] JOAN-APR rx opcode=0x110e8 token=0x1 dispatch returned
+[   77.132011] JOAN-APR tx opcode=0x10d94 svc=7->7 dom=5->4 port=0x0->0x0 token=0x100 size=24 ret=0
+[   77.132453] JOAN-APR rx opcode=0x110e8 svc=7->7 mt=1 port=0x0->0x0 token=0x100 size=40 -> dispatch
+[   77.132533] JOAN-APR rx opcode=0x110e8 token=0x100 dispatch returned
+[   77.132622] JOAN-APR tx opcode=0x10327 svc=8->8 dom=5->4 port=0x2->0x0 token=0x20000 size=20 ret=0
+[   77.135355] JOAN-APR rx opcode=0x110e8 svc=8->8 mt=1 port=0x0->0x2 token=0x20000 size=40 -> dispatch
+[   77.135427] JOAN-APR rx opcode=0x110e8 token=0x20000 dispatch returned
