@@ -1,5 +1,35 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21f (Ember) — UCM profile written + validated; new pmOS package repo.**
+- **New repo (local, unpushed):** `~/vibe-coding-projects/coding/joan-pmos-packages`
+  — suggested name `lg-v30-pmos-packages` to match `lg-v30-port`. Subdirs:
+  `alsa-ucm-conf-lge-joan/` (new) and `firmware-lge-joan/` (COPIED; the
+  standalone repo is untouched — Lance plans to retire it).
+- **Why audio needs a UCM package:** kernel audio works, but PipeWire will not
+  expose a card with no UCM profile → pmOS Settings shows "dummy output" and
+  `wpctl status` lists ZERO audio devices.
+- **Profile validated with alsaucm on hardware:**
+  `0: Headphones — Headphone jack (ES9218P Quad DAC)`; enabling it sets
+  `QUAT_MI2S_RX Audio Mixer MultiMedia1 = on` and
+  `Headphone Playback Volume = 195` (~-30 dB; 255 = 0 dB is painfully loud).
+- **UCM GOTCHAS (cost real time):**
+  1. **Matching is on the card LONG NAME (`LG-V30`), not the id (`LGV30`).**
+     `alsaucm -c 0` and `-c LG-V30` work; `-c LGV30` always fails with -2.
+     I misread that as a broken profile; bisected by pointing our conf.d entry
+     at the SHIPPED db845c config — it failed identically, proving the lookup
+     not the content was at fault.
+  2. Shipped sdm845 profiles use **`Syntax 3`** and bare control names
+     (`PlaybackVolume "Headphone Playback Volume"`), not Syntax 6 / `name='...'`.
+  3. Layout: `conf.d/<card driver>/<long name>.conf` → `Qualcomm/<board>/HiFi.conf`.
+- **NOT yet proven end-to-end through PipeWire.** This rootfs is **Alpine/OpenRC
+  — there is no `systemctl`**, so every "restart wireplumber" I tried was a
+  silent no-op (PID never changed). Needs one boot with the package installed.
+- **BLOCKED ON A DECISION: `master` diverged.** 11 commits exist only on
+  `master` (6fc576542), 22 only on HEAD. Force-pushing HEAD there would discard
+  those 11, and HEAD carries the full debug stack (28 JOAN-* hooks) while master
+  is meant to be proven fixes. `joan/latest-clean-test` is current at 50ed1c09e.
+
+
 **2026-08-21e (Ember) — *** WORKING STEREO AUDIO ON JOAN *** through the ES9218P Quad DAC.**
 Kernel `ghfork/joan/latest-clean-test` `50ed1c09e`.
 - **Working chain:** aplay → q6asm → ADM → AFE **QUATERNARY** MI2S → gpio58/59/61
