@@ -21,7 +21,12 @@
   2. Shipped sdm845 profiles use **`Syntax 3`** and bare control names
      (`PlaybackVolume "Headphone Playback Volume"`), not Syntax 6 / `name='...'`.
   3. Layout: `conf.d/<card driver>/<long name>.conf` → `Qualcomm/<board>/HiFi.conf`.
-- **NOT yet proven end-to-end through PipeWire.** This rootfs is **Alpine/OpenRC
+- **CONFIRMED WORKING END-TO-END:** the sink shows in pmOS Settings and its
+  built-in audio test plays. My earlier "not working" call was a measurement
+  error — `wpctl` over plain ssh is not attached to the phosh session's
+  PipeWire, so it reported zero devices. Read the session bus from
+  `/proc/$(pgrep -x wireplumber)/environ` before trusting any session query.
+- (superseded) previously recorded as unproven through PipeWire: This rootfs is **Alpine/OpenRC
   — there is no `systemctl`**, so every "restart wireplumber" I tried was a
   silent no-op (PID never changed). Needs one boot with the package installed.
 - **BLOCKED ON A DECISION: `master` diverged.** 11 commits exist only on
