@@ -1,5 +1,46 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21c (Ember) — ES9218P Quad DAC ALIVE and fully configured; DPLL sees NO input clock. That is the whole remaining problem.**
+Kernel `ghfork/joan/latest-clean-test` `d21c5513f`.
+- **DAC probes on real silicon:** `es9218p 0-0048: ES9218P chip id 0xd0` — the exact
+  value LG's driver checks for (`es9218p.c:2758`). Our reverse-engineered driver's
+  regmap, I2C addressing and power sequencing are correct.
+- **LG's init + analog amplifier power-up are ported** (`d21c5513f`) and verified
+  **byte-exact against LG's own inline comments**, read off the chip during playback:
+  `ANALOG_OVERRIDE 0x7c`, `CP_OVERRIDE 0x78`, `AMP_CONFIG 0x02` (HiFi1),
+  `DIGITAL_OVERRIDE 0x03`, `HPA_CTRL 0x47` (ENHPA_OUT set), analog volume restored —
+  and torn back down between streams by the DAPM event.
+- **STILL SILENT, and the cause is now located:** with a tone playing,
+  **`DPLL_NUMBER` (0x42-0x45) reads 0x00000000**. The DAC's DPLL has nothing to lock
+  to — it sees **no input clock**. Everything downstream of the clock (amp, registers,
+  volume, routing) is therefore exonerated; do not re-audit it.
+- **SoC side looks correct on paper:** `q6afe_dai_prepare dai id 20`,
+  `AFE_PORT_CMD_DEVICE_START` (token 0x14) issued **and acked**; pins report
+  `device sound function ter_mi2s` on gpio75/76/78; `TERT_MI2S_RX Audio Mixer
+  MultiMedia1` routes. But an ADSP ack means the command was accepted, **not** that
+  LPASS is physically toggling the pins.
+- **MCLK is probably NOT the issue:** LG's es9218p.c never calls `clk_get`/
+  `clk_prepare`, and joan's DAC node has no `clocks` property — so the part almost
+  certainly has a dedicated on-board oscillator. Worth confirming, but it means the
+  suspect is the I2S clock/data from LPASS, not a missing MCLK.
+- **NEXT: prove whether BCLK/WS are actually toggling on gpio75/76.** Options, cheapest
+  first: (a) check LPASS/q6afe clock state and whether
+  `Q6AFE_LPASS_CLK_ID_TER_MI2S_IBIT` really enables — the machine driver ignores
+  `snd_soc_dai_set_sysclk`'s return; (b) compare the AFE MI2S port config payload
+  against downstream's; (c) scope gpio75/76 if hardware access is easy.
+  Also verify `qcom,sd-lines = <1>` is the right encoding for SD1 in mainline q6afe
+  (downstream expresses it as a bitmask, `rx-lines = 2`).
+- Tooling: nest `~/joan-images/staging/qmidbg29a/`. Image
+  boot-joan-qmidbg29a.img (c2aa0603..., size **30003200** — the kernel grew, so pass
+  the size explicitly to boot scripts).
+- **Rig trap hit three times this session:** `pkill -f <pattern>` inside a
+  `sudo sh -c '...'` whose own command line contains that pattern kills its own shell.
+  Use a bracket pattern (`"joan-liste[n]"`) or drop the pkill.
+- **Read DAPM state and DAC registers only WHILE A TONE IS PLAYING.** Sampling between
+  plays shows the power-down state and looks exactly like a failed sequence — that
+  cost a wrong diagnosis this session before the second read corrected it.
+
+
 **2026-08-21b (Ember) — codec DAPM lane opened. Chain proven ON end to end; still not audible; topology question is the blocker.**
 Handoff: `docs/ember-handoff-2026-08-21-audio-crash-fixed-dapm-open.md`.
 Kernel `ghfork/joan/latest-clean-test` `2fac70c23`.
