@@ -1,5 +1,39 @@
 # LG V30 (joan) — next session start here
 
+**2026-08-21d (Ember) — AFE I2S payload diffed against downstream: composition logic is CORRECT by inspection. Runtime capture still owed.**
+Kernel `58d3cb4eb`.
+- **`set_sysclk` is NOT silently failing.** Added error logging (`2ff3b6eec`);
+  `snd_soc_dai_set_sysclk(TER_MI2S_IBIT, 1536000)` and both `set_fmt` calls all
+  return **0**, and the ADSP acks `AFE_SVC_CMD_SET_PARAM` (0x100f3) and
+  `AFE_PORT_CMD_DEVICE_START` (0x100e5). That theory is dead.
+- **Payload diff, by source inspection — every field checks out:**
+  - `ws_src`: derived from the DAI fmt at `q6afe.c:1526`. `SND_SOC_DAIFMT_BP_FP`
+    → `WS_SRC_INTERNAL` (LPASS drives the clocks). The machine driver passes
+    `BP_FP` for the cpu_dai, so this is right. **This was the prime suspect —
+    EXTERNAL would have explained the dead clock exactly — and it is not it.**
+  - `sd_line_mask`: `qcom,sd-lines = <1>` → `priv->sd_line_mask |= BIT(1)` →
+    `AFE_PORT_I2S_SD1`. Correct for joan (downstream `rx-lines = 2`, same line).
+  - `q6i2s_ops` (which carries `set_fmt`/`set_sysclk`) IS assigned to tertiary:
+    `q6dsp-lpass-ports.c:713`, range `PRIMARY_MI2S_RX ... QUATERNARY_MI2S_TX`.
+  - prepare dispatch covers tertiary too (`q6afe-dai.c:417`), calling
+    `q6afe_i2s_port_prepare()`.
+- **STILL OWED: the runtime values.** `58d3cb4eb` adds a `JOAN-I2S` dump of the
+  composed payload, but it never fired in the sampling windows I tried —
+  `q6afe_i2s_port_prepare()` was not entered during my manual plays, most likely
+  because the detached tone loop already had the BE up and a second FE open
+  reuses it rather than re-preparing. **Next session: boot, do ONE aplay with no
+  loop running, and read the `JOAN-I2S` line.** That gives the actual
+  ws_src/channel_mode/rate on the wire.
+- Unchanged from 2026-08-21c: the DAC is alive (chip id 0xd0), LG's init and the
+  analog amp power-up are ported and byte-exact, and `DPLL_NUMBER` reads
+  **0x00000000** while playing — the DAC sees no input clock. Everything from
+  the routing through to the amplifier is exonerated.
+- Remaining candidates, now that the payload logic is cleared: LPASS not
+  physically driving the pads despite the ack; an msm8998-specific LPASS clock
+  root/gating difference; or a hardware-level check (scope gpio75/76) to settle
+  whether BCLK/WS toggle at all.
+
+
 **2026-08-21c (Ember) — ES9218P Quad DAC ALIVE and fully configured; DPLL sees NO input clock. That is the whole remaining problem.**
 Kernel `ghfork/joan/latest-clean-test` `d21c5513f`.
 - **DAC probes on real silicon:** `es9218p 0-0048: ES9218P chip id 0xd0` — the exact
