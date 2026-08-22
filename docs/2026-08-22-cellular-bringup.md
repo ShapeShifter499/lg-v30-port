@@ -1,0 +1,150 @@
+# joan — cellular bring-up: LTE registration working (2026-08-22)
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
+Date: 2026-08-22
+
+## Headline
+
+**The LG V30 registers on LTE under mainline + pmOS.** T-Mobile, 310/260,
+-57 dBm, CS and PS both attached, and a data bearer establishes with a real
+routable IPv6 address.
+
+Not yet working: data packets do not actually flow through QMAP/IPA, and voice
+needs VoLTE, which is not up.
+
+## The blocker was one missing firmware file
+
+The modem booted and then died:
+
+```
+qcom-q6v5-mss 4080000.remoteproc: fatal error received:
+    ipa_util.c:1094:IPA Assert: ipa_util.imm_cmd.clients[cmd_handle].init_done ==
+remoteproc remoteproc0: crash detected in 4080000.remoteproc: type fatal error
+```
+
+The modem asserts inside its own IPA client init.  The cause is on the
+**apps** side:
+
+```
+ipa 1e40000.ipa: Direct firmware load for ipa_fws.mdt failed with error -2
+ipa 1e40000.ipa: probe with driver ipa failed with error -2
+```
+
+`ipa_fws.mdt` was missing, so the AP's IPA driver never probed, so the modem's
+handshake with it asserted.  The firmware is on the device itself, in the same
+place the modem firmware came from:
+
+```sh
+mount -o ro /dev/disk/by-partlabel/modem /mnt/modemfw
+cp /mnt/modemfw/image/ipa_fws.* /lib/firmware/
+```
+
+(It is also at `/system/etc/firmware/ipa_fws.*` on the Android system
+partition.)
+
+**It must be in the initramfs, not just on the rootfs.**  IPA probes at
+~1.4 s, long before the SD-card rootfs is mounted, so a copy in
+`/lib/firmware` on the rootfs is found too late and the probe still fails.
+Adding it to the initramfs (`lib/firmware/` in the ramdisk, alongside the
+crnv21.bin already there) gives:
+
+```
+[1.375147] ipa 1e40000.ipa: IPA driver initialized
+[1.718836] ipa 1e40000.ipa: IPA driver setup completed successfully
+```
+
+and **zero IPA asserts** thereafter.  Rebinding the driver by hand after boot
+also works for registration, but leaves `unexpected init_completed response`
+and an incomplete handshake — do it properly via the initramfs.
+
+## Kernel config change required
+
+`CONFIG_RMNET=m` -> **`CONFIG_RMNET=y`**.  This kernel has no modules installed
+on the rootfs, so anything built `=m` simply does not exist.  With RMNET built
+in, `rmnet_ipa0` appears and ModemManager can create `qmapmux0.0`.
+
+(`CONFIG_WWAN` stays `=m`; it is only selected by module-only MHI options and
+is not needed — QMI is spoken over QRTR sockets directly.)
+
+## Bring-up sequence that works
+
+Order matters: IPA must be up before the modem starts.
+
+```sh
+# 1. IPA firmware must already be in the initramfs (see above)
+# 2. modem
+echo start > /sys/class/remoteproc/remoteproc0/state
+# 3. support daemons
+LD_LIBRARY_PATH=/tmp/bin /tmp/bin/tqftpserv &     # from nest joanfw.tgz
+rmtfs -r -P -s &
+# 4. radio on - it comes up in 'shutting-down' otherwise
+qmicli -d qrtr://0 --dms-set-operating-mode=online
+# 5. ModemManager
+ModemManager &
+mmcli -m 0 --simple-connect="apn=fast.t-mobile.com,ip-type=ipv4v6"
+```
+
+Give the modem ~25 s after start: the core telephony QMI services (WDS 1,
+NAS 3, WMS 5, UIM 11) register noticeably later than the first batch.  An
+early `qrtr-lookup` showing only services like 15/21/22/23 is not a failure,
+just impatience.  **`pd-mapper` was not needed.**
+
+## Verified state
+
+| | |
+|---|---|
+| SIM | `Card state: present`, `Application state: ready`, PIN1 disabled |
+| IMEI | read via `--dms-get-ids` |
+| Registration | `registered`, CS `attached`, PS `attached`, `3gpp`, `lte` |
+| Operator | T-Mobile, MCC 310 MNC 260 |
+| Signal | -57 dBm (91%) |
+| ModemManager | finds the modem, `Voice | emergency only: no` |
+| Data bearer | connects, APN fast.t-mobile.com, real IPv6 /64 + gateway |
+
+Tools installed on the phone (Alpine community): `libgpiod`, `qrtr`,
+`qrtr-libs`, `qmi-utils`.
+
+## Open: data packets do not flow
+
+The bearer connects and hands out a valid address, but nothing traverses it:
+`qmapmux0.0` counts tx packets and **zero** rx, and the bearer's own byte
+counters stay frozen at their post-connect values.  No kernel errors, no IPA
+debugfs, and `--wda-get-data-format` returns `InvalidArgument`.
+
+IPv6 note: the address comes up `tentative` because DAD does not complete on
+this link.  Disable it *before* adding the address —
+`echo 0 > /proc/sys/net/ipv6/conf/qmapmux0.0/accept_dad` — busybox `ip` has no
+`nodad`.  That gets the address to `global` but does not by itself fix the
+data path.
+
+Next places to look: QMAP mux id / aggregation agreement between the apps
+rmnet and the modem, and whether the modem's IPA endpoints are actually
+configured.
+
+## Open: voice needs VoLTE
+
+A call attempt is refused by the modem:
+
+```
+QMI protocol error (90): 'IncompatibleState'   -> call state: terminated
+```
+
+That is the modem declining a circuit-switched call.  **T-Mobile US has retired
+2G/3G**, so there is no CS fallback: voice on this SIM requires VoLTE, i.e. IMS.
+
+The good news is the modem does expose IMS: `qrtr-lookup` lists proprietary
+services **700-707 and 800** (IMS presence / video telephony / application /
+settings), so the IMS stack is present in the firmware.  Bringing VoLTE up
+means establishing the IMS PDN and driving IMS registration over those
+services — libqmi does not implement them, so this is reverse-engineering
+work, which Lance has approved.
+
+Note also that call audio is a separate problem: joan's earpiece does not
+work (see `2026-08-22-tfa9872-fix-and-slimbus-playback.md`), so even a
+connected call would need loudspeaker or headphones.
+
+## mmcli gotcha
+
+Calls are selected with `-o` / `--call=`, not `-c`.  Passing a call object
+path to `-c` prints "no call was specified" and then **segfaults**.

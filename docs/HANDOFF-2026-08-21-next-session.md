@@ -56,7 +56,12 @@ a neighbouring DT node. Getting that backwards cost about four boots.
    PipeWire exposes it alongside the headphone device.
 3. **TFA firmware container** from the device's own partition, for protection +
    real loudness (see below).
-4. Then: tethering, cameras, USB-C.
+4. **Cellular**: LTE registration WORKS as of 2026-08-22 — see
+   `2026-08-22-cellular-bringup.md`.  The blocker was a missing `ipa_fws.mdt`
+   (from the device's own modem partition) which must live in the INITRAMFS,
+   plus `CONFIG_RMNET=y`.  Still open there: data packets do not flow through
+   QMAP/IPA, and voice needs VoLTE/IMS (T-Mobile has no CS fallback).
+5. Then: tethering, cameras, USB-C.
 
 ## Recipes that work (do not re-derive)
 
