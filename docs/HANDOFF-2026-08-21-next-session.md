@@ -20,7 +20,7 @@ TFA9872 register map, and the traps.  That document also supersedes the
 
 | what | where |
 |---|---|
-| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `c2a302cea` |
+| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `f3cbcaa87` |
 | port docs | `ShapeShifter499/lg-v30-port` — `abd7a21` |
 | pmOS packages | `ShapeShifter499/lg-v30-joan-pmos-packages` (public) — UCM profile + firmware |
 | working image | nest `~/joan-images/boot-joan-qmidbg35a.img` |
@@ -37,7 +37,7 @@ CROSS_COMPILE="ccache aarch64-linux-gnu-" -j12 Image.gz dtbs`, then
 q6 DSP --QUATERNARY MI2S--> ES9218P  --> headphone jack     (works)
 q6 DSP --TERTIARY   MI2S--> TFA9872  --> loudspeaker        (WORKS)
 q6 DSP --SLIMbus--> WCD9340 --> HPHL/HPHR --> headphone jack (WORKS)
-q6 DSP --SLIMbus--> WCD9340 --> EAR       --> earpiece       (silent, open)
+q6 DSP --SLIMbus--> WCD9340 --> EAR/LINEOUT --> jack too (NOT the earpiece)
 ```
 
 **Find a codec's port from the dai-link that NAMES it**, never by inferring from
@@ -115,9 +115,11 @@ the card registers. Do it within `deferred_probe_timeout=300` of boot.
 
 ## Open / unproven
 
-- Earpiece silent: EAR PA enables in hardware and the DAPM chain powers, but
-  nothing comes out, while HPHL/HPHR on the same codec/bus/stream are audible.
-  Board-level question now — see the 2026-08-22 doc.
+- Earpiece: NOT driven by the WCD9340.  Every analog output (EAR, HPHL/HPHR,
+  LINEOUT1) was driven alone with the others confirmed off by register readback;
+  all are audible only at the headphone jack and silent with nothing inserted.
+  Do not re-run the mixer permutations — see the 2026-08-22 doc for the table.
+  Open question is hardware: what the earpiece is physically connected to.
 - TFA runs with no speaker protection: the part has no DSP, and SpeakerBoost for
   Probus parts runs as a module in the Qualcomm ADSP firmware
   (`AFE_MODULE_ID_TFADSP 0x1000B910`, param `0x1000B921`, on the tertiary MI2S

@@ -113,14 +113,40 @@ With that applied (minus `CDC_IF RX0 MUX`, which mainline wires statically):
 - **And it is silent**, while HPHL/HPHR on the same codec, bus and stream are
   audible.
 
-So the codec, SLIMbus and DSP are all exonerated. What remains is the EAR pin
-itself or what it drives on this board. Note `RX INT0 DEM MUX` must be
-`CLSH_DSM_OUT`: `NORMAL_DSM_OUT` has no route defined at all in
+So the codec, SLIMbus and DSP are all exonerated. Note `RX INT0 DEM MUX` must
+be `CLSH_DSM_OUT`: `NORMAL_DSM_OUT` has no route defined at all in
 `wcd934x.c:5649` and silently breaks the chain.
 
-Board-level things not yet checked: the `hph-sw` analog switch
-(`pm8998_gpios 12`, held low by `es9218p`, never changed) and whether any other
-switch gates the receiver.
+### Negative result: every WCD analog output goes to the jack, none to the earpiece
+
+Each output was driven on its own, with the other output stages confirmed **off
+by register readback**, not just by DAPM:
+
+| output | register state during test | headphones IN | headphones OUT |
+|---|---|---|---|
+| `EAR PA` | `ANA_EAR` 0x60a = `0x80`, `ANA_HPH` = `0x00` | headphones | silent |
+| `EAR PA`, analog switch flipped | same, `hph-sw` asserted | headphones | — |
+| `HPHL`/`HPHR` | `ANA_HPH` 0x609 = `0xf0`, `ANA_EAR` = `0x00` | headphones | silent |
+| `LINEOUT1` | `ANA_LO_1_2` 0x60b = `0xbc`, HPH+EAR off | headphones | silent |
+
+So all three analog outputs are audible **only** through the headphone jack and
+silent with nothing inserted; the jack's switched contacts do not reroute to the
+earpiece either.  **joan's earpiece is not driven by the WCD9340.**
+
+This holds despite the vendor's own `handset` path terminating at `EAR PA`, so
+that path alone is not sufficient evidence of what the pin reaches on this
+board.
+
+The `hph-sw` analog switch (`pm8998_gpios 12`, `GPIO_ACTIVE_HIGH`, requested
+`GPIOD_OUT_LOW` and never asserted) was exposed as an ALSA control
+(`Headphone Analog Switch`) to test it.  Flipping it made **no audible
+difference** to any WCD output, so its documented role — "routes the jack
+between the WCD9340's own output and this DAC" — is not what it does here, or
+not all it does.  Its actual function is uncharacterised.
+
+**Do not re-run the mixer permutations.**  The open question is hardware: what
+joan's earpiece is physically connected to.  That wants a schematic, a teardown,
+or the Android HAL's device-to-backend mapping — not more ALSA settings.
 
 ## Rig notes (additions)
 
