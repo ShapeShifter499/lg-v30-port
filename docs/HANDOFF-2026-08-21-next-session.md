@@ -7,14 +7,20 @@ Date: 2026-08-21
 ## One-line state
 
 **Audio works** (stereo, headphones, through the ES9218P Quad DAC), **Wi-Fi
-works**, **Bluetooth reaches hci0**, and the **speaker amplifier probes but has
-never been listened to**.
+works**, **Bluetooth reaches hci0**, the **loudspeaker plays** (TFA9872 fixed
+2026-08-22), and **SLIMbus playback works** (WCD9340 HPHL/HPHR audible at the
+jack).  The **earpiece is still silent** and is the open audio item.
+
+See `2026-08-22-tfa9872-fix-and-slimbus-playback.md` for both fixes, the
+TFA9872 register map, and the traps.  That document also supersedes the
+"sound does not play over SLIMbus / silent SoC reset" conclusion in
+`aurel-handoff-2026-08-18-audio.md`, which no longer reproduces.
 
 ## Where everything is
 
 | what | where |
 |---|---|
-| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `0c0124a30` |
+| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `c2a302cea` |
 | port docs | `ShapeShifter499/lg-v30-port` — `abd7a21` |
 | pmOS packages | `ShapeShifter499/lg-v30-joan-pmos-packages` (public) — UCM profile + firmware |
 | working image | nest `~/joan-images/boot-joan-qmidbg35a.img` |
@@ -28,9 +34,10 @@ CROSS_COMPILE="ccache aarch64-linux-gnu-" -j12 Image.gz dtbs`, then
 ## The port map — settle this before touching audio
 
 ```
-q6 DSP --SLIMbus--> WCD9340  --analog--> NOT CONNECTED on this board
 q6 DSP --QUATERNARY MI2S--> ES9218P  --> headphone jack     (works)
-q6 DSP --TERTIARY   MI2S--> TFA9872  --> loudspeaker        (probes, unheard)
+q6 DSP --TERTIARY   MI2S--> TFA9872  --> loudspeaker        (WORKS)
+q6 DSP --SLIMbus--> WCD9340 --> HPHL/HPHR --> headphone jack (WORKS)
+q6 DSP --SLIMbus--> WCD9340 --> EAR       --> earpiece       (silent, open)
 ```
 
 **Find a codec's port from the dai-link that NAMES it**, never by inferring from
@@ -38,11 +45,13 @@ a neighbouring DT node. Getting that backwards cost about four boots.
 
 ## Next actions, in order
 
-1. **Listen to the speaker.** Software path is complete: route
-   `TERT_MI2S_RX Audio Mixer MultiMedia1` on, `Amp Input` is the amp's CHSA
-   control. **Keep the gain low** — the CoolFlux DSP is bypassed, so there is no
-   excursion or thermal protection and it is physically possible to damage the
-   speaker.
+1. **DONE (2026-08-22): the speaker plays.**  Route
+   `TERT_MI2S_RX Audio Mixer MultiMedia1` on and play; the driver now brings the
+   amplifier up by itself.  **Keep the gain low** — the TFA9872 has no CoolFlux
+   DSP at all (it is a Probus part), so there is no excursion or thermal
+   protection and it is physically possible to damage the speaker.  There is
+   also no amplifier gain control yet; level must come from the source until
+   `TDMSPKG` is exposed as an ALSA control.
 2. **UCM `SectionDevice` for the speaker** in `lg-v30-joan-pmos-packages`, so
    PipeWire exposes it alongside the headphone device.
 3. **TFA firmware container** from the device's own partition, for protection +
@@ -106,8 +115,15 @@ the card registers. Do it within `deferred_probe_timeout=300` of boot.
 
 ## Open / unproven
 
-- Speaker never heard.
-- TFA runs with its DSP bypassed — no protection, reduced loudness.
+- Earpiece silent: EAR PA enables in hardware and the DAPM chain powers, but
+  nothing comes out, while HPHL/HPHR on the same codec/bus/stream are audible.
+  Board-level question now — see the 2026-08-22 doc.
+- TFA runs with no speaker protection: the part has no DSP, and SpeakerBoost for
+  Probus parts runs as a module in the Qualcomm ADSP firmware
+  (`AFE_MODULE_ID_TFADSP 0x1000B910`, param `0x1000B921`, on the tertiary MI2S
+  port).  Reverse-engineerable: container format is defined in the vendor
+  headers we have, the blob is on the device, and the algorithm is likely
+  already inside the ADSP image we load.  Needs new q6afe plumbing.
 - Wi-Fi MAC: `invalid MAC address; choosing random` (not read from NV).
 - One vendor TFA register write is intentionally dropped; see the driver comment.
 - Wi-Fi/BT/modem bring-up is all manual — nothing starts at boot.
