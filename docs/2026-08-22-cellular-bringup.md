@@ -414,6 +414,37 @@ the transmit queue is stopped early in boot and the only external
 not recovered in practice.  And the underlying reason transactions never
 complete - the frozen GSI interrupt count - is untouched by this fix.
 
+### The hardware failure, finally with an error code
+
+With the deadlock gone, `ip link set rmnet_ipa0 down` **succeeds** where it
+previously hung three times out of three.  Bringing it back up then fails, and
+the log names the defect exactly:
+
+```
+ipa 1e40000.ipa: GSI command 2 for channel 5 timed out, state 4
+ipa 1e40000.ipa: channel 5 global error ee 0x00000000 code 0x00000002
+    (repeated - this is gsi_channel_stop_retry() exhausting its retries)
+ipa 1e40000.ipa: error -11 attempting to stop endpoint 3
+Internal error: Oops - BUG
+```
+
+So the GSI **CH_STOP command (command 2) times out** on channel 5, which is
+sitting in state 4, and the hardware raises global error code `0x2`.  After the
+retries are exhausted the driver returns `-EAGAIN` and then oopses on the
+failure path - a second bug worth fixing on its own, since a failed stop should
+not take the kernel down.
+
+This is the concrete defect to chase, and it is a much better starting point
+than "completions never arrive":
+
+1. Decode GSI global error code `0x2` and channel state `4`
+   (`GSI_CHANNEL_STATE_STOP_IN_PROC`) against the downstream driver's error
+   enums in `drivers/platform/msm/gsi/`.
+2. Compare downstream's stop sequence for this state - it may require a channel
+   reset, or a different command ordering, that mainline does not perform.
+3. Fix the oops on the `-EAGAIN` path independently: `ipa_endpoint_disable_one()`
+   should handle a failed stop rather than crash.
+
 Useful facts for that work:
 
 - The IPA<->modem QMI handshake *does* complete: dmesg shows `received modem
