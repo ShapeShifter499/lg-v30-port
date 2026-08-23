@@ -1,0 +1,63 @@
+diff --git a/sound/soc/qcom/qdsp6/q6voice.c b/sound/soc/qcom/qdsp6/q6voice.c
+index b9078d7c5..a8bd8110f 100644
+--- a/sound/soc/qcom/qdsp6/q6voice.c
++++ b/sound/soc/qcom/qdsp6/q6voice.c
+@@ -13,10 +13,10 @@
+  * For VoLTE the modem's IMS stack terminates RTP and the ADSP vocodes, so the
+  * AP never touches media; it only has to build the session and route PCM.
+  *
+- * This first step registers the three services and creates an MVM session, to
+- * establish that mainline's APR bus can reach CVD at all.  Sessions are named
+- * with an ASCII string rather than a numeric VSID - "11C05000" is
+- * VOICEMMODE1, the multimode session stock uses for VoLTE.
++ * Sessions are addressed by an ASCII name, not by their numeric VSID: the
++ * multimode session stock uses for VoLTE is named "VoiceMMode1" (its VSID,
++ * 0x11C05000, is what the modem matches internally and is never sent here).
++ * Only MVM and CVS sessions are named; vocprocs are not.
+  *
+  * Copyright (c) 2026 Lance <Gero3977@gmail.com>
+  */
+@@ -61,7 +61,7 @@
+ #define VSS_ICOMMON_CAL_NETWORK_ID_NONE			0x0001135E
+ 
+ #define SESSION_NAME_LEN		20
+-#define VOICEMMODE1_NAME		"11C05000"
++#define VOICEMMODE1_NAME		"VoiceMMode1"
+ #define Q6VOICE_TIMEOUT_MS		5000
+ 
+ struct vss_imvm_cmd_create_control_session {
+@@ -82,7 +82,6 @@ struct vss_ivocproc_cmd_create_full_control_session_v2 {
+ 	u32 profile_id;
+ 	u32 vocproc_mode;
+ 	u16 ec_ref_port_id;
+-	char name[SESSION_NAME_LEN];
+ } __packed;
+ 
+ /* One APR service endpoint (MVM, CVS or CVP). */
+@@ -273,7 +272,7 @@ static int q6voice_attach(struct q6voice_svc *svc, u32 opcode, u16 dest,
+  * ADSP will happily create a vocproc with no ports but refuses to enable one,
+  * so the ports have to be real even before any audio flows through them.
+  */
+-static int q6voice_create_vocproc(const char *name)
++static int q6voice_create_vocproc(void)
+ {
+ 	struct vss_ivocproc_cmd_create_full_control_session_v2 cvp = {
+ 		.direction	= VSS_IVOCPROC_DIRECTION_RX_TX,
+@@ -287,8 +286,6 @@ static int q6voice_create_vocproc(const char *name)
+ 	};
+ 	int ret;
+ 
+-	strscpy(cvp.name, name, sizeof(cvp.name));
+-
+ 	ret = q6voice_cmd(&q6voice_cvp,
+ 			  VSS_IVOCPROC_CMD_CREATE_FULL_CONTROL_SESSION_V2, 0,
+ 			  &cvp, sizeof(cvp));
+@@ -329,7 +326,7 @@ static int q6voice_build_session(const char *name)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = q6voice_create_vocproc(name);
++	ret = q6voice_create_vocproc();
+ 	if (ret)
+ 		return ret;
+ 
