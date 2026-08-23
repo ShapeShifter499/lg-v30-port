@@ -159,9 +159,47 @@ calls `netif_stop_queue()` unconditionally on entry and only re-wakes it when
 power is ACTIVE).
 
 Trying to reset that queue revealed the deeper problem: **`ip link set
-rmnet_ipa0 down` hangs too.**  So the endpoint teardown path wedges in the same
-way as suspend, which points at GSI channel / endpoint handling for IPA v3.1
-rather than at the power code.  That is where the next session should dig.
+rmnet_ipa0 down` hangs too.**  Worse, it hangs *holding the RTNL lock*, so every
+later netlink call blocks behind it and the box needs a reboot.  Do not run it.
+
+### Narrowed further: GSI transfers never complete
+
+Ruled out, each on hardware:
+
+- Not the parent being down: `rmnet_ipa0` is `<UP,LOWER_UP>` and `ipa_open()`
+  (which calls `netif_start_queue()`) has run.
+- Not uplink aggregation: forcing `egress_agg_params.count` to 1 in
+  `rmnet_map_update_ul_agg_config()` changed nothing.  (The driver default is
+  already 1; userspace raises it.)  Patch reverted.
+- Not rmnet dropping: the child (`qmapmux0.0`) counts every packet as
+  transmitted with `tx_dropped 0`, so rmnet reaches `dev_queue_xmit()`.
+
+What is left, and what the counters say:
+
+```
+qmapmux0.0   tx 19    tx_dropped 0     rmnet hands them to the parent
+rmnet_ipa0   tx  3    tx_dropped 7     frozen from early boot
+GSI irq                          15    frozen
+bearer bytes tx                  48    frozen
+```
+
+Three packets went out early and **their completions never came back** - the
+GSI interrupt count does not move.  With no completions the TX ring never
+drains, `ipa_endpoint_skb_tx()` then fails, and `ipa_start_xmit()` returns
+`NETDEV_TX_BUSY`, which requeues without touching any netdev counter.  That is
+exactly the observed signature, and it also explains why both
+`ipa_runtime_suspend()` and `ipa_stop()` hang: each waits on endpoint/GSI
+state that never settles.
+
+So the real defect is that **GSI transfers do not complete on IPA v3.1**.  The
+runtime-PM workaround in `2631e1503` is still worth having (it removes the
+RPM_SUSPENDING deadlock and lets the box boot and stay usable), but it does not
+address this.
+
+Next session should start at the GSI layer: event ring configuration and
+doorbell handling for this IPA version, and whether the modem's TX endpoint is
+actually being told about the ring.  Downstream `drivers/platform/msm/ipa/ipa_v3`
+is the reference to diff against.
 
 Useful facts for that work:
 
