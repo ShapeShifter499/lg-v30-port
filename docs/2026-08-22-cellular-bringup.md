@@ -382,6 +382,38 @@ about `gsi_trans_free()` on that path before trusting it.
 So the remaining work needs live register state (channel and event ring
 context, IEOB mask readback, doorbell values), not more source reading.
 
+### A real bug found and fixed: quiesce before the version check
+
+`__gsi_channel_stop()` waited for outstanding transactions *before* checking
+whether it had anything to do:
+
+```c
+gsi_channel_trans_quiesce(channel);           /* unbounded wait */
+
+/* Prior to IPA v4.0 suspend/resume is not implemented by GSI */
+if (suspend && gsi->version < IPA_VERSION_4_0)
+        return 0;                             /* ...a no-op, too late */
+```
+
+On IPA v3.1 the suspend is a no-op, but the unbounded quiesce ran anyway - so
+`ipa_runtime_suspend()` blocked forever on hardware that had stopped delivering
+completions, leaving the device in `RPM_SUSPENDING`.  Everything else followed:
+`pm_runtime_get()` failures in `ipa_start_xmit()`, dropped uplink packets, a
+blocking `power/control` write, and `ip link down` wedging while holding RTNL.
+
+Fixed in `ca2f77f89` by doing the version check first.  **Verified on
+hardware**: IPA now suspends and resumes normally (`runtime_suspended_time`
+advances) where it previously stuck in `suspending` indefinitely.  The runtime
+PM workaround from `2631e1503` was dropped in the same change - holding a
+permanent PM reference prevents the very resume that
+`ipa_modem_wake_queue_work()` depends on.
+
+**This fixes the deadlock but not the data path.**  Uplink still does not flow:
+the transmit queue is stopped early in boot and the only external
+`netif_wake_queue()` is scheduled from the resume path, so once stopped it is
+not recovered in practice.  And the underlying reason transactions never
+complete - the frozen GSI interrupt count - is untouched by this fix.
+
 Useful facts for that work:
 
 - The IPA<->modem QMI handshake *does* complete: dmesg shows `received modem
