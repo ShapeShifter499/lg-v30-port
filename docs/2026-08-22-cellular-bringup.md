@@ -233,8 +233,44 @@ make the flush actually fire.  Worth checking why the hrtimer armed in
 `egress_agg_params.count`/`.bytes`/`.time_nsec` MM actually installs (iproute2
 does not print them; they arrive over netlink as `IFLA_RMNET_UL_AGG_PARAMS`).
 
-The GSI angle is *not* the lead - the earlier conclusion in this document was
-wrong and is corrected here.
+### Final state of the investigation, and a warning about the instruments
+
+The aggregation conclusion above is **also wrong**.  Creating a fresh rmnet link
+by hand (`ip link add link rmnet_ipa0 name rmnet0 type rmnet mux_id 1`, which
+re-runs `rmnet_map_tx_aggregate_init()` with the driver default of count 1, so
+aggregation is definitively off) changes nothing: the child still counts
+transmits and the parent still shows none.
+
+With a bounded, non-rate-limited log at the top of `ipa_start_xmit()`, the
+picture during one 5-ping attempt is:
+
+```
+JOAN-IPA: ENTRY len=84  proto=0xf9      <- ETH_P_MAP, correctly framed
+JOAN-IPA: ENTRY len=56  proto=0xf9
+JOAN-IPA: ENTRY len=104 proto=0xf9
+child qmapmux0.0 tx 11 / drop 0
+parent rmnet_ipa0 tx 3 / drop 7         <- unchanged before and after
+```
+
+Exactly three packets enter the driver, all correctly framed, and they leave no
+trace at all: no `tx_packets`, no `tx_dropped`, and no failure log despite 37
+unused log slots.  Every path out of that function should touch one of the
+three.  That is unexplained and is where the next session should start.
+
+**A warning worth more than any of the theories above:** this investigation
+reached three different confident conclusions (GSI completion, uplink
+aggregation, the queue layer) and each was an artefact of the instrument, not
+evidence:
+
+- Logging only the *failure* paths made "never called" indistinguishable from
+  "called and succeeded".
+- `net_ratelimited_function()` silently drops after ~10 messages per 5 s, so an
+  absent message means nothing.
+- The rmnet child and the IPA parent keep separate counters; reading only one
+  hides where packets go.
+
+Log unconditionally with a bounded budget, and check both netdevs, before
+believing any conclusion here.
 
 Useful facts for that work:
 
