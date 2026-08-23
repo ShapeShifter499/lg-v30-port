@@ -196,10 +196,45 @@ runtime-PM workaround in `2631e1503` is still worth having (it removes the
 RPM_SUSPENDING deadlock and lets the box boot and stay usable), but it does not
 address this.
 
-Next session should start at the GSI layer: event ring configuration and
-doorbell handling for this IPA version, and whether the modem's TX endpoint is
-actually being told about the ring.  Downstream `drivers/platform/msm/ipa/ipa_v3`
-is the reference to diff against.
+### Corrected again: it is rmnet uplink aggregation, not GSI
+
+`ipa_start_xmit()` was instrumented (`b485d525a`) so that both silent failure
+paths log.  With that kernel, **no message ever appears** - so the function is
+never called at all.  That rules out the stalled-ring/GSI theory above: the
+packets never reach IPA.
+
+Working back, the only path in `rmnet_egress_handler()` that increments the
+child's counters, records no drop, and never calls `dev_queue_xmit()` on the
+parent is the `-EINPROGRESS` return from `rmnet_map_tx_aggregate()`.  So the
+packets sit in rmnet's uplink aggregation buffer and are never flushed.
+
+Confirmed shape of the failure:
+
+```
+qmapmux0.0   tx 12   tx_dropped 0    accepted, "transmitted"
+rmnet_ipa0   tx  3   tx_dropped 7    frozen; ipa_start_xmit never runs
+GSI irq                        15    frozen (consistent - nothing is submitted)
+```
+
+Two attempts to disable it, and how they went:
+
+- **Kernel side**: clamping `count` to 1 in `rmnet_map_update_ul_agg_config()`
+  built and booted, but the modem bring-up crashed the kernel twice out of two
+  attempts, where the same kernel without the clamp was reliable.  Reverted
+  rather than debugged.
+- **Modem side**: setting `ul-protocol=disabled` via
+  `--wda-set-data-format` before connecting does not survive - ModemManager
+  re-negotiates the data format when it brings the bearer up and turns
+  aggregation back on.
+
+So the fix has to prevent ModemManager from enabling uplink aggregation, or
+make the flush actually fire.  Worth checking why the hrtimer armed in
+`rmnet_map_tx_aggregate()`'s `schedule:` path never expires here, and what
+`egress_agg_params.count`/`.bytes`/`.time_nsec` MM actually installs (iproute2
+does not print them; they arrive over netlink as `IFLA_RMNET_UL_AGG_PARAMS`).
+
+The GSI angle is *not* the lead - the earlier conclusion in this document was
+wrong and is corrected here.
 
 Useful facts for that work:
 
