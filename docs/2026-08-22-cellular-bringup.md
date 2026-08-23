@@ -359,6 +359,29 @@ A cheap first measurement: add a bounded `wait_for_completion_timeout()` in
 wedging the box.  That alone makes this debuggable without a reboot per
 attempt, which was the single biggest cost in this session.
 
+**Tried, and deliberately not committed.**  A 1 s bounded wait there builds and
+boots cleanly, but the modem bring-up then crashed the kernel.  It is not clear
+whether that is the patch or the pre-existing bring-up flakiness - the same
+bring-up has crashed other kernels in this session - so it was reverted rather
+than committed on a guess.  If picking it up, note the ordering hazard: on
+timeout the transaction may still be owned by the hardware, so think carefully
+about `gsi_trans_free()` on that path before trusting it.
+
+### Ruled out by inspection (do not re-check)
+
+- **v3.1 GSI register definitions exist and are selected correctly** -
+  `reg/gsi_reg-v3.1.c`, chosen in `gsi_reg.c` for `IPA_VERSION_3_1`.
+- **The IPA driver supports this SoC**: `qcom,msm8998-ipa` with
+  `data/ipa_data-v3.1.c`.
+- **IEOB is enabled at channel start** (`gsi_irq_ieob_enable_one()` from
+  `gsi_channel_start()`), and `GSI_IEOB = BIT(3)` in the IRQ type mask is the
+  standard value, not version-specific.
+- **`ndo_get_stats64` is not implemented**, so the sysfs counters really do
+  reflect what `ipa_start_xmit()` records - those readings were valid.
+
+So the remaining work needs live register state (channel and event ring
+context, IEOB mask readback, doorbell values), not more source reading.
+
 Useful facts for that work:
 
 - The IPA<->modem QMI handshake *does* complete: dmesg shows `received modem
