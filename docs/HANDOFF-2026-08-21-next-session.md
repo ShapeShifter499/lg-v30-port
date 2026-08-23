@@ -20,7 +20,7 @@ TFA9872 register map, and the traps.  That document also supersedes the
 
 | what | where |
 |---|---|
-| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `f3cbcaa87` |
+| kernel | `ShapeShifter499/linux-lg-v30-joan` — `joan/latest-clean-test` **and** `master` both at `ca2f77f89` |
 | port docs | `ShapeShifter499/lg-v30-port` — `abd7a21` |
 | pmOS packages | `ShapeShifter499/lg-v30-joan-pmos-packages` (public) — UCM profile + firmware |
 | working image | nest `~/joan-images/boot-joan-qmidbg35a.img` |
@@ -57,10 +57,18 @@ a neighbouring DT node. Getting that backwards cost about four boots.
 3. **TFA firmware container** from the device's own partition, for protection +
    real loudness (see below).
 4. **Cellular**: LTE registration WORKS as of 2026-08-22 — see
-   `2026-08-22-cellular-bringup.md`.  The blocker was a missing `ipa_fws.mdt`
-   (from the device's own modem partition) which must live in the INITRAMFS,
-   plus `CONFIG_RMNET=y`.  Still open there: data packets do not flow through
-   QMAP/IPA, and voice needs VoLTE/IMS (T-Mobile has no CS fallback).
+   `2026-08-22-cellular-bringup.md`.  Needed a missing `ipa_fws.mdt` (from the
+   device's own modem partition) placed in the **initramfs**, and
+   `CONFIG_RMNET=y`.  A real mainline bug was found and fixed on the way
+   (`ca2f77f89`: unbounded GSI quiesce ahead of the version check).
+
+   **Data is still blocked**, and the hardware error is now decoded: GSI
+   reports `GSI_OUT_OF_BUFFERS_ERR` on channel stop, i.e. **the event ring is
+   full**.  Prime suspect is the early return in `gsi_evt_ring_update()` that
+   skips the event ring doorbell.  Start there — the doc has the details, the
+   ruled-out list, and the instrument traps that produced three wrong
+   conclusions.  VoLTE and calls sit behind data (T-Mobile has no CS
+   fallback).
 5. Then: tethering, cameras, USB-C.
 
 ## Recipes that work (do not re-derive)
