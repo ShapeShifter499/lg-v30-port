@@ -272,6 +272,45 @@ evidence:
 Log unconditionally with a bounded budget, and check both netdevs, before
 believing any conclusion here.
 
+### The actual root cause, consistent with every observation
+
+`ipa_endpoint_disable_one()` / GSI channel stop **hangs on this hardware**.
+Everything else follows from that:
+
+1. `ip link set rmnet_ipa0 down` wedges, three times out of three, in an
+   uninterruptible wait - `timeout` cannot kill it, and it holds the RTNL lock,
+   so all later netlink calls block and the device needs a reboot.
+   `ipa_stop()` calls `ipa_endpoint_disable_one()`, so that is the hang.
+2. `ipa_runtime_suspend()` calls `ipa_endpoint_suspend()` on the same path,
+   which is why the device sticks in `RPM_SUSPENDING` forever and why writing
+   `on` to `power/control` also blocks.
+3. The workaround in `2631e1503` (hold a permanent runtime PM reference)
+   removes the suspend deadlock and lets the box boot and stay usable - but it
+   **breaks the transmit queue**, because:
+
+```
+ipa_modem_wake_queue_work()   /* the ONLY external netif_wake_queue() */
+    is scheduled from ipa_modem_resume(), i.e. the runtime PM *resume* path
+```
+
+   With a permanent reference the device never suspends, so it never resumes,
+   so that wake never runs.  `ipa_start_xmit()` calls `netif_stop_queue()`
+   unconditionally on entry and, on the `NETDEV_TX_BUSY` return, leaves it
+   stopped expecting a resume to re-enable it.  Once that happens early in boot
+   (the 3 tx / 7 drops seen on every boot), the queue is stopped forever: a
+   stopped queue means `ipa_start_xmit()` is never called again, so it cannot
+   wake itself, and the only external waker is disabled.
+
+That is the deadlock, and it explains the whole signature: rmnet forwards,
+`dev_queue_xmit()` is called, the driver is never entered, and no counter
+anywhere moves.
+
+**So the fix is not another workaround at the queue or aggregation level - it is
+to make GSI channel stop work.**  Until then any PM workaround trades a boot
+hang for a dead transmit queue.  Start from `gsi_channel_stop()` /
+`ipa_endpoint_disable_one()` and diff the channel state machine against
+downstream `drivers/platform/msm/ipa/ipa_v3`, which drives the same hardware.
+
 Useful facts for that work:
 
 - The IPA<->modem QMI handshake *does* complete: dmesg shows `received modem
