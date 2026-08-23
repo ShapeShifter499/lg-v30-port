@@ -1,4 +1,8 @@
-# joan — start here (handoff, 2026-08-21)
+# joan — handoff, 2026-08-21
+
+> **SUPERSEDED for audio and cellular by
+> `HANDOFF-2026-08-22-next-session.md` — start there.**  This document is still
+> correct for Wi-Fi, Bluetooth and the ADSP recipes.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
