@@ -437,13 +437,45 @@ not take the kernel down.
 This is the concrete defect to chase, and it is a much better starting point
 than "completions never arrive":
 
-1. Decode GSI global error code `0x2` and channel state `4`
-   (`GSI_CHANNEL_STATE_STOP_IN_PROC`) against the downstream driver's error
-   enums in `drivers/platform/msm/gsi/`.
-2. Compare downstream's stop sequence for this state - it may require a channel
-   reset, or a different command ordering, that mainline does not perform.
+**Decoded** against downstream `drivers/platform/msm/gsi/gsi.h`:
+
+| value | meaning |
+|---|---|
+| global error code `0x2` | **`GSI_OUT_OF_BUFFERS_ERR`** |
+| channel state `4` | `GSI_CHAN_STATE_STOP_IN_PROC` |
+
+"Out of buffers" on a TX channel means the **event ring is full** - the hardware
+has no free entry to post a completion into.  That closes the loop on every
+symptom: a full event ring means completions can never be posted, which is why
+transactions never complete, why the GSI interrupt count is frozen, and why the
+channel cannot be stopped.
+
+The event ring only drains when the AP advances its read pointer, and
+`gsi_evt_ring_doorbell()` is rung *only* at the end of
+`gsi_event_handle()` - i.e. after the IEOB interrupt has driven NAPI to process
+events.  So an event ring that starts filling never recovers by itself.
+
+Worth checking there specifically: `gsi_event_handle()` does
+
+```c
+trans = gsi_event_trans(gsi, event);
+if (!trans)
+        return;                 /* early return - doorbell NOT rung */
+```
+
+If the first event ever maps to no transaction, the read pointer is never
+advanced and the ring is stranded permanently, which would produce exactly this
+failure.  That is the first thing to instrument.
+
+Remaining steps:
+
+1. Instrument `gsi_event_handle()` - is it entered at all, and does it take that
+   early return?
+2. If IEOB genuinely never fires, read back `CNTXT_SRC_IEOB_IRQ_MSK` and
+   `CNTXT_TYPE_IRQ_MSK` from hardware rather than trusting the write, and
+   compare the event ring context programming against downstream `gsi.c`.
 3. Fix the oops on the `-EAGAIN` path independently: `ipa_endpoint_disable_one()`
-   should handle a failed stop rather than crash.
+   should handle a failed stop rather than crash the kernel.
 
 Useful facts for that work:
 
