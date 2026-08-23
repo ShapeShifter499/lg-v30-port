@@ -1337,3 +1337,68 @@ One important distinction: the call mic path is **not** a userspace ALSA
 capture stream. CVP wires an AFE Tx port straight into the vocoder, so the
 requirement is "codec Tx routed to an AFE port", not "arecord works". The
 prerequisites overlap (the WCD must be up) but they are not the same milestone.
+
+---
+
+## *** A VOICE SESSION RUNS ON MAINLINE ***
+
+The whole CVD bring-up sequence now completes on joan, every step status 0:
+
+| # | Service | Opcode | Command | Result |
+|---|---|---|---|---|
+| 1 | MVM | `0x000110ff` | CREATE_PASSIVE_CONTROL_SESSION | status 0, handle `0x0020` |
+| 2 | CVS | `0x00011140` | CREATE_PASSIVE_CONTROL_SESSION | status 0, handle `0x0100` |
+| 3 | MVM | `0x0001123c` | ATTACH_STREAM (CVS handle) | status 0 |
+| 4 | CVP | `0x000112bf` | CREATE_FULL_CONTROL_SESSION_V2 | status 0, handle `0x0100` |
+| 5 | CVP | `0x000100c6` | ENABLE | status 0 |
+| 6 | MVM | `0x0001123e` | ATTACH_VOCPROC (CVP handle) | status 0 |
+| 7 | MVM | `0x00011190` | **START_VOICE** | **status 0** |
+
+Mainline Linux has never had this. The Q6 voice path is up.
+
+### The one real failure along the way, and what it taught
+
+Step 5 initially returned **ADSP error 1**. The vocproc had been created with
+`VSS_IVOCPROC_PORT_ID_NONE` and `TOPOLOGY_ID_NONE` — deliberately, to exercise
+the control path without depending on codec routing.
+
+**The ADSP will create a portless vocproc but will not enable one.** Supplying
+real ports fixed it with no other change:
+
+    rx_port     = 0x4000  (AFE SLIMBUS_0_RX)
+    tx_port     = 0x4001  (AFE SLIMBUS_0_TX)
+    rx_topology = 0x00010F77  (VSS_IVOCPROC_TOPOLOGY_ID_RX_DEFAULT)
+    tx_topology = 0x00010F71  (VSS_IVOCPROC_TOPOLOGY_ID_TX_SM_ECNS)
+
+The ports must be real *before any audio flows through them*. Note these are
+SLIMbus port 0 — the WCD codec, i.e. the same path the earpiece and call mic
+sit on. The session and the codec bring-up meet exactly here.
+
+### Protocol details confirmed on hardware
+
+* A create's response carries the new handle in the APR **source port**; every
+  later command for that session goes to it as **destination port**. The reply
+  to a create is what tells you where to send everything after it.
+* `0x000100be` arrives before `0x000110e8` on MVM commands — an ACCEPTED event
+  ahead of the basic result. Only the latter carries status.
+* CVS and CVP independently issued handle `0x0100`. Handles are per-service, not
+  global; they must not be compared across services.
+
+### Known gap
+
+Module unload does not destroy ADSP-side sessions. The ADSP keeps them, and a
+later create for the same VSID goes **unanswered** (not refused — no response at
+all, so it presents as a timeout). Until teardown is implemented, reload needs a
+reboot in between. This cost one confusing cycle: an identical command that had
+just succeeded timed out purely because the previous session was still alive.
+
+### What this does and does not mean
+
+It does **not** mean VoLTE or phone calls work. It means the kernel-side voice
+path — the piece mainline was missing entirely — now exists and runs. Still
+required for an actual call:
+
+1. **Audio through the path.** SLIMbus/WCD bring-up so the earpiece and call mic
+   are live. Same work as the earpiece issue.
+2. **Call setup.** An AP-side IMS/SIP stack, per the earlier finding that joan's
+   modem exposes zero IMS QMI services.
