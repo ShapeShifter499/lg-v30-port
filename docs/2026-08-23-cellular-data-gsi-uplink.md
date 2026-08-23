@@ -1402,3 +1402,117 @@ required for an actual call:
    are live. Same work as the earpiece issue.
 2. **Call setup.** An AP-side IMS/SIP stack, per the earlier finding that joan's
    modem exposes zero IMS QMI services.
+
+---
+
+## Why there is no sound card at all: one unset config symbol
+
+Chasing audio for the voice path turned up the reason `/proc/asound/cards` is
+empty on this build, and it is not what it looks like.
+
+SLIMbus and the WCD9340 are **fine**. The bus enumerates three devices and the
+codec binds:
+
+    /sys/bus/slimbus/devices/217:250:0:0
+    /sys/bus/slimbus/devices/217:250:1:0  -> driver: wcd934x-slim
+    /sys/bus/slimbus/devices/217:210:5:0
+
+The actual blocker:
+
+    platform sound: deferred probe pending: msm-snd-sdm845:
+      Tertiary MI2S Playback: codec dai not found
+
+joan's `sound` node has a `tert-mi2s-dai-link` whose codec is `&speaker_amp`:
+
+    speaker_amp: audio-codec@34 {
+        compatible = "nxp,tfa9872";
+        reg = <0x34>;
+        #sound-dai-cells = <0>;
+    };
+
+and `CONFIG_SND_SOC_TFA989X` **was not set** in `master-47041183b.config`. The
+tree ships `sound/soc/codecs/tfa989x.c` and it does support `"nxp,tfa9872"` — it
+simply was not built.
+
+### The part worth remembering
+
+A sound card is all-or-nothing. One unresolvable codec DAI leaves the whole card
+in deferred probe **forever**, so a missing *speaker amp* driver also takes down
+the completely unrelated SLIM/WCD playback link — which is the earpiece and the
+call mic. The symptom ("no soundcards") points nowhere near the cause, and every
+other audio path looks broken while being perfectly healthy.
+
+This is the third instance in this port of the same shape: **an absent
+declaration is not a benign default.** Previously it was a hidden BIMC QoS base
+offset, then `CONFIG_QCOM_Q6V5_PAS` leaving the ADSP dead. Here an unset codec
+symbol masquerades as a broken audio subsystem.
+
+Two red herrings ruled out along the way, both logged loudly at boot:
+
+* `wcd934x-slim ...: missing qcom,mbhc-buttons-vthreshold-microvolt entry` —
+  headset-button thresholds, cosmetic here.
+* `qcom-soundwire ...: din-ports (2) mismatch with controller (6)` — logged with
+  `dev_err`, but `drivers/soundwire/qcom.c` then simply overrides its value with
+  the DT one and continues. Noisy, not fatal.
+
+### Rig lesson: stop patching vermagic
+
+Iterating by binary-patching the module's vermagic string worked while only the
+commit hash changed and lengths matched. It broke as soon as a new commit
+removed `-dirty`, changing the string length. Build the kernel and its modules
+from the same tree state and reboot into the pair; do not chase the version
+string.
+
+---
+
+## Session teardown works; module reload is a separate, open bug
+
+Teardown was implemented (reverse of build order, all three services taking
+`APRV2_IBASIC_CMD_DESTROY_SESSION 0x0001003C` on their own handle) and verified.
+
+**Four start/stop cycles, no module reload, on one boot:**
+
+    cycle 1: start OK (mvm=0x0020) stop OK
+    cycle 2: start OK (mvm=0x0066) stop OK
+    cycle 3: start OK (mvm=0x00ad) stop OK
+    cycle 4: start OK (mvm=0x00f4) stop OK
+    timeouts: 0
+
+A distinct MVM handle each time is the proof the previous session was really
+destroyed rather than reused. Every teardown step returns status 0.
+
+### Correcting an earlier conclusion
+
+The doc previously recorded module reload failing *because* sessions leaked.
+That was wrong. With teardown clean and every session destroyed, reload still
+fails:
+
+    [471.111] q6voice: voice session torn down      <- clean
+    [471.155] q6voice: service bound (svc 0x09 ...) <- after modprobe
+    [473.181] q6voice: -> op 0x000110ff dest 0x0000 len 40
+    [478.431] q6voice: timeout waiting for ADSP
+    ... retried at 525 s and 531 s, both timed out
+
+So it is not leaked sessions, and the cycle test shows it is not session count
+or ADSP fatigue either. The state after reload looks entirely healthy:
+
+* all three services rebind (`bound` mask 7),
+* the APR devices are the same ones, still attached to
+  `qcom-q6mvm` / `qcom-q6cvs` / `qcom-q6cvp`,
+* the command is sent (`->` line present),
+* the ADSP never answers.
+
+Something about unbinding and rebinding the APR service stops the ADSP
+responding to that service, persistently. Note the driver has **no `.remove`
+callback**, which is an omission worth fixing on its own merits and a plausible
+first suspect.
+
+Practical impact is small — reboot between reloads — but it is a real bug and
+should not be written off as a test-rig quirk.
+
+### Rig note
+
+After every `fastboot boot`, the phone's USB gadget enumerates as a **new**
+netdev with a new MAC, so the host's `172.16.42.2/24` is gone. Re-add the
+address on every boot, not just the first; otherwise the phone is up and
+healthy while every connection times out.
