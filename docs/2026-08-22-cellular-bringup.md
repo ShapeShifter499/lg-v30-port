@@ -307,9 +307,57 @@ anywhere moves.
 
 **So the fix is not another workaround at the queue or aggregation level - it is
 to make GSI channel stop work.**  Until then any PM workaround trades a boot
-hang for a dead transmit queue.  Start from `gsi_channel_stop()` /
-`ipa_endpoint_disable_one()` and diff the channel state machine against
-downstream `drivers/platform/msm/ipa/ipa_v3`, which drives the same hardware.
+hang for a dead transmit queue.
+
+### The single root cause: GSI transmit completions never arrive
+
+The exact hang site is `gsi_channel_trans_quiesce()`, called from
+`gsi_channel_stop()` (`gsi.c:982`):
+
+```c
+/* Wait for transaction activity on a channel to complete */
+trans = gsi_channel_trans_last(channel);
+if (trans) {
+        wait_for_completion(&trans->completion);   /* no timeout */
+        gsi_trans_free(trans);
+}
+```
+
+An unbounded wait for the last transaction to complete.  One fact explains
+every symptom in this document:
+
+> **Transactions submitted to the modem TX channel never complete.**
+
+- The GSI interrupt count is frozen (15 on every boot) - no completions.
+- Three packets go out early (`tx_packets` 3) and the ring never drains.
+- Subsequent transmits get `NETDEV_TX_BUSY`, which leaves the queue stopped
+  awaiting a resume that a PM workaround prevents - so the queue dies.
+- Any attempt to stop the channel (`ipa_stop()`, `ipa_runtime_suspend()`,
+  `ip link set rmnet_ipa0 down`) blocks forever in the quiesce above, holding
+  RTNL where applicable.
+
+The intermediate theories in this document - aggregation, the queue layer,
+"ipa_start_xmit is never called" - were all downstream effects or instrument
+artefacts.  This is the one defect.
+
+### Where to start next
+
+Why completions do not arrive, in order of suspicion:
+
+1. **Event ring / IEOB.**  `gsi_irq_ieob_enable_one()` is called at channel
+   start, but verify the mask actually lands for this event ring and that
+   `GSI_IEOB` is enabled in `CNTXT_TYPE_IRQ_MSK` on v3.1.
+2. **Doorbell.**  Confirm the TRE doorbell is rung with the right value after
+   `gsi_trans_commit()`; a missed doorbell means the hardware never processes
+   the TREs and never raises IEOB.
+3. **Whether the modem is consuming TREs at all** - compare channel/event ring
+   scratch and context programming against downstream
+   `drivers/platform/msm/gsi/gsi.c`, which drives this same hardware.
+
+A cheap first measurement: add a bounded `wait_for_completion_timeout()` in
+`gsi_channel_trans_quiesce()` so the hangs become recoverable errors instead of
+wedging the box.  That alone makes this debuggable without a reboot per
+attempt, which was the single biggest cost in this session.
 
 Useful facts for that work:
 
