@@ -118,9 +118,63 @@ this link.  Disable it *before* adding the address —
 `nodad`.  That gets the address to `global` but does not by itself fix the
 data path.
 
-Next places to look: QMAP mux id / aggregation agreement between the apps
-rmnet and the modem, and whether the modem's IPA endpoints are actually
-configured.
+### Root cause found: IPA runtime PM deadlocks
+
+```
+/sys/devices/platform/soc@0/1e40000.ipa/power/runtime_status  ->  suspending
+```
+
+The device sticks in `RPM_SUSPENDING` forever: `ipa_runtime_suspend()` enters
+`ipa_endpoint_suspend()`/`gsi_suspend()` and never returns.  Every
+`pm_runtime_get()` from `ipa_start_xmit()` then fails and each uplink packet is
+dropped.  Writing `on` to `power/control` **also blocks**, because the pending
+suspend never completes.
+
+Worked around in `2631e1503`: take a permanent runtime PM reference once setup
+completes, so the device never idles into that path.  With it, `runtime_status`
+reads `active` and the kernel boots clean.
+
+Two traps found the hard way:
+
+- Do **not** call `pm_runtime_forbid()` from `ipa_power_init()`.  It resumes the
+  device before the driver data is installed, so `ipa_runtime_resume()`
+  dereferences garbage and the kernel hangs during probe.  Take the reference
+  after `ipa->setup_complete = true` instead.
+- Read the **child's** counters as well as the parent's.  rmnet's own drops land
+  on the rmnet child (`qmapmux0.0`), not on `rmnet_ipa0`; watching only the
+  parent hides where packets go.
+
+### Still open after that fix
+
+Data *still* does not flow.  Measured over 40 large pings with IPA `active`:
+
+```
+qmapmux0.0   tx 12 -> 53   (42 KB)   tx_dropped 0
+rmnet_ipa0   tx  3 ->  3   unchanged  tx_dropped 7 unchanged
+```
+
+rmnet accepts and forwards, and IPA neither transmits nor drops - consistent
+with the netdev TX queue being stopped and never woken (`ipa_start_xmit()`
+calls `netif_stop_queue()` unconditionally on entry and only re-wakes it when
+power is ACTIVE).
+
+Trying to reset that queue revealed the deeper problem: **`ip link set
+rmnet_ipa0 down` hangs too.**  So the endpoint teardown path wedges in the same
+way as suspend, which points at GSI channel / endpoint handling for IPA v3.1
+rather than at the power code.  That is where the next session should dig.
+
+Useful facts for that work:
+
+- The IPA<->modem QMI handshake *does* complete: dmesg shows `received modem
+  starting event` then `received modem running event`.
+- IPA is hard-configured for QMAP: `feature/rx_offload = MAPv4`,
+  `tx_offload = MAPv4`, modem endpoints rx 16 / tx 3.
+- `ipa_start_xmit()` requires `skb->protocol == ETH_P_MAP`, so the rmnet mux
+  child is **mandatory** - it is not double-wrapping, as it first appears.
+- busybox `ip` cannot show rmnet details.  Extract `sbin/ip` from Alpine's
+  `iproute2-minimal` apk plus `libmnl.so.0` and run it with
+  `LD_LIBRARY_PATH`; a full `apk add` fails because optional libcap
+  subpackages cannot be fetched without internet on the phone.
 
 ## Open: voice needs VoLTE
 
