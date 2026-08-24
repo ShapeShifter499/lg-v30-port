@@ -235,6 +235,14 @@ this one Class-H initialization coefficient. Rank follow-up work by evidence:
 
 - LG downstream source: `/home/kumo02/vibe-coding-projects/coding/android_kernel_lge_msm8998/`
 - Mainline test source: `/home/kumo02/vibe-coding-projects/coding/linux-mainline-v30-wcd934x-init/`
+- Raw tool-result transcripts (committed, this lane):
+  - `docs/evidence/2026-08-24-wcd934x-k2/k2-hotswap-and-restore-output.log`
+  - `docs/evidence/2026-08-24-wcd934x-k2/probe13-listen-test-output.log`
+  - `docs/evidence/2026-08-24-wcd934x-k2/probe12-dapm-live-stream-output.log`
+    (probe #12 ran pre-hot-swap on stock K2=0x80: full EAR DAPM graph On,
+    ANA_BIAS=0x80, ANA_RX_SUPPLIES=0xc1, ANA_EAR=0x80, RX0_PATH_CTL=0x24
+    during a live stream — the previously provisional register claims are now
+    backed by a captured transcript)
 - Prior audio topology/crash handoff:
   `docs/ember-handoff-2026-08-21-audio-crash-fixed-dapm-open.md`
 - This session's live phone observations were captured through

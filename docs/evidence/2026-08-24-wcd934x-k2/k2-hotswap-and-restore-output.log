@@ -1,0 +1,44 @@
+# Transcribed from Hermes foreground/background tool-result captures, 2026-08-24.
+# Bodies are verbatim stdout/stderr; "#" headers are provenance annotations.
+#
+# --- Part 1: temporary K2 module hot-swap (script /tmp/reload-wcd934x-k2.sh,
+#     as-run variant, sha256 4235306c618257dd85ac4075a29e2844f7d463174a5f00299bef23ce705bc65e;
+#     the committed docs/tools copy adds attribution headers and the
+#     cat|grep verify line, sha256 227380aafca16b4c61ee47ec723357d3f89cde52544db45ff7394942315e0e27) ---
+== unload machine card ==
+== unload packaged WCD934x codec component ==
+== load temporary K2 codec module ==
+== rebind machine card ==
+== verify card and the programmed Class-H K2 coefficient ==
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+0c0b: 60
+== temporary K2 module active; run the earpiece listening test next ==
+
+# --- Part 2: packaged-module restore (/tmp/restore-wcd934x-stock.sh, as-run
+#     variant sha256 2c879ff04a2ec0aa6802244229e37b9bbc73bca981d9b89adc054fdfb0a56ed9;
+#     committed docs/tools copy adds attribution headers,
+#     sha256 2e51d78c4b0b1b048ada88e7c925bd50f8eee63b71c61d757664867932205229) ---
+== unload machine card ==
+== unload temporary WCD934x module ==
+== restore packaged WCD934x module ==
+== rebind machine card ==
+== verify restored card and stock K2 ==
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+0c0b: 60
+== packaged codec module restored ==
+
+# --- Part 3: independent post-restore read-only state check ---
+kernel=7.2.0-rc2-g5f6732fb6cb8
+module=/lib/modules/7.2.0-rc2-g5f6732fb6cb8/kernel/sound/soc/codecs/snd-soc-wcd934x.ko.zst
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+snd_soc_sdm845         12288  0
+snd_soc_wcd934x       266240  1
+snd_soc_wcd_classh     16384  1 snd_soc_wcd934x
+0601: 00
+0608: 00
+060a: 00
+0b41: 04
+0c0b: 60

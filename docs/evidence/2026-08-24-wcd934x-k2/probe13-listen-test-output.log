@@ -1,0 +1,27 @@
+# Transcribed from Hermes background-process tool-result capture, 2026-08-24.
+# Script: /tmp/ear-test-v13-k2.sh, as-run sha256 equals the committed copy:
+#   a0c3b229f273bdd94fe7c0f2721aacb401e68031c4528f171b12e35844be7a35
+# Executed while the temporary K2=0x60 codec module was loaded.
+# Physical verdict supplied separately by Lance during the announced window: "no".
+== stop sound daemons and prevent PulseAudio autospawn ==
+ok: RX0 Digital Volume (0 dB) = 84
+ok: EAR PA Volume (+6 dB) = 4
+== reset then configure complete earpiece path ==
+ok: SLIMBUS_0_RX Audio Mixer MultiMedia1 = [on]
+ok: SLIM RX0 MUX = AIF1_PB
+ok: RX INT0_1 MIX1 INP0 = RX0
+ok: RX INT0_1 INTERP = RX INT0_1 MIX1
+ok: RX INT0_2 MUX = RX0
+ok: RX INT0_2 INTERP = RX INT0_2 MUX
+ok: RX INT0 DEM MUX = CLSH_DSM_OUT
+== earpiece tone begins in 5 seconds; listen continuously (~26 seconds) ==
+aplay exit=0
+== completed; route and PulseAudio autospawn are being restored ==
+
+# --- Independent post-playback readbacks (separate read-only commands) ---
+0c0b: 60
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+snd_soc_sdm845         12288  0
+snd_soc_wcd934x       266240  1
+snd_soc_wcd_classh     16384  1 snd_soc_wcd934x

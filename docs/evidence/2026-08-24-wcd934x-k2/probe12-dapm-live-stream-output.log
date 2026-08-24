@@ -1,0 +1,54 @@
+# Probe #12 — DAPM widget + WCD register state during a live silent PCM stream
+# Transcribed verbatim from the Hermes background-process completion capture
+# (session proc_17e22dfbd4fc, exit 0). Script: /tmp/ear-dapm-v12.sh,
+# as-run sha256 db3e8730f5bd7c6ebd6a2ada9842496fff828a1b444ed9fdf33f363aff5989c0
+# (not committed; superseded by docs/tools/* and this capture).
+#
+# Timing: executed BEFORE the K2 hot-swap experiment, on stock kernel/module.
+# This is therefore hard evidence that with reset-default K2 = 0x80:
+#   - the entire EAR DAPM graph powers On during playback, and
+#   - the analog bias / RX supplies / EAR PA registers are all enabled,
+# yet the earpiece was physically silent (consistent user reports across v5/v6).
+== route up; starting 90s SILENT PCM stream ==
+== DAPM WIDGET STATES DURING LIVE STREAM ==
+EAR: EAR: On  in 2 out 1
+EAR PA: EAR PA: On  in 2 out 1 - R1546(0x60a) mask 0x80
+RX INT0 DAC: RX INT0 DAC: On  in 2 out 1
+RX_BIAS: RX_BIAS: On  in 0 out 0 - R1544(0x608) mask 0x1
+RX INT0 DEM MUX: RX INT0 DEM MUX: On  in 2 out 1
+RX INT0 MIX2: RX INT0 MIX2: On  in 2 out 1
+RX INT0 SEC MIX: RX INT0 SEC MIX: On  in 2 out 1
+RX INT0_2 INTERP: RX INT0_2 INTERP: On  in 1 out 1
+RX INT0_2 MUX: RX INT0_2 MUX: On  in 1 out 1
+RX INT0_1 INTERP: RX INT0_1 INTERP: On  in 1 out 1
+RX INT0_1 MIX1: RX INT0_1 MIX1: On  in 1 out 1
+RX INT0_1 MIX1 INP0: RX INT0_1 MIX1 INP0: On  in 1 out 1
+SLIM RX0: SLIM RX0: On  in 1 out 2
+AIF1 PB: AIF1 PB: On  in 1 out 2
+== WCD REGISTERS DURING LIVE STREAM (may take ~1min) ==
+0601: 80
+0608: c1
+060a: 80
+0711: 91
+0b41: 24
+0b42: 48
+0b46: 24
+0c01: 01
+0c03: 02
+0c0a: 00
+0c0b: 80
+== aplay raw log ==
+Playing raw data '/dev/zero' : Signed 16 bit Little Endian, Rate 48000 Hz, Mono
+Aborted by signal Terminated...
+== DONE ==
+
+# Register legend (from mainline wcd934x register map):
+#   0601 ANA_BIAS        80 = analog bias enabled
+#   0608 ANA_RX_SUPPLIES c1 = RX bias + supplies on
+#   060a ANA_EAR         80 = EAR PA enable (bit7) set
+#   0711 MCLK_PRG?       91 = clock config live (matches earlier probes)
+#   0b41 RX0_PATH_CTL    24 = path enabled + unmuted (bit5 clear), rate field 0
+#   0c0b CLSH_K2_LSB     80 = reset-default coefficient at time of probe
+#
+# Note for Ember: these mid-stream values were captured while audio played;
+# idle readbacks show power-down zeros (0601/0608/060a=00) and are not failures.
