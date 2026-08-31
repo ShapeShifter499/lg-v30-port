@@ -393,8 +393,18 @@ pmbootstrap kernel build on this host would have hit it.
   Lance's call.
 - The two handoff-doc commits were removed from the pmaports branch and the doc
   relocated here, per Lance: the pmaports fork stays clean for outside builders.
-- The joan kernel work is still carried as a 10-patch series over public
+- ~~The joan kernel work is still carried as a 10-patch series over public
   `323451cb`. Patches 0009/0010 exist only as patches — they are not on
   `joan/clean-gpu-brightness-v1` (which is 0001–0008), so the kernel repo and
-  the pmaports series are not yet in sync. Worth reconciling before the next
-  pkgrel bump.
+  the pmaports series are not yet in sync.~~ **RECONCILED — and the premise was
+  wrong twice over.** Aurel's handoff identified patch 0009 as `15d1ea453`
+  ("raise the brightness ceiling to 255 and make it tunable") and I repeated
+  that. It is not: 0009's `From` line names `739bc79d3`
+  ("restore full byte brightness range", 8 lines); `15d1ea453` is a different,
+  later commit touching 19 lines. Both 0009 and 0010 do exist in the kernel
+  repo, on branch **`joan/a184-polish`**, which is exactly `323451cb` plus the
+  ten commits of the series in patch order (`clean-gpu-brightness-v1` is its
+  ancestor). Verified by regenerating: `git format-patch
+  323451cb..joan/a184-polish` reproduces all ten patch bodies byte-identically.
+  The only mismatch was cosmetic — the `[PATCH n/N]` counter in the Subject of
+  0001–0006 still read `n/6` from when the series was six patches.
