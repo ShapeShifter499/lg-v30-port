@@ -87,3 +87,140 @@ since that is the one a call needs.
 Not claimed: none of this has been exercised on pmOS yet. The sequences are
 what stock uses on the same silicon, and the controls exist, but no capture has
 been attempted on a mainline boot.
+
+## Follow-up, same day: headset switch, in-line mics, and a third built-in mic
+
+Extended from the stock **device tree** (the ten DTBs appended to the retail
+`boot.img`), which carries what `mixer_paths_tavil.xml` does not.
+
+### There are three built-in mics, not two
+
+LG's factory test path `mictest-allmic` captures **ADC1, ADC2, ADC3 and ADC4**
+together, and the four `camcorder-*` paths use ADC1 + ADC3 + ADC4. The stock
+`qcom,audio-routing` names them:
+
+| widget | bias | LG's name |
+|---|---|---|
+| AMIC1 | MIC BIAS1 | Handset Mic (bottom) |
+| AMIC2 | MIC BIAS2 | Headset Mic (in-line) |
+| AMIC3 | MIC BIAS3 | Handset 2nd Mic (top) |
+| AMIC4 | MIC BIAS4 | Handset 3rd Mic |
+
+Our DTS only routed AMIC1..3. AMIC4 reaches ADC4 through the codec's
+`AMIC4_5 SEL` mux, so using it needs `cset "name='AMIC4_5 SEL Mux' AMIC4"`.
+
+`camcorder-0`/`-90` map ADC3 to channel 0 and ADC1 to channel 1;
+`camcorder-180`/`-270` swap them. That orientation-dependent channel
+assignment is the whole of LG's "uses both mics together" for video — the rest
+of what that marketing describes is ADSP processing, not routing.
+
+### No digital mics are populated
+
+Every path LG names `*-dmic-*` selects **analog** mics. The only path that
+genuinely selects a DMIC is `speaker-mic-liquid`, which targets Qualcomm's
+Liquid reference board. So no DMIC route belongs in the joan DTS.
+
+### Headset switch (MBHC)
+
+Stock values, identical across all ten board revisions:
+
+```
+qcom,msm-mbhc-hphl-swh   = <1>            normally open
+qcom,msm-mbhc-gnd-swh    = <0>            normally closed
+qcom,mbhc-audio-jack-type = "4-pole-jack"
+qcom,msm-mbhc-moist-cfg  = <0 0 1>
+lge,msm-mbhc-extn-cable  = <0>
+qcom,cdc-micbias1-mv = <0xabe>  2750       qcom,cdc-micbias2-mv = <0x7d0>  2000
+qcom,cdc-micbias3-mv = <0xabe>  2750       qcom,cdc-micbias4-mv = <0xabe>  2750
+```
+
+Qualcomm's encoding is **1 = normally open, 0 = normally closed**. An earlier
+revision of our DTS comment had that inverted (it called `hphl-swh = <1>` "NC")
+and left `gnd_swh` at mainline's default `true`, which writes the wrong value
+into `WCD_MBHC_GND_PLUG_TYPE`. That is a candidate cause of the live
+insert/remove IRQ never behaving, and is now fixed with
+`qcom,ground-jack-type-normally-closed`.
+
+All four micbias rails were on mainline's 1800 mV fallback rather than LG's
+values. MICBIAS2 is the consequential one: `wcd934x` uses `common.micb_mv[1]`
+as `cfg->micb_mv`, so MBHC's jack-type and button thresholds scale with it.
+
+### In-line remote buttons
+
+`sound/soc/qcom/sdm845.c` already creates the jack and maps
+`BTN_0..BTN_3` to `KEY_PLAYPAUSE`, `KEY_VOICECOMMAND`, `KEY_VOLUMEUP`,
+`KEY_VOLUMEDOWN`, and `wcd934x` supports eight buttons — but without
+`qcom,mbhc-buttons-vthreshold-microvolt`, `wcd_dt_parse_mbhc_data()` defaults
+`btn_high[0..7]` to 500000, so **every button compares equal and decodes as
+BTN_0**. Three of the four keys were unreachable. Fixed with the standard
+Qualcomm 75/150/237 mV ladder, which `qcom,wcd934x.yaml` documents.
+
+Not adding the `"MIC BIAS2", "Headset Mic"` route yet, though stock has it:
+`sdm845.c` pin-switches that widget from jack state, and while jack detect is
+unreliable a "no jack" report would pull MIC BIAS2 down and silence headset
+capture. Worth revisiting once insertion reporting is confirmed.
+
+## Global (US998) vs H932: no odd deviation
+
+Checked three ways.
+
+1. **Same DTB.** Both pmaports devices set
+   `deviceinfo_dtb="qcom/msm8998-lge-joan"` and build from one DTS.
+2. **Downstream DTBs vary only by PCB revision.** The ten in the stock
+   `boot.img` share one `qcom,msm-id` and differ across `qcom,board-id`
+   `0x308..0xf08`. Excluding phandles, **ten lines** differ between revisions:
+   USB-C SBU select, `fcc-max-ua`, battery id and thermal GPIO, and
+   `dac,use-internal-ldo`. No audio routing, no MBHC, no micbias.
+3. **Vendor audio config is byte-identical bar one path.** Extracted from
+   `us998-pie-system.img` and `h932-pie-system.img`:
+
+   | file | differing lines |
+   |---|---|
+   | `audio_platform_info.xml` | 0 |
+   | `audio_policy_configuration.xml` | 0 |
+   | `mixer_paths_tavil.xml` | 2 |
+
+   The two lines are `voice-tty-full-headset-mic`: H932 uses
+   `ADC2 Volume 20` / `DEC0 Volume 84` against the global model's `10` / `64`.
+   TTY is a US carrier accessibility requirement and T-Mobile certifies its own
+   gain, so this is a carrier difference, not a hardware one.
+
+Conclusion: one shared DTS is correct, and nothing here justifies splitting it.
+
+## Noise cancellation: what is and is not portable
+
+The routing ports 1:1. The processing does not.
+
+LG's noise suppression, echo cancellation and two-mic beamforming run **inside
+the ADSP**, in topologies selected by ID and parameterised from proprietary
+ACDB calibration data. Mainline's `q6adm` opens every stream with
+`NULL_COPP_TOPOLOGY` and has no ACDB parser, so none of it is reachable without
+reimplementing that and shipping LG's blobs.
+
+The practical replacement is userspace. Alpine already ships the WebRTC AEC
+backend (`libspa-aec-webrtc.so`, from `webrtc-audio-processing-2`) but **not**
+the module that drives it — `pipewire-echo-cancel` is a separate subpackage and
+was never in our depends. Adding it plus a drop-in gets noise suppression,
+high-pass, gain control and echo cancellation on the mic. The four keys that
+backend understands are exactly:
+
+```
+webrtc.noise_suppression   webrtc.high_pass_filter
+webrtc.gain_control        webrtc.mobile_mode
+```
+
+The two-mic beamformer that older `webrtc-audio-processing` had is gone from
+the v2 API, so `DualMic` gives two raw channels and nothing beamforms them.
+Beamforming would have to be a filter-chain of our own.
+
+## Status
+
+Committed, none of it booted:
+
+* kernel DTS — micbias, ground switch, AMIC4 (`joan/mbhc-headset-mic-v2`)
+* `linux-lge-joan` — `0002-joan-micbias-mbhc-amic4.patch`, applies clean to the pin
+* `alsa-ucm-conf-lge-joan` — `Mic`, `Headset`, `DualMic` on `hw:x,1`
+* `device-lge-joan{,-h932}` — `pipewire-echo-cancel` + drop-in
+
+First test should be raw capture through the UCM devices before trusting the
+PipeWire layer.
