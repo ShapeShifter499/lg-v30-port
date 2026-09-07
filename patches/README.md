@@ -13,6 +13,7 @@ sha512 of each archived copy matches the package's sha512sums block.
 | `0001-ipa-imem-addr-override.patch` | **LIVE — package is authoritative; this is a mirror** | pmaports commit `d9a12d3cdf` only; no kernel commit carries it |
 | `0002-joan-micbias-mbhc-amic4.patch` | RETIRED 2026-09-07 | kernel `622008e1657f` (DTS micbias 2750/2000/2750/2750 mV, ground-jack-type-normally-closed, AMIC4/MIC BIAS4 route) |
 | `0003-q6routing-selectable-tx-topology.patch` | RETIRED 2026-09-07 | kernel `fb968169503b` (q6routing `TX COPP Topology` enum, default None; playback untouched) |
+| `0004-dpu-first-kickoff-te-gate.patch` | RETIRED 2026-09-07 (same day) | kernel `2f1308c271d8` on `joan/wake-path-v1` = `joan/latest-clean-test` (pushed): gate first kickoff after wake on one TE edge |
 
 ## Why 0002/0003 are retired
 
