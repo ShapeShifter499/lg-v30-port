@@ -114,11 +114,24 @@ Our DTS only routed AMIC1..3. AMIC4 reaches ADC4 through the codec's
 assignment is the whole of LG's "uses both mics together" for video — the rest
 of what that marketing describes is ADSP processing, not routing.
 
-### No digital mics are populated
+### Digital mics: open question, corrected
 
-Every path LG names `*-dmic-*` selects **analog** mics. The only path that
-genuinely selects a DMIC is `speaker-mic-liquid`, which targets Qualcomm's
-Liquid reference board. So no DMIC route belongs in the joan DTS.
+An earlier revision of this note (and of the DTS comment) said flatly that no
+digital mic is populated. That was stated too strongly. The evidence is mixed:
+
+*Against a DMIC.* Every path LG names `*-dmic-*` selects **analog** mics.
+`speaker-mic-liquid`, which genuinely selects DMIC2, targets Qualcomm's Liquid
+reference board. And `mictest-allmic` — the factory test, which one would
+expect to exercise every fitted mic — uses only ADC1–ADC4.
+
+*For a DMIC.* The four `camcorder-*` paths do select `DMIC0` on TX8, in a real
+use case rather than a reference-board one. And the stock DTB sets
+`qcom,cdc-dmic-sample-rate = <4800000>` (dtc renders the bytes as the garbage
+string `"", "I>"`; decoded it is `0x00493E00`).
+
+Both of the latter also appear in Qualcomm's generic 8998 configuration, which
+is the likelier explanation, so no DMIC route is added — but it is left out
+pending evidence, not because absence was proven.
 
 ### Headset switch (MBHC)
 
@@ -224,3 +237,87 @@ Committed, none of it booted:
 
 First test should be raw capture through the UCM devices before trusting the
 PipeWire layer.
+
+## ADSP noise suppression: it is reachable after all
+
+The earlier conclusion in this note — that LG's NS/AEC/beamforming needs ACDB
+and is therefore out of reach — was half right and led to the wrong plan.
+
+### What ACDB actually is
+
+The ADSP builds a COPP's processing chain from a **topology definition carried
+in its own firmware**, named by an ID in `ADM_CMD_DEVICE_OPEN_V5`. ACDB
+calibration does not create that chain; it *retunes* modules the chain already
+contains. So naming a topology is on its own enough to instantiate the modules
+with their firmware defaults, and no ACDB parser is required to get there.
+
+Mainline never did, because `q6routing.c` hardcoded `NULL_COPP_TOPOLOGY` for
+every stream. That is a request for a bit-transparent chain — which is exactly
+why mainline capture on these SoCs is raw mic and nothing else.
+
+`q6adm_open()` already took `topology`, `app_type` and `acdb_id` parameters.
+Only the caller was fixed.
+
+### Which topology, from LG's own data
+
+Rather than trust remembered constants, the IDs were counted in LG's
+calibration files pulled off the retail vendor image:
+
+| file | topology found | count |
+|---|---|---|
+| `Handset_cal.acdb` | `VPM_TX_DM_FLUENCE` `0x00010F72` | 8 |
+| `Headset_cal.acdb` | `VPM_TX_SM_ECNS` `0x00010F71` | 1 |
+| `Speaker_cal.acdb` | `VPM_TX_DM_FLUENCE` | 1 |
+| RX paths (`General`, `Headset`, `Speaker`) | `DEFAULT_COPP_TOPOLOGY` `0x00010314` | 7/17/10 |
+
+That is both a verification of the IDs and a statement of which topology LG
+considered correct for which input. Our UCM follows it: `SM ECNS` for a single
+mic, `DM Fluence` for the pair.
+
+### What was actually changed
+
+`q6routing` gains a `TX COPP Topology` enum control (`None`, `SM ECNS`,
+`DM Fluence`, `QMIC Fluence`, `DM RFECNS`), defaulting to `None` so nothing
+changes for anyone who does not ask. Playback is untouched.
+`q6adm_find_matching_copp()` already keys on topology, so flipping the control
+opens a fresh COPP.
+
+**This is the one change in the set that can fail closed.** If the ADSP
+rejects a topology, the COPP open fails and that input goes silent rather than
+merely unprocessed. Recovery is one command:
+
+```
+amixer -c0 cset name='TX COPP Topology' None
+```
+
+### What is still out of reach
+
+Pushing LG's *tuning* — mic spacing, beam direction, per-device NS
+aggressiveness — needs two things we do not have:
+
+1. `ADM_CMD_SET_PP_PARAMS_V5` in `q6adm`. Mainline implements only
+   `DEVICE_OPEN_V5`, `DEVICE_CLOSE_V5` and `MATRIX_MAP_ROUTINGS_V5`. This is
+   maybe 150 lines of ordinary APR code.
+2. An ACDB parser. The files are a proprietary keyed heap that
+   `libacdbloader.so` walks. This is the real work, and it is a project on its
+   own.
+
+Note also that ACDB **is per-model**, unlike the Bluetooth firmware:
+`Handset_cal.acdb` is 674039 bytes on US998 and 670571 on H932. If we ever do
+parse it, it needs per-device packaging.
+
+Until then the ACDB blobs are inert, so they are deliberately **not** packaged.
+
+## Codec-side quality: two dead ends worth recording
+
+* **TX high-pass filter.** Mainline `wcd934x_codec_enable_dec()` hardcodes
+  every decimator to `CF_MIN_3DB_150HZ`. Downstream exposes a per-decimator
+  cutoff. 150 Hz is a sensible voice default that removes handling rumble, so
+  this is a limitation rather than a defect — no change made.
+* **IIR0 "Band1..5".** LG sets these, and mainline implements the
+  get/put handlers, but IIR0/IIR1 are the **sidetone** filters: their output
+  feeds the RX interpolators, i.e. mic-into-earpiece during a call. They are
+  not a capture EQ and do not affect recorded audio.
+
+The capture-side gains that do matter — `ADCn Volume` and `DECn Volume` — are
+set explicitly per device in the UCM profile.
