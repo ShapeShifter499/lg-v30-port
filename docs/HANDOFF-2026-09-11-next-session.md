@@ -120,11 +120,17 @@ The live `alsa-ucm-conf-lge-joan/HiFi.conf` is the one in
 under `lg-v30-joan-pmos-packages/` is **stale** — deploying it wiped every
 microphone device from the phone before it was restored from backup.
 
-`pmaports-lge-joan`'s `joan/readme-build-guide` branch has **diverged**: local
-was 89 ahead and 31 behind, and the remote side includes an Aurel→Ember
-handoff. Today's UCM work was pushed to a new branch,
-**`joan/audio-lpb-2026-09-11`**, rather than force over it. That needs
-reconciling.
+`pmaports-lge-joan`'s `joan/readme-build-guide` had **diverged into two
+parallel lineages** — 89 ahead, 31 behind, with add/add conflicts on nine files
+because the merge base predates all of them. **Reconciled 2026-09-11** at
+`2eed71fddb`: merged with `-s ours` after checking that nothing existed only on
+the remote side (its `CONFIG_RTC_DRV_PM8XXX=m` is `=y` here; its cmdline is a
+subset of ours; its README is 307 lines against our 337 with identical
+headings; Aurel's handoff doc was already present byte-identical). Aurel's 31
+commits are preserved as a merge parent — nothing was force-pushed away.
+
+`joan/audio-lpb-2026-09-11` on the fork is now redundant (its content is in
+`joan/readme-build-guide`) and can be deleted whenever Lance wants.
 
 ## Commits
 
