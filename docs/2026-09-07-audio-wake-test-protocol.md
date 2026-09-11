@@ -16,7 +16,7 @@ The prealpha rootfs does NOT yet contain the new audio packages. After boot
 (USB network 172.16.42.1, ssh user@172.16.42.1), push and install:
 
     scp alsa-ucm-conf-lge-joan-1.0-r4.apk device-lge-joan-1-r12.apk user@172.16.42.1:/tmp/
-    ssh user@172.16.42.1 'doas apk add --allow-untrusted /tmp/alsa-ucm-conf-lge-joan-1.0-r4.apk /tmp/device-lge-joan-1-r12.apk'
+    ssh user@172.16.42.1 'sudo apk add --allow-untrusted /tmp/alsa-ucm-conf-lge-joan-1.0-r4.apk /tmp/device-lge-joan-1-r12.apk'
 
 Then stop PipeWire's takeover of the card for step 1 (raw capture first):
 
@@ -63,3 +63,24 @@ new path firing; absence of the message is not a failure (DPU_DEBUG).
 
 Artifacts on nest: ~/joan-test-assets/audio-wake-20260907/
 (boot img, 4 apks, SHA256SUMS, this protocol).
+
+## Access-lane addenda (2026-09-11, from Ember's bench memory)
+
+- The USB gadget dies ~63 s into every pmOS boot because `usb-signaller`
+  applies default_mode=charging_only. Mask it with ZERO rootfs writes:
+  `fastboot boot <img> --cmdline "panic=5 pmos.force-partition-resize
+  pmos_rootfsopts=defaults systemd.mask=usb-signaller.service"`.
+  sshd then answers at ~+81 s. Password via **sudo**, not doas, on this image.
+- To read the pmOS rootfs from LineageOS without recovery (vold holds the
+  device, but losetup does not take O_EXCL):
+  `losetup -r -f /dev/block/mmcblk0p2 && mount -o ro,noload -t ext4
+  /dev/block/loopN /mnt/pmroot`. Read-only; supersedes the ext4 feature-bit
+  dd surgery for read access (surgery still needed for writes from recovery).
+- Reboot hazards: never `setprop ctl.stop vold` / `stop vold` from LOS (reboots
+  phone); never `udevadm trigger --action=add` inside pmOS (resets this SoC).
+- Before every capture measurement: clear every `AIF*_CAP Mixer SLIM TX*`
+  bit (sticky state across uptime makes the ADSP reject multi-channel TX;
+  one port = clean start).
+- STANDING APPROVAL (Lance): always look at the code and reverse engineer
+  stock ROM/kernel wherever it helps the port — state this in every joan
+  handoff and note.
