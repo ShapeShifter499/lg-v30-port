@@ -136,16 +136,32 @@ commits are preserved as a merge parent — nothing was force-pushed away.
 
 **`linux-lg-v30-joan`** (the kernel fork)
 
-    master                   648c5181  <- advanced 4 commits, fast-forward
-    joan/latest-clean-test   648c5181  <- advanced 1 commit, fast-forward
+**Branch roles matter here and are not interchangeable:** `master` is curated
+**verified fixes only**; `joan/latest-clean-test` carries the **full history**.
+Do not fast-forward `master` to the working tip even when git allows it —
+cherry-pick verified commits instead. (Done wrong once on 2026-09-11 and
+corrected; see below.)
+
+    master                   ab54ef66  1b42626b + two verified cherry-picks
+    joan/latest-clean-test   648c5181  full history
     joan/wake-path-v1        648c5181
 
-What landed on `master`, oldest first:
+What is on `master`, and why each earned it:
 
-    622008e1657f  arm64: dts: qcom: msm8998-lge-joan: micbias, ground switch, AMIC4
-    fb968169503b  ASoC: qdsp6: q6routing: make the capture COPP topology selectable
-    2f1308c271d8  drm/msm/dpu: gate first kickoff after wake on one TE edge
-    648c5181cbb6  ASoC: es9218p: expose the mode pins and reach Low Power Bypass
+    f2b525e7  ASoC: qdsp6: q6routing: selectable capture COPP topology
+              verified — None is required for capture to open at all, and
+              SM_ECNS demonstrably fails the ALSA open
+    ab54ef66  ASoC: es9218p: expose the mode pins and reach Low Power Bypass
+              verified — LPB confirmed audible, the WCD drives the jack
+
+Deliberately **not** promoted to `master`, though present on
+`joan/latest-clean-test`:
+
+    2f1308c2  drm/msm/dpu: gate first kickoff after wake on one TE edge
+              verification status unknown to this session
+    622008e1  arm64: dts: qcom: msm8998-lge-joan: micbias, ground switch, AMIC4
+              only partly verified — micbias matches stock and is booted, but
+              the ground-switch fix did not fix MBHC and AMIC4 is inconclusive
 
 **Banked but deliberately NOT on a verified branch:**
 
