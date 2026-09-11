@@ -101,12 +101,49 @@ So MBHC is correctly configured from DT and still does not detect. That makes
 this a more interesting problem than "an unbooted patch", and it is why the
 investigation went to the register level.
 
+## TESTED: the GND_DET_EN hypothesis is WRONG
+
+Patched `wcd_dt_parse_mbhc_data()` with `cfg->gnd_det_en = !cfg->gnd_swh`,
+rebuilt, booted, and confirmed the patch reached the hardware:
+
+    ANA_MBHC_MECH = 0xf7   (was 0xb5)
+      0x40 GND_DET_EN         = 1   <- now set
+      0x02 HSG_PULLUP_COMP_EN = 1   <- also set, the callback writes both
+
+So `cfg->gnd_det_en` reached `wcd934x_mbhc_gnd_det_ctrl()` and ground detection
+is armed for the first time. **It changed nothing.** After a physical
+unplug/replug:
+
+    Elect Insert / Elect Remove / mbhc sw / Button Press / Release : all 0
+    ANA_MBHC_RESULT_1 = 0x00      jack kcontrols: hp=off mic=off
+    /dev/input/event4: 0 bytes    dmesg: nothing
+
+Ground detection was not the blocker. The finding that `cfg->gnd_det_en` is
+declared, read once and assigned nowhere in the tree still stands as a real
+mainline defect — the callback is dead code on every WCD codec — it simply is
+not *this* bug.
+
+Note also the earlier claim in this file that "no code in the tree ever writes
+GND_DET_EN" was wrong twice: `wcd934x` does implement `mbhc_gnd_det_ctrl()`
+(and so do wcd937x/938x/939x), and `wcd_mbhc_start()` does call it. Only the
+config flag gating that call is never set.
+
 ## Next
 
-Set `GND_DET_EN` in `wcd934x`'s MBHC init and retest insertion. The regmap
-debugfs is read-only here (`REGMAP_ALLOW_WRITE_DEBUGFS` unset), so this needs
-a driver change and a rebuild rather than a live poke.
+Ground detection is ruled out. Remaining avenues, roughly in order of promise:
 
-If that gives detection, three things land together: jack reporting, the
-in-line mic, and the in-line button — the button interrupts are registered and
-idle for the same reason.
+* **Does the codec raise its parent interrupt at all?** `msmgpio 54`
+  (`wcd934x_irq`) has fired exactly once, at probe, and never since. Before
+  chasing MBHC logic further it is worth establishing whether *any* WCD
+  interrupt source can reach the SoC — the SLIMbus and soundwire children on
+  the same controller are also at 0. If the parent line is the problem, every
+  MBHC symptom follows from it and the MBHC block itself may be fine.
+* **`MECH_DETECTION_TYPE` semantics.** Bit 0x20 is set. Whether 1 means
+  "detect insertion" or "detect removal" has not been traced through
+  `wcd-mbhc-v2.c`; if the driver is armed for the wrong edge on a jack that is
+  already inserted, nothing would ever fire.
+* **Compare against downstream's MBHC bring-up**, the way the ES9218P mode
+  pins were solved: LG's `wcd934x_mbhc.c` init order versus mainline's.
+
+The interrupt-controller block at 0x0460-0x0472 reads all zeros, which on this
+part means unmasked, so masking is not the cause.
