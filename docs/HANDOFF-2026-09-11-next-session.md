@@ -132,10 +132,55 @@ commits are preserved as a merge parent — nothing was force-pushed away.
 `joan/audio-lpb-2026-09-11` on the fork is now redundant (its content is in
 `joan/readme-build-guide`) and can be deleted whenever Lance wants.
 
-## Commits
+## Commits — everything is pushed
 
-    lg-v30-port       523dc7c 7ac0e72 0e30ebb b76a314 270d7d9 bc1ade5  (docs)
-    linux-lg-v30-joan 648c5181  ASoC: es9218p: mode pins + Low Power Bypass
-    pmaports-lge-joan ce06b332  low-power headphone device, Class-H, topology
+**`linux-lg-v30-joan`** (the kernel fork)
 
-`.config` in the kernel tree is byte-identical to where it started.
+    master                   648c5181  <- advanced 4 commits, fast-forward
+    joan/latest-clean-test   648c5181  <- advanced 1 commit, fast-forward
+    joan/wake-path-v1        648c5181
+
+What landed on `master`, oldest first:
+
+    622008e1657f  arm64: dts: qcom: msm8998-lge-joan: micbias, ground switch, AMIC4
+    fb968169503b  ASoC: qdsp6: q6routing: make the capture COPP topology selectable
+    2f1308c271d8  drm/msm/dpu: gate first kickoff after wake on one TE edge
+    648c5181cbb6  ASoC: es9218p: expose the mode pins and reach Low Power Bypass
+
+**Banked but deliberately NOT on a verified branch:**
+
+    joan/mbhc-gnd-det-experiment  a54b241e  ASoC: wcd-mbhc: set gnd_det_en
+
+That one is the ground-detection experiment. It corrects genuine dead code —
+`cfg->gnd_det_en` is declared once, read once and assigned nowhere, so
+`mbhc_gnd_det_ctrl()` is unreachable on every WCD codec — but it **did not fix
+jack detection** and is unverified as a functional improvement anywhere. Do not
+promote it on the strength of that commit alone.
+
+`joan/master-proven-fixes` was left alone: it has diverged (50 ahead, 11
+behind) and reconciling it is a separate job.
+
+**`pmaports-lge-joan`**
+
+    joan/readme-build-guide  2eed71fddb  <- lineages reconciled, fast-forward
+
+**`lg-v30-port`** (docs)
+
+    ember/pmaports-joan-gpu-publish-handoff
+      523dc7c 7ac0e72 0e30ebb b76a314 270d7d9 bc1ade5 795cccc a9a119a
+
+`.config` in the kernel tree is byte-identical to where it started, and the
+kernel worktree is clean.
+
+## Bench state at handoff
+
+Phone is on the RAM-booted pmOS with the card registered. The module tree is
+**tmpfs and does not survive a reboot** — but `~/joan-test-assets/joan-modules.tgz`
+on the nest has both patched modules baked in (`snd-soc-es9218p.ko` with
+`Headphone Mode`, and `snd-soc-wcd-mbhc.ko` with the failed ground-detection
+experiment), so `scripts/bench-automation/nest-boot-masked-and-load-audio.sh`
+restores them. Remember to load the SLIMbus modules afterwards or no card
+registers, and to reboot out of pmOS first so `adb` exists for the script.
+
+If you want a module set without the failed experiment, rebuild
+`snd-soc-wcd-mbhc.ko` from `joan/latest-clean-test` and repack the tarball.
