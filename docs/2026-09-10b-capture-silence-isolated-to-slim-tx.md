@@ -9,6 +9,13 @@ Second session of 2026-09-10. **Partially supersedes
 lanes and the module/SLIMbus/UCM prerequisites, which all still hold, then read
 this for the corrected diagnosis. Nothing was written to the SD card.
 
+> **Superseded on 2026-09-11 by `2026-09-11-microphone-capture-works.md`.**
+> The microphone works. SLIMbus TX was never broken — every capture measured
+> here was taken with `pulseaudio` running on the phone, which is what forces
+> the zeros. Sections 1-3 (the channel-count rule, the `out 0` correction, the
+> register readback) still stand; the "isolated to SLIMbus TX transport"
+> conclusion in §4-§6 does not.
+
 ## Headline
 
 The previous diagnosis — "the SLIM capture BE never starts, the whole analog
