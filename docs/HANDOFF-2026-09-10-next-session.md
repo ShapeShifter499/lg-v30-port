@@ -6,6 +6,15 @@ Date: 2026-09-10
 
 Supersedes `HANDOFF-2026-09-08-next-session.md` (Fulgor). Read this first.
 
+> **Partially superseded, same day, by
+> `2026-09-10b-capture-silence-isolated-to-slim-tx.md`.** Sections 1-5 (bench
+> access, usb-signaller, the missing modules, load order, the SD read trick and
+> the UCM ordering trap) all still hold. **Section 6's diagnosis does not.**
+> The SLIM capture BE *does* start and the front end *does* power up; the
+> `arecord` hw_params failure was a channel-count problem, and `out 0` merely
+> meant no capture was running at the time the dump was taken. Read the newer
+> note before acting on §6.
+
 ## Headline
 
 Three blockers found and fixed; the capture chain now runs end to end for the
