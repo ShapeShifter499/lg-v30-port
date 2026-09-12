@@ -33,6 +33,26 @@ US998, SD-card pmOS, RAM-booted from
 - tuned profile was restored to its original `throughput-performance` after the
   A/B. It is the wrong profile (see below) but I did not change it persistently.
 
+## !! Phone is WEDGED at handoff — needs a physical force-off
+
+I restarted `81voltd` on the live bench to test the startup-race hypothesis
+below. The USB gadget dropped immediately (device number 34 -> 40) and pmOS
+stopped answering: no IPv4, no IPv6 neighbour, no reply to `ff02::1`, and
+link-local ssh times out. The gadget still *enumerates* as
+`1d6b:0104 LG V30 / lge-joan`, so the device is powered and configfs is up,
+but nothing above the USB layer responds.
+
+Nothing persistent is at risk — it is a RAM boot and the SD rootfs was not
+being written at the time. **Recovery is the documented one: force-off (power
+~10 s) -> normal power-on -> LineageOS.** It cannot be done remotely; there is
+no adb (that is LOS's) and no ssh.
+
+**Lesson, and it is mine:** `81voltd` speaks QMI over QRTR to the modem, which
+shares the SoC with the IPA/rmnet path that carries the USB network. Bouncing
+it under a live session took the bench link down with it. The ordering fix
+belongs in the unit file and must be tested across a *clean boot*, not by
+restarting the service on a running bench.
+
 ## What is DONE and verified
 
 1. **Boot lottery — root-caused and fixed.** joan's DTS aimed the soundwire
