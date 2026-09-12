@@ -66,8 +66,12 @@ happened twice). Recover from dark states: force-off (power ~10 s) →
 normal power-on → LOS → adb → chain again.
 
 Image: nest `~/joan-test-assets/jack-cellular-20260911/
-boot-joan-pmos-r14-jack-cellular-20260911.img` (sha256 0c99c321…,
+boot-joan-pmos-r14-jack-cellular-20260911.img` (sha256 60927d0e…,
 cmdline = label args + mask + skip_versions + slim_dbg + ipa.lowmem).
+[Corrected 2026-09-12: this line read `0c99c321…`, the sum of the v3
+build.  That file was replaced in place by the v3.1 rebuild at 19:33 on
+09-11 -- v3.1, 60927d0e…, is what the bench actually booted, and nest's
+SHA256SUMS has been regenerated to match.]
 Kernel/device r14 apks + joan-modules-r14.tgz alongside. The r14 apks
 are ALREADY installed on the SD rootfs — a new boot needs no apk work.
 

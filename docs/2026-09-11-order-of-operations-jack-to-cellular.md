@@ -13,7 +13,10 @@ Boot pkgrel-14 kernel via the staged image (RAM boot only):
 
     # on nest
     sudo -n fastboot boot ~/joan-test-assets/jack-cellular-20260911/boot-joan-pmos-r14-jack-cellular-20260911.img
-    # (sha256 0c99c3213aafa050; cmdline masks usb-signaller so the gadget
+    # (sha256 60927d0ed9654f73 -- the v3.1 rebuild of 09-11 19:33, which is
+    #  what the bench booted; the v3 sum 0c99c3213aafa050 recorded here
+    #  originally was left behind when the file was replaced.
+    #  cmdline masks usb-signaller so the gadget
     #  survives until the r14 device package installs developer-default;
     #  then sshd answers on 172.16.42.1, user/147147, via sudo)
 
