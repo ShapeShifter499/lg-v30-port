@@ -156,3 +156,54 @@ Stage-then-push with Lance's explicit OK per target (kernel
 latest-clean-test + pmaports + lg-v30-port pushes are currently
 pre-approved flow). SD-card path only for now. Never flash during
 qualification. Never point IPA DMA at guessed addresses.
+
+## Research index (all in lg-v30-port/docs/, all carry the standing RE approval)
+
+| doc | what it holds |
+|---|---|
+| `2026-09-11-performance-vs-lineageos-report.md` | perf causes ranked (SD rootfs, GTK3 rendering, no input boost); fix ladder; sibling status |
+| `2026-09-11-fingerprint-fpc1022-report.md` | chip = FPC1022; QSEE trustlet architecture; bit-bang chip-ID path; fprintd re-enroll |
+| `2026-09-11-ims-calls-pmos-report.md` | calls architecture (AP-side IMS), joan-imsd internals, M0-M3 plan, how 81voltd/q6voiced differ |
+| `2026-09-11-camera-bringup-report.md` | CAMSS driver already in-tree (4dd87de5e58d); sensors IMX351/S5K3M3/HI-553; DT node = gate; power wiring table |
+| `2026-09-11-suspend-resume-report.md` | PSCI SYSTEM_SUSPEND probe plan; downstream suspend_ops fallback fully RE'd (0x40000343 + MPM + RPM); fix ladder |
+| `2026-09-11-upstreaming-strategy-report.md` | 140 real patches; Tier 1 first PR = wcd934x slimbus init to Brown; rebase to 7.3 late Oct |
+| `2026-09-11-wcd934x-irq-re-map.md` | jack IRQ stock-vs-mainline parity analysis (register addresses, level semantics) |
+| `2026-09-11-usb-gadget-and-usbc-report.md` | developer-default permanent fix; USB-C map (PD PMI8998, SBU GPIOs 11/16/90, BOB); DP/host/MTP gaps |
+| `2026-09-11-order-of-operations-jack-to-cellular.md` | the bench script: Phase 1-4 with commands and pass criteria |
+| `2026-09-07-audio-wake-test-protocol.md` | audio test order + access-lane addenda (signaller mask, losetup trick, hazards) |
+| `HANDOFF-2026-09-11-next-session.md` | Ember's audio handoff (mics working, buffer params, bench traps) |
+| older `HANDOFF-2026-09-08/-09-10` + `2026-09-11-microphone-capture-works.md` | capture-path history |
+
+## Planned to-do (ordered)
+
+1. **Boot-lottery bisect (kernel build)**: move LEVEL_HIGH into the
+   regmap-irq type table for WCD934X_IRQ_SLIMBUS (drop the probe-time
+   LEVEL write), keep the soundwire specifier fix; if wedging persists,
+   second build reverts the specifier to isolate. Commit targets:
+   `drivers/mfd/wcd934x.c` type table + `msm8998-lge-joan.dts`.
+2. **Phase 1 headset test on a lottery winner**: MBHC virq count ≥4 →
+   arm /tmp/jw2.py watcher → Lance plugs/unplugs + button → events =
+   jack DONE → in-line mic capture (Headset UCM, sticky-TX reset) →
+   keycode check (one-button remote = KEY_PLAYPAUSE band).
+3. **Cellular M0**: ESP modules live in r14 kernel; joan-imsd first-boot
+   ISIM read + `joan-ims register` on T-Mobile; capture SIP/ESP evidence.
+4. **Cellular M1**: stable GUA on IMS iface, answer P-CSCF keepalives,
+   TCP-in-xfrm (all fixes documented in the IMS report).
+5. **Cellular M2**: RTP receive + jitter buffer + G.711 loop to PipeWire
+   via the echo-cancel source; port LOS AGC/limiter.
+6. **Suspend ladder**: `pm_test=devices` first (GPU resume was the
+   historic killer); SYSTEM_SUSPEND probe decides fallback port.
+7. **Camera**: author the msm8998 CAMSS dtsi node from the sdm630
+   template (driver already in-tree); probe milestone = CSIPHY HW
+   version read.
+8. **Haptics port**: leds-qpnp-haptics.c from downstream + captured LRA
+   params (PM8998@c000); feedback daemon lights it for free.
+9. **USB host milestone**: BOB vbus-supply + usb-role-switch DT; test
+   with a FAT stick.
+10. **Upstream Tier 1**: wcd934x slimbus init series to Brown (Lance
+    approves draft); then stmfts/BT/ath10k/a5xx series.
+11. **Alpha rebuild**: after Phase 1-2 verify, rebuild the recovery zip
+    with the r14 stack (installer already carries fstab/NM quirks fixes).
+12. **Lance decisions pending**: UFS rootfs policy; retire master;
+    GND_DET_EN; master-proven-fixes reconciliation; branch deletions;
+    4-button headset for the full ladder test.
