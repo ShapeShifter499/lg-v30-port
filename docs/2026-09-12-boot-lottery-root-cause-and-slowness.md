@@ -102,6 +102,30 @@ Switching profiles demonstrably moves the knobs (measured, not inferred):
 `balanced` does not set swappiness at all, which is why zramstart's 180
 survives under it. This is the direct proof of which component clobbers it.
 
+### Measured (600 small files, caches dropped, profile order alternated)
+
+Timer positive-controlled first (`sleep 2` measured 2.02 s) because busybox
+`date` has no `%N`: an earlier run of this same benchmark reported `0ms` four
+times and would have been read as "no difference".
+
+| order | profile | readahead | swappiness | elapsed |
+|---|---|---|---|---|
+| 1 | balanced | 128 kB | 180 | 6.09 s |
+| 2 | throughput-performance | 4096 kB | 10 | 7.27 s |
+| 3 | balanced | 128 kB | 180 | 5.04 s |
+| 4 | throughput-performance | 4096 kB | 10 | 6.57 s |
+
+`balanced` is faster in both pairs: 5.57 s vs 6.92 s mean, about 20%. Order is
+alternated because there is a visible warming trend (later runs faster), and
+`throughput-performance` is still slower in the later slot than `balanced` was
+in the earlier one -- so the effect is not drift.
+
+**What this does and does not show.** N=2 per arm, and the workload is
+read-only: it exercises readahead, not the dirty ratios. The writeback argument
+above (40%/10% dirty on single-digit-MB/s media) is reasoned from the observed
+37% iowait and `jbd2` D-state during a package install, and is *not* measured
+here. A write-side benchmark is still owed before claiming a figure for it.
+
 **Not the SD card, and not the scheduler.** Both were already correct and
 should be left alone:
 
