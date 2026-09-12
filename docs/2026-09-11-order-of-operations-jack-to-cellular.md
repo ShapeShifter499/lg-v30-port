@@ -9,7 +9,23 @@ mic, buttons), then wire cellular calls into pmOS. One kernel build
 
 ## Phase 1 — headphone jack, in-line mic, buttons (Lance's hands + headset)
 
-Boot pkgrel-14 kernel (RAM boot or laf), then:
+Boot pkgrel-14 kernel via the staged image (RAM boot only):
+
+    # on nest
+    sudo -n fastboot boot ~/joan-test-assets/jack-cellular-20260911/boot-joan-pmos-r14-jack-cellular-20260911.img
+    # (sha256 0c99c3213aafa050; cmdline masks usb-signaller so the gadget
+    #  survives until the r14 device package installs developer-default;
+    #  then sshd answers on 172.16.42.1, user/147147, via sudo)
+
+First thing on boot — make the running kernel self-consistent and bring
+developer-default + the new daemons in:
+
+    scp alsa-ucm + device apks ... (or from nest ~/joan-test-assets/jack-cellular-20260911/)
+    sudo apk add --allow-untrusted ./device-lge-joan-1-r14.apk ./linux-lge-joan-7.2.0_rc2-r14.apk
+    (installkernel + depmod make /lib/modules/7.2.0-rc2 match the running
+     kernel; developer-default ends the signaller teardown for future boots)
+
+Then:
 
 1. **Verify the fix took** (before any headset work):
    - `grep wcd934x /proc/interrupts` — note parent fire count at idle
