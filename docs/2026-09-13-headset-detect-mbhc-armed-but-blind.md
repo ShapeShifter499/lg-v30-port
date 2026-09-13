@@ -485,3 +485,47 @@ state, rather than only setting the pins.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## ES9218P register dump — partial comparison only
+
+Mainline exposes the part at `/sys/kernel/debug/regmap/0-0048` (70 registers);
+dumped live on r19 in HiFi mode. **LOS cannot be dumped**: its driver binds at
+`1-0048` but the `registers` sysfs attribute from `DEVICE_ATTR(registers,...)`
+is not present on that build, and there are no i2c-tools on the device. Note
+`/sys/bus/i2c/devices/1-0059/registers` DOES exist and is a *haptics* chip
+(IC_INFO/FIFO_FULLNESS/HAPTIC_DATA) -- not the DAC. Do not diff it by mistake.
+
+So the comparison is mainline-live against downstream-*source*
+(`es9218_RevB_init_register[]`):
+
+| reg | | downstream | mainline |
+|---|---|---|---|
+| 0x02 | automute config | F4 | 34 |
+| 0x05 | automute level | 63 | 68 |
+| 0x07 | filter shape | A0 | 80 |
+| 0x0b | channelmap/OCP | 90 | 90 |
+| 0x0d | THD comp | 00 | 00 |
+| 0x1b | gen config | C4 | c4 |
+
+The three that differ are audio-quality settings. None gates an analog detect
+line, so porting them is housekeeping, not a jack fix.
+
+`AMP_CONFIG` (0x20) reads 00 in mainline against downstream's 0x02/0x03, but
+that is explained rather than a defect: mainline writes `AMP_MODE_HIFI1` inside
+`es9218p_amp_power_up()`, which runs from a DAPM `SND_SOC_DAPM_POST_PMU` event
+-- i.e. only when a stream actually powers the ES9218P widget.
+
+### Untested: does detection work once the analog path is powered?
+
+Attempted and FAILED to test. `alsaucm set _enadev Headphones` plus
+`speaker-test -D hw:0,0` left `AMP_CONFIG` at 00 through the whole run, so the
+bring-up never ran and the test exercised nothing. `hw:0,0` (MultiMedia1) is
+the same FE that fails for capture; `hw:0,1` is the working one.
+
+To test properly: get a real stream through the ES9218P DAPM widget so
+POST_PMU fires and `AMP_CONFIG` goes 00 -> 02, *then* replug. If detection
+starts working with the analog stage powered, the fix is about when mainline
+brings that path up -- not about downstream's automute/filter values.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
