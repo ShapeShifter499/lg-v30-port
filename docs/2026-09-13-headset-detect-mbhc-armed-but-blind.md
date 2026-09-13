@@ -190,3 +190,90 @@ unassigned tree-wide.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## Full register diff, both sides with the headset REMOVED
+
+The single-state capture above was not enough to interpret polarity, so both
+states were captured on LOS and compared against mainline in the same state.
+
+**The MECH_DETECTION_TYPE hypothesis is REFUTED.** LOS, headset removed, reads
+`0614 = b5` / `0615 = 09` / `0619 = 10` -- byte-for-byte identical to mainline.
+So the polarity is the opposite of what the single sample suggested:
+
+| | MECH_DETECTION_TYPE |
+|---|---|
+| LOS, jack empty | 1 (armed to detect insertion) |
+| LOS, jack inserted | 0 (armed to detect removal) |
+| mainline, undetected | **1 -- correct** |
+
+`FSM_EN = 0` is likewise correct for the empty state; downstream reads `09`
+there too. Both of the fixes proposed in the previous section would have been
+patches for non-bugs. The second capture cost one `adb` read and prevented
+shipping them.
+
+### Every MBHC field-map register, headset removed on both
+
+| addr | name | LOS | mainline | |
+|---|---|---|---|---|
+| 0411 | INTR_PIN1_STATUS0 | 00 | 00 | same |
+| 0609 | ANA_HPH | 0c | 0c | same |
+| 0614 | ANA_MBHC_MECH | b5 | f7 | differs *only* by r18's GND_DET_EN |
+| 0615 | ANA_MBHC_ELECT | 09 | 09 | same |
+| 0616 | ANA_MBHC_ZDET | 00 | 00 | same |
+| 0619 | ANA_MBHC_RESULT_3 | 10 | 10 | same |
+| 0623 | ANA_MICB2 | 14 | 14 | same |
+| 065a | MBHC_CTL_BCS | 01 | 00 | bit0, unmapped in mainline's field table |
+| 065b | MBHC_STATUS_SPARE_1 | 00 | 00 | same |
+| 06cd | HPH_CNP_WG_TIME | 14 | 14 | same |
+| 06ce | HPH_OCP_CTL | 3a | 28 | OCP config |
+| 06d2 | HPH_PA_CTL2 | 50 | 50 | same |
+| 06d4 | HPH_L_TEST | e1 | e0 | bit0 = HPHL_OCP_DET_EN |
+| 06d7 | HPH_R_TEST | e1 | e0 | bit0 = HPHR_OCP_DET_EN |
+| 0720 | MBHC_NEW_CTL_1 | 86 | 82 | bit2 = DETECTION_DONE |
+| 0721 | MBHC_NEW_CTL_2 | 05 | 06 | HS_VREF 1 vs 2 |
+| 0722 | MBHC_NEW_PLUG_DETECT_CTL | a6 | a6 | same |
+| 0725 | MBHC_NEW_FSM_STATUS | 00 | 00 | same |
+| 0726 | MBHC_NEW_ADC_RESULT | 00 | 00 | same |
+
+**The mechanical detection path is configured identically.** MECH (modulo
+GND_DET_EN), ELECT, ZDET, MICB2, PLUG_DETECT_CTL and every RESULT/STATUS
+register match. The only differences are over-current protection, a button
+threshold, and DETECTION_DONE -- none of which gate insertion sensing.
+
+**Conclusion: the fault is not in MBHC configuration.** It is in interrupt
+delivery, or in something outside this regmap.
+
+### Correction to the LEVEL premise of 2026-09-12
+
+The interrupt block diff also corrects something this project has believed
+since `abc48a756b0f`. Both that commit and its type-table replacement assumed
+downstream programs "source 0 level-high, everything else pulse". Downstream
+actually programs all four LEVEL bytes:
+
+| | 0461 | 0462 | 0463 | 0464 |
+|---|---|---|---|---|
+| LOS | **03** | **e0** | **94** | **80** |
+| mainline | 01 | 00 | 00 | 00 |
+
+MBHC_SW_DET is source 8 = LEVEL1 bit0, which is 0 on both, so the MBHC sources
+really are pulse in both and this does not explain the jack. But the premise
+"downstream sets only bit 0" was wrong, and the type-table fix reproduces only
+part of downstream's configuration.
+
+Other interrupt-block differences, none of them MBHC sources: `0400` (LOS 00,
+mainline 04), `0409` bit1 = IRQ_MISC (unmasked downstream, masked in mainline
+because mainline's table has no MISC entry), `040b`/`040c` unmasking sources
+mainline does not implement.
+
+### Next step
+
+Determine whether mainline's INTR1 delivers *any* wcd934x interrupt during
+normal operation. The 2026-09-11 handoff records a boot where the parent fired
+66 times and demuxed to the slim child, so the path can work. If slim
+interrupts still fire on a current kernel while MBHC never does, the fault is
+specific to the MBHC source; if nothing fires at all, INTR1 delivery is broken
+generally and MBHC is only the visible victim. That is one audio-playback test,
+not a rebuild.
+
+`0400` also wants identifying -- mainline sets bit2 where downstream has the
+register at zero, and it sits at the base of the interrupt block.
