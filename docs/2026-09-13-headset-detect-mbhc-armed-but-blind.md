@@ -369,3 +369,71 @@ source and datasheet work, not another register dump.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## Clock gating refuted; the codec is fully cleared
+
+Hypothesis: INTR1 had fired exactly once all day -- during a mic capture --
+and never while idle, so perhaps the codec can only report jack events while
+MCLK is up.
+
+Test: 90 s mic capture with per-10 s sampling, Lance plugging the headset and
+pressing the button mid-capture.
+
+    t=0..80   parent=2  mbhc_sw=0  btnpress=0  electins=0  jack=off
+    t=90      parent=4  mbhc_sw=0  btnpress=0  electins=0  jack=off
+
+MCLK was demonstrably up (capture ran; the parent ticked 2->4 at stream stop)
+and **no MBHC source moved**. Clock gating is not the cause.
+
+### Everything in the driver's control is now verified correct
+
+| property | evidence |
+|---|---|
+| configuration | byte-identical to the stock kernel across wcd934x's whole MBHC field map |
+| clocked | interrupts fire on the same INTR1 line during capture |
+| armed | `L_DET_EN = 1` in `ANA_MBHC_MECH` |
+| sources unmasked | `INTR_PIN1_MASK1 = f2` |
+| interrupt path | parent fires, regmap-irq demuxes, `slim` child serviced |
+| hardware | LOS detects this jack on this silicon, `h2w state = 1` |
+
+All measured, none inferred. And the jack still does not detect.
+
+### ES9218P pin model is correct -- not a hidden routing switch
+
+joan wires three GPIOs to the ES9218P (`power` pm8998 gpio 10, `reset`
+pmi8998 gpio 2 ACTIVE_LOW, `hph-sw` pm8998 gpio 12). "HPH_SW" reads like an
+analog switch routing the jack between WCD and DAC, which would explain
+everything -- but downstream's own driver says otherwise (`es9218.c:434`):
+
+    hph_switch_gpio;                    //HIFI_MODE2
+    reset_gpio=H && hph_switch_gpio=L   --> HiFi mode
+    reset_gpio=L && hph_switch_gpio=H   --> Bypass mode
+
+`hph_sw` *is* MODE2, so mainline's model is right. Bypass mode was tested
+earlier today with a physical replug: negative.
+
+## Hypotheses eliminated this session, all by measurement
+
+1. Interrupt plumbing -- parent fires and demuxes, proven during capture
+2. Masking -- MBHC sources unmasked on both
+3. Plug-type polarity -- matches the stock DTB, registers confirm
+4. Jack / machine-driver wiring -- input device and kcontrols exist
+5. ES9218P routing -- tested in Low Power Bypass, negative
+6. Ground detection (`GND_DET_EN`) -- clean negative, and downstream runs it at 0
+7. Moisture detection -- `MOISTURE_STATUS` clear
+8. `MECH_DETECTION_TYPE` -- mainline's value is correct for an empty jack
+9. `FSM_EN` -- likewise correct for an empty jack
+10. Micbias ramp -- real defect, fixed in r19, did not fix the jack
+11. Clock gating -- refuted with MCLK demonstrably up
+12. Hidden analog routing switch -- `hph_sw` is MODE2 per downstream
+
+## What is left
+
+The fault is in the analog path between the jack sleeve and the WCD's L_DET
+pin, and nothing in the codec's register space or the driver explains it. The
+next step is joan's schematic -- specifically how the jack's detect contact is
+routed, and whether anything on that line needs enabling that is not modelled
+in DT at all. That is not bench work and not driver archaeology.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
