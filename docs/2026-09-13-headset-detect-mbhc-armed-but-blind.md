@@ -277,3 +277,45 @@ not a rebuild.
 
 `0400` also wants identifying -- mainline sets bit2 where downstream has the
 register at zero, and it sits at the base of the interrupt block.
+
+## INTR1 delivery WORKS — the fault is specific to the MBHC source
+
+Tested by generating real WCD-routed traffic: UCM `HiFi`/`Mic` (built-in mic,
+AMIC1, WCD9340) then `arecord -D hw:0,1`. Capture succeeded (384044 bytes), so
+the mic path also works on r18.
+
+    before capture:  136 msmgpio 54 = 0    138 slim = 0    139 mbhc sw intr = 0
+    after  capture:  136 msmgpio 54 = 2    138 slim = 1    139 mbhc sw intr = 0
+
+The codec asserted INTR1, the parent handler ran, regmap-irq demuxed to the
+`slim` child and it was handled. **The whole interrupt path is functional.**
+This also independently validates the LEVEL work: `slim` shows `Level` in
+/proc/interrupts and fired *and was serviced*, with no one-shot-then-silence.
+
+Two notes on method:
+
+- `arecord -D hw:0,0` (MultiMedia1) fails with `Invalid argument`; `hw:0,1`
+  (MultiMedia2) is the working capture FE.
+- Do NOT grep /proc/interrupts for bare "slim": it also matches the SoC's
+  `slim_qcom_ngd_ctrl` slimbus controller, which was at 66191 and climbing
+  throughout. That is a different interrupt from the WCD's `slim` child and
+  conflating them makes the WCD look far busier than it is.
+- pulseaudio is NOT on this image. joan moved to PipeWire
+  (`pipewire`/`wireplumber`/`pipewire-pulse` all running); the "kill
+  pulseaudio first" note from 2026-09-11 is obsolete and killing it is a no-op.
+- The loudspeaker is a TFA9872 on tertiary MI2S, per UCM. Speaker playback does
+  NOT traverse the WCD and cannot be used to test WCD interrupt delivery.
+
+### Where that leaves it
+
+Every source on INTR1 works except MBHC. MBHC's steady-state configuration is
+byte-identical to downstream. So the remaining difference is almost certainly
+not *what* mainline writes but *how*: the order, timing, or a latch/toggle in
+downstream's MBHC init sequence that leaves the mechanical comparator armed,
+which a register dump of the settled state cannot reveal.
+
+Next: diff downstream's `wcd_mbhc_initialise()` / `wcd_mbhc_start()` write
+sequence against mainline's, rather than the resulting register values.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
