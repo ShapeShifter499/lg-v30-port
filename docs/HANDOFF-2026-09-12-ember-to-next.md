@@ -47,11 +47,24 @@ being written at the time. **Recovery is the documented one: force-off (power
 ~10 s) -> normal power-on -> LineageOS.** It cannot be done remotely; there is
 no adb (that is LOS's) and no ssh.
 
-**Lesson, and it is mine:** `81voltd` speaks QMI over QRTR to the modem, which
-shares the SoC with the IPA/rmnet path that carries the USB network. Bouncing
-it under a live session took the bench link down with it. The ordering fix
-belongs in the unit file and must be tested across a *clean boot*, not by
-restarting the service on a running bench.
+**CORRECTION 2026-09-13:** the attribution above is not supported. The phone
+wedged a second time with the identical signature -- gadget re-enumerates,
+nest's side healthy, phone unreachable, no adb -- while nothing touched
+`81voltd`. The only event was a physical headset replug, on r18. So two wedges,
+two unrelated triggers, one signature; `81voltd` is not established as the
+cause and the paragraph that follows was over-confident from a single data
+point.
+
+Open hypothesis for the second one, unproven: r18 sets `GND_DET_EN`, arming a
+ground-detection comparator that was dead code on this device until now, and
+the first thing that exercises it is a jack insertion -- which is when it hung.
+Wedge 1 happened on r16 without that patch, so it cannot be the whole story.
+
+Original (over-confident) note follows: `81voltd` speaks QMI over QRTR to the
+modem, which shares the SoC with the IPA/rmnet path that carries the USB
+network, so bouncing it under a live session is still not a cheap experiment
+and the ordering fix still belongs in the unit file, tested across a clean
+boot.
 
 ## What is DONE and verified
 
