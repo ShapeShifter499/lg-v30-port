@@ -72,6 +72,39 @@ Ordered suspects:
    it does because downstream uses `qcom,msm-mbhc-*`, which is suggestive but
    not proof.
 
+## GND_DET_EN: retested on a clean baseline, and eliminated
+
+Suspect 1 above has now been tested properly. `a54b241e43c9` was cherry-picked
+onto the fixed kernel as `joan/mbhc-gnd-det-v2` (`1c0180a108ec`) and shipped as
+pkgrel 18.
+
+Why the retest was justified: the original run's parent is `648c5181cbb6`,
+which predates `2b6ecf829cd7`. On that tree soundwire could still hold IRQ 8 =
+`WCD934X_IRQ_MBHC_SW_DET`, so "every MBHC interrupt reads zero" could not
+distinguish *ground detection does not help* from *MBHC was never armed*.
+
+The retest baseline was verified before touching the hardware:
+
+    0614 ANA_MBHC_MECH        f7     (was b5 -- GND_DET_EN and pullup-comp set)
+    loaded snd-soc-wcd-mbhc   2ffb0fd1  (r18, the patched module)
+    MBHC handlers             7
+    all counters              0
+
+Lance then physically unplugged, replugged and pressed the in-line button.
+Result: **every counter still zero**, parent `msmgpio 54` included, both jack
+kcontrols still `off`, `ANA_MBHC_RESULT_1/2` still `0x00`.
+
+**Ground detection is not the cause on joan.** The original commit reached the
+same conclusion and was right, but on evidence that could not support it; this
+is the same answer with the confound removed. The commit stays worth keeping
+as a dead-code correction (`cfg->gnd_det_en` is assigned nowhere in the tree,
+making `mbhc_gnd_det_ctrl()` unreachable on wcd934x/937x/938x/939x) but it is
+not a joan fix.
+
+That leaves one suspect standing: **whether joan's jack-detect pin reaches the
+WCD's L_DET at all.** Everything else has been measured and ruled out. This is
+schematic / downstream-DTB work, not bench work.
+
 ## Method note (cost me two rounds)
 
 The python input watcher reported nothing both times **because it was never
