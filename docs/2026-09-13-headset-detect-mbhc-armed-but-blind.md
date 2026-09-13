@@ -529,3 +529,62 @@ brings that path up -- not about downstream's automute/filter values.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## ANSWER: the WCD never reaches the jack. MBHC was never the problem.
+
+Found by listening, not by reading registers.
+
+Two audio paths exist to the headphone jack:
+
+- `HeadphonesHiFi` — SoC I2S -> ES9218P DAC -> jack. The WCD is not involved.
+- `Headphones` — WCD9340 HPHL/HPHR -> **ES9218P bypass** -> jack. UCM correctly
+  sets `Headphone Mode = Low Power Bypass` for this (device HiFi.conf line 164;
+  note the checked-out alsa-ucm-conf repo is STALE and disagrees with what is
+  installed -- read the device's copy).
+
+A/B tested by ear, with order and pitch deliberately crossed against path
+because the first design had all three confounded:
+
+| run | burst 1 | burst 2 | heard |
+|---|---|---|---|
+| 1 | WCD, 300 Hz, first | DAC, 1200 Hz, second | **burst 2 only** |
+| 2 | DAC, 300 Hz, first | WCD, 1200 Hz, second | **burst 1 only** |
+
+Both runs verified mid-burst: DAC path `mode=0 AMP=02`, bypass path
+`mode=2 AMP=00`. The DAC path is audible in both positions and both pitches;
+the WCD path is silent in both. Order and pitch are eliminated.
+
+**The WCD9340's HPHL/HPHR do not reach the jack in mainline.**
+
+### Why this retires the whole session's investigation
+
+MBHC's `L_DET` senses the HPHL pin. If HPHL never reaches the jack, then
+inserting a plug produces no electrical change at the comparator's input --
+so:
+
+- the raw status latch never moves (measured, 13 samples/195 s)
+- MBHC's registers match the stock kernel byte-for-byte, because **MBHC is not
+  broken**
+- all thirteen hypotheses died because every one of them was aimed at a block
+  that was working correctly the whole time
+
+### Where the bug actually is
+
+The ES9218P bypass path. Mainline sets the mode pins correctly and UCM
+requests bypass correctly, but the analog signal does not cross. The driver
+says why, in its own comment:
+
+    This control only moves the mode pins.  The register sequences downstream
+    runs across a transition (es9218p_sabre_hifi2lpb() and friends) are not
+    implemented yet
+
+The pins say bypass; the chip's internal analog switches were never told. Port
+`es9218p_sabre_hifi2lpb()` (and its siblings) from LG's es9218.c.
+
+**Expected consequence:** fixing the bypass path should restore BOTH the
+low-power headphone audio route AND jack detection, because L_DET will finally
+have a live signal at its input. Jack detection is downstream of an audio
+routing bug, not a codec bug.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
