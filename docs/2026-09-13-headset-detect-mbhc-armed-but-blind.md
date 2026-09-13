@@ -437,3 +437,51 @@ in DT at all. That is not bench work and not driver archaeology.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## The codec's raw status latch never moves — it is blind at its input
+
+Instrument changed: instead of asking why the interrupt does not arrive, poll
+the hardware status registers directly across a physical plug event.
+
+13 samples over ~195 s on r19, with Lance unplugging, replugging and pressing
+the button inside the window. **Every sample identical:**
+
+    STATUS0=00 STATUS1=00 MECH=b5 ELECT=09 RES3=10 mbhc_irq=0 parent=0
+
+`INTR_PIN1_STATUS0/1` are the raw latches, read before any interrupt handling.
+They never set. So this was never an interrupt-delivery problem, never a
+masking problem, and never a configuration problem: **the WCD9340's mechanical
+comparator does not register the insertion at all.**
+
+That holds while:
+
+- MBHC registers are byte-identical to the stock kernel
+- all three ES9218P GPIOs are byte-identical to the stock kernel
+- LOS detects via the *same* `mbhc sw intr` source on the *same* msmgpio 54
+  (verified: parent=1, mbhc sw intr=1, h2w state=1)
+- the codec is otherwise fully functional: mics, slimbus, audio capture
+
+Note on the instrument: each sample costs ~15 s because it greps a 65536-line
+regmap dump five times, so a "3 s cadence, 40 samples" script actually samples
+every ~15 s. Budget for that; the wall-clock window is what matters, not the
+sample count.
+
+## Next: the ES9218P's internal registers
+
+The one active component between jack and codec whose *internal* state has
+never been compared. Mainline's own driver says it is incomplete:
+
+    This control only moves the mode pins.  The register sequences downstream
+    runs across a transition (es9218p_sabre_hifi2lpb() and friends) are not
+    implemented yet
+
+Correct mode pins with un-programmed internal analog switches would isolate
+the jack from the WCD in every mode, which is exactly what the status latch
+says is happening. GPIO parity has been established; register parity has not.
+
+Dump and diff: mainline `i2c 0-0048`; on LOS the regmap list shows `7-0008`
+and `7-0034`. Then port whatever sequence downstream runs to reach the idle
+state, rather than only setting the pins.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
