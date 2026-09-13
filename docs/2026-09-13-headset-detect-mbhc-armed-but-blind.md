@@ -119,3 +119,74 @@ Positive-control the channel before trusting its silence.
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
 Date: 2026-09-13
+
+## BREAKTHROUGH: register diff against LineageOS on the same hardware
+
+Rather than keep guessing at the analog layer, boot the stock OS on the same
+phone and diff the codec registers. LOS detects the headset, so whatever bit
+differs is the answer.
+
+`adb root` on LOS; the WCD9340 regmap is `/sys/kernel/debug/regmap/tavil-slim-pgd`.
+
+**LOS state at capture: headset INSERTED and detected** --
+`/sys/class/switch/h2w/state = 1`, and `getevent -lp` on
+`msm8998-tavil-snd-card Headset Jack` shows `SW_HEADPHONE_INSERT*`,
+`SW_MICROPHONE_INSERT*`, `SW_JACK_PHYSICAL_INS*` all currently set.
+**This proves the hardware path is intact and joan's jack-detect pin does
+reach the WCD's L_DET.** The remaining suspect from the previous section is
+eliminated; the fault is entirely in the mainline driver.
+
+Same registers, same physical state (headset inserted), both drivers:
+
+| register | mainline r18 | LOS | note |
+|---|---|---|---|
+| `0409` INTR_PIN1_MASK0 | f2 | f0 | |
+| `040a` INTR_PIN1_MASK1 | f2 | f2 | same |
+| `0603` ANA_RCO | 80 | 00 | |
+| `0614` ANA_MBHC_MECH | **f7** | **95** | see below |
+| `0615` ANA_MBHC_ELECT | **09** | **b9** | bit7 FSM_EN: 0 vs **1** |
+| `0623` ANA_MICB2 | 14 | 14 | same |
+| `0656` MBHC_CTL_CLK | 30 | 30 | same |
+| `0720` MBHC_NEW_CTL_1 | 82 | 86 | DETECTION_DONE set downstream |
+| `0721` MBHC_NEW_CTL_2 | 06 | 05 | HS_VREF 2 vs 1 |
+| `0725` FSM_STATUS | 00 | 00 | moisture clear both |
+
+`ANA_MBHC_MECH` decoded:
+
+| field | mask | mainline | LOS |
+|---|---|---|---|
+| L_DET_EN | 0x80 | 1 | 1 |
+| GND_DET_EN | 0x40 | 1 | **0** |
+| MECH_DETECTION_TYPE | 0x20 | **1** | **0** |
+| HPHL_PLUG_TYPE | 0x10 | 1 | 1 |
+| GND_PLUG_TYPE | 0x08 | 0 | 0 |
+
+### Three conclusions
+
+1. **`GND_DET_EN` is wrong and r18 should be reverted.** Downstream runs it at
+   0 while detecting correctly. Independent confirmation of the clean negative
+   above.
+2. **`MECH_DETECTION_TYPE` is inverted relative to downstream for the same
+   physical state, and mainline never initialises it.** Across all of
+   `wcd-mbhc-v2.c` there are exactly two writes: the read-and-invert inside
+   `wcd_mbhc_swch_irq_handler()` (which cannot run if no interrupt ever
+   fires -- a deadlock), and one in `wcd_mbhc_typec_report_unplug()`, gated on
+   `cfg->typec_analog_mux`, which joan does not set. So on a non-Type-C device
+   the bit is never written at arm time and keeps whatever value it powers up
+   with. joan powers up at 1.
+3. **`FSM_EN` is 0 in mainline, 1 downstream.**
+
+### The fix to try
+
+`wcd_mbhc_start()` must establish `MECH_DETECTION_TYPE` to match the current
+jack state before setting `L_DET_EN`, instead of inheriting the POR value. As
+it stands the driver arms itself to watch for the edge that cannot occur:
+watching for removal with nothing inserted, so an insertion is never seen, so
+the IRQ handler that would flip the bit never runs.
+
+This is a mainline bug affecting every non-Type-C wcd934x/937x/938x/939x
+board, not a joan quirk -- the same way `cfg->gnd_det_en` was found to be
+unassigned tree-wide.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
