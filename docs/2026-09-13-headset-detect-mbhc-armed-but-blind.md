@@ -319,3 +319,53 @@ sequence against mainline's, rather than the resulting register values.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## r19: configuration now byte-identical to downstream, and detection STILL fails
+
+pkgrel 19 (kernel `8454b5f74bca`, `joan/mbhc-micb-ramp`) added the missing
+`mbhc_micb_ramp_control(true)` to `wcd_mbhc_initialise()` and dropped r18's
+GND_DET_EN. Verified live on the phone:
+
+    0624 ANA_MICB2_RAMP   8c    (was 00 -- now exactly LOS's value)
+    0614 ANA_MBHC_MECH    b5    (GND_DET_EN gone -- exactly LOS)
+    0615 ANA_MBHC_ELECT   09    (exactly LOS)
+    loaded snd-soc-wcd-mbhc  52c45a28 (r19)
+
+**Every register in wcd934x's MBHC field map now matches the stock kernel.**
+Lance plugged the headset in, pressed the button, unplugged. Every counter
+still zero, parent included; both jack kcontrols still `off`.
+
+### This is the conclusive negative for the configuration theory
+
+Mainline's MBHC is now configured identically to a kernel that detects this
+jack on this hardware, and it still does not detect. **Register configuration
+is not the cause.** Every register-level hypothesis this session has produced
+is therefore retired, and the register-diff approach has been taken as far as
+it goes.
+
+The micbias-ramp patch stays worth keeping on its own merits -- the callback
+having a single unreachable call site is a real defect on wcd934x/937x/938x/
+939x/pm4125 -- but it is not the jack fix, and the commit message already says
+so rather than claiming otherwise.
+
+### Remaining differences, all OUTSIDE the MBHC field map
+
+| addr | name | mainline | LOS |
+|---|---|---|---|
+| `0712` | CLK_SYS_MCLK2_PRG1 | **00** | **a0** |
+| `0603` | ANA_RCO | 80 | 00 |
+| `0720` bit2 | MBHC_NEW_CTL_1 DETECTION_DONE | 0 | 1 |
+| `0721` | MBHC_NEW_CTL_2 HS_VREF | 2 | 1 |
+
+`MBHC_CTL_RCO_EN` (MBHC_NEW_CTL_1 bit7) is set on both, so the MBHC RCO itself
+is enabled either way. But **MCLK2 is never programmed in mainline**, and the
+insertion debounce is 96 ms of counting that needs a clock to run. A detection
+FSM whose debounce timer never advances would present exactly as this does:
+correctly armed, comparator configured, and no interrupt ever generated.
+
+Next lead: the MBHC clock domain -- what `CLK_SYS_MCLK2_PRG1 = a0` enables
+downstream, and whether the MBHC debounce/FSM is clocked from it. That is
+source and datasheet work, not another register dump.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
