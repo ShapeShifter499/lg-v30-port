@@ -588,3 +588,44 @@ routing bug, not a codec bug.
 
 Signed-off-by: Lance <Gero3977@gmail.com>
 Assisted-by: Claude-Code:claude-opus-5
+
+## r20: AMP_CONFIG=0x01 is NOT sufficient
+
+pkgrel 20 (kernel f7695e7515dd) makes the bypass transition write
+AMP_CONFIG = 0x01 instead of 0, matching joan's downstream
+es9218_sabre_hifi2bypass() for ESS_B. Verified live: module 4bd02cd3
+loaded, and in bypass `mode=2 AMP_CONFIG=01` where every earlier boot read
+`00`.
+
+Re-ran the A/B tone test unchanged, single variable against r19:
+
+    burst 1 (WCD, 300 Hz):  mode=2 AMP_CONFIG=01   -> STILL SILENT
+    burst 2 (DAC, 1200 Hz): mode=0 AMP_CONFIG=02   -> audible (control)
+
+**The WCD still does not reach the jack.** The root-cause finding is
+unaffected -- it was established independently by the order- and
+pitch-crossed A/B -- but this fix is incomplete.
+
+Mainline now performs downstream's three documented steps in downstream's
+order (AMP_CONFIG=0x01, MODE2 high, RESETb low) and the analog path is
+still not established, so the bypass must depend on something outside that
+function. Most likely candidates, none of which mainline has an equivalent
+of: `__es9218_sabre_headphone_on()`, `es9218_sabre_audio_active()`, and the
+`es9218_power_state` machine (ESS_PS_CLOSE/IDLE/BYPASS/HIFI) that gates
+them. Downstream reaches bypass as a *state*, not as a pin transition.
+
+Keep the r20 change regardless: AMP_CONFIG = 0 powers the amplifier block
+down entirely and is wrong for a bypass mode on this part, whatever else
+is missing.
+
+### Bench note: sticky mixer state
+
+A tone test that worked earlier in the session produced silence on both
+bursts after ~9 hours of uptime and dozens of UCM device switches --
+`Headphone Playback Switch` had ended up `off`. ALSA control state
+accumulates and two runs of the same script stop being comparable. Reboot
+or reset the control family before each audio measurement; do not trust a
+control that passed hours earlier.
+
+Signed-off-by: Lance <Gero3977@gmail.com>
+Assisted-by: Claude-Code:claude-opus-5
