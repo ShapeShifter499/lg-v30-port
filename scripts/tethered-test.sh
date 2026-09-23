@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # LG V30 (joan) mainline tethered RAM-boot test runner.
 #
-# Safety contract (binding, see docs/ember-handoff-2026-07-07-*.md):
+# Safety contract (binding, see docs/handoff-2026-07-07-k027-complete.md):
 #   - RAM-only `fastboot boot`, never flash.
 #   - Enter fastboot via `adb reboot bootloader` (menu-entered fastboot
 #     has wedged aboot before).
@@ -67,7 +67,7 @@ ts "adb reboot bootloader"
 adb reboot bootloader >>"$LOG" 2>&1
 
 FBDEV=""
-for i in $(seq 1 30); do
+for _ in $(seq 1 30); do
     sleep 2
     OUT=$(sudo -n fastboot devices 2>&1)
     if [ -n "$OUT" ]; then FBDEV="$OUT"; break; fi

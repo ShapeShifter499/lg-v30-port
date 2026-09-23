@@ -4,10 +4,12 @@ Contributions from **humans and AI agents alike** are welcome, via GitHub
 pull requests, to any of the three project repos:
 
 - **Kernel** — [`ShapeShifter499/linux-lg-v30-joan`](https://github.com/ShapeShifter499/linux-lg-v30-joan),
-  PRs against branch **`joan/latest-clean-test`**. Board DTS, drivers,
-  defconfig — anything that moves the LG V30 (`joan`) toward booting
-  mainline/postmarketOS with working peripherals (current wishlist: UFS
-  storage, display/DSC, touchscreen, wifi WCN3990/ath10k-SNOC, BT hci_qca).
+  PRs against branch **`joan/latest-clean-test`** (the working history;
+  `master` receives only device-verified fixes — see README "Branches").
+  Board DTS, drivers, defconfig — anything that moves the LG V30 (`joan`)
+  toward booting mainline/postmarketOS with working peripherals (current
+  wishlist: Wi-Fi WCN3990/ath10k-SNOC, A540 GPU runtime PM, charging,
+  suspend/resume — see README "Work parcels").
 - **postmarketOS port** — [`ShapeShifter499/pmaports-lge-joan`](https://github.com/ShapeShifter499/pmaports-lge-joan),
   PRs against branch **`device-lge-joan`** (a pmaports fork; shaped to
   become the upstream pmaports MR).
@@ -49,12 +51,17 @@ duplicated.
    `docs/test-results/README.md` index. Record exact identity/hashes,
    authorization and retry status, scoped pass/fail/open gates, owner-visible
    observations, decisions, rejected/no-replay paths, raw evidence, and the next
-   safe action. Maintainer/agent work also mirrors the exact result to the shared
-   coordination card and reads GitHub plus that card back before the next test.
+   safe action. Maintainer/agent work also mirrors the exact result to the
+   private coordination card and reads GitHub plus that card back before the
+   next test; outside contributors skip that step.
 7. **Track dependencies.** If your work installs a host package or
    downloads an external source, record it in `docs/dependency-tracker.md`
    in the same change (see that file's rules).
-8. **Device testing safety** (maintainers/testers with hardware): read the
+8. **Run `scripts/check.sh` before pushing to this repo.** It checks script
+   syntax, shellcheck (if installed) and that docs only point at files that
+   exist. `scripts/install-git-hooks.sh` installs the commit-msg hook that
+   enforces rules 1–2 locally.
+9. **Device testing safety** (maintainers/testers with hardware): read the
    safety contract in `scripts/tethered-test.sh` before touching a phone.
    Never `fastboot getvar` on LG aboot, enter fastboot only via
    `adb reboot bootloader`, one fastboot client at a time, RAM-only

@@ -50,7 +50,7 @@ adb wait-for-device
 # was enough to preserve the K042 mainline ramoops record in the 2026-07-08 run.
 adb exec-out dd if="$PSTORE_DEV" bs=262144 count=1 2>>"$META" > "$BIN"
 
-python - "$BIN" "$TXT" <<'PY'
+python3 - "$BIN" "$TXT" <<'PY'
 from pathlib import Path
 import sys
 src=Path(sys.argv[1])

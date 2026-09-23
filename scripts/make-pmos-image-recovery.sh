@@ -1,48 +1,44 @@
 #!/usr/bin/env bash
 # Build a recovery-patched boot image from a sealed source image.
 # Kernel + DTB stay byte-identical to the source; only the initramfs
-# is patched (self-healing boot-stage waits). Also verifies the patch
-# markers exist in the final image's ramdisk.
+# is patched (self-healing boot-stage waits, see
+# patch-initramfs-recovery.sh). Also verifies the patch markers exist in
+# the final image's ramdisk.
+#
+# Usage: scripts/make-pmos-image-recovery.sh <source-boot.img> <dest-boot.img>
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
+
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+. "$HERE/lib/bootimg.sh"
+need_tools mkbootimg unpack_bootimg cpio gzip python3
+
 SRC="${1:?usage: $0 <source-boot.img> <dest-boot.img>}"
 DEST="${2:?usage: $0 <source-boot.img> <dest-boot.img>}"
-PATCHER="$HERE/patch-initramfs-recovery.sh"
 
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
-unpack_bootimg --boot_img "$SRC" --out "$WORK" > "$WORK/header.txt" 2>&1
-CMDLINE="$(sed -n 's/^command line args: //p' "$WORK/header.txt")"
-[[ -n "$CMDLINE" ]] || { echo "could not read cmdline" >&2; exit 1; }
+unpack_image "$SRC" "$WORK/src"
+unpack_cpio "$WORK/src/ramdisk" "$WORK/rd"
 
-mkdir -p "$WORK/rd"
-( cd "$WORK/rd" && zcat "$WORK/ramdisk" | cpio -idm --quiet )
+bash "$HERE/patch-initramfs-recovery.sh" "$WORK/rd"
 
-bash "$PATCHER" "$WORK/rd"
-
-( cd "$WORK/rd" && find . | cpio -o -H newc --owner=0:0 --quiet | gzip -9 ) > "$WORK/ramdisk.new"
-
-mkbootimg \
-    --kernel "$WORK/kernel" \
-    --ramdisk "$WORK/ramdisk.new" \
-    --base 0x00000000 --pagesize 4096 \
-    --kernel_offset 0x00008000 --ramdisk_offset 0x02000000 \
-    --tags_offset 0x00000100 \
-    --cmdline "$CMDLINE" \
-    --output "$DEST"
+pack_cpio "$WORK/rd" "$WORK/ramdisk.new"
+joan_mkbootimg "$WORK/src/kernel" "$WORK/ramdisk.new" "$BOOT_CMDLINE" "$DEST"
 
 echo "=== verify final image ramdisk has the patches ==="
-VW="$(mktemp -d)"; trap 'rm -rf "$WORK" "$VW"' EXIT
-unpack_bootimg --boot_img "$DEST" --out "$VW" > /dev/null 2>&1
-mkdir -p "$VW/rd"
-( cd "$VW/rd" && zcat "$VW/ramdisk" | cpio -idm --quiet )
-grep -c 'fsck repair wait timed out' "$VW/rd/init_functions.sh"
-grep -c 'Debug shell timed out' "$VW/rd/init_functions.sh"
-grep -c 'rebooting to persistent OS' "$VW/rd/init_functions.sh"
+unpack_image "$DEST" "$WORK/verify"
+unpack_cpio "$WORK/verify/ramdisk" "$WORK/verify/rd"
+for marker in 'fsck repair wait timed out' 'Debug shell timed out' 'rebooting to persistent OS'; do
+	grep -q "$marker" "$WORK/verify/rd/init_functions.sh" ||
+		die "patch marker missing from final image: $marker"
+	echo "  present: $marker"
+done
 
 echo "=== kernel identity preserved ==="
-sha256sum "$WORK/kernel" "$VW/kernel"
+[[ "$(sha "$WORK/src/kernel")" == "$(sha "$WORK/verify/kernel")" ]] ||
+	die "kernel changed during repack"
+sha256sum "$WORK/src/kernel" "$WORK/verify/kernel"
 echo "=== cmdline ==="
-echo "$CMDLINE"
+echo "$BOOT_CMDLINE"
 echo "=== image ==="
 sha256sum "$DEST"
 echo BUILD_OK

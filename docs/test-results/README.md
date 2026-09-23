@@ -2,6 +2,25 @@
 
 > **Mandatory read-first source for device work.** Before building, booting, diagnosing, or replaying an LG V30 candidate, read this index, the newest applicable closure packet, and `../kernel-change-ledger.md`. A node, UI, boot, or successful command alone is not a pass.
 
+## Gap: 2026-08-08 .. 2026-08-10 device work has no closure packets yet
+
+The newest packet below is mas_ipa (2026-08-07). The device work after it —
+modem bring-up, Bluetooth, touch phantom contacts, rainbow-on-wake, power-key
+debounce, the master-tree boot, and the confounded A540 unpin — was recorded
+only in handoffs. Until packets exist, the evidence is in:
+
+- [`../ember-handoff-2026-08-10-session-close.md`](../ember-handoff-2026-08-10-session-close.md) (summary of all four closed lanes and the open ones)
+- [`../ember-note-2026-08-10-for-aurel-paths-and-ccache.md`](../ember-note-2026-08-10-for-aurel-paths-and-ccache.md) (master `47041183b` boot)
+- [`../ember-2026-08-10-unpin-result-was-confounded.md`](../ember-2026-08-10-unpin-result-was-confounded.md) (the unpin result is **withdrawn**; do not treat the pin as proven necessary)
+- [`../ember-handoff-2026-08-08-modem-layer1-and-integration.md`](../ember-handoff-2026-08-08-modem-layer1-and-integration.md)
+
+Config baseline: the QoS-era config named below is superseded for the
+current `master` tree by [`../master-47041183b.config`](../master-47041183b.config),
+the config master was built and booted with (commit `02701c6` in this repo).
+
+Back-filling these packets from those docs is work parcel P11 in the
+top-level README. (Noted 2026-09-23. Assisted-by: Claude-Code)
+
 ## Current state — 2026-08-07
 
 - **Newest completed device test:** [mas_ipa QoS](mas-ipa-2026-08-07.md).
@@ -54,7 +73,7 @@ A candidate is not administratively closed until all of the following are true:
 5. Fixed items, decisions, rejected paths, and “do not replay” conditions are explicit.
 6. The packet identifies one next safe action and its stop/approval condition.
 7. The docs commit is signed, checked, safety-scanned, and pushed.
-8. The corresponding shared Nextcloud Deck card gets the same verdict, decisions, no-replay rule, next step, and immutable GitHub commit/file link.
+8. The corresponding shared Nextcloud Deck card gets the same verdict, decisions, no-replay rule, next step, and immutable GitHub commit/file link. *(Maintainers only — the Deck is private. Outside contributors skip 8 and read back GitHub alone in 9.)*
 9. Both GitHub and Deck are read back from their original sources.
 
 Immediate safety recovery may precede documentation, but the next experimental candidate must not.

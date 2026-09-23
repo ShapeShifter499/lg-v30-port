@@ -19,12 +19,14 @@
 #   RD=/path/to/unpacked-initramfs scripts/sd-fsck-repair.sh [check|repair]
 #   IMG=/path/to/boot.img scripts/sd-fsck-repair.sh [check|repair]
 #
-# Env: HOST (default nym-nest-family), SERIAL (default LGUS9986e606d55),
-# DEV (default /dev/block/mmcblk0p2).
+# Env: HOST   -- ssh host the phone is plugged into; empty (default) means
+#               the phone is on this machine and adb runs locally.
+#      SERIAL -- adb serial to target; empty (default) = the only device.
+#      DEV    -- default /dev/block/mmcblk0p2.
 set -uo pipefail
 
-HOST="${HOST:-nym-nest-family}"
-SERIAL="${SERIAL:-LGUS9986e606d55}"
+HOST="${HOST:-}"
+SERIAL="${SERIAL:-}"
 DEV="${DEV:-/dev/block/mmcblk0p2}"
 RD="${RD:-}"
 IMG="${IMG:-}"
@@ -32,6 +34,22 @@ MODE="${1:-check}"
 AUTH="${AUTH:-}"
 
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
+
+ADB="adb${SERIAL:+ -s $SERIAL}"
+# Run a shell snippet on the machine the phone is attached to.
+on_host() {
+  if [ -n "$HOST" ]; then ssh -o ConnectTimeout=15 "$HOST" "$1"; else bash -c "$1"; fi
+}
+# Make a local file available on that machine as <name>; prints its path.
+STAGE="$WORK/stage"; mkdir -p "$STAGE"
+stage() {
+  if [ -n "$HOST" ]; then
+    scp -o ConnectTimeout=15 "$1" "$HOST:/tmp/$2" >/dev/null 2>&1 || return 1
+    echo "/tmp/$2"
+  else
+    cp "$1" "$STAGE/$2" && echo "$STAGE/$2"
+  fi
+}
 
 case "$MODE" in
   check)  ;;
@@ -59,36 +77,36 @@ fi
 
 # --- 1. phone side prep (adb root, stage dirs) --------------------------
 echo "=== DEVICE PREP ==="
-ssh -o ConnectTimeout=15 "$HOST" "
-  adb -s $SERIAL root >/dev/null 2>&1; sleep 2; adb -s $SERIAL wait-for-device
-  adb -s $SERIAL shell 'mkdir -p /data/local/tmp/musl/lib /data/local/tmp/musl/usr/lib'
-  adb -s $SERIAL shell 'cat /proc/partitions | grep mmcblk'
+on_host "
+  $ADB root >/dev/null 2>&1; sleep 2; $ADB wait-for-device
+  $ADB shell 'mkdir -p /data/local/tmp/musl/lib /data/local/tmp/musl/usr/lib'
+  $ADB shell 'cat /proc/partitions | grep mmcblk'
 " || { echo "DEVICE_PREP_FAILED" >&2; exit 4; }
 
 # --- 2. stage on host, push to device ------------------------------------
 echo "=== PUSH e2fsck + loader + libs ==="
-scp -o ConnectTimeout=15 "$RD/sbin/e2fsck" "$HOST:/tmp/e2fsck-modern" >/dev/null 2>&1
-scp -o ConnectTimeout=15 "$RD/lib/ld-musl-aarch64.so.1" "$HOST:/tmp/ld-musl.so" >/dev/null 2>&1
-for l in libext2fs.so.2 libcom_err.so.2 libblkid.so.1 libuuid.so.1 \
-         libe2p.so.2 libc.musl-aarch64.so.1 libeconf.so.0; do
+LIBS="libext2fs.so.2 libcom_err.so.2 libblkid.so.1 libuuid.so.1 libe2p.so.2 libc.musl-aarch64.so.1 libeconf.so.0"
+e2fsck_src="$(stage "$RD/sbin/e2fsck" e2fsck-modern)" || { echo "STAGE_FAILED" >&2; exit 4; }
+musl_src="$(stage "$RD/lib/ld-musl-aarch64.so.1" ld-musl.so)" || { echo "STAGE_FAILED" >&2; exit 4; }
+PUSH="$ADB push $e2fsck_src /data/local/tmp/e2fsck 2>&1 | tail -1
+  $ADB push $musl_src /data/local/tmp/musl/lib/ld-musl-aarch64.so.1 2>&1 | tail -1"
+for l in $LIBS; do
   f="$(find "$RD" -name "$l*" 2>/dev/null | head -1)"
   [ -n "$f" ] || { echo "MISSING $l in ramdisk" >&2; exit 2; }
-  scp -o ConnectTimeout=15 "$f" "$HOST:/tmp/lib-$l" >/dev/null 2>&1
+  src="$(stage "$f" "lib-$l")" || { echo "STAGE_FAILED" >&2; exit 4; }
+  PUSH="$PUSH
+  $ADB push $src /data/local/tmp/musl/usr/lib/$l 2>&1 | tail -1"
 done
-ssh -o ConnectTimeout=15 "$HOST" "
-  adb -s $SERIAL push /tmp/e2fsck-modern /data/local/tmp/e2fsck 2>&1 | tail -1
-  adb -s $SERIAL push /tmp/ld-musl.so /data/local/tmp/musl/lib/ld-musl-aarch64.so.1 2>&1 | tail -1
-  for l in libext2fs.so.2 libcom_err.so.2 libblkid.so.1 libuuid.so.1 libe2p.so.2 libc.musl-aarch64.so.1 libeconf.so.0; do
-    adb -s $SERIAL push /tmp/lib-\$l /data/local/tmp/musl/usr/lib/\$l 2>&1 | tail -1
-  done
-  adb -s $SERIAL shell 'chmod 755 /data/local/tmp/e2fsck /data/local/tmp/musl/lib/ld-musl-aarch64.so.1'
-  adb -s $SERIAL shell '/data/local/tmp/musl/lib/ld-musl-aarch64.so.1 --library-path /data/local/tmp/musl/usr/lib /data/local/tmp/e2fsck -V 2>&1 | head -1'
+on_host "
+  $PUSH
+  $ADB shell 'chmod 755 /data/local/tmp/e2fsck /data/local/tmp/musl/lib/ld-musl-aarch64.so.1'
+  $ADB shell '/data/local/tmp/musl/lib/ld-musl-aarch64.so.1 --library-path /data/local/tmp/musl/usr/lib /data/local/tmp/e2fsck -V 2>&1 | head -1'
 " || { echo "PUSH_FAILED" >&2; exit 4; }
 
 # --- 3. run --------------------------------------------------------------
 [ "$MODE" = "repair" ] && {
   echo "=== MOUNT GUARD ==="
-  mnt="$(ssh -o ConnectTimeout=15 "$HOST" "adb -s $SERIAL shell 'mount | grep -c $DEV' | tr -d '\r'")"
+  mnt="$(on_host "$ADB shell 'mount | grep -c $DEV' | tr -d '\r'")"
   [ "${mnt:-0}" = "0" ] || { echo "REFUSED: $DEV is mounted; unmount it first" >&2; exit 5; }
   echo "not mounted, ok"
 }
@@ -96,10 +114,10 @@ ssh -o ConnectTimeout=15 "$HOST" "
 echo "=== FSCK ($MODE) on $DEV ==="
 RUN="/data/local/tmp/musl/lib/ld-musl-aarch64.so.1 --library-path /data/local/tmp/musl/usr/lib /data/local/tmp/e2fsck"
 if [ "$MODE" = "check" ]; then
-  ssh -o ConnectTimeout=15 "$HOST" "adb -s $SERIAL shell '$RUN -fn $DEV; echo E2FSCK_RC=\$?'" \
+  on_host "$ADB shell '$RUN -fn $DEV; echo E2FSCK_RC=\$?'" \
     || { echo "FSCK_CHECK_FAILED" >&2; exit 4; }
 else
-  ssh -o ConnectTimeout=15 "$HOST" "adb -s $SERIAL shell '$RUN -p $DEV; echo PREEN_RC=\$?; $RUN -fy $DEV; echo FULL_RC=\$?'" \
+  on_host "$ADB shell '$RUN -p $DEV; echo PREEN_RC=\$?; $RUN -fy $DEV; echo FULL_RC=\$?'" \
     || { echo "FSCK_REPAIR_FAILED" >&2; exit 4; }
 fi
 
@@ -115,4 +133,4 @@ A full pass can orphan inconsistent trees (2026-08-05: /home/user) into
 write — get Lance's authorization first, and verify /home/user exists
 before relying on the install.
 EOF
-echo "SD_FSCK_$MODE_DONE"
+echo "SD_FSCK_${MODE}_DONE"

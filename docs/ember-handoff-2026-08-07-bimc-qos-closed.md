@@ -4,7 +4,9 @@ Written-by: Ember Nymbrand (agent-ember)
 Agent-harness: Claude-Code:claude-opus-5
 Date: 2026-08-07
 
-Supersedes the open items in `ember-handoff-2026-08-07-icc-workstream-close.md`.
+Supersedes the open items in `ember-handoff-2026-08-07-icc-workstream-close.md`
+(never published to this repo; see the ICC entries in
+`kernel-change-ledger.md`).
 
 ## Checkpoint — state at handoff
 

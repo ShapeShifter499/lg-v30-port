@@ -9,54 +9,36 @@
 # root. Reusing the reference image's ramdisk byte-for-byte is what
 # keeps that true across kernel rebuilds.
 #
-# Usage: ./make-pmos-image.sh [reference.img] [output.img]
+# Usage: KDIR=<kernel-dir> ./make-pmos-image.sh [reference.img] [output.img]
+#   KDIR: kernel source tree or O= build directory.
+#
+# Before booting the result, compare its size with the family of images
+# already known to boot: a kernel ~1 MB light means a lost .config, not a
+# code change (docs/ember-2026-08-10-unpin-result-was-confounded.md).
 
 set -euo pipefail
 
-KDIR="${KDIR:-$HOME/vibe-coding-projects/coding/linux-mainline-v30}"
-OUT="$(cd "$(dirname "$0")" && pwd)/out"
+. "$(dirname "$(readlink -f "$0")")/scripts/lib/bootimg.sh"
+need_tools mkbootimg unpack_bootimg
+resolve_kernel
 
-REF="${1:-$OUT/boot-joan-pmos-display.img}"
-DEST="${2:-$OUT/boot-joan-pmos-touch.img}"
-
-IMAGE="$KDIR/arch/arm64/boot/Image.gz"
-DTB="$KDIR/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb"
-
-[[ -f "$IMAGE" && -f "$DTB" ]] || { echo "kernel or dtb missing — build first" >&2; exit 1; }
-[[ -f "$REF" ]] || { echo "reference image $REF not found" >&2; exit 1; }
+REF="${1:-$JOAN_OUT/boot-joan-pmos-display.img}"
+DEST="${2:-$JOAN_OUT/boot-joan-pmos-touch.img}"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-# unpack_bootimg prints the header fields; keep them so the cmdline
-# (and therefore the rootfs UUIDs) can be carried over verbatim.
-unpack_bootimg --boot_img "$REF" --out "$WORK" > "$WORK/header.txt"
-CMDLINE="$(sed -n 's/^command line args: //p' "$WORK/header.txt")"
-[[ -n "$CMDLINE" ]] || { echo "could not read cmdline from $REF" >&2; exit 1; }
-
+unpack_image "$REF" "$WORK"
 echo "reference : $REF"
-echo "cmdline   : $CMDLINE"
+echo "cmdline   : $BOOT_CMDLINE"
 
-# LG aboot boots Image.gz-dtb (appended DTB), base 0x0, pagesize 4096.
-# ramdisk_offset 0x02000000 is required: aboot loads the ramdisk on top
-# of kernels larger than 16 MiB at the default offset.
-cat "$IMAGE" "$DTB" > "$WORK/Image.gz-dtb"
-
-mkbootimg \
-    --kernel "$WORK/Image.gz-dtb" \
-    --ramdisk "$WORK/ramdisk" \
-    --base 0x00000000 \
-    --pagesize 4096 \
-    --kernel_offset 0x00008000 \
-    --ramdisk_offset 0x02000000 \
-    --tags_offset 0x00000100 \
-    --cmdline "$CMDLINE" \
-    --output "$DEST"
+append_dtb "$WORK/Image.gz-dtb"
+joan_mkbootimg "$WORK/Image.gz-dtb" "$WORK/ramdisk" "$BOOT_CMDLINE" "$DEST"
 
 echo
 ls -la "$DEST"
-echo "kernel  sha256: $(sha256sum "$WORK/Image.gz-dtb" | cut -d' ' -f1)"
-echo "ramdisk sha256: $(sha256sum "$WORK/ramdisk" | cut -d' ' -f1)"
-echo "image   sha256: $(sha256sum "$DEST" | cut -d' ' -f1)"
+echo "kernel  sha256: $(sha "$WORK/Image.gz-dtb")"
+echo "ramdisk sha256: $(sha "$WORK/ramdisk")"
+echo "image   sha256: $(sha "$DEST")"
 echo
 echo "RAM boot only:  sudo -n fastboot boot $DEST"

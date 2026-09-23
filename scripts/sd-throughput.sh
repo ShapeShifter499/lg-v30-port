@@ -15,13 +15,18 @@
 #      throughput for reasons interconnect wiring cannot fix
 #   2. actual sequential read throughput
 #
-# Run standalone, or let icc-verify-capture.sh call it.
+# Needs the RAM-booted pmOS reachable over the USB gadget and the test
+# user's sudo password in PASS_FILE (never commit it). Output lands in
+# OUTDIR (default out/sd-bench under the repo).
+#
+#   DEV_IP  default 172.16.42.1     KEY  ssh identity (optional)
+#   PASS_FILE default /tmp/pmos-pass SIZE_MB default 256
 set -uo pipefail
 
 DEV_IP="${DEV_IP:-172.16.42.1}"
-KEY="${KEY:-$HOME/.ssh/id_pi_migration}"
+KEY="${KEY:-}"
 PASS_FILE="${PASS_FILE:-/tmp/pmos-pass}"
-OUTDIR="${OUTDIR:-/tmp/sd-bench}"
+OUTDIR="${OUTDIR:-$(cd "$(dirname "$0")/.." && pwd)/out/sd-bench}"
 SIZE_MB="${SIZE_MB:-256}"
 
 mkdir -p "$OUTDIR"
@@ -59,11 +64,21 @@ dmesg | grep -iE "mmc0|mmcblk0" | grep -iE "error|fail|timeout" | tail -3 || ech
 echo "SD_BENCH_DONE"
 REMOTE_EOF
 
-ssh -tt -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i "$KEY" "user@$DEV_IP" \
+ssh -tt -o StrictHostKeyChecking=no -o ConnectTimeout=15 ${KEY:+-i "$KEY"} "user@$DEV_IP" \
     "sudo -k -p 'PW: ' sh -c $(printf '%q' "$REMOTE")" \
     < "$PASS_FILE" > "$OUTDIR/sd-bench.log" 2>&1
 rc=$?
-sed -i -e 's/^PW: .*/[redacted]/' -e "s/$(cat "$PASS_FILE")/[REDACTED]/g" "$OUTDIR/sd-bench.log"
+# Literal (not regex) replacement: a password containing / or . must not
+# break or partially survive the redaction.
+python3 - "$OUTDIR/sd-bench.log" "$PASS_FILE" <<'PY'
+import re, sys
+log, pw = sys.argv[1], open(sys.argv[2]).read().strip()
+s = open(log, errors="replace").read()
+s = re.sub(r"(?m)^PW: .*", "[redacted]", s)
+if pw:
+    s = s.replace(pw, "[REDACTED]")
+open(log, "w").write(s)
+PY
 
 grep -q SD_BENCH_DONE "$OUTDIR/sd-bench.log" || {
     echo "CLASSIFICATION=SD_BENCH_INCOMPLETE (rc=$rc)"; tail -15 "$OUTDIR/sd-bench.log"; exit 13; }

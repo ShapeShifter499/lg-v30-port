@@ -7687,7 +7687,8 @@ Date: 2026-08-07
   one change, one boot, dtb overlap scan first. Tracked on Deck card
   78.
 - Cross-ref: `docs/ember-handoff-2026-08-07-bimc-qos-closed.md`,
-  `docs/ember-handoff-2026-08-07-icc-workstream-close.md`.
+  `docs/ember-handoff-2026-08-07-icc-workstream-close.md` (never published
+  to this repo; local-only).
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
 Date: 2026-08-07

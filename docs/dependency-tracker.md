@@ -27,6 +27,7 @@ Rules:
 | 2026-07-11 | `pmbootstrap` 3.10.3 | pacman | postmarketOS build tooling (M3) | Claude Code |
 | 2026-07-11 | `pahole` | pacman | kconfig BTF resolution for the pmOS kernel config (PAHOLE_VERSION) | Claude Code |
 | 2026-08-02 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into disposable `/tmp/v30-dtschema-venv` | kernel `gpu.yaml` schema, style, example-DTB validation | Hermes Agent |
+| 2026-09-23 | `shellcheck` (optional), `cpio` | distro package | `scripts/check.sh` lint pass; `cpio` was already required by the image scripts but unrecorded | Claude Code (in an ephemeral cloud container, not the build host) |
 
 ## Sources / repos / downloads
 
@@ -34,7 +35,7 @@ Rules:
 |---|---|---|---|---|---|
 | 2026-07-04 | mainline kernel tree | kernel.org/torvalds git | `~/vibe-coding-projects/coding/linux-mainline-v30` | the port itself | Claude Code |
 | 2026-07-04 | LG downstream kernel (LineageOS 22.2, lineage-22.2 merge) | github.com/LineageOS | `~/vibe-coding-projects/coding/android_kernel_lge_msm8998` | read-only reference | Claude Code |
-| 2026-07-06 | `busybox-static-1.37.0-r31.apk` (aarch64) | Alpine package mirror | `lg-v30-port/initramfs/` (apk retained in-repo) | bringup initramfs userland | Claude Code |
+| 2026-07-06 | `busybox-static-1.37.0-r31.apk` (aarch64) | Alpine package mirror | `lg-v30-port/initramfs/` (apk local-only, `*.apk` is git-ignored; the extracted binary is committed as `initramfs/root/bin/busybox`) | bringup initramfs userland | Claude Code |
 | 2026-07-07 | edk2-msm8998 UEFI port | github.com/edk2-porting | `~/vibe-coding-projects/coding/edk2-msm8998` | behavioral reference / escape hatch | Claude Code |
 | 2026-07-11 | pmaports checkout | gitlab.postmarketos.org/postmarketOS/pmaports | `~/.local/var/pmbootstrap/cache_git/pmaports` (fork: github.com/ShapeShifter499/pmaports-lge-joan) | pmOS device port | Claude Code (via pmbootstrap) |
 | 2026-07-11 | linux-lg-v30-joan source tarball @ ce78c1369 | github.com/ShapeShifter499 (our own fork) | pmbootstrap cache (`cache_distfiles`) | pmOS kernel package build | Claude Code (via pmbootstrap) |
