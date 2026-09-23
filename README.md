@@ -178,7 +178,7 @@ existing one) so work isn't duplicated; deliver via pull request.**
 | P8 | A540 runtime PM: GPU never suspends (staged ICC-vote + unpin retest) | open | yes |
 | P9 | Charging path moves current | open | yes |
 | P10 | Suspend/resume (s2idle) | open | yes |
-| P11 | Closure packets for the 2026-08-07..10 device work (see `docs/test-results/README.md`) | open | no |
+| P11 | Closure packets for the 2026-08-08..10 device work (see `docs/test-results/README.md`) | open | no |
 | P12 | Power key IRQ stuck at 46: retest with the new debounce, or retire | open | yes |
 
 ## Conventions (binding)

@@ -55,7 +55,7 @@ path = re.compile(r"(?<![\w/.-])((?:docs|scripts|tools|initramfs|device)/[\w./*-
 for f in files:
     text = open(f, errors="replace").read()
     base = os.path.dirname(f)
-    for m in link.finditer(text):
+    for m in (link.finditer(text) if f.endswith(".md") else ()):
         t = m.group(1)
         if re.match(r"^[a-z]+:", t):
             continue

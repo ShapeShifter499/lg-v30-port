@@ -24,7 +24,14 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
   Phosh session on postmarketOS.
 - [recon-2026-07-04.md](recon-2026-07-04.md) — original background.
 
-## Latest handoffs (2026-08-10)
+## Latest handoffs
+
+- [handoff-2026-09-23-cloud-harness-refactor.md](handoff-2026-09-23-cloud-harness-refactor.md)
+  — harness refactor and reference cleanup: changed script defaults
+  (`sd-fsck-repair.sh` `HOST`/`SERIAL`, hook installer, `RAMDISK_OFFSET`),
+  where README content moved, and asks for the local agents.
+
+### 2026-08-10
 
 - [ember-handoff-2026-08-10-session-close.md](ember-handoff-2026-08-10-session-close.md)
   — **current state**: BT, keypad, rainbow and power-key lanes closed; the
