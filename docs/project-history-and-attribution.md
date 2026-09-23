@@ -710,3 +710,38 @@ Current index:
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-03
 Update-scope: A183 runtime closure, A184 host checkpoint, and reusable closure workflow.
+
+## 2026-08-04 .. 2026-08-10 — not yet indexed here
+
+This index has no entries for GPU DVFS/overclock (GPU-FULL3, G4-G6), the
+D-series display close-out, BIMC/QoS, battery, modem, Bluetooth, touch
+phantom contacts, the branch-convention change, or the 2026-08-10 session.
+Until someone back-fills them, start from the top-level
+[`README.md`](../README.md) (*Current state*), the "Latest handoffs" section
+of [`docs/README.md`](README.md), then
+[`kernel-change-ledger.md`](kernel-change-ledger.md).
+
+## 2026-09-23 — harness refactor and dangling-reference cleanup
+
+- Image builders now share `scripts/lib/bootimg.sh` (kernel lookup through
+  `KDIR` — source tree or `O=` build dir — joan `mkbootimg` offsets, and
+  boot-image/cpio unpack and repack). The bring-up and pmOS images come out
+  byte-identical to before on a test kernel. The firmware image matches in
+  kernel, cmdline and ramdisk contents; only gzip output differs, from file
+  timestamps, as it did before.
+- Fixed `scripts/sd-fsck-repair.sh`, which aborted on its last line
+  (`$MODE_DONE` unbound under `set -u`); its private host/serial defaults
+  are now opt-in (`HOST=`, `SERIAL=`), and it runs adb locally by default.
+- Removed private defaults from `install-git-hooks.sh` and
+  `sd-throughput.sh`; made password redaction literal; `python` -> `python3`
+  in `read-pstore-partition.sh`.
+- Added `tools/Makefile` (probes and `wdkill`), `scripts/check.sh` (syntax,
+  shellcheck, doc-link check) and `docs/README.md` (full index).
+- README restructured around the 2026-08-10 state and the current branch
+  convention; the dated snapshots moved verbatim to `docs/status-history.md`.
+  Broken doc references repaired; the never-published 2026-08-07 ICC
+  handoff is annotated where it is cited.
+
+Assisted-by: Claude-Code
+Date: 2026-09-23
+Update-scope: harness refactor; README/docs index; reference cleanup.

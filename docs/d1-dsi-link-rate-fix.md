@@ -230,8 +230,8 @@ candidate (likely: continuous-clock re-test) based on the split.
 
 ## Evidence refs
 
-- ember-handoff-2026-07-11-k074-clock-divider.md (half-rate pin)
-- ember-handoff-2026-07-11-aurel-k076-k077-display.md (byte_intf
+- docs/handoff-2026-07-11-k074-clock-divider.md (half-rate pin)
+- docs/handoff-2026-07-11-k076-k077-display.md (byte_intf
   mechanism + correct-fix spec)
 - mmcc-msm8998.c:1578 (div clk present), dsi_phy.c:355/461
   (byte_intf_clk_div_2), panel-lg-sw43402.c:341 (NON_CONTINUOUS)

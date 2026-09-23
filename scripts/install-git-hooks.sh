@@ -6,7 +6,8 @@
 # from the tracked copy in scripts/hooks/ so the thing being enforced is
 # reviewable in the repo rather than hidden in .git.
 #
-#   usage: install-git-hooks.sh [repo ...]        (defaults to the shared set)
+#   usage: install-git-hooks.sh [repo ...]        (default: this repo, plus
+#                                                  $KDIR / $PMAPORTS if set)
 #          install-git-hooks.sh --check [repo ...] report only, install nothing
 #          install-git-hooks.sh --uninstall [repo ...]
 #
@@ -28,11 +29,9 @@ esac
 if (( $# )); then
 	REPOS=("$@")
 else
-	REPOS=(
-		"$HOME/vibe-coding-projects/coding/lg-v30-port"
-		"$HOME/vibe-coding-projects/coding/linux-mainline-v30"
-		"$HOME/vibe-coding-projects/coding/linux-mainline-v30-aurel-a184-polish"
-	)
+	REPOS=("$(cd "$HERE/.." && pwd)")
+	[[ -n "${KDIR:-}" ]] && REPOS+=("$KDIR")
+	[[ -n "${PMAPORTS:-}" ]] && REPOS+=("$PMAPORTS")
 fi
 
 rc=0

@@ -59,9 +59,12 @@ entries use neutral subjects plus harness/model identities.
   classifier init scripts.
 - `initramfs/src/wdkill.c` — small register-level APSS watchdog
   disable/pet tool (built static; source included here).
-- `scripts/tethered-test.sh`, `scripts/read-pstore-partition.sh`,
-  `scripts/read-imem-reset-reason.sh`, `make-testimage.sh` — host-side
-  test/observability tooling.
+- `make-testimage.sh`, `make-pmos-image*.sh` and everything under
+  `scripts/` (including `scripts/lib/bootimg.sh`) — host-side build,
+  test and observability tooling.
+- `tools/msmprobe.c`, `tools/msmsubmit.c`, `tools/Makefile` — DRM/MSM
+  ioctl probes used during GPU bring-up.
+- `device/` — the joan Bluetooth-address OpenRC service and helper.
 - All documentation under `docs/`.
 
 ## Borrowed / derived / referenced
@@ -78,9 +81,10 @@ entries use neutral subjects plus harness/model identities.
   per their SPDX headers): structural template for the joan DTS and
   precedent for the `<81 4>` reserved GPIO range.
 - **busybox** (GPL-2.0): prebuilt static binary from Alpine's
-  `busybox-static-1.37.0-r31` package (apk retained at
-  `initramfs/busybox-static-1.37.0-r31.apk`); source at
-  https://git.alpinelinux.org/aports and busybox.net.
+  `busybox-static-1.37.0-r31` package, committed as
+  `initramfs/root/bin/busybox` and `initramfs/root-null/bin/busybox`.
+  The apk itself is not published (`*.apk` is git-ignored); source at https://git.alpinelinux.org/aports and
+  busybox.net.
 - **mkbootimg** boot-image parameters: from LineageOS
   `android_device_lge_joan-common` `BoardConfigCommon.mk`.
 - **edk2-msm8998** (https://github.com/edk2-porting/edk2-msm8998):

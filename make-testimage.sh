@@ -2,38 +2,28 @@
 # Build a fastboot-bootable Android boot.img with the mainline kernel,
 # joan DTB (appended) and the USB-gadget bring-up initramfs.
 #
-# Usage: ./make-testimage.sh [kernel-tree]   (default: coding/linux-mainline-v30)
+# Usage: ./make-testimage.sh [kernel-dir]
+#   kernel-dir (or $KDIR): kernel source tree or O= build directory.
 set -euo pipefail
 
-HERE="$(dirname "$(readlink -f "$0")")"
-KDIR="${1:-$HOME/vibe-coding-projects/coding/linux-mainline-v30}"
-OUT="$HERE/out"
-mkdir -p "$OUT"
-
-IMAGE="$KDIR/arch/arm64/boot/Image.gz"
-DTB="$KDIR/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb"
-[[ -f "$IMAGE" && -f "$DTB" ]] || { echo "kernel or dtb missing — build first" >&2; exit 1; }
+. "$(dirname "$(readlink -f "$0")")/scripts/lib/bootimg.sh"
+need_tools mkbootimg cpio gzip
+resolve_kernel "${1:-}"
+mkdir -p "$JOAN_OUT"
 
 # initramfs
-( cd "$HERE/initramfs/root" && chmod +x init bin/busybox && \
-  find . | cpio -o -H newc --owner=0:0 | gzip -9 ) > "$OUT/initramfs.cpio.gz"
+chmod +x "$JOAN_REPO/initramfs/root/init" "$JOAN_REPO/initramfs/root/bin/"*
+pack_cpio "$JOAN_REPO/initramfs/root" "$JOAN_OUT/initramfs.cpio.gz"
 
-# LG aboot boots Image.gz-dtb (appended DTB), base 0x0, pagesize 4096
-cat "$IMAGE" "$DTB" > "$OUT/Image.gz-dtb"
+append_dtb "$JOAN_OUT/Image.gz-dtb"
 
-# Values from LineageOS android_device_lge_joan-common BoardConfigCommon.mk;
 # androidboot.* args mirrored from the stock cmdline where they matter for
 # mainline (usbcontroller name is cosmetic there, kept for parity).
-mkbootimg \
-    --kernel "$OUT/Image.gz-dtb" \
-    --ramdisk "$OUT/initramfs.cpio.gz" \
-    --base 0x00000000 \
-    --pagesize 4096 \
-    --ramdisk_offset 0x02000000 \
-    --cmdline "androidboot.hardware=joan panic=5 ignore_loglevel" \
-    --output "$OUT/boot-joan-mainline.img"
+joan_mkbootimg "$JOAN_OUT/Image.gz-dtb" "$JOAN_OUT/initramfs.cpio.gz" \
+	"androidboot.hardware=joan panic=5 ignore_loglevel" \
+	"$JOAN_OUT/boot-joan-mainline.img"
 
-ls -la "$OUT/boot-joan-mainline.img"
-echo "Tethered test:  fastboot boot $OUT/boot-joan-mainline.img"
-echo "Recovery slot:  fastboot flash recovery $OUT/boot-joan-mainline.img  (then Vol-Down+Power boot)"
+ls -la "$JOAN_OUT/boot-joan-mainline.img"
+echo "Tethered test:  fastboot boot $JOAN_OUT/boot-joan-mainline.img"
+echo "Recovery slot:  fastboot flash recovery $JOAN_OUT/boot-joan-mainline.img  (then Vol-Down+Power boot)"
 echo "After boot: host side 'ip addr add 172.16.42.2/24 dev <usb-if>' then 'telnet 172.16.42.1'"

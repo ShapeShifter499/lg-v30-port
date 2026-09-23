@@ -14,10 +14,17 @@ Supersedes: nothing — complements the standing pre-boot check in
     AUTH=yes-i-have-owner-authorization scripts/sd-fsck-repair.sh repair
 
 Both need the pmOS initramfs e2fsck source: `RD=<unpacked-ramdisk-dir>`
-or `IMG=<boot.img>` (the script unpacks it itself). Defaults: host
-`nym-nest-family`, serial `LGUS9986e606d55`, partition
+or `IMG=<boot.img>` (the script unpacks it itself). By default adb runs
+on this machine against the only attached device; set `HOST=<ssh-host>`
+when the phone is plugged into another machine and `SERIAL=<adb-serial>`
+when more than one device is attached. Partition defaults to
 `/dev/block/mmcblk0p2`. The manual steps below are the reference
-procedure the script automates.
+procedure the script automates, as run on the original maintainers'
+port host (`HOST=nym-nest-family SERIAL=LGUS9986e606d55`); substitute
+your own.
+
+(Updated 2026-09-23: the script previously defaulted to that host and
+serial; they are now opt-in. Assisted-by: Claude-Code)
 
 ## When you need this
 
@@ -144,7 +151,8 @@ is dirty.
 ## Related but separate
 
 - SD *throughput* is fixed via ICC wiring (5.7 -> 52.3 MB/s, see
-  `ember-handoff-2026-08-07-icc-workstream-close.md`); benchmark with
+  `ember-handoff-2026-08-07-icc-workstream-close.md`, never published to
+  this repo — the ICC entries in `kernel-change-ledger.md` carry it); benchmark with
   `scripts/sd-throughput.sh` (read-only by design).
 - The initramfs self-heal patches (`scripts/make-pmos-image-recovery.sh`,
   `scripts/patch-initramfs-recovery.sh`) are standard on all images;
