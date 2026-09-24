@@ -116,6 +116,20 @@ but live insert/remove edges never arrive, on either HPHL polarity.
   `qcom,msm8998-qmp-usb3-dp-phy` variant with downstream
   `mdss-dp-pll-8998` tables, the DP controller (0x0c990000), DPU INTF_0,
   gpio-sbu-mux (TLMM 100 enable, TLMM 80 select), connector altmodes.
+  PHY finding (LG `drivers/clk/msm/mdss/mdss-dp-pll-8998-util.c` vs
+  mainline `qcs615_dp_serdes_tbl*`): the msm8998 DP PLL is the same QMP v2
+  COM register map (identical offsets), with the same RBR divider/lock
+  values; LG's loop tuning differs (INTEGLOOP_GAIN0 0x3f, CP_CTRL 0x06,
+  PLL_CCTRL 0x36, PLL_IVCO 0x07, BIAS_EN_CLKBUFLR_EN 0x37, BG_TIMER 0x0a),
+  per-rate SYS_CLK_CTRL/CMN_CONFIG/LOCK_CMP_EN differ, HBR uses HSCLK_SEL
+  0x84 (LOCK_CMP 0x3f/0x38), HBR2 DEC_START 0x8c, FRAC 0x00/0x00/0x0a,
+  LOCK_CMP 0x7f/0x70. So an msm8998 USB3+DP config in `phy-qcom-qmp-usbc.c`
+  (offsets as QCS615: dp_phy 0x1000, txa 0x1400, txb 0x1800, serdes 0x1c00)
+  with LG's tables is the PHY half. Open questions before writing it: the
+  qcs615 path switches the PHY between USB3 *or* DP through a TCSR register
+  and has no Type-C mode-switch — msm8998's concurrent 2-lane DP + USB3
+  needs checking in `mdss_dp_util.c` (lane/PD_CTL values: PD_CTL 0x3d,
+  MODE 0x48/0x58, TX0_TX1/TX2_TX3_LANE_CTL 0x05).
   Reference: sdm845-mainline `caleb/axolotl-dp-alt`. "USB 3.1": the QMP PHY
   on msm8998 is a USB 3.0/3.1 Gen 1 (5 Gb/s) PHY; there is no Gen 2.
 - Wide/front camera drivers (tables banked), lens actuator/OIS/laser AF.
