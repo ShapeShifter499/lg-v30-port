@@ -7727,3 +7727,28 @@ Date: 2026-08-07
 
 Assisted-by: Hermes-Agent:deepseek/deepseek-v4-flash
 Date: 2026-08-07
+
+## PR #11 — cleanup, USB-C, IPA header table, jack, camera (2026-09-24, build-tested only)
+
+- Handle: `linux-lg-v30-joan` branch `claude/lucid-dijkstra-bxx3r9`, draft
+  PR #11 → `joan/latest-clean-test`. Base: master `ab54ef668` plus
+  cherry-picks `68c8b96` (micbias/ground/AMIC4), `a00b7dc` (later reverted),
+  `8bbf86d` (soundwire IRQ).
+- Class: mixed — `upstream-candidate` (USB-C port/VBUS/charger, bindings,
+  CAMSS/CCI, imx351, IPA fix), `device-only` (joan DTS).
+- Change: instrumentation removal; q6voice; bindings; IPA
+  `IPA_CMD_HDR_INIT_SYSTEM` for v3.1; PMI8998 Type-C port (TCPM) + VBUS +
+  role switch + SuperSpeed; revert of the no-op INTR_LEVEL init; LG MBHC
+  thresholds; CAMSS/CCI DT, CSID supplies, IMX351 driver, rear flash.
+- Verification: none on hardware. clang W=1 builds, checkpatch,
+  `dt_binding_check`, `CHECK_DTBS` (no new findings on joan; all 12
+  msm8998 DTBs build).
+- Evidence: downstream `smb-lib.c`/`qpnp-smb2.c`/`smb-reg.h` (USB-C),
+  `wcd-mbhc-v2.c`/`wcd9xxx-irq.c`/`msm8998.c` (MBHC), `msm8998-camera.dtsi`
+  and `msm8998-joan-camera_rev_0.dtsi` (camera), `libmmcamera_imx351.so`
+  from US998 30b (IMX351 tables); Caleb Connolly's `caleb/pmi8998-tcpm-next`.
+- Public/PR disposition: open draft; needs Lance's sign-off and device tests
+  (checklist in `docs/handoff-2026-09-24-usbc-camera-audio-cleanup.md`).
+
+Assisted-by: Claude-Code:Claude Opus 5.5
+Date: 2026-09-24

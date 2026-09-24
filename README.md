@@ -41,6 +41,20 @@ Mainline (7.2-rc base) boots postmarketOS/Phosh from the microSD with:
 | Charging path | open; needs the pack to drain to ~90 % to test | [session close](docs/ember-handoff-2026-08-10-session-close.md) |
 | Suspend (s2idle) | open; a 2026-08-03 accidental s2idle rebooted | [A184](docs/test-results/A184-2026-08-03-host-only.md) |
 
+### Update 2026-09-24 (build-tested only, nothing booted)
+
+Kernel PR #11 (branch `claude/lucid-dijkstra-bxx3r9`, towards
+`joan/latest-clean-test`) adds, on top of the August audio/voice/cellular
+work: removal of the bring-up instrumentation, a PMI8998 USB-C port driver
+(TCPM + PD, dual role, OTG VBUS, SuperSpeed with orientation), the IPA v3.1
+header-table fix that should retire `ipa.lowmem`, CAMSS/CCI plus an IMX351
+main-camera driver and the rear flash, and a narrowed-down jack-detection
+diagnosis. **A RAM boot of it needs `CONFIG_TYPEC=y`,
+`CONFIG_PHY_QCOM_QMP_COMBO=y` and `CONFIG_DRM_AUX_BRIDGE=y`.** Hand-off
+and test checklist:
+[`docs/handoff-2026-09-24-usbc-camera-audio-cleanup.md`](docs/handoff-2026-09-24-usbc-camera-audio-cleanup.md);
+camera: [`docs/camera/README.md`](docs/camera/README.md).
+
 Kernel `master` and `joan/latest-clean-test` were both `c861d1217` at the
 2026-08-10 session close. The full hand-off, including the open lanes, is
 [`docs/ember-handoff-2026-08-10-session-close.md`](docs/ember-handoff-2026-08-10-session-close.md).

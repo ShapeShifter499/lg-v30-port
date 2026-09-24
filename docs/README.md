@@ -26,6 +26,10 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
 
 ## Latest handoffs
 
+- [handoff-2026-09-24-usbc-camera-audio-cleanup.md](handoff-2026-09-24-usbc-camera-audio-cleanup.md)
+  — kernel PR #11: cleanup, PMI8998 USB-C, IPA header table, jack-detection
+  diagnosis, camera; the config a RAM boot needs; hardware test checklist.
+  Camera wiring, sensor tables and method: [camera/README.md](camera/README.md).
 - [handoff-2026-09-23-cloud-harness-refactor.md](handoff-2026-09-23-cloud-harness-refactor.md)
   — harness refactor and reference cleanup: changed script defaults
   (`sd-fsck-repair.sh` `HOST`/`SERIAL`, hook installer, `RAMDISK_OFFSET`),
