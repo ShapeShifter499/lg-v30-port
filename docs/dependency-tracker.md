@@ -28,6 +28,7 @@ Rules:
 | 2026-07-11 | `pahole` | pacman | kconfig BTF resolution for the pmOS kernel config (PAHOLE_VERSION) | Claude Code |
 | 2026-08-02 | `dtschema` 2026.6 and `yamllint` 1.38.0 | `uv pip install` into disposable `/tmp/v30-dtschema-venv` | kernel `gpu.yaml` schema, style, example-DTB validation | Hermes Agent |
 | 2026-09-23 | `shellcheck` (optional), `cpio` | distro package | `scripts/check.sh` lint pass; `cpio` was already required by the image scripts but unrecorded | Claude Code (in an ephemeral cloud container, not the build host) |
+| 2026-09-24 | `flex`, `bison`, `libssl-dev`, `libelf-dev`, `bc`; `dtschema` 2026.9, `ply` (pip) | apt / pip, ephemeral cloud container | kernel build, `dt_binding_check`/`CHECK_DTBS`, checkpatch's spdxcheck | Claude Code |
 
 ## Sources / repos / downloads
 
@@ -47,6 +48,9 @@ Rules:
 | 2026-07-11 | upstream 10nm DSI initial VCO-rate fix `8a48e35becb214743214f5504e726c3ec131cd6d` | `https://github.com/torvalds/linux/commit/8a48e35becb214743214f5504e726c3ec131cd6d` / linked lore and Patchwork discussion | read-only network reference; current upstream raw source compared, no new checkout | explain K070's zero initial `vco_current_rate` and its interaction with local/public-reference VCO formula fix | Hermes Agent |
 | 2026-08-02 | Linux master source snapshot `2d2338c93da79b3bfe4b6099a931d9468d539952` | `https://github.com/torvalds/linux` raw/API | `out/audit-20260802/upstream-linux-2d2338c93da79b3bfe4b6099a931d9468d539952/` plus disposable `/tmp/v30-upstream-audit` | compare joan brightness/GPU changes with current upstream and validate binding shape | Hermes Agent |
 | 2026-08-02 | `linux-firmware` `WHENCE` at `a968c5c2962e0bad2482f4b05a3fb627b871ca89` | `https://gitlab.com/kernel-firmware/linux-firmware` | disposable `/tmp/linux-firmware-WHENCE-20260802`, SHA-256 `b78facd5dcc32f3cb079f0727104408acbedde17547569557c28f02030c099f9` | verify redistributability boundary: A530 PM4/PFP are listed; joan A540 GPMU/ZAP are not | Hermes Agent |
+| 2026-09-24 | sdm845-mainline kernel (`caleb/pmi8998-tcpm-next`, `caleb/axolotl-dp-alt`, blobless) | gitlab.com/sdm845-mainline/linux | ephemeral cloud container | prior art for PMI8998 TCPM, VBUS and DP alt mode (credited in commits) | Claude Code |
+| 2026-09-24 | msm8998-mainline kernel (`qcom-msm8998-6.18.y`, blobless) | github.com/msm8998-mainline | ephemeral cloud container | prior-art check | Claude Code |
+| 2026-09-24 | LG US998 30b stock firmware `US99830b.zip` (3.0 GB; `system.img` extracted, then deleted) | Lance's Google Drive ROM folder | ephemeral cloud container; only the three sensor libraries' SHA-256 and extracted tables kept (`docs/camera/tables/`) | camera sensor register settings | Claude Code |
 
 Assisted-by: Claude-Code:claude-fable-5
 Date: 2026-07-11
