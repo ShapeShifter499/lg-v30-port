@@ -5,11 +5,11 @@ Nothing here has been booted.
 
 ## Where it stands
 
-- **Reverted:** another agent's DP attempt (`5fa00a2`). It broke USB on every
+- **Reverted:** another agent's DP attempt (`42eff31`). It broke USB on every
   msm8998 board (`#phy-cells = <1>` with dwc3 still passing none), used
   QCS615's PLL tables, placed the DP P0 block at `0x1000` (it is at `0xa00`),
   and broke two bindings.
-- **Done:** `53b45d7` clk: qcom: mmcc-msm8998. The DP link RCG is now a byte2
+- **Done:** `e6e796d` clk: qcom: mmcc-msm8998. The DP link RCG is now a byte2
   divider of the PHY link clock, and the pixel RCG uses `clk_dp_ops` with a
   16-bit M/N counter. The old link table was in kHz (162000), and the pixel
   RCG had no M/N counter.
@@ -18,7 +18,7 @@ Nothing here has been booted.
 ## Correction to the 2026-09-24 notes
 
 The 2026-09-24 handoff said the msm8998 DP PLL uses "the same QMP v2 COM
-register map" as QCS615. That was wrong, and the revert message `5fa00a2`
+register map" as QCS615. That was wrong, and the revert message `42eff31`
 repeats it. Checked register by register against LG's `mdss-dp-pll-8998.h`:
 
 - **DP PLL:** mainline **QMP v3 COM** layout (`phy-qcom-qmp-qserdes-com-v3.h`;
