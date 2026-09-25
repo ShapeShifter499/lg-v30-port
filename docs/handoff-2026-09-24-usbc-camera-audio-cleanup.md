@@ -109,7 +109,9 @@ but live insert/remove edges never arrive, on either HPHL polarity.
 
 ## Not done yet (next)
 
-- **DisplayPort alt mode**: mainline msm DP has no msm8998 descriptor or
+- **DisplayPort alt mode** (superseded: the PLL is QMP *v3* COM, not v2,
+  see [handoff-2026-09-25-dp-altmode.md](handoff-2026-09-25-dp-altmode.md)):
+  mainline msm DP has no msm8998 descriptor or
   binding; mmcc-msm8998 already has the DP clocks (parents `dplink`/`dpvco`
   from a DP PHY); the msm8998 DP PHY at 0xc011000 (serdes 0xc011c00)
   matches qmp-usbc's QCS615 USB3+DP layout, so the path is a
