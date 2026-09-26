@@ -1,0 +1,31 @@
+   baseline: cpu4 ~2357 MHz  b04 silver=0x0460009c gold=0x0470009c
+      [  127.706173] lmhprof: cluster0 rel disable: 0
+      [  127.706224] lmhprof: cluster1 rel disable: 0
+      [  127.706290] lmhprof: cluster0 crnt disable: 0
+      [  127.706338] lmhprof: cluster1 crnt disable: 0
+   after steps=96: cpu4 ~2262 MHz  b04 silver=0x0420009c gold=0x0420009c
+      [  127.706290] lmhprof: cluster0 crnt disable: 0
+      [  127.706338] lmhprof: cluster1 crnt disable: 0
+      [  130.784870] lmhprof: cluster0 rel enable: 0
+      [  130.784981] lmhprof: cluster1 rel enable: 0
+   after steps=128: cpu4 ~2358 MHz  b04 silver=0x0460009c gold=0x0470009c
+      [  130.784870] lmhprof: cluster0 rel enable: 0
+      [  130.784981] lmhprof: cluster1 rel enable: 0
+      [  133.893144] lmhprof: cluster0 rel disable: 0
+      [  133.893208] lmhprof: cluster1 rel disable: 0
+   after steps=32: cpu4 ~2262 MHz  b04 silver=0x0420009c gold=0x0420009c
+      [  133.893144] lmhprof: cluster0 rel disable: 0
+      [  133.893208] lmhprof: cluster1 rel disable: 0
+      [  136.980789] lmhprof: cluster0 crnt enable: 0
+      [  136.980863] lmhprof: cluster1 crnt enable: 0
+   after steps=256: cpu4 ~2261 MHz  b04 silver=0x0420009c gold=0x0420009c
+      [  140.069186] lmhprof: cluster0 rel disable: 0
+      [  140.069281] lmhprof: cluster1 rel disable: 0
+      [  140.069370] lmhprof: cluster0 crnt disable: 0
+      [  140.069448] lmhprof: cluster1 crnt disable: 0
+   after steps=96: cpu4 ~2262 MHz  b04 silver=0x0420009c gold=0x0420009c
+      [  143.157453] lmhprof: cluster0 rel enable: 0
+      [  143.157527] lmhprof: cluster1 rel enable: 0
+      [  143.157603] lmhprof: cluster0 crnt enable: 0
+      [  143.157702] lmhprof: cluster1 crnt enable: 0
+   after steps=384: cpu4 ~2358 MHz  b04 silver=0x0460009c gold=0x0470009c

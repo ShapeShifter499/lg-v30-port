@@ -20,7 +20,7 @@ Every claim below was measured on the phone unless marked otherwise.
 | CPU cpufreq policies | 8 single-CPU | 2 (CPUs 0-3, 4-7) | kernel `db210e9f` |
 | CPU cooling devices | none | `cpufreq-cpu0`, `cpufreq-cpu4` | kernel `db210e9f` |
 | dmesg err+warn lines | 109 | 66-71 | several |
-| Gold cluster real clock | ~150 MHz | **not fixed yet** (see CPU DVFS) | WIP branch |
+| Gold cluster real clock | ~150 MHz | 2348 MHz (row 2361.6) | branch `joan/cpu-dvfs-cprh`, see [handoff](ember-2026-09-26-cpu-dvfs-handoff.md) |
 
 ## Boot: why Aurel's images went blank
 
@@ -143,7 +143,7 @@ LG's "2.45 GHz", so LG did not cap anything. Our `clk-osm-8998` always loads
 bin 0's table and advertises 2476.8 MHz all-core, which is beyond this chip's
 rating.
 
-**In progress** (local branch `joan/cpu-dvfs-cprh`, not pushed, not yet booted):
+**Update (later on 2026-09-26):** DVFS now works; see [ember-2026-09-26-cpu-dvfs-handoff.md](ember-2026-09-26-cpu-dvfs-handoff.md). The notes below describe the branch as first written:
 
 - CPR3/CPR4/CPRh v15 (AngeloGioacchino Del Regno / Konrad Dybcio) rebased onto
   7.2-rc2.
