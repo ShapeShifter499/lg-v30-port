@@ -69,8 +69,8 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | GNSS | modem QMI LOC | ❓ | |
 | Wi-Fi | WCN3990 (ath10k_snoc) | 🟡 | Works. SMMU faults on SID 0x1900 at iova 0 at bring-up. `invalid MAC address; choosing random`. firmware-lge-joan r9 adds the proper WCN3990 board data. |
 | Bluetooth | WCN3990 (btqca) | 🟡 | Works. Frame reassembly errors (-84). Branch/config adds RFCOMM, BNEP, UHID. |
-| FM radio (RX) | unknown: WCN3990 datasheet summaries list no FM (WCN3980 has it) | ❓ | LG kernel has no FM tuner driver; the "btfm" symbols are BT audio over SLIMbus. US998 owners report NextRadio FM. Settle with one HCI vendor command (FM recv enable, OGF 0x13/OCF 0x0001) — Deck #163. |
-| FM transmit | — | ❓ | No FM transmit anywhere upstream or in LG/Qualcomm Helium code (TX opcodes exist only in the protocol header, legacy from iris). If FM RX exists, test OGF 0x14/OCF 0x0001 once; expect rejection. Deck #163. |
+| FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | ❌→🟡 | **Hardware confirmed 2026-09-26**: recv enable/disable return FM_CMD_COMPLETE status 0 (`evidence/2026-09-26-bench-bl1/fm-hci-probe.txt`). Needs a mainline V4L2 radio driver on hci_qca FM packets plus the audio path. Deck #163. |
+| FM transmit | — | ❌ (firmware) | Probed 2026-09-26: the transmit command group (OGF 0x14) gets no response while receiver commands on the same link do, so the V30's FM firmware does not offer transmit. No upstream or LG/Qualcomm driver drives FM TX on this chip either. |
 | NFC | NXP PN547 (+ eSE) | ✅ | nxp-nci bound; neard (default since device-lge-joan r17) exposes `/org/neard/nfc0`: Felica, MIFARE, Jewel, ISO-DEP, NFC-DEP, ISO-15693; powers on and polls (2026-09-26). Tag read/write not yet tried with a physical tag. eSE unused. |
 | USB | DWC3, Type-C (TCPM) | ✅ | Gadget networking, host. |
 
@@ -78,11 +78,11 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
-| ISP | CAMSS (msm_vfe0/1) | 🟡 | Video nodes exist. |
-| Rear main | Sony IMX351 (CCI 5-0010) | ❌ | No mainline driver. |
-| Rear wide, front | — | ❌ | Not in DT yet. |
-| Laser AF | ST VL53L0X (CCI 5-0029) | ❌→fix | Mainline driver exists; `CONFIG_VL53L0X_I2C` was off. |
-| SAR proximity | Semtech SX9320 (I2C 3-0028) | ❌→fix | DT falls back to `semtech,sx9324`; `CONFIG_SX9324` was off. |
+| ISP | CAMSS: CSIPHY v5.0.1, CSID, ISPIF, VFE 4.8 | ✅ | porthole-dev's msm8998 CAMSS (own `CAMSS_8998`, gen2 CSIPHY lane table, ISPIF, VFE 4.8 write-master fixes) replaced this tree's untested CAMSS_660 reuse on 2026-09-26, plus the CAMSS TOP GDSC and the CSID `vdd_sec` supply. RDI raw capture runs at 30 fps. Evidence `evidence/2026-09-26-camera/`. |
+| Rear main | Sony IMX351 (CCI 5-0010, CSIPHY0 4-lane) | ✅🟡 | Probes and streams. MCLK needed porthole's GPLL0_DIV/2 and MCLK `mnd_width` fixes (it ran at 48 MHz). libcamera (simple pipeline + GPU software ISP on the A540) captures 1280x720 at 30.0 fps from the 2328x1744 RGGB10 mode (`cam -c1 --capture`). Next: a libcamera CameraSensorHelper for IMX351 (gain is uncalibrated, frames dark in a dim room), then the LC898-class AF actuator and OIS. |
+| Rear wide, front | wide on CSIPHY1, front on CSIPHY2, both on CCI1 (LG camera@2 / camera@1) | ❌ | Not in DT yet. Part numbers (S5K3M3 wide, HI553 front, per earlier notes) are unverified: LG's kernel names only the IMX351; the others are identified by userspace sensor libraries. |
+| Laser AF | ST VL53L0X (CCI 5-0029) | ✅ | Ranges (`in_distance_raw` x 0.001 m). CCI0 answers only with LVS1 (main camera I/O rail) up, so LVS1 is always-on. Driver gained runtime PM (camera AVDD off between readings, verified). Nothing in userspace reads it yet. |
+| SAR proximity | Semtech SX9320 (I2C 3-0028) | ❌ | `sx9324` is built and loaded but does not bind the SX9320; it needs support of its own. |
 | Flash LED | PMI8998 flash | ✅ | `white:flash`. |
 | Motion / light / proximity | on the SLPI (sensor DSP) | ❌ | Deck #162. SLPI firmware ships in firmware-lge-joan r9. Needs a 15 MiB region and an SMGR-era QMI client. |
 
@@ -94,7 +94,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | SMS | chatty | phosh default |
 | Sound panel | phosh quick settings + pwvucontrol (per-app) | ✅ default since device-lge-joan r17 |
 | Voice recorder | gnome-sound-recorder | ✅ default since device-lge-joan r17 |
-| Camera | Megapixels / Snapshot | blocked on IMX351 |
+| Camera | Snapshot (phosh default, libcamera) | 🟡 libcamera captures from the IMX351; Snapshot on screen not tried yet |
 | FM tuner | TBD | blocked on FM driver |
 | NFC | neard daemon (enabled by preset); no GUI tag app in Alpine yet | 🟡 |
 | Flashlight | phosh torch toggle | ✅ (flash LED present) |

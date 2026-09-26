@@ -1,0 +1,32 @@
+--- A1: imx351 control=auto status=suspended
+touch_avdd 1 1 0
+1-0049-avdd 1 0mA 0mV
+lvs1 0 1 0
+cam0_avdd_2p8 0 1 0
+5-0010-avdd 0 0mA 0mV
+cam0_dvdd_1p05 0 1 0
+bind rc=1
+i2c-qcom-cci ca0c000.cci: master 0 queue 0 timeout
+vl53l0x-i2c 5-0029: error -ETIMEDOUT: Failed to read the model ID
+vl53l0x-i2c 5-0029: probe with driver vl53l0x-i2c failed with error -110
+--- B: imx351 control=on status=active
+touch_avdd 1 1 0
+1-0049-avdd 1 0mA 0mV
+lvs1 1 1 0
+cam0_avdd_2p8 1 1 0
+5-0010-avdd 1 0mA 0mV
+cam0_dvdd_1p05 1 1 0
+bind rc=0
+BOUND
+1
+--- A2: imx351 control=auto status=suspended
+touch_avdd 1 1 0
+1-0049-avdd 1 0mA 0mV
+lvs1 0 1 0
+cam0_avdd_2p8 0 1 0
+5-0010-avdd 0 0mA 0mV
+cam0_dvdd_1p05 0 1 0
+bind rc=1
+i2c-qcom-cci ca0c000.cci: master 0 queue 0 timeout
+vl53l0x-i2c 5-0029: error -ETIMEDOUT: Failed to read the model ID
+vl53l0x-i2c 5-0029: probe with driver vl53l0x-i2c failed with error -110

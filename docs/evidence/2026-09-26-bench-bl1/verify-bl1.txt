@@ -1,0 +1,55 @@
+
+== system
+7.2.0-rc2-joan-bl+
+panic=5 pmos.force-partition-resize ipa.lowmem=1 log_buf_len=8M  androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+running
+lockdown,capability,yama,bpf
+
+== cpu
+policy0 qcom-cpufreq-osm gov=schedutil max=1900800
+policy4 qcom-cpufreq-osm gov=schedutil max=2361600
+lru_gen=0x0001
+
+== gpu
+[    2.466539] adreno 5000000.gpu: GFX open-loop mV 656 668 680 744 832 896 956 984 (fusing rev 2, fuses 8/5/8/6, limit 0, force 0)
+[    2.467096] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.468034] adreno 5000000.gpu: [drm:adreno_iommu_create_vm] gpu aspace: aperture 0x0-0xffffffffffff, base 0x1000000, size 0xffffff000000
+[    2.468704] adreno 5000000.gpu: gfx-mem interconnect: 5680000 Bps
+[    2.478032] msm_dpu c901000.display-controller: [drm:adreno_request_fw] loaded qcom/a540_gpmu.fw2 from new location
+257000000 668000 uV
+342000000 680000 uV
+414000000 744000 uV
+515000097 832000 uV
+596000097 896000 uV
+670000048 956000 uV
+710000097 984000 uV
+devfreq gov=simple_ondemand cur=710000097
+gpu faults+hangchecks: 0
+
+== audio
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+
+== thermal
+gpu-top-thermal 45100 90000 85000
+pm8998-thermal 37900 105000 125000
+skin-thermal 31088 37000 38000 38500 39000 41000 41000 42500 44000 46000
+cpu4-thermal 58700 85000 110000
+
+== devices
+dw7800-haptics
+iio pmi8998-rradc
+iio 800f000.spmi:pmic@0:adc@3100
+i2c dw7800 driver=dw7800-haptics
+i2c sx9320 driver=
+i2c imx351 driver=
+i2c vl53l0x driver=
+
+== userspace
+Sep 26 01:00:25 lge-joan systemd[1]: bpf-restrict-fs: LSM BPF program attached
+rfcomm bnep nxp_nci_i2c nxp_nci uhid 
+
+== bootlog
+kernel err+warn lines: 67
+journal warning+ lines: 160
+root dir root:root 555

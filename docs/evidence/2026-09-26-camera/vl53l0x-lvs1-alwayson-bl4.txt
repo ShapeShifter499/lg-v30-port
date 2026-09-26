@@ -1,0 +1,8 @@
+imx351 status=suspended driver=imx351
+vl53l0x driver=vl53l0x-i2c
+lvs1 use=1 open=1
+cam0_avdd_2p8 use=1 open=2
+cam0_dvdd_1p05 use=0 open=1
+distance_raw=83 scale=0.001000
+distance_raw=82 scale=0.001000
+distance_raw=85 scale=0.001000
