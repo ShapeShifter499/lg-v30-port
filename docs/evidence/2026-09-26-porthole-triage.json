@@ -1,0 +1,3248 @@
+[
+ {
+  "patch": "0001-iommu-arm-smmu-qcom-Skip-the-TTBR1-quirk-for-MSM8998.patch",
+  "subject": "iommu/arm-smmu-qcom: Skip the TTBR1 quirk for MSM8998 and SDM630",
+  "status": "APPLIES",
+  "files": [
+   "drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.95,
+  "fixes_crash": 0.61
+ },
+ {
+  "patch": "0002-iommu-arm-smmu-qcom-Add-MSM8998-and-SDM660-mss-compa.patch",
+  "subject": "iommu/arm-smmu-qcom: Add MSM8998 and SDM660 mss compatibles for identity",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c"
+  ],
+  "relevant": 0.89,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.45
+ },
+ {
+  "patch": "0003-clk-qcom-mmcc-msm8998-Set-CLK_GET_RATE_NOCACHE-to-pi.patch",
+  "subject": "clk: qcom: mmcc-msm8998: Set CLK_GET_RATE_NOCACHE to pixel/byte clks",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/mmcc-msm8998.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "display",
+  "subsystem_conf": 0.78,
+  "fixes_crash": 0.34
+ },
+ {
+  "patch": "0004-clk-qcom-gcc-msm8998-Mark-hmss-gpu-ahb-critical.patch",
+  "subject": "clk: qcom: gcc-msm8998: Mark hmss/gpu-ahb critical",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/gcc-msm8998.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.82,
+  "fixes_crash": 0.61
+ },
+ {
+  "patch": "0005-drm-msm-a5xx-Disable-flat-shading-optimization.patch",
+  "subject": "drm/msm/a5xx: Disable flat shading optimization",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_gpu.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.63
+ },
+ {
+  "patch": "0006-drm-msm-dsi_phy_10nm-Fix-bad-VCO-rate-calculation.patch",
+  "subject": "drm/msm/dsi_phy_10nm: Fix bad VCO rate calculation",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/dsi/phy/dsi_phy_10nm.c"
+  ],
+  "relevant": 0.31,
+  "subsystem": "display",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.44
+ },
+ {
+  "patch": "0007-drm-msm-Mention-DSI-10nm-PHY-support-for-MSM8998.patch",
+  "subject": "drm/msm: Mention DSI 10nm PHY support for MSM8998",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/Kconfig"
+  ],
+  "relevant": 0.28,
+  "subsystem": "display",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0008-arm64-dts-qcom-msm8998-Add-qcom-adreno-smmu-compatib.patch",
+  "subject": "arm64: dts: qcom: msm8998: Add qcom,adreno-smmu compatible",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.88,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.55,
+  "fixes_crash": 0.26
+ },
+ {
+  "patch": "0009-arm64-dts-qcom-msm8998-Add-imem-pil-reloc-info-for-f.patch",
+  "subject": "arm64: dts: qcom: msm8998: Add imem pil-reloc-info for firmware loading",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.89,
+  "subsystem": "connectivity",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.29
+ },
+ {
+  "patch": "0010-arm64-dts-qcom-pm8998-Add-VREF_1P25-and-REF_GND-VADC.patch",
+  "subject": "arm64: dts: qcom: pm8998: Add VREF_1P25 and REF_GND VADC channels",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/pm8998.dtsi"
+  ],
+  "relevant": 0.68,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0011-backlight-qcom-wled-fix-unbalanced-enable-irq.patch",
+  "subject": "backlight: qcom-wled: fix unbalanced enable irq",
+  "status": "APPLIES",
+  "files": [
+   "drivers/video/backlight/qcom-wled.c"
+  ],
+  "relevant": 0.19,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.24
+ },
+ {
+  "patch": "0012-media-i2c-imx179-add-Sony-IMX179-sensor-driver.patch",
+  "subject": "media: i2c: imx179: add Sony IMX179 sensor driver",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/i2c/Kconfig",
+   "drivers/media/i2c/Makefile",
+   "drivers/media/i2c/imx179.c"
+  ],
+  "relevant": 0.2,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0013-media-i2c-imx362-add-Sony-IMX362-sensor-driver.patch",
+  "subject": "media: i2c: imx362: add Sony IMX362 sensor driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/Kconfig",
+   "drivers/media/i2c/Makefile",
+   "drivers/media/i2c/imx362.c"
+  ],
+  "relevant": 0.26,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0014-media-i2c-lc898214xd-add-ON-Semi-LC898214XD-AF-actua.patch",
+  "subject": "media: i2c: lc898214xd: add ON Semi LC898214XD AF actuator driver",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/i2c/Kconfig",
+   "drivers/media/i2c/Makefile",
+   "drivers/media/i2c/lc898214xd.c"
+  ],
+  "relevant": 0.08,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0015-misc-easel-mipi-add-Easel-MIPI-bridge-driver.patch",
+  "subject": "misc: easel-mipi: add Easel MIPI bridge driver",
+  "status": "APPLIES",
+  "files": [
+   "drivers/misc/Kconfig",
+   "drivers/misc/Makefile",
+   "drivers/misc/easel-mipi.c",
+   "include/linux/easel-mipi.h"
+  ],
+  "relevant": 0.12,
+  "subsystem": "camera",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.64
+ },
+ {
+  "patch": "0016-regulator-bcm15602-easel-add-BCM15602-PMIC-driver.patch",
+  "subject": "regulator: bcm15602-easel: add BCM15602 PMIC driver",
+  "status": "APPLIES",
+  "files": [
+   "drivers/regulator/Kconfig",
+   "drivers/regulator/Makefile",
+   "drivers/regulator/bcm15602-easel.c"
+  ],
+  "relevant": 0.05,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0017-Input-ftm4-add-STMicroelectronics-FingerTip-M4-touch.patch",
+  "subject": "Input: ftm4 - add STMicroelectronics FingerTip M4 touchscreen driver",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/input/touchscreen/st,ftm4.yaml",
+   "drivers/input/touchscreen/Kconfig",
+   "drivers/input/touchscreen/Makefile",
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.12,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0018-Input-drv2624-add-TI-DRV2624-haptics-driver.patch",
+  "subject": "Input: drv2624 - add TI DRV2624 haptics driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/misc/Kconfig",
+   "drivers/input/misc/Makefile",
+   "drivers/input/misc/drv2624.c"
+  ],
+  "relevant": 0.07,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.91,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0019-drm-panel-add-LG-SW43402-panel-driver.patch",
+  "subject": "drm/panel: add LG SW43402 panel driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/Kconfig",
+   "drivers/gpu/drm/panel/Makefile",
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.6
+ },
+ {
+  "patch": "0020-net-qrtr-turn-QRTR-into-a-bus.patch",
+  "subject": "net: qrtr: turn QRTR into a bus",
+  "status": "APPLIES",
+  "files": [
+   "include/linux/device-id/qrtr.h",
+   "include/linux/mod_devicetable.h",
+   "include/linux/soc/qcom/qrtr.h",
+   "net/qrtr/af_qrtr.c",
+   "net/qrtr/qrtr.h",
+   "net/qrtr/smd.c",
+   "scripts/mod/devicetable-offsets.c",
+   "scripts/mod/file2alias.c"
+  ],
+  "relevant": 0.56,
+  "subsystem": "connectivity",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.27
+ },
+ {
+  "patch": "0021-iio-qcom-smgr-add-Qualcomm-SMGR-sensor-driver.patch",
+  "subject": "iio: qcom-smgr: add Qualcomm SMGR sensor driver",
+  "status": "APPLIES",
+  "files": [
+   "drivers/iio/common/Kconfig",
+   "drivers/iio/common/Makefile",
+   "drivers/iio/common/qcom_smgr/Kconfig",
+   "drivers/iio/common/qcom_smgr/Makefile",
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c",
+   "drivers/iio/common/qcom_smgr/qmi/Makefile",
+   "drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.c",
+   "drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.h",
+   "include/linux/iio/common/qcom_smgr.h"
+  ],
+  "relevant": 0.4,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.82,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0022-power-supply-qcom_fg-add-Qualcomm-PMIC-fuel-gauge-dr.patch",
+  "subject": "power: supply: qcom_fg: add Qualcomm PMIC fuel gauge driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/power/supply/Kconfig",
+   "drivers/power/supply/Makefile",
+   "drivers/power/supply/qcom_fg.c",
+   "drivers/power/supply/qcom_fg.h"
+  ],
+  "relevant": 0.58,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0023-ASoC-qcom-add-msm8998-machine-driver.patch",
+  "subject": "ASoC: qcom: add msm8998 machine driver",
+  "status": "APPLIES",
+  "files": [
+   "include/dt-bindings/sound/msm8998-lpass.h",
+   "sound/soc/qcom/Kconfig",
+   "sound/soc/qcom/Makefile",
+   "sound/soc/qcom/lpass-msm8998.c",
+   "sound/soc/qcom/msm8998.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.07
+ },
+ {
+  "patch": "0024-ASoC-codecs-add-TI-TAS2557-smart-amplifier-driver.patch",
+  "subject": "ASoC: codecs: add TI TAS2557 smart amplifier driver",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/codecs/Kconfig",
+   "sound/soc/codecs/Makefile",
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.08,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0025-arm64-dts-qcom-msm8998-add-cooling-CAMSS-CCI-and-GPU.patch",
+  "subject": "arm64: dts: qcom: msm8998: add cooling, CAMSS/CCI and GPU fixes",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.89,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.74,
+  "fixes_crash": 0.91
+ },
+ {
+  "patch": "0026-arm64-dts-qcom-pmi8998-add-fuel-gauge-node.patch",
+  "subject": "arm64: dts: qcom: pmi8998: add fuel gauge node",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/pmi8998.dtsi"
+  ],
+  "relevant": 0.6,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0027-arm64-dts-qcom-msm8998-google-wahoo-add-Pixel-2-fami.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-wahoo: add Pixel 2 family shared dtsi",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi"
+  ],
+  "relevant": 0.14,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.74,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0028-arm64-dts-qcom-msm8998-google-taimen-add-Pixel-2-XL-.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: add Pixel 2 XL board",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/Makefile",
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.14,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0029-arm64-dts-qcom-msm8998-google-walleye-add-Pixel-2-bo.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-walleye: add Pixel 2 board",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/Makefile",
+   "arch/arm64/boot/dts/qcom/msm8998-google-walleye.dts"
+  ],
+  "relevant": 0.08,
+  "subsystem": "board_other",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0030-drm-msm-adreno-don-t-put-the-global-address-space-at.patch",
+  "subject": "drm/msm/adreno: don't put the global address space at 2^48",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/adreno_gpu.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.91,
+  "fixes_crash": 0.98
+ },
+ {
+  "patch": "0031-drm-msm-adreno-base-the-TTBR1-global-vm-in-the-sign-.patch",
+  "subject": "drm/msm/adreno: base the TTBR1 global vm in the sign-extendable half",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/adreno_gpu.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.9,
+  "fixes_crash": 0.98
+ },
+ {
+  "patch": "0032-drm-msm-a5xx-don-t-preempt-while-per-process-pagetab.patch",
+  "subject": "drm/msm/a5xx: don't preempt while per-process pagetables are on",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_gpu.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0033-drm-msm-a5xx-log-where-the-global-vm-kernel-buffers-.patch",
+  "subject": "drm/msm/a5xx: log where the global-vm kernel buffers landed",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_gpu.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0034-drm-msm-adreno-attach-the-OPP-regulator-when-the-GPU.patch",
+  "subject": "drm/msm/adreno: attach the OPP regulator when the GPU wires one up",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/adreno_gpu.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.22
+ },
+ {
+  "patch": "0035-media-qcom-camss-csiphy-take-the-settle-rate-from-th.patch",
+  "subject": "media: qcom: camss: csiphy: take the settle rate from the timer clock",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-csiphy.c"
+  ],
+  "relevant": 0.75,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.5
+ },
+ {
+  "patch": "0036-media-qcom-camss-allocate-the-ISPIF-whenever-the-SoC.patch",
+  "subject": "media: qcom: camss: allocate the ISPIF whenever the SoC declares one",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss.c"
+  ],
+  "relevant": 0.55,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0037-media-qcom-camss-csiphy-3ph-1-0-derive-gen2-from-the.patch",
+  "subject": "media: qcom: camss: csiphy-3ph-1-0: derive gen2 from the lane register table",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-csiphy-3ph-1-0.c"
+  ],
+  "relevant": 0.76,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.14
+ },
+ {
+  "patch": "0038-media-qcom-camss-vfe-4-8-override-the-write-master-c.patch",
+  "subject": "media: qcom: camss: vfe-4-8: override the write master clock gating",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe-4-8.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.79
+ },
+ {
+  "patch": "0039-media-qcom-camss-vfe-4-8-keep-the-bus-bridge-out-of-.patch",
+  "subject": "media: qcom: camss: vfe-4-8: keep the bus bridge out of the global reset",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe-4-8.c"
+  ],
+  "relevant": 0.85,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.88
+ },
+ {
+  "patch": "0040-dt-bindings-media-qcom-msm8998-camss-document-the-MS.patch",
+  "subject": "dt-bindings: media: qcom,msm8998-camss: document the MSM8998 CAMSS",
+  "status": "CONFLICT",
+  "files": [
+   "Documentation/devicetree/bindings/media/qcom,msm8998-camss.yaml"
+  ],
+  "relevant": 0.39,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0041-arm64-dts-qcom-msm8998-drop-the-unused-CAMSS-VBIF-re.patch",
+  "subject": "arm64: dts: qcom: msm8998: drop the unused CAMSS VBIF reset",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.55,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0042-media-qcom-camss-add-support-for-the-MSM8998-CAMSS.patch",
+  "subject": "media: qcom: camss: add support for the MSM8998 CAMSS",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-csiphy-3ph-1-0.c",
+   "drivers/media/platform/qcom/camss/camss-ispif.c",
+   "drivers/media/platform/qcom/camss/camss-vfe.c",
+   "drivers/media/platform/qcom/camss/camss.c",
+   "drivers/media/platform/qcom/camss/camss.h"
+  ],
+  "relevant": 0.93,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.11
+ },
+ {
+  "patch": "0043-ASoC-qcom-lpass-msm8998-add-missing-const-on-variant.patch",
+  "subject": "ASoC: qcom: lpass-msm8998: add missing const on variant pointers",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/lpass-msm8998.c"
+  ],
+  "relevant": 0.57,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0044-arm64-dts-qcom-msm8998-google-wahoo-mark-ramoops-reg.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-wahoo: mark ramoops region no-map",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi"
+  ],
+  "relevant": 0.08,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.45,
+  "fixes_crash": 0.22
+ },
+ {
+  "patch": "0045-watchdog-qcom-wdt-add-arm_on_probe-module-parameter.patch",
+  "subject": "watchdog: qcom-wdt: add arm_on_probe module parameter",
+  "status": "APPLIES",
+  "files": [
+   "drivers/watchdog/qcom-wdt.c"
+  ],
+  "relevant": 0.7,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.52,
+  "fixes_crash": 0.7
+ },
+ {
+  "patch": "0046-arm64-dts-qcom-msm8998-google-wahoo-fix-duplicate-pa.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-wahoo: fix duplicate panel-ldo node name",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi"
+  ],
+  "relevant": 0.09,
+  "subsystem": "display",
+  "subsystem_conf": 0.55,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0047-drm-panel-sw43402-store-DSC-bits_per_pixel-in-1-16th.patch",
+  "subject": "drm/panel: sw43402: store DSC bits_per_pixel in 1/16th units",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.33
+ },
+ {
+  "patch": "0048-drm-panel-sw43402-set-prepare_prev_first.patch",
+  "subject": "drm/panel: sw43402: set prepare_prev_first",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.36
+ },
+ {
+  "patch": "0049-drm-msm-dpu-msm8998-drop-the-nonexistent-CTL_START-i.patch",
+  "subject": "drm/msm/dpu: msm8998: drop the nonexistent CTL_START interrupts",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/disp/dpu1/catalog/dpu_3_0_msm8998.h"
+  ],
+  "relevant": 0.95,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.89
+ },
+ {
+  "patch": "0050-drm-msm-dsi-serialize-cmd-mode-DCS-transfers-against.patch",
+  "subject": "drm/msm/dsi: serialize cmd-mode DCS transfers against DPU frame kickoff",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_encoder.c",
+   "drivers/gpu/drm/msm/dsi/dsi_host.c",
+   "drivers/gpu/drm/msm/msm_drv.h"
+  ],
+  "relevant": 0.81,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.94
+ },
+ {
+  "patch": "0051-drm-panel-sw43402-slice_count-is-slices-per-line-not.patch",
+  "subject": "drm/panel: sw43402: slice_count is slices per line, not per packet",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.39
+ },
+ {
+  "patch": "0052-Bluetooth-hci_core-don-t-drop-a-config-transition-in.patch",
+  "subject": "Bluetooth: hci_core: don't drop a config transition in hci_power_on()",
+  "status": "APPLIES",
+  "files": [
+   "net/bluetooth/hci_core.c"
+  ],
+  "relevant": 0.82,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.23
+ },
+ {
+  "patch": "0053-nfc-nxp-nci-fix-NFC-dying-permanently-after-a-power-.patch",
+  "subject": "nfc: nxp-nci: fix NFC dying permanently after a power cycle",
+  "status": "APPLIES",
+  "files": [
+   "drivers/nfc/nxp-nci/i2c.c"
+  ],
+  "relevant": 0.11,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.86
+ },
+ {
+  "patch": "0054-wifi-ath10k-snoc-the-MSA-carveout-is-Device-memory-u.patch",
+  "subject": "wifi: ath10k: snoc: the MSA carveout is Device memory, use memcpy_fromio()",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/snoc.c"
+  ],
+  "relevant": 0.85,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0055-wifi-ath10k-bound-the-scan-channel-list-to-the-size-.patch",
+  "subject": "wifi: ath10k: bound the scan channel list to the size of the WMI array",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.22
+ },
+ {
+  "patch": "0056-wifi-ath-allow-overriding-the-board-data-regulatory-.patch",
+  "subject": "wifi: ath: allow overriding the board-data regulatory domain",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/regd.c"
+  ],
+  "relevant": 0.55,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0057-net-ipa-don-t-starve-non-command-channels-with-a-WRR.patch",
+  "subject": "net: ipa: don't starve non-command channels with a WRR weight of 0",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/ipa/gsi.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.92
+ },
+ {
+  "patch": "0058-iio-qcom_smgr-give-prox-light-PRIMARY-and-SECONDARY-.patch",
+  "subject": "iio: qcom_smgr: give prox/light PRIMARY and SECONDARY their own completion",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c",
+   "include/linux/iio/common/qcom_smgr.h"
+  ],
+  "relevant": 0.45,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.78,
+  "fixes_crash": 0.46
+ },
+ {
+  "patch": "0059-iio-qcom_smgr-fix-last_values-data-race-and-samp_fre.patch",
+  "subject": "iio: qcom_smgr: fix last_values data race and samp_freq slot routing",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c"
+  ],
+  "relevant": 0.51,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.69,
+  "fixes_crash": 0.45
+ },
+ {
+  "patch": "0060-iio-qcom_smgr-route-the-remaining-samp_freq-paths-by.patch",
+  "subject": "iio: qcom_smgr: route the remaining samp_freq paths by data type",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c"
+  ],
+  "relevant": 0.53,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.41,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0061-usb-dwc3-qcom-re-select-UTMI-as-pipe-clk-on-resume.patch",
+  "subject": "usb: dwc3: qcom: re-select UTMI as pipe clk on resume",
+  "status": "APPLIES",
+  "files": [
+   "drivers/usb/dwc3/dwc3-qcom.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "usb_typec",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.61
+ },
+ {
+  "patch": "0062-usb-dwc3-qcom-restore-the-VBUS-override-on-resume-to.patch",
+  "subject": "usb: dwc3: qcom: restore the VBUS override on resume too",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/usb/dwc3/dwc3-qcom.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "usb_typec",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.23
+ },
+ {
+  "patch": "0063-power-supply-qcom_smbx-don-t-zero-USBIN-voltage-curr.patch",
+  "subject": "power: supply: qcom_smbx: don't zero USBIN voltage/current when full",
+  "status": "APPLIES",
+  "files": [
+   "drivers/power/supply/qcom_smbx.c"
+  ],
+  "relevant": 0.78,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0064-power-supply-qcom_fg-fix-inverted-POWER_SUPPLY_PROP_.patch",
+  "subject": "power: supply: qcom_fg: fix inverted POWER_SUPPLY_PROP_CURRENT_NOW sign",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/power/supply/qcom_fg.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0065-power-supply-qcom_fg-map-TERMINATE-INHIBIT_CHARGE-to.patch",
+  "subject": "power: supply: qcom_fg: map TERMINATE/INHIBIT_CHARGE to STATUS_FULL",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/power/supply/qcom_fg.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0066-drm-msm-pipeline-commits-by-dropping-the-post-kickof.patch",
+  "subject": "drm/msm: pipeline commits by dropping the post-kickoff flush wait",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/msm_atomic.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "display",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.17
+ },
+ {
+  "patch": "0067-drm-msm-devfreq-wake-the-GPU-at-the-top-OPP-not-at-t.patch",
+  "subject": "drm/msm/devfreq: wake the GPU at the top OPP, not at twice the last one",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/msm_gpu.h",
+   "drivers/gpu/drm/msm/msm_gpu_devfreq.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0068-clk-qcom-gcc-msm8998-the-MMSS-and-GPU-GPLL0_DIV-feed.patch",
+  "subject": "clk: qcom: gcc-msm8998: the MMSS and GPU GPLL0_DIV feeds are GPLL0/2",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/gcc-msm8998.c"
+  ],
+  "relevant": 0.73,
+  "subsystem": "camera",
+  "subsystem_conf": 0.58,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0069-clk-qcom-mmcc-msm8998-add-the-missing-mnd_width-to-t.patch",
+  "subject": "clk: qcom: mmcc-msm8998: add the missing mnd_width to the MCLK RCGs",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/mmcc-msm8998.c"
+  ],
+  "relevant": 0.85,
+  "subsystem": "camera",
+  "subsystem_conf": 0.53,
+  "fixes_crash": 0.28
+ },
+ {
+  "patch": "0070-media-i2c-imx179-drop-the-bring-up-rail-drop-module-.patch",
+  "subject": "media: i2c: imx179: drop the bring-up rail-drop module parameter",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx179.c"
+  ],
+  "relevant": 0.23,
+  "subsystem": "camera",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.18
+ },
+ {
+  "patch": "0071-pmdomain-qcom-add-support-for-CPR-v3-v4-and-Hardened.patch",
+  "subject": "pmdomain: qcom: add support for CPR v3, v4 and Hardened",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/pmdomain/qcom/Kconfig",
+   "drivers/pmdomain/qcom/Makefile",
+   "drivers/pmdomain/qcom/cpr-common.c",
+   "drivers/pmdomain/qcom/cpr-common.h",
+   "drivers/pmdomain/qcom/cpr3.c",
+   "include/soc/qcom/cpr.h"
+  ],
+  "relevant": 0.85,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.14
+ },
+ {
+  "patch": "0072-cpufreq-qcom-hw-implement-CPRh-aware-OSM-programming.patch",
+  "subject": "cpufreq: qcom-hw: implement CPRh aware OSM programming",
+  "status": "APPLIES",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0073-arm64-dts-qcom-msm8998-add-CPRh-and-cpufreq-hw-nodes.patch",
+  "subject": "arm64: dts: qcom: msm8998: add CPRh and cpufreq-hw nodes",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.64,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0074-arm64-dts-qcom-msm8998-google-wahoo-enable-CPU-frequ.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-wahoo: enable CPU frequency scaling",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi"
+  ],
+  "relevant": 0.2,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0075-ASoC-q6afe-fix-the-inverted-I2S-word-clock-source.patch",
+  "subject": "ASoC: q6afe: fix the inverted I2S word-clock source",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/qcom/qdsp6/q6afe.c"
+  ],
+  "relevant": 0.83,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0076-ASoC-wcd934x-open-the-slave-port-when-the-stream-sta.patch",
+  "subject": "ASoC: wcd934x: open the slave port when the stream starts",
+  "status": "CONFLICT",
+  "files": [
+   "include/linux/mfd/wcd934x/registers.h",
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.44
+ },
+ {
+  "patch": "0077-ASoC-wcd934x-derive-EXT_CLK_DIV_RATIO-from-the-MCLK-.patch",
+  "subject": "ASoC: wcd934x: derive EXT_CLK_DIV_RATIO from the MCLK rate",
+  "status": "APPLIES",
+  "files": [
+   "include/linux/mfd/wcd934x/registers.h",
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.35
+ },
+ {
+  "patch": "0078-ASoC-wcd934x-ask-for-the-slave-port-earlier-than-12-.patch",
+  "subject": "ASoC: wcd934x: ask for the slave port earlier than 12 bytes",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.58
+ },
+ {
+  "patch": "0079-slimbus-qcom-ngd-ctrl-don-t-re-enter-tx_lock-from-th.patch",
+  "subject": "slimbus: qcom-ngd-ctrl: don't re-enter tx_lock from the SSR teardown",
+  "status": "APPLIES",
+  "files": [
+   "drivers/slimbus/qcom-ngd-ctrl.c"
+  ],
+  "relevant": 0.89,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0080-slimbus-qcom-ngd-ctrl-remove-data-channels-when-a-st.patch",
+  "subject": "slimbus: qcom-ngd-ctrl: remove data channels when a stream is disabled",
+  "status": "APPLIES",
+  "files": [
+   "drivers/slimbus/qcom-ngd-ctrl.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.19
+ },
+ {
+  "patch": "0081-ASoC-qcom-msm8998-drop-the-bring-up-module-parameter.patch",
+  "subject": "ASoC: qcom: msm8998: drop the bring-up module parameters",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/msm8998.c"
+  ],
+  "relevant": 0.74,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0082-arm64-dts-qcom-msm8998-Add-APR-services-configuratio.patch",
+  "subject": "arm64: dts: qcom: msm8998: Add APR services configuration",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.89,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0083-arm64-dts-qcom-msm8998-Add-disabled-slimbus-support.patch",
+  "subject": "arm64: dts: qcom: msm8998: Add disabled slimbus support",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.4,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0084-arm64-dts-qcom-msm8998-google-taimen-add-audio.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: add audio",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.15,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.89
+ },
+ {
+  "patch": "0085-dt-bindings-sound-qcom-sm8250-add-the-msm8998-sound-.patch",
+  "subject": "dt-bindings: sound: qcom,sm8250: add the msm8998 sound card",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/sound/qcom,sm8250.yaml"
+  ],
+  "relevant": 0.53,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0086-cpufreq-qcom-hw-only-read-a-DCVS-control-register-th.patch",
+  "subject": "cpufreq: qcom-hw: only read a DCVS control register that exists",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.8,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.44
+ },
+ {
+  "patch": "0087-ASoC-wcd934x-unmute-the-TX-PGA-after-the-decimator-i.patch",
+  "subject": "ASoC: wcd934x: unmute the TX PGA after the decimator is powered",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.33
+ },
+ {
+  "patch": "0088-iio-qcom_smgr-don-t-hold-the-sensor-lock-across-the-.patch",
+  "subject": "iio: qcom_smgr: don't hold the sensor lock across the report wait",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c"
+  ],
+  "relevant": 0.56,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.58,
+  "fixes_crash": 0.88
+ },
+ {
+  "patch": "0089-pmdomain-qcom-cpr3-arm-the-CPRh-loop-only-once-the-O.patch",
+  "subject": "pmdomain: qcom: cpr3: arm the CPRh loop only once the OSM runs",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c",
+   "drivers/pmdomain/qcom/cpr3.c",
+   "include/soc/qcom/cpr.h"
+  ],
+  "relevant": 0.96,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0090-cpufreq-qcom-hw-BRINGUP-walk-the-OSM-setup-one-step-.patch",
+  "subject": "cpufreq: qcom-hw: [BRINGUP] walk the OSM setup one step at a time",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.07
+ },
+ {
+  "patch": "0091-pmdomain-qcom-cpr3-BRINGUP-walk-the-CPRh-setup-one-p.patch",
+  "subject": "pmdomain: qcom: cpr3: [BRINGUP] walk the CPRh setup one phase at a time",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/pmdomain/qcom/cpr3.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.35
+ },
+ {
+  "patch": "0092-cpufreq-qcom-hw-do-not-device-link-a-CPU-to-its-CPRh.patch",
+  "subject": "cpufreq: qcom-hw: do not device-link a CPU to its CPRh domain",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.95
+ },
+ {
+  "patch": "0093-cpufreq-qcom-hw-let-the-genpd-core-bind-the-CPRh-req.patch",
+  "subject": "cpufreq: qcom-hw: let the genpd core bind the CPRh required-opp device",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.07
+ },
+ {
+  "patch": "0094-clk-qcom-mmcc-msm8998-keep-the-MMSS-config-NoC-AHB-c.patch",
+  "subject": "clk: qcom: mmcc-msm8998: keep the MMSS config NoC AHB clock on",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/mmcc-msm8998.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "camera",
+  "subsystem_conf": 0.57,
+  "fixes_crash": 0.55
+ },
+ {
+  "patch": "0095-arm64-dts-qcom-msm8998-google-taimen-do-not-narrow-t.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: do not narrow the PCIe bus range",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.12,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.83,
+  "fixes_crash": 0.26
+ },
+ {
+  "patch": "0096-arm64-dts-qcom-msm8998-add-the-IPA-block.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the IPA block",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.94,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0097-arm64-dts-qcom-msm8998-google-wahoo-enable-IPA.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-wahoo: enable IPA",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi"
+  ],
+  "relevant": 0.23,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.17
+ },
+ {
+  "patch": "0098-ASoC-wcd934x-apply-the-vendor-register-init-sequence.patch",
+  "subject": "ASoC: wcd934x: apply the vendor register init sequence",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.37
+ },
+ {
+  "patch": "0099-slimbus-stream-free-the-port-array-when-the-presence.patch",
+  "subject": "slimbus: stream: free the port array when the presence rate is rejected",
+  "status": "APPLIES",
+  "files": [
+   "drivers/slimbus/stream.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.41
+ },
+ {
+  "patch": "0100-slimbus-stream-check-that-each-port-connects-to-its-.patch",
+  "subject": "slimbus: stream: check that each port connects to its channel",
+  "status": "APPLIES",
+  "files": [
+   "drivers/slimbus/stream.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.42
+ },
+ {
+  "patch": "0101-PCI-Override-the-class-code-of-the-Intel-Easel-imagi.patch",
+  "subject": "PCI: Override the class code of the Intel Easel imaging coprocessor",
+  "status": "APPLIES",
+  "files": [
+   "drivers/pci/quirks.c"
+  ],
+  "relevant": 0.05,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.63,
+  "fixes_crash": 0.23
+ },
+ {
+  "patch": "0102-misc-easel-mipi-drop-the-open-coded-BAR-assignment.patch",
+  "subject": "misc: easel-mipi: drop the open-coded BAR assignment",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/misc/easel-mipi.c"
+  ],
+  "relevant": 0.14,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.56,
+  "fixes_crash": 0.29
+ },
+ {
+  "patch": "0103-ASoC-wcd934x-check-the-SLIMbus-stream-setup-in-trigg.patch",
+  "subject": "ASoC: wcd934x: check the SLIMbus stream setup in trigger",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0104-ASoC-wcd934x-parse-the-mic-bias-voltages-from-the-de.patch",
+  "subject": "ASoC: wcd934x: parse the mic bias voltages from the devicetree",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/codecs/wcd934x.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.18
+ },
+ {
+  "patch": "0105-media-qcom-camss-vfe-4-8-write-the-write-master-addr.patch",
+  "subject": "media: qcom: camss: vfe-4-8: write the write-master address limits",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe-4-8.c",
+   "drivers/media/platform/qcom/camss/camss-vfe-gen1.c",
+   "drivers/media/platform/qcom/camss/camss-vfe.h"
+  ],
+  "relevant": 0.91,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.61
+ },
+ {
+  "patch": "0106-media-qcom-camss-vfe-4-8-park-idle-write-masters-on-.patch",
+  "subject": "media: qcom: camss: vfe-4-8: park idle write masters on a scratch page",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe-4-8.c",
+   "drivers/media/platform/qcom/camss/camss-vfe.h"
+  ],
+  "relevant": 0.93,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.97
+ },
+ {
+  "patch": "0107-media-qcom-camss-vfe-gen1-write-every-frame-the-call.patch",
+  "subject": "media: qcom: camss: vfe-gen1: write every frame the caller did not gate off",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe-gen1.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.94
+ },
+ {
+  "patch": "0108-media-qcom-camss-ispif-clear-the-msm8998-interface-s.patch",
+  "subject": "media: qcom: camss: ispif: clear the msm8998 interface state on reset",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-ispif.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0109-pmdomain-qcom-cpr3-look-up-the-CPRh-thread-instead-o.patch",
+  "subject": "pmdomain: qcom: cpr3: look up the CPRh thread instead of attaching to it",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c",
+   "drivers/pmdomain/qcom/cpr3.c",
+   "include/soc/qcom/cpr.h"
+  ],
+  "relevant": 0.95,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.95
+ },
+ {
+  "patch": "0110-arm64-dts-qcom-msm8998-fix-the-PLL-override-for-the-.patch",
+  "subject": "arm64: dts: qcom: msm8998: fix the PLL override for the 8th CPU corner",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.95,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.19
+ },
+ {
+  "patch": "0111-cpufreq-qcom-hw-msm8998-request-a-corner-before-star.patch",
+  "subject": "cpufreq: qcom-hw: msm8998: request a corner before starting the OSM",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.32
+ },
+ {
+  "patch": "0112-wifi-ath10k-handle-the-DROP-HTT-tx-completion-status.patch",
+  "subject": "wifi: ath10k: handle the DROP HTT tx completion status",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/htt.h",
+   "drivers/net/wireless/ath/ath10k/htt_rx.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0113-wifi-ath10k-restart-the-firmware-when-a-SET_KEY-inst.patch",
+  "subject": "wifi: ath10k: restart the firmware when a SET_KEY install times out",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.75
+ },
+ {
+  "patch": "0114-ASoC-codecs-wcd-mbhc-v2-fix-double-release-of-the-MI.patch",
+  "subject": "ASoC: codecs: wcd-mbhc-v2: fix double release of the MICB_ENABLE vote in wcd_correct_swch_plug()",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/codecs/wcd-mbhc-v2.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.52
+ },
+ {
+  "patch": "0115-media-qcom-camss-vfe-reference-count-the-power-domai.patch",
+  "subject": "media: qcom: camss: vfe: reference count the power domain link",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-vfe.c",
+   "drivers/media/platform/qcom/camss/camss-vfe.h"
+  ],
+  "relevant": 0.96,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.98
+ },
+ {
+  "patch": "0116-cpufreq-qcom-hw-msm8998-program-the-APM-threshold-co.patch",
+  "subject": "cpufreq: qcom-hw: msm8998: program the APM threshold corner in SEQ_REG1",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.89,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.29
+ },
+ {
+  "patch": "0117-cpufreq-qcom-hw-msm8998-do-not-enable-the-droop-FSMs.patch",
+  "subject": "cpufreq: qcom-hw: msm8998: do not enable the droop FSMs",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.66
+ },
+ {
+  "patch": "0118-arm64-dts-qcom-msm8998-add-the-L2-SAW4-AVS-power-man.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the L2 SAW4 AVS power managers",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi",
+   "drivers/soc/qcom/spm.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.79
+ },
+ {
+  "patch": "0119-cpufreq-qcom-hw-cpr3-msm8998-default-the-bring-up-ga.patch",
+  "subject": "cpufreq: qcom-hw, cpr3: msm8998: default the bring-up gates fully open",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c",
+   "drivers/pmdomain/qcom/cpr3.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.15
+ },
+ {
+  "patch": "0120-media-qcom-camss-csiphy-add-a-module-parameter-to-sw.patch",
+  "subject": "media: qcom: camss: csiphy: add a module parameter to sweep the settle count",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-csiphy-3ph-1-0.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0121-drm-msm-do-not-tear-down-shared-VM-mappings-on-GEM-h.patch",
+  "subject": "drm/msm: do not tear down shared-VM mappings on GEM handle close",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/msm_gem.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.97
+ },
+ {
+  "patch": "0122-wifi-ath10k-shorten-the-QMI-transaction-timeout-to-t.patch",
+  "subject": "wifi: ath10k: shorten the QMI transaction timeout to the vendor's 10 s",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/qmi.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.9
+ },
+ {
+  "patch": "0123-drm-panel-lg-sw43402-rate-limit-brightness-to-one-DC.patch",
+  "subject": "drm/panel: lg-sw43402: rate-limit brightness to one DCS write per frame",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.79
+ },
+ {
+  "patch": "0124-media-i2c-lc898214xd-write-the-focus-code-into-the-D.patch",
+  "subject": "media: i2c: lc898214xd: write the focus code into the DAC field",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/lc898214xd.c"
+  ],
+  "relevant": 0.4,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0125-drm-msm-dsi-say-why-the-cmd-frame-interlock-let-a-fr.patch",
+  "subject": "drm/msm/dsi: say why the cmd/frame interlock let a frame through",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/dsi/dsi_host.c"
+  ],
+  "relevant": 0.73,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0126-media-i2c-lc898214xd-the-focus-code-is-signed-and-th.patch",
+  "subject": "media: i2c: lc898214xd: the focus code is signed, and the range is ~580 not 4095",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/lc898214xd.c"
+  ],
+  "relevant": 0.22,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0127-net-ipa-add-stop_on_suspend-to-force-GSI-channel-sto.patch",
+  "subject": "net: ipa: add stop_on_suspend to force GSI channel stop on IPA v3.x",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/net/ipa/gsi.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.93
+ },
+ {
+  "patch": "0128-drm-msm-dsi-count-frames-instead-of-flagging-them-so.patch",
+  "subject": "drm/msm/dsi: count frames instead of flagging them, so the cmd interlock can actually hold",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/dsi/dsi_host.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.92
+ },
+ {
+  "patch": "0129-drm-msm-dpu-compare-intf_type-against-INTF_DSI-not-t.patch",
+  "subject": "drm/msm/dpu: compare intf_type against INTF_DSI, not the DRM encoder type",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_encoder.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.91
+ },
+ {
+  "patch": "0130-arm64-dts-qcom-msm8998-describe-the-qcom-pshold-rest.patch",
+  "subject": "arm64: dts: qcom: msm8998: describe the qcom,pshold restart register",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.43,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.66,
+  "fixes_crash": 0.07
+ },
+ {
+  "patch": "0131-firmware-qcom-scm-add-the-SCM_SVC_PWR-reset-calls.patch",
+  "subject": "firmware: qcom: scm: add the SCM_SVC_PWR reset calls",
+  "status": "APPLIES",
+  "files": [
+   "drivers/firmware/qcom/qcom_scm.c",
+   "drivers/firmware/qcom/qcom_scm.h",
+   "include/linux/firmware/qcom/qcom_scm.h"
+  ],
+  "relevant": 0.94,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.85
+ },
+ {
+  "patch": "0132-power-reset-msm-poweroff-deassert-PS_HOLD-through-th.patch",
+  "subject": "power: reset: msm-poweroff: deassert PS_HOLD through the secure world",
+  "status": "APPLIES",
+  "files": [
+   "drivers/power/reset/Kconfig",
+   "drivers/power/reset/msm-poweroff.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.74
+ },
+ {
+  "patch": "0133-power-reset-msm-poweroff-outrank-PSCI-when-the-firmw.patch",
+  "subject": "power: reset: msm-poweroff: outrank PSCI when the firmware owns PS_HOLD",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/firmware/qcom/qcom_scm.c",
+   "drivers/power/reset/msm-poweroff.c",
+   "include/linux/firmware/qcom/qcom_scm.h"
+  ],
+  "relevant": 0.95,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.91
+ },
+ {
+  "patch": "0134-wifi-ath10k-reset-recovery-bookkeeping-when-the-devi.patch",
+  "subject": "wifi: ath10k: reset recovery bookkeeping when the device stops",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.93
+ },
+ {
+  "patch": "0135-wifi-ath10k-snoc-use-one-predicate-for-the-irq-disab.patch",
+  "subject": "wifi: ath10k: snoc: use one predicate for the irq disable/enable pair",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/snoc.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.92
+ },
+ {
+  "patch": "0136-dt-bindings-PCI-qcom-Add-endpoint-powered-off-in-sus.patch",
+  "subject": "dt-bindings: PCI: qcom: Add endpoint-powered-off-in-suspend",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/pci/qcom,pcie-common.yaml"
+  ],
+  "relevant": 0.18,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.74,
+  "fixes_crash": 0.15
+ },
+ {
+  "patch": "0137-PCI-qcom-Leave-the-controller-alone-in-suspend-when-.patch",
+  "subject": "PCI: qcom: Leave the controller alone in suspend when the EP powers off",
+  "status": "APPLIES",
+  "files": [
+   "drivers/pci/controller/dwc/pcie-qcom.c"
+  ],
+  "relevant": 0.31,
+  "subsystem": "connectivity",
+  "subsystem_conf": 0.55,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0138-arm64-dts-qcom-msm8998-google-taimen-Easel-powers-of.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: Easel powers off in suspend",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.14,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.66,
+  "fixes_crash": 0.93
+ },
+ {
+  "patch": "0139-arm64-dts-qcom-msm8998-vote-for-XO-from-gcc-and-gpuc.patch",
+  "subject": "arm64: dts: qcom: msm8998: vote for XO from gcc and gpucc in the active set only",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.94,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.93,
+  "fixes_crash": 0.33
+ },
+ {
+  "patch": "0140-dt-bindings-interconnect-qcom-Add-MSM8998-NoC-bindin.patch",
+  "subject": "dt-bindings: interconnect: qcom: Add MSM8998 NoC bindings",
+  "status": "CONFLICT",
+  "files": [
+   "Documentation/devicetree/bindings/interconnect/qcom,msm8998.yaml",
+   "include/dt-bindings/interconnect/qcom,msm8998.h"
+  ],
+  "relevant": 0.54,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0141-interconnect-qcom-Add-MSM8998-interconnect-provider-.patch",
+  "subject": "interconnect: qcom: Add MSM8998 interconnect provider driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/interconnect/qcom/Kconfig",
+   "drivers/interconnect/qcom/Makefile",
+   "drivers/interconnect/qcom/msm8998.c",
+   "drivers/interconnect/qcom/msm8998.h"
+  ],
+  "relevant": 0.95,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.21
+ },
+ {
+  "patch": "0142-arm64-dts-qcom-msm8998-Add-interconnect-provider-nod.patch",
+  "subject": "arm64: dts: qcom: msm8998: Add interconnect provider nodes",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.92,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0143-arm64-dts-qcom-msm8998-Wire-interconnect-paths-for-U.patch",
+  "subject": "arm64: dts: qcom: msm8998: Wire interconnect paths for UFS, USB and MDSS",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.95,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0144-regulator-qcom_smd-Add-RPM-sleep-set-support-via-sus.patch",
+  "subject": "regulator: qcom_smd: Add RPM sleep-set support via suspend states",
+  "status": "APPLIES",
+  "files": [
+   "drivers/regulator/qcom_smd-regulator.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.22
+ },
+ {
+  "patch": "0145-regulator-bcm15602-easel-expose-direct-power-on-off-.patch",
+  "subject": "regulator: bcm15602-easel: expose direct power on/off for the sleep-lifecycle owner",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/regulator/bcm15602-easel.c",
+   "include/linux/regulator/bcm15602-easel.h"
+  ],
+  "relevant": 0.06,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.55
+ },
+ {
+  "patch": "0146-PCI-qcom-add-root-port-link-sleep-wake-helpers-for-a.patch",
+  "subject": "PCI: qcom: add root-port link sleep/wake helpers for an endpoint lifecycle owner",
+  "status": "APPLIES",
+  "files": [
+   "drivers/pci/controller/dwc/pcie-qcom.c",
+   "include/linux/pcie-qcom.h"
+  ],
+  "relevant": 0.39,
+  "subsystem": "connectivity",
+  "subsystem_conf": 0.33,
+  "fixes_crash": 0.41
+ },
+ {
+  "patch": "0147-misc-easel-mipi-own-Easel-s-system-sleep-lifecycle-v.patch",
+  "subject": "misc: easel-mipi: own Easel's system-sleep lifecycle, vendor-shaped",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/misc/easel-mipi.c"
+  ],
+  "relevant": 0.13,
+  "subsystem": "camera",
+  "subsystem_conf": 0.45,
+  "fixes_crash": 0.73
+ },
+ {
+  "patch": "0148-irqchip-qcom-mpm-hand-vMPM-to-RPM-from-system-suspen.patch",
+  "subject": "irqchip/qcom-mpm: hand vMPM to RPM from system suspend on PC-mode firmware",
+  "status": "APPLIES",
+  "files": [
+   "drivers/irqchip/irq-qcom-mpm.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.42
+ },
+ {
+  "patch": "0149-cpuidle-dt-allow-an-idle-state-to-be-disabled-by-def.patch",
+  "subject": "cpuidle: dt: allow an idle state to be disabled by default",
+  "status": "APPLIES",
+  "files": [
+   "drivers/cpuidle/dt_idle_states.c"
+  ],
+  "relevant": 0.82,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.53
+ },
+ {
+  "patch": "0150-arm64-dts-qcom-msm8998-add-the-MPM-interrupt-control.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the MPM interrupt controller",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.91,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.98,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0151-arm64-dts-qcom-msm8998-add-the-system-power-collapse.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the system power-collapse idle state, disabled by default",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.85,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0152-interconnect-qcom-msm8998-compensate-BIMC-AB-votes-l.patch",
+  "subject": "interconnect: qcom: msm8998: compensate BIMC AB votes like downstream",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/interconnect/qcom/msm8998.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0153-arm64-dts-qcom-msm8998-add-the-BWMON-to-scale-DDR-wi.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the BWMON to scale DDR with CPU traffic",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.93,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0154-arm64-dts-qcom-msm8998-let-the-GPU-vote-for-DDR-band.patch",
+  "subject": "arm64: dts: qcom: msm8998: let the GPU vote for DDR bandwidth",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.93,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.95,
+  "fixes_crash": 0.11
+ },
+ {
+  "patch": "0155-soc-qcom-icc-bwmon-quiesce-and-drop-the-vote-across-.patch",
+  "subject": "soc: qcom: icc-bwmon: quiesce and drop the vote across sleep",
+  "status": "APPLIES",
+  "files": [
+   "drivers/soc/qcom/icc-bwmon.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0156-wifi-ath10k-don-t-wait-for-DISABLE_KEY-acks-WCN3990-.patch",
+  "subject": "wifi: ath10k: don't wait for DISABLE_KEY acks WCN3990 never sends",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.59
+ },
+ {
+  "patch": "0157-tick-don-t-report-a-hard-lockup-on-CPUs-frozen-in-s2.patch",
+  "subject": "tick: don't report a hard lockup on CPUs frozen in s2idle",
+  "status": "APPLIES",
+  "files": [
+   "kernel/time/tick-common.c"
+  ],
+  "relevant": 0.89,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.68,
+  "fixes_crash": 0.93
+ },
+ {
+  "patch": "0158-arm64-dts-qcom-msm8998-google-taimen-wire-the-codec-.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: wire the codec's second SLIMbus interface",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.08,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0159-arm64-dts-qcom-msm8998-add-the-ADSP-voice-services.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the ADSP voice services",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.82,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0160-arm64-dts-qcom-msm8998-google-taimen-drop-the-PD-on-.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: drop the PD on the voice services",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.27,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.11
+ },
+ {
+  "patch": "0161-ASoC-qdsp6-BRINGUP-raw-APR-access-to-the-voice-servi.patch",
+  "subject": "ASoC: qdsp6: BRINGUP: raw APR access to the voice services",
+  "status": "APPLIES",
+  "files": [
+   "sound/soc/qcom/Kconfig",
+   "sound/soc/qcom/qdsp6/Makefile",
+   "sound/soc/qcom/qdsp6/q6voice-dbg.c"
+  ],
+  "relevant": 0.77,
+  "subsystem": "audio",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0162-ASoC-tas2557-add-configuration-and-volume-controls.patch",
+  "subject": "ASoC: tas2557: add configuration and volume controls",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.09,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0163-ASoC-qdsp6-q6voice-voice-call-session-management.patch",
+  "subject": "ASoC: qdsp6: q6voice: voice call session management",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/Kconfig",
+   "sound/soc/qcom/qdsp6/Makefile",
+   "sound/soc/qcom/qdsp6/q6voice.c",
+   "sound/soc/qcom/qdsp6/q6voice.h"
+  ],
+  "relevant": 0.88,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.53
+ },
+ {
+  "patch": "0164-ASoC-qdsp6-q6voice-add-the-voice-call-front-end.patch",
+  "subject": "ASoC: qdsp6: q6voice: add the voice call front-end",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/Kconfig",
+   "sound/soc/qcom/qdsp6/Makefile",
+   "sound/soc/qcom/qdsp6/q6voice-dai.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0165-ASoC-qdsp6-q6routing-route-a-voice-front-end-to-the-.patch",
+  "subject": "ASoC: qdsp6: q6routing: route a voice front-end to the backends",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/qdsp6/q6routing.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.15
+ },
+ {
+  "patch": "0166-arm64-dts-qcom-msm8998-wire-up-the-voice-call-front-.patch",
+  "subject": "arm64: dts: qcom: msm8998: wire up the voice call front-end",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts",
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi",
+   "sound/soc/qcom/qdsp6/q6voice.c"
+  ],
+  "relevant": 0.78,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0167-ASoC-qdsp6-q6voice-say-what-the-session-did.patch",
+  "subject": "ASoC: qdsp6: q6voice: say what the session did",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/qdsp6/q6voice-dai.c",
+   "sound/soc/qcom/qdsp6/q6voice.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0168-drm-msm-don-t-submit-to-a-GPU-that-failed-to-resume.patch",
+  "subject": "drm/msm: don't submit to a GPU that failed to resume",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/msm_gpu.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.97
+ },
+ {
+  "patch": "0169-ASoC-qdsp6-q6voice-unwind-a-failed-session-instead-o.patch",
+  "subject": "ASoC: qdsp6: q6voice: unwind a failed session instead of leaking it",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/qdsp6/q6voice.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.65
+ },
+ {
+  "patch": "0170-watchdog-qcom-BRINGUP-say-when-the-bark-fires-and-le.patch",
+  "subject": "watchdog: qcom: BRINGUP: say when the bark fires, and let it be provoked",
+  "status": "APPLIES",
+  "files": [
+   "drivers/watchdog/qcom-wdt.c"
+  ],
+  "relevant": 0.42,
+  "subsystem": "tooling",
+  "subsystem_conf": 0.95,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0171-ASoC-tas2557-expose-the-two-amps-as-separate-volume-.patch",
+  "subject": "ASoC: tas2557: expose the two amps as separate volume controls",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.1,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0172-ASoC-tas2557-keep-the-DAC-gain-across-a-configuratio.patch",
+  "subject": "ASoC: tas2557: keep the DAC gain across a configuration download",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.12,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0173-ASoC-tas2557-drop-an-unused-variable-in-hw_params.patch",
+  "subject": "ASoC: tas2557: drop an unused variable in hw_params",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.07,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0174-ASoC-tas2557-make-the-bottom-of-the-volume-control-s.patch",
+  "subject": "ASoC: tas2557: make the bottom of the volume control silence",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/codecs/tas2557.c"
+  ],
+  "relevant": 0.14,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0175-ASoC-qdsp6-q6voice-a-control-for-the-vocproc-s-downl.patch",
+  "subject": "ASoC: qdsp6: q6voice: a control for the vocproc's downlink volume",
+  "status": "CONFLICT",
+  "files": [
+   "sound/soc/qcom/qdsp6/q6voice-dai.c",
+   "sound/soc/qcom/qdsp6/q6voice.c",
+   "sound/soc/qcom/qdsp6/q6voice.h"
+  ],
+  "relevant": 0.89,
+  "subsystem": "audio",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0176-drm-msm-a5xx-reset-the-GPU-before-hw_init-reprograms.patch",
+  "subject": "drm/msm/a5xx: reset the GPU before hw_init() reprograms the CP",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_gpu.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.98
+ },
+ {
+  "patch": "0177-cpufreq-qcom-hw-msm8998-busy-poll-the-ACD-transfers.patch",
+  "subject": "cpufreq: qcom-hw: msm8998: busy-poll the ACD transfers",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/cpufreq/qcom-cpufreq-hw.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.51
+ },
+ {
+  "patch": "0178-arm64-dts-qcom-msm8998-vote-the-bus-for-the-video-co.patch",
+  "subject": "arm64: dts: qcom: msm8998: vote the bus for the video codec",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.76,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.57,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0179-iio-qcom_smgr-QMI_DATA_LEN-fields-are-u32-on-the-hos.patch",
+  "subject": "iio: qcom_smgr: QMI_DATA_LEN fields are u32 on the host",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.c",
+   "drivers/iio/common/qcom_smgr/qmi/qmi_sns_smgr.h"
+  ],
+  "relevant": 0.73,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.48,
+  "fixes_crash": 0.52
+ },
+ {
+  "patch": "0180-arm64-dts-qcom-msm8998-google-taimen-pull-the-NFC-IR.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: pull the NFC IRQ line down",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.05,
+  "subsystem": "connectivity",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.44
+ },
+ {
+  "patch": "0181-media-venus-add-a-stop_at-parameter-to-bisect-the-ms.patch",
+  "subject": "media: venus: add a stop_at parameter to bisect the msm8998 bring-up",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "tooling",
+  "subsystem_conf": 0.75,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0182-arm64-dts-qcom-msm8998-google-taimen-enable-the-vide.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: enable the video codec",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.15,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.83,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0183-media-venus-add-clk_limit-to-name-the-clock-that-wed.patch",
+  "subject": "media: venus: add clk_limit to name the clock that wedges msm8998",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/pm_helpers.c"
+  ],
+  "relevant": 0.83,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.87,
+  "fixes_crash": 0.42
+ },
+ {
+  "patch": "0184-media-venus-add-boot_stage-to-split-the-CPU-access-p.patch",
+  "subject": "media: venus: add boot_stage to split the CPU access path from the firmware",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_venus.c"
+  ],
+  "relevant": 0.81,
+  "subsystem": "tooling",
+  "subsystem_conf": 0.59,
+  "fixes_crash": 0.14
+ },
+ {
+  "patch": "0185-media-venus-add-preset_limit-to-name-the-preset-writ.patch",
+  "subject": "media: venus: add preset_limit to name the preset write that wedges",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_venus.c"
+  ],
+  "relevant": 0.84,
+  "subsystem": "camera",
+  "subsystem_conf": 0.52,
+  "fixes_crash": 0.84
+ },
+ {
+  "patch": "0186-media-venus-do-not-swallow-a-TZ-refusal-of-set_remot.patch",
+  "subject": "media: venus: do not swallow a TZ refusal of set_remote_state",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/firmware.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "camera",
+  "subsystem_conf": 0.44,
+  "fixes_crash": 0.87
+ },
+ {
+  "patch": "0187-media-venus-set-the-content-protection-regions-for-m.patch",
+  "subject": "media: venus: set the content protection regions for msm8998",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.87,
+  "subsystem": "audio",
+  "subsystem_conf": 0.57,
+  "fixes_crash": 0.92
+ },
+ {
+  "patch": "0188-media-venus-msm8998-needs-the-two-MMSS-NoC-clocks.patch",
+  "subject": "media: venus: msm8998 needs the two MMSS NoC clocks",
+  "status": "APPLIES",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi",
+   "drivers/media/platform/qcom/venus/core.c",
+   "drivers/media/platform/qcom/venus/core.h"
+  ],
+  "relevant": 0.79,
+  "subsystem": "camera",
+  "subsystem_conf": 0.24,
+  "fixes_crash": 0.89
+ },
+ {
+  "patch": "0189-media-venus-write-the-VBIF-presets-before-the-firmwa.patch",
+  "subject": "media: venus: write the VBIF presets before the firmware boots",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c",
+   "drivers/media/platform/qcom/venus/hfi_venus.c",
+   "drivers/media/platform/qcom/venus/hfi_venus.h"
+  ],
+  "relevant": 0.87,
+  "subsystem": "camera",
+  "subsystem_conf": 0.42,
+  "fixes_crash": 0.95
+ },
+ {
+  "patch": "0190-media-venus-msm8998-power-the-vcodec-subcores-before.patch",
+  "subject": "media: venus: msm8998: power the vcodec subcores before touching VBIF",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi",
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.88,
+  "fixes_crash": 0.91
+ },
+ {
+  "patch": "0191-media-venus-rate-the-core-clocks-on-3XX-before-touch.patch",
+  "subject": "media: venus: rate the core clocks on 3XX before touching registers",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/pm_helpers.c"
+  ],
+  "relevant": 0.78,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.79,
+  "fixes_crash": 0.74
+ },
+ {
+  "patch": "0192-media-venus-disable-wrapper-clock-auto-gating-on-msm.patch",
+  "subject": "media: venus: disable wrapper clock auto-gating on msm8998",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_venus.c"
+  ],
+  "relevant": 0.77,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.68,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0193-media-venus-add-an-hfi_trace-knob-that-logs-every-pa.patch",
+  "subject": "media: venus: add an hfi_trace knob that logs every packet",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_msgs.c",
+   "drivers/media/platform/qcom/venus/hfi_venus.c"
+  ],
+  "relevant": 0.59,
+  "subsystem": "tooling",
+  "subsystem_conf": 0.46,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0194-media-venus-msm8998-clock-the-vcodec-subcores.patch",
+  "subject": "media: venus: msm8998: clock the vcodec subcores",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi",
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.69,
+  "fixes_crash": 0.9
+ },
+ {
+  "patch": "0195-clk-qcom-mmcc-msm8998-video-subcore-gdscs-are-HW_CTR.patch",
+  "subject": "clk: qcom: mmcc-msm8998: video subcore gdscs are HW_CTRL_TRIGGER",
+  "status": "APPLIES",
+  "files": [
+   "drivers/clk/qcom/mmcc-msm8998.c"
+  ],
+  "relevant": 0.76,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.56
+ },
+ {
+  "patch": "0196-media-venus-msm8998-restore-the-TZ-threshold-registe.patch",
+  "subject": "media: venus: msm8998: restore the TZ threshold registers after firmware boot",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_venus.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "audio",
+  "subsystem_conf": 0.22,
+  "fixes_crash": 0.85
+ },
+ {
+  "patch": "0197-media-venus-msm8998-reboot-the-firmware-on-runtime-r.patch",
+  "subject": "media: venus: msm8998: reboot the firmware on runtime resume",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "camera",
+  "subsystem_conf": 0.32,
+  "fixes_crash": 0.89
+ },
+ {
+  "patch": "0198-media-venus-msm8998-do-not-power-collapse-the-firmwa.patch",
+  "subject": "media: venus: msm8998: do not power-collapse the firmware",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.59,
+  "fixes_crash": 0.81
+ },
+ {
+  "patch": "0199-media-venus-msm8998-drop-the-content-protection-TZ-c.patch",
+  "subject": "media: venus: msm8998: drop the content-protection TZ call",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "audio",
+  "subsystem_conf": 0.77,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0200-wifi-ath10k-don-t-advertise-a-reserved-VHT-channel-w.patch",
+  "subject": "wifi: ath10k: don't advertise a reserved VHT channel width pair",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0201-wifi-ath10k-don-t-set-DSSS-CCK-in-40-MHz-on-5-GHz.patch",
+  "subject": "wifi: ath10k: don't set DSSS/CCK in 40 MHz on 5 GHz",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/mac.c"
+  ],
+  "relevant": 0.91,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0202-wifi-ath10k-make-in-order-rx-amsdu-buffers-persisten.patch",
+  "subject": "wifi: ath10k: make in-order rx amsdu buffers persistent",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/htt.h",
+   "drivers/net/wireless/ath/ath10k/htt_rx.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.67
+ },
+ {
+  "patch": "0203-media-venus-msm8998-vote-the-bus-for-the-decode-load.patch",
+  "subject": "media: venus: msm8998: vote the bus for the decode load",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "storage_mem",
+  "subsystem_conf": 0.75,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0204-drm-msm-dpu-cmd-mode-send-the-pageflip-event-at-rd_p.patch",
+  "subject": "drm/msm/dpu: cmd mode: send the pageflip event at rd_ptr, not transfer end",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.c",
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_encoder.h",
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_cmd.c"
+  ],
+  "relevant": 0.92,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.3
+ },
+ {
+  "patch": "0205-drm-msm-a5xx-use-the-vendor-hang-detect-threshold.patch",
+  "subject": "drm/msm/a5xx: use the vendor hang-detect threshold",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_gpu.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.77
+ },
+ {
+  "patch": "0206-input-touchscreen-ftm4-release-all-contacts-on-the-p.patch",
+  "subject": "input: touchscreen: ftm4: release all contacts on the palm flag",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.73,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.95,
+  "fixes_crash": 0.19
+ },
+ {
+  "patch": "0207-media-venus-vdec-implement-VIDIOC_G_PARM.patch",
+  "subject": "media: venus: vdec: implement VIDIOC_G_PARM",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/vdec.c"
+  ],
+  "relevant": 0.88,
+  "subsystem": "audio",
+  "subsystem_conf": 0.43,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0208-power-supply-qcom_smbx-honour-the-Type-C-current-adv.patch",
+  "subject": "power: supply: qcom_smbx: honour the Type-C current advertisement",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/power/supply/qcom_smbx.c"
+  ],
+  "relevant": 0.9,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.85,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0209-media-venus-bound-the-system-error-recovery-retries.patch",
+  "subject": "media: venus: bound the system error recovery retries",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c",
+   "drivers/media/platform/qcom/venus/core.h"
+  ],
+  "relevant": 0.85,
+  "subsystem": "audio",
+  "subsystem_conf": 0.38,
+  "fixes_crash": 0.83
+ },
+ {
+  "patch": "0210-drm-msm-dpu-find-the-encoder-through-the-atomic-stat.patch",
+  "subject": "drm/msm/dpu: find the encoder through the atomic state, not encoder->crtc",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.c"
+  ],
+  "relevant": 0.79,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.16
+ },
+ {
+  "patch": "0211-arm64-dts-qcom-msm8998-give-the-a540-GPU-OPPs-the-ve.patch",
+  "subject": "arm64: dts: qcom: msm8998: give the a540 GPU OPPs the vendor CPR ceilings",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-wahoo.dtsi",
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.79,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.86
+ },
+ {
+  "patch": "0212-media-venus-msm8998-vote-the-bus-for-a-4k60-decode-l.patch",
+  "subject": "media: venus: msm8998: vote the bus for a 4k60 decode load",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/platform/qcom/venus/core.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "audio",
+  "subsystem_conf": 0.34,
+  "fixes_crash": 0.07
+ },
+ {
+  "patch": "0213-drm-msm-BRINGUP-gpu_opp_adjust-raise-GPU-OPP-voltage.patch",
+  "subject": "drm/msm: [BRINGUP] gpu_opp_adjust: raise GPU OPP voltages at runtime",
+  "status": "APPLIES",
+  "files": [
+   "drivers/gpu/drm/msm/Makefile",
+   "drivers/gpu/drm/msm/gpu_opp_adjust.c"
+  ],
+  "relevant": 0.65,
+  "subsystem": "gpu",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0214-firmware-qcom-scm-Allow-QSEECOM-on-Google-Pixel-2-XL.patch",
+  "subject": "firmware: qcom: scm: Allow QSEECOM on Google Pixel 2 XL",
+  "status": "APPLIES",
+  "files": [
+   "drivers/firmware/qcom/qcom_scm.c"
+  ],
+  "relevant": 0.29,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0215-firmware-qcom-scm-Add-QSEECOM-app-loading.patch",
+  "subject": "firmware: qcom: scm: Add QSEECOM app loading",
+  "status": "APPLIES",
+  "files": [
+   "drivers/firmware/qcom/qcom_scm.c",
+   "include/linux/firmware/qcom/qcom_scm.h"
+  ],
+  "relevant": 0.73,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.76,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0216-firmware-qcom-scm-Add-QSEECOM-listener-support.patch",
+  "subject": "firmware: qcom: scm: Add QSEECOM listener support",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/firmware/qcom/qcom_scm.c",
+   "include/linux/firmware/qcom/qcom_scm.h"
+  ],
+  "relevant": 0.57,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.68,
+  "fixes_crash": 0.27
+ },
+ {
+  "patch": "0217-dt-bindings-vendor-prefixes-Add-Fingerprint-Cards-AB.patch",
+  "subject": "dt-bindings: vendor-prefixes: Add Fingerprint Cards AB",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/vendor-prefixes.yaml"
+  ],
+  "relevant": 0.05,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.9,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0218-dt-bindings-misc-Add-FPC-fingerprint-sensor-behind-a.patch",
+  "subject": "dt-bindings: misc: Add FPC fingerprint sensor behind a QSEE trustlet",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/misc/fpc,fpc1020.yaml"
+  ],
+  "relevant": 0.07,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0219-misc-Add-driver-for-FPC-fingerprint-sensors-behind-a.patch",
+  "subject": "misc: Add driver for FPC fingerprint sensors behind a QSEE trustlet",
+  "status": "APPLIES",
+  "files": [
+   "MAINTAINERS",
+   "drivers/misc/Kconfig",
+   "drivers/misc/Makefile",
+   "drivers/misc/fpc1020.c",
+   "include/uapi/misc/fpc1020.h"
+  ],
+  "relevant": 0.13,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0220-arm64-dts-qcom-msm8998-google-taimen-Add-the-fingerp.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: Add the fingerprint sensor",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.06,
+  "subsystem": "board_other",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0221-misc-Add-a-QSEE-listener-supplicant-transport.patch",
+  "subject": "misc: Add a QSEE listener supplicant transport",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/misc/Kconfig",
+   "drivers/misc/Makefile",
+   "drivers/misc/qsee_lsnr.c"
+  ],
+  "relevant": 0.34,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.71,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0222-media-i2c-imx362-add-the-vendor-s-16-9-and-2x2-binne.patch",
+  "subject": "media: i2c: imx362: add the vendor's 16:9 and 2x2-binned modes",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx362.c"
+  ],
+  "relevant": 0.11,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0223-misc-easel-mipi-let-sensors-retune-a-bypass-link-per.patch",
+  "subject": "misc: easel-mipi: let sensors retune a bypass link per stream",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/misc/easel-mipi.c",
+   "include/linux/easel-mipi.h"
+  ],
+  "relevant": 0.28,
+  "subsystem": "camera",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0224-media-i2c-imx179-expose-the-video-and-binned-modes.patch",
+  "subject": "media: i2c: imx179: expose the video and binned modes",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx179.c"
+  ],
+  "relevant": 0.15,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0225-media-i2c-imx362-run-the-binned-modes-at-the-vendor-.patch",
+  "subject": "media: i2c: imx362: run the binned modes at the vendor's link rates",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx362.c"
+  ],
+  "relevant": 0.1,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0226-media-i2c-imx179-hold-back-the-binned-mode.patch",
+  "subject": "media: i2c: imx179: hold back the binned mode",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx179.c"
+  ],
+  "relevant": 0.16,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.26
+ },
+ {
+  "patch": "0227-dt-bindings-media-i2c-Add-ON-Semiconductor-LC898123F.patch",
+  "subject": "dt-bindings: media: i2c: Add ON Semiconductor LC898123F40",
+  "status": "APPLIES",
+  "files": [
+   "Documentation/devicetree/bindings/media/i2c/onnn,lc898123f40.yaml"
+  ],
+  "relevant": 0.08,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.02
+ },
+ {
+  "patch": "0228-media-i2c-Add-ON-Semiconductor-LC898123F40-OIS-contr.patch",
+  "subject": "media: i2c: Add ON Semiconductor LC898123F40 OIS controller driver",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/Kconfig",
+   "drivers/media/i2c/Makefile",
+   "drivers/media/i2c/lc898123f40.c"
+  ],
+  "relevant": 0.09,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0229-iio-proximity-vl53l0x-i2c-select-the-triggered-buffe.patch",
+  "subject": "iio: proximity: vl53l0x-i2c: select the triggered buffer support it uses",
+  "status": "APPLIES",
+  "files": [
+   "drivers/iio/proximity/Kconfig"
+  ],
+  "relevant": 0.83,
+  "subsystem": "camera",
+  "subsystem_conf": 0.41,
+  "fixes_crash": 0.52
+ },
+ {
+  "patch": "0230-arm64-dts-qcom-msm8998-google-taimen-Add-camera-OIS-.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: Add camera OIS, laser AF and EEPROM",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.07,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0231-iio-proximity-vl53l0x-i2c-identify-the-sensor-after-.patch",
+  "subject": "iio: proximity: vl53l0x-i2c: identify the sensor after powering it on",
+  "status": "APPLIES",
+  "files": [
+   "drivers/iio/proximity/vl53l0x-i2c.c"
+  ],
+  "relevant": 0.7,
+  "subsystem": "camera",
+  "subsystem_conf": 0.77,
+  "fixes_crash": 0.09
+ },
+ {
+  "patch": "0232-media-i2c-lc898123f40-defer-probe-until-the-controll.patch",
+  "subject": "media: i2c: lc898123f40: defer probe until the controller answers",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/lc898123f40.c"
+  ],
+  "relevant": 0.16,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.15
+ },
+ {
+  "patch": "0233-media-venus-hfi_cmds-packetize-the-H.264-8x8-transfo.patch",
+  "subject": "media: venus: hfi_cmds: packetize the H.264 8x8 transform for HFI 3xx",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/venus/hfi_cmds.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "audio",
+  "subsystem_conf": 0.48,
+  "fixes_crash": 0.13
+ },
+ {
+  "patch": "0234-media-uapi-add-2X8_PADHI_LE-codes-for-the-other-10-b.patch",
+  "subject": "media: uapi: add 2X8_PADHI_LE codes for the other 10-bit Bayer orders",
+  "status": "APPLIES",
+  "files": [
+   "include/uapi/linux/media-bus-format.h"
+  ],
+  "relevant": 0.66,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0235-media-qcom-camss-offer-unpacked-10-bit-on-RDI-for-ev.patch",
+  "subject": "media: qcom: camss: offer unpacked 10-bit on RDI for every Bayer order",
+  "status": "APPLIES",
+  "files": [
+   "drivers/media/platform/qcom/camss/camss-csid-4-7.c",
+   "drivers/media/platform/qcom/camss/camss-csid.c",
+   "drivers/media/platform/qcom/camss/camss-ispif.c",
+   "drivers/media/platform/qcom/camss/camss-vfe.c"
+  ],
+  "relevant": 0.86,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0237-arm64-dts-qcom-msm8998-give-the-CPU-OPPs-the-vendor-.patch",
+  "subject": "arm64: dts: qcom: msm8998: give the CPU OPPs the vendor's measured energy model",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.94,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.99,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0238-arm64-dts-qcom-msm8998-google-taimen-add-the-skin-th.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: add the skin thermistor",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.09,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0239-arm64-dts-qcom-msm8998-google-taimen-wire-the-vendor.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: wire the vendor's skin thermal ladder",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.12,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.14
+ },
+ {
+  "patch": "0240-arm64-dts-qcom-msm8998-take-cpu-capacity-off-the-ven.patch",
+  "subject": "arm64: dts: qcom: msm8998: take cpu capacity off the vendor's own scale",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.95,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.93,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0241-thermal-qcom-spmi-adc-tm5-stop-requiring-IIO_VAL_INT.patch",
+  "subject": "thermal: qcom-spmi-adc-tm5: stop requiring IIO_VAL_INT from a processed read",
+  "status": "APPLIES",
+  "files": [
+   "drivers/thermal/qcom/qcom-spmi-adc-tm5.c"
+  ],
+  "relevant": 0.78,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.12
+ },
+ {
+  "patch": "0242-Input-ftm4-add-keep_powered-so-resume-need-not-power.patch",
+  "subject": "Input: ftm4 - add keep_powered so resume need not power-cycle the controller",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.27,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.78,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0243-wifi-ath10k-trust-the-WMI-service-map-for-WoWLAN-on-.patch",
+  "subject": "wifi: ath10k: trust the WMI service map for WoWLAN on SNOC",
+  "status": "APPLIES",
+  "files": [
+   "drivers/net/wireless/ath/ath10k/wow.c"
+  ],
+  "relevant": 0.94,
+  "subsystem": "connectivity",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0244-iio-qcom-smgr-give-the-wake-gestures-an-input-device.patch",
+  "subject": "iio: qcom-smgr: give the wake gestures an input device",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/iio/common/qcom_smgr/qcom_smgr.c",
+   "include/linux/iio/common/qcom_smgr.h"
+  ],
+  "relevant": 0.4,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.76,
+  "fixes_crash": 0.03
+ },
+ {
+  "patch": "0245-misc-easel-mipi-revive-Easel-off-the-resume-path.patch",
+  "subject": "misc: easel-mipi: revive Easel off the resume path",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/misc/easel-mipi.c"
+  ],
+  "relevant": 0.21,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.4,
+  "fixes_crash": 0.17
+ },
+ {
+  "patch": "0246-Input-ftm4-add-handover-to-give-the-touch-i2c-to-the.patch",
+  "subject": "Input: ftm4 - add handover, to give the touch i2c to the SLPI while awake",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.72,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0247-arm64-dts-qcom-msm8998-google-taimen-poll-the-skin-t.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: poll the skin thermistor",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.11,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.2
+ },
+ {
+  "patch": "0248-Input-ftm4-wake-the-system-on-a-double-tap.patch",
+  "subject": "Input: ftm4 - wake the system on a double tap",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.57,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.94,
+  "fixes_crash": 0.04
+ },
+ {
+  "patch": "0249-thermal-qcom-lmh-support-the-msm8998-limiter-thermal.patch",
+  "subject": "thermal: qcom: lmh: support the msm8998 limiter, thermal subfunction only",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/thermal/qcom/lmh.c"
+  ],
+  "relevant": 0.93,
+  "subsystem": "thermal_power",
+  "subsystem_conf": 0.83,
+  "fixes_crash": 0.1
+ },
+ {
+  "patch": "0250-arm64-dts-qcom-msm8998-add-the-TZ-DCVS-limiter.patch",
+  "subject": "arm64: dts: qcom: msm8998: add the TZ DCVS limiter",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.92,
+  "subsystem": "cpu_dvfs",
+  "subsystem_conf": 0.62,
+  "fixes_crash": 0.11
+ },
+ {
+  "patch": "0251-drm-msm-a5xx-enable-the-A540-s-on-die-limiter-and-fe.patch",
+  "subject": "drm/msm/a5xx: enable the A540's on-die limiter, and feed it five levels",
+  "status": "ALREADY-IN",
+  "files": [
+   "drivers/gpu/drm/msm/adreno/a5xx_power.c"
+  ],
+  "relevant": 0.95,
+  "subsystem": "gpu",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.45
+ },
+ {
+  "patch": "0252-media-i2c-imx179-imx362-let-the-sensors-idle-after-p.patch",
+  "subject": "media: i2c: imx179, imx362: let the sensors idle after probe",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/media/i2c/imx179.c",
+   "drivers/media/i2c/imx362.c"
+  ],
+  "relevant": 0.41,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.29
+ },
+ {
+  "patch": "0253-Input-ftm4-add-gesture_test-to-arm-the-wake-gesture-.patch",
+  "subject": "Input: ftm4 - add gesture_test, to arm the wake gesture while awake",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.74,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.66,
+  "fixes_crash": 0.05
+ },
+ {
+  "patch": "0254-Input-ftm4-do-not-read-the-controller-from-the-wake-.patch",
+  "subject": "Input: ftm4 - do not read the controller from the wake gesture's interrupt",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.29,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.96,
+  "fixes_crash": 0.96
+ },
+ {
+  "patch": "0255-Input-ftm4-stop-sensing-the-way-the-vendor-does.patch",
+  "subject": "Input: ftm4 - stop sensing the way the vendor does",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.82,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.27
+ },
+ {
+  "patch": "0256-Input-ftm4-release-the-interrupt-on-handover-so-the-.patch",
+  "subject": "Input: ftm4 - release the interrupt on handover, so the SLPI can take it",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.42,
+  "subsystem": "board_other",
+  "subsystem_conf": 0.97,
+  "fixes_crash": 0.17
+ },
+ {
+  "patch": "0257-Input-ftm4-follow-the-panel-so-the-SLPI-gets-the-con.patch",
+  "subject": "Input: ftm4 - follow the panel, so the SLPI gets the controller on screen off",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/input/touchscreen/ftm4.c"
+  ],
+  "relevant": 0.83,
+  "subsystem": "display",
+  "subsystem_conf": 0.79,
+  "fixes_crash": 0.37
+ },
+ {
+  "patch": "0258-arm64-dts-qcom-msm8998-google-taimen-make-the-touchs.patch",
+  "subject": "arm64: dts: qcom: msm8998-google-taimen: make the touchscreen follow the panel",
+  "status": "CONFLICT",
+  "files": [
+   "arch/arm64/boot/dts/qcom/msm8998-google-taimen.dts"
+  ],
+  "relevant": 0.09,
+  "subsystem": "display",
+  "subsystem_conf": 0.63,
+  "fixes_crash": 0.06
+ },
+ {
+  "patch": "0259-arm64-dts-qcom-msm8998-give-CAMSS-the-TOP-GDSC-it-vo.patch",
+  "subject": "arm64: dts: qcom: msm8998: give CAMSS the TOP GDSC it votes for",
+  "status": "CONFLICT",
+  "files": [
+   "Documentation/devicetree/bindings/media/qcom,msm8998-camss.yaml",
+   "arch/arm64/boot/dts/qcom/msm8998.dtsi"
+  ],
+  "relevant": 0.94,
+  "subsystem": "camera",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.53
+ },
+ {
+  "patch": "0260-drm-panel-lg-sw43402-send-display-on-after-the-first.patch",
+  "subject": "drm/panel: lg-sw43402: send display-on after the first frame, like the vendor",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/msm/dsi/dsi_host.c",
+   "drivers/gpu/drm/msm/msm_drv.h",
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.96,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.08
+ },
+ {
+  "patch": "0261-drm-panel-lg-sw43402-record-why-the-msm-coupling-can.patch",
+  "subject": "drm/panel: lg-sw43402: record why the msm coupling cannot go upstream as-is",
+  "status": "CONFLICT",
+  "files": [
+   "drivers/gpu/drm/panel/panel-lg-sw43402.c"
+  ],
+  "relevant": 0.61,
+  "subsystem": "display",
+  "subsystem_conf": 1.0,
+  "fixes_crash": 0.07
+ }
+]

@@ -1,0 +1,63 @@
+== system
+Linux lge-joan 7.2.0-rc2 #28-lge-joan SMP PREEMPT Sat Sep 26 14:19:43 UTC 2026 aarch64 Linux
+panic=5 pmos.force-partition-resize ipa.lowmem=1  pmos_boot_uuid=ca984cf4-a54d-429a-91b0-1fae66c9f085 pmos_root_uuid=ff480c16-a01c-4563-859b-9281241c4b36 pmos_rootfsopts=defaults androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+ 00:33:27 up 0 min,  0 users,  load average: 3.12, 0.85, 0.29
+running
+== root
+root:root 555
+/dev/mmcblk0p2            2.4G      2.0G    232.8M  90% /
+/dev/mmcblk0p1          454.2M     74.7M    355.2M  17% /boot
+NAME          SIZE FSTYPE LABEL     MOUNTPOINTS
+mmcblk0     183.3G                  
+├─mmcblk0p1   487M ext2   pmOS_boot /boot
+└─mmcblk0p2 182.9G ext4   pmOS_root /
+== governor
+/sys/devices/system/cpu/cpufreq/policy0 schedutil 1900800
+/sys/devices/system/cpu/cpufreq/policy4 schedutil 1728000
+Current active profile: balanced
+auto
+== session
+bluetooth.service greetd.service ModemManager.service NetworkManager.service rmtfs.service sshd.service tqftpserv.service 
+      1 callaudiod
+      1 feedbackd
+      1 phoc
+      1 pipewire
+      1 pipewire-pulse
+      1 wireplumber
+== firewall
+0
+active
+== pkgs
+alsa-ucm-conf-lge-joan-1.0-r4
+chatty-0.8.9-r15
+chatty-lang-0.8.9-r15
+chatty-systemd-0.8.9-r15
+device-lge-joan-1-r16
+firefox-esr-140.14.0-r0
+firmware-lge-joan-1.0-r9
+firmware-lge-joan-h930-1.0-r9
+firmware-lge-joan-initramfs-1.0-r9
+joan-imsd-0.1-r4
+joan-imsd-systemd-0.1-r4
+linux-lge-joan-7.2.0_rc2-r27
+mesa-dri-gallium-26.2.3-r1
+mesa-gbm-26.2.3-r1
+phosh-99990.57.0-r2
+pipewire-1.6.8-r5
+postmarketos-base-ui-61-r0
+postmarketos-base-ui-alsa-utils-61-r0
+postmarketos-base-ui-audio-61-r0
+postmarketos-base-ui-audio-backend-pipewire-61-r0
+postmarketos-base-ui-flatpak-61-r0
+postmarketos-base-ui-gnome-14-r0
+postmarketos-base-ui-gnome-mobile-1-r3
+postmarketos-base-ui-iio-sensor-proxy-systemd-61-r0
+postmarketos-base-ui-modemmanager-61-r0
+postmarketos-base-ui-modemmanager-systemd-61-r0
+postmarketos-base-ui-networkmanager-61-r0
+postmarketos-base-ui-qt-tweaks-61-r0
+postmarketos-base-ui-qt-wayland-61-r0
+postmarketos-base-ui-wifi-wpa_supplicant-61-r0
+snapshot-51.0-r0
+snapshot-lang-51.0-r0
+wireplumber-0.5.17-r0

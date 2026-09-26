@@ -1,0 +1,268 @@
+# US998 LGUS9986e606d55 qfprom rows (nvmem qfprom0, row N at byte N*8), read 2026-09-26 on pmOS dvfs15
+row38  0x9870b1705002005e  (low word = speed-bin row, matches dvfs handoff)
+row39  0x801a03f2a0ac61b0  fusing_rev[48:50]=2
+row41  0x202e00e4b1f63240  limitation[46:47]=0
+row65  0x0000041506000000  init[39:43,34:38,29:33,24:28]=8,5,8,6  offset[56:59..44:47]=0,0,0,0  aging[60:63]=0
+row66  0x21924314c629cc50
+row100 0x0000000000000000  force_highest[45]=0
+
+MMSS (GFX) open-loop per fuse corner, v2 ref 516/628/752/924 mV + signed init*10 mV:
+  596 678 832 984 mV (fuse corners at 180/342/515/710 MHz; before DT fuse adjustment +60 mV on FC0)
+Stock closed-loop at 710 MHz on this chip (pm8005_s1 readback, 2026-08-04): 936 mV
+
+## downstream msm8998-v2.dtsi &gfx_cpr (LG kernel)
+&gfx_cpr {
+	compatible = "qcom,cpr4-msm8998-v2-mmss-regulator";
+	qcom,cpr-aging-ref-voltage = <1088000>;
+};
+
+&gfx_vreg {
+	regulator-min-microvolt = <1>;
+	regulator-max-microvolt = <8>;
+
+	qcom,cpr-fuse-corners = <4>;
+	qcom,cpr-fuse-combos = <8>;
+	qcom,cpr-corners = <8>;
+
+	qcom,cpr-corner-fmax-map = <1 3 5 8>;
+
+	qcom,cpr-voltage-ceiling =
+		<716000 716000 772000 880000 908000 948000 1016000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>,
+		<724000 724000 772000 832000 916000 968000 1024000 1088000>;
+
+	qcom,cpr-voltage-floor =
+		<516000 516000 532000 584000 632000 672000 712000 756000>;
+
+	qcom,mem-acc-voltage = <1 1 1 2 2 2 2 2>;
+
+	qcom,corner-frequencies =
+		<180000000 257000000 342000000 414000000
+		 515000000 596000000 670000000 710000000>;
+
+	qcom,cpr-target-quotients =
+		<   0    0    0    0  331  357    0    0
+		    0    0    0    0    0    0  115    0>,
+		<   0    0    0    0  467  500    0    0
+		    0    0    0    0    0    0  199    0>,
+		<   0    0    0    0  628  665    0    0
+		    0    0    0    0    0    0  290    0>,
+		<   0    0    0    0  762  805    0    0
+		    0    0    0    0    0    0  397    0>,
+		<   0    0    0    0  964 1013    0    0
+		    0    0 1143    0 1138 1055    0    0>,
+		<   0    0    0    0    0    0    0    0
+		    0    0 1306    0 1289 1168    0    0>,
+		<   0    0    0    0    0    0    0    0
+		    0    0 1468    0 1429 1256    0    0>,
+		<   0    0    0    0    0    0    0    0
+		    0    0 1627    0 1578 1353    0    0>;
+
+	qcom,cpr-ro-scaling-factor =
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>,
+		<   0    0    0    0 2377 2571    0    0
+		    0    0 2168    0 2209 1849 1997    0>;
+
+	qcom,cpr-open-loop-voltage-fuse-adjustment =
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>,
+		<   60000        0        0        0>;
+
+	qcom,cpr-closed-loop-voltage-adjustment =
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>,
+		<   90000    38000    28000     8000
+			0    29000    11000        0>;
+
+	qcom,cpr-floor-to-ceiling-max-range =
+	       <40000 40000 40000 40000 40000 40000 50000 50000>;
+
+	qcom,cpr-fused-closed-loop-voltage-adjustment-map =
+		<0 0 0 0 1 2 3 4>;
+
+	qcom,allow-voltage-interpolation;
+	qcom,cpr-scaled-open-loop-voltage-as-ceiling;
+
+	qcom,cpr-aging-max-voltage-adjustment = <15000>;
+	qcom,cpr-aging-ref-corner = <8>;
+	qcom,cpr-aging-ro-scaling-factor = <1620>;
+	qcom,allow-aging-voltage-adjustment = <0>;
+};
+
+&qusb_phy0 {
+	reg = <0x0c012000 0x2a8>,
+	      <0x01fcb24c 0x4>,
+	      <0x00784238 0x4>;
+	reg-names = "qusb_phy_base",
+			"tcsr_clamp_dig_n_1p8",
+			"efuse_addr";
+	qcom,efuse-bit-pos = <16>;
+	qcom,efuse-num-bits = <4>;
+	qcom,qusb-phy-init-seq =
+			/* <value reg_offset> */
+				<0x13 0x04 /* analog_controls_two */
+
+## downstream cpr3-mmss-regulator.c msm8998 fuse tables
+};
+
+/* MSM8998 MMSS fuse parameter locations: */
+static const struct cpr3_fuse_param
+msm8998_mmss_init_voltage_param[MSM8996_MMSS_FUSE_CORNERS][2] = {
+	{{65, 39, 43}, {} },
+	{{65, 34, 38}, {} },
+	{{65, 29, 33}, {} },
+	{{65, 24, 28}, {} },
+};
+
+static const struct cpr3_fuse_param msm8998_cpr_fusing_rev_param[] = {
+	{39, 48, 50},
+	{},
+};
+
+static const struct cpr3_fuse_param msm8998_cpr_limitation_param[] = {
+	{41, 46, 47},
+	{},
+};
+
+static const struct cpr3_fuse_param
+msm8998_mmss_aging_init_quot_diff_param[] = {
+	{65, 60, 63},
+	{66, 0, 3},
+	{},
+};
+
+static const struct cpr3_fuse_param
+msm8998_mmss_offset_voltage_param[MSM8996_MMSS_FUSE_CORNERS][2] = {
+	{{65, 56, 59}, {} },
+	{{65, 52, 55}, {} },
+	{{65, 48, 51}, {} },
+	{{65, 44, 47}, {} },
+};
+
+static const struct cpr3_fuse_param
+msm8998_cpr_force_highest_corner_param[] = {
+	{100, 45, 45},
+	{},
+};
+
+#define MSM8996PRO_SOC_ID			4
+#define MSM8998_V1_SOC_ID			5
+#define MSM8998_V2_SOC_ID			6
+
+/*
+ * Some initial msm8996 parts cannot be used in a meaningful way by software.
+ * Other parts can only be used when operating with CPR disabled (i.e. at the
+ * fused open-loop voltage) when no voltage interpolation is applied.  A fuse
+ * parameter is provided so that software can properly handle these limitations.
+ */
+enum msm8996_cpr_limitation {
+	MSM8996_CPR_LIMITATION_NONE = 0,
+	MSM8996_CPR_LIMITATION_UNSUPPORTED = 2,
+	MSM8996_CPR_LIMITATION_NO_CPR_OR_INTERPOLATION = 3,
+};
+
+/* Additional MSM8996 specific data: */
+
+/* Open loop voltage fuse reference voltages in microvolts */
+static const int msm8996_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	670000,
+	745000,
+	905000,
+	1015000,
+};
+
+static const int msm8996pro_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	670000,
+	745000,
+	905000,
+	1065000,
+};
+
+static const int msm8998_v1_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	528000,
+	656000,
+	812000,
+	932000,
+};
+
+static const int
+msm8998_v1_rev0_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	632000,
+	768000,
+	896000,
+	1032000,
+};
+
+static const int msm8998_v2_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	516000,
+	628000,
+	752000,
+	924000,
+};
+
+static const int
+msm8998_v2_rev0_mmss_fuse_ref_volt[MSM8996_MMSS_FUSE_CORNERS] = {
+	616000,
+	740000,
+	828000,
+	1024000,
+};
+
+#define MSM8996_MMSS_FUSE_STEP_VOLT		10000
+#define MSM8996_MMSS_OFFSET_FUSE_STEP_VOLT	10000
+#define MSM8996_MMSS_VOLTAGE_FUSE_SIZE		5
+#define MSM8996_MMSS_MIN_VOLTAGE_FUSE_VAL	0x1F
+#define MSM8996_MMSS_AGING_INIT_QUOT_DIFF_SCALE	2
+#define MSM8996_MMSS_AGING_INIT_QUOT_DIFF_SIZE	6
+
+## Port check (a540_gfx_rail.c algorithm, recomputed offline for this part)
+fuses FC0..3 = 8 5 8 6 (signed +), fusing rev 2 -> v2 ref 516/628/752/924 mV
+fuse-corner open-loop after +60 mV FC0 adjustment and monotonic: 656 678 832 984 mV
+MHz  open-loop  stock-measured(2026-08-04)  open-loop-minus-max-range(40/50)->4mV step
+180    656        -                          -
+257    668       628                        628
+342    680       644                        640
+414    744       704                        704
+515    832       792                        792
+596    896       856                        856
+670    956       908                        908 (906 -> 908)
+710    984       936                        936 (934 -> 936)
+Reading: stock closed-loop CPR sat on its floor (qcom,cpr-floor-to-ceiling-max-range
+below the open-loop ceiling) at 6/7 corners, 4 mV above it at 342 MHz. The port
+reproduces the per-part ceiling and floor exactly, and the old joan DT curve was this
+fast part's floor, not a table that is safe on other parts.

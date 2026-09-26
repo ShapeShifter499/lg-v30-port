@@ -1,0 +1,135 @@
+== uname
+Linux lge-joan 7.2.0-rc2 #28-lge-joan SMP PREEMPT Sat Sep 26 14:19:43 UTC 2026 aarch64 Linux
+panic=5 pmos.force-partition-resize ipa.lowmem=1  pmos_rootfsopts=defaults androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+running
+== cpufreq
+/sys/devices/system/cpu/cpufreq/policy0 drv=qcom-cpufreq-osm gov=performance min=300000 max=1900800 hwmax=1900800 cur=1900800 rl=
+/sys/devices/system/cpu/cpufreq/policy4 drv=qcom-cpufreq-osm gov=performance min=300000 max=2361600 hwmax=2361600 cur=2361600 rl=
+== osm
+policy0
+policy4
+== devfreq
+/sys/class/devfreq/1da4000.ufshc gov=simple_ondemand cur=50000000 max=200000000
+/sys/class/devfreq/5000000.gpu gov=simple_ondemand cur=257000000 max=710000097
+== thermal
+cpu0-thermal 47400
+cpu1-thermal 45800
+cluster1-l2-thermal 47700
+gpu-bottom-thermal 39300
+gpu-top-thermal 39000
+modem-thermal 41200
+mem-thermal 39300
+wlan-thermal 43800
+q6-dsp-thermal 42500
+camera-thermal 40900
+multimedia-thermal 40900
+qcom-battery 33000
+cpu2-thermal 44800
+pm8998-thermal 36412
+cpu3-thermal 44500
+clust0-mhm-thermal 45800
+clust1-mhm-thermal 49000
+cpu4-thermal 48000
+cpu5-thermal 45800
+cpu6-thermal 46700
+cpu7-thermal 47000
+== lsmod
+Module                  Size  Used by
+apr                    20480  4 q6asm,q6core,q6afe,q6adm
+ath                    36864  1 ath10k_core
+ath10k_core           385024  1 ath10k_snoc
+ath10k_snoc            49152  0
+bluetooth             548864  26 btqca,hci_uart,btbcm
+btbcm                  24576  1 hci_uart
+btqca                  16384  1 hci_uart
+cfg80211             1110016  3 ath,mac80211,ath10k_core
+ecc                    36864  1 ecdh_generic
+ecdh_generic           16384  2 bluetooth
+fuse                  196608  7
+gpio_wcd934x           12288  0
+hci_uart               86016  0
+i2c_qcom_cci           16384  0
+ipa                   262144  0
+kpp                    12288  2 ecdh_generic,bluetooth
+led_class_flash        16384  1 leds_qcom_flash
+leds_qcom_flash        16384  0
+libarc4                12288  1 mac80211
+mac80211             1155072  1 ath10k_core
+mc                     61440  5 v4l2_async,videodev,qcom_camss,videobuf2_v4l2,videobuf2_common
+nci                    49152  2 nxp_nci,nxp_nci_i2c
+nf_conntrack          122880  1 nft_ct
+nf_defrag_ipv4         12288  1 nf_conntrack
+nf_defrag_ipv6         20480  1 nf_conntrack
+nf_reject_ipv4         12288  1 nft_reject_inet
+nf_reject_ipv6         16384  1 nft_reject_inet
+nf_tables             249856  131 nft_ct,nft_reject_inet,nft_reject
+nfc                    90112  2 nci,nxp_nci
+nft_ct                 16384  3
+nft_reject             12288  1 nft_reject_inet
+nft_reject_inet        12288  1
+nxp_nci                12288  1 nxp_nci_i2c
+nxp_nci_i2c            12288  0
+pdr_interface          16384  2 slim_qcom_ngd_ctrl,apr
+q6adm                  16384  1 q6routing
+q6afe                  28672  2 q6afe_dai,q6adm
+q6afe_dai              77824  1
+q6asm                  28672  1 q6asm_dai
+q6asm_dai              28672  1
+q6core                 12288  3 q6asm,q6afe,q6adm
+q6routing             393216  2 q6asm_dai
+qcom_camss            638976  0
+qcom_common            16384  5 ipa,ath10k_snoc,qcom_q6v5_pas,slim_qcom_ngd_ctrl,qcom_q6v5_mss
+qcom_glink_smem        12288  1 qcom_common
+qcom_pd_mapper         24576  0
+qcom_pdr_msg           16384  2 qcom_pd_mapper,pdr_interface
+qcom_pil_info          12288  2 qcom_q6v5_pas,qcom_q6v5_mss
+qcom_q6v5              12288  2 qcom_q6v5_pas,qcom_q6v5_mss
+qcom_q6v5_mss          45056  0
+qcom_q6v5_pas          40960  0
+qcom_spmi_adc5         32768  0
+qcom_spmi_temp_alarm    20480  0
+qcom_stats             12288  0
+qcom_sysmon            16384  3 qcom_q6v5_pas,qcom_q6v5,qcom_q6v5_mss
+qcom_vadc_common       16384  1 qcom_spmi_adc5
+qmi_helpers            28672  7 qcom_pd_mapper,ipa,ath10k_snoc,qcom_sysmon,qcom_pdr_msg,slim_qcom_ngd_ctrl,pdr_interface
+qrtr                   45056  61 qrtr_smd
+qrtr_smd               12288  0
+regmap_slimbus         12288  2 snd_soc_wcd934x,wcd934x
+rfkill                 28672  8 nfc,bluetooth,cfg80211
+rmnet                  24576  0
+rmtfs_mem              12288  2
+rpmsg_char             20480  1 rpmsg_ctrl
+rpmsg_ctrl             12288  0
+slim_qcom_ngd_ctrl     24576  0
+slimbus                28672  5 regmap_slimbus,slim_qcom_ngd_ctrl,snd_soc_wcd934x,soundwire_qcom,wcd934x
+snd                   102400  9 snd_soc_sdm845,snd_soc_qcom_common,snd_soc_hdmi_codec,snd_timer,snd_compress,snd_soc_core,snd_pcm
+snd_compress           24576  1 snd_soc_core
+snd_pcm               143360  10 q6afe_dai,snd_soc_hdmi_codec,snd_soc_es9218p,snd_compress,q6asm_dai,snd_soc_core,snd_soc_wcd934x,snd_soc_rt5663,snd_soc_tfa989x,snd_pcm_dmaengine
+snd_pcm_dmaengine      16384  1 snd_soc_core
+snd_q6dsp_common       49152  3 q6asm,q6afe_dai,q6adm
+snd_soc_core          290816  14 snd_soc_sdm845,snd_soc_qcom_common,q6routing,q6afe_dai,snd_soc_hdmi_codec,snd_soc_qcom_sdw,snd_soc_es9218p,q6asm_dai,snd_soc_wcd_mbhc,snd_soc_wcd934x,soundwire_qcom,snd_soc_rt5663,snd_soc_tfa989x,snd_soc_wcd_classh
+snd_soc_es9218p        12288  1
+snd_soc_hdmi_codec     16384  0
+snd_soc_qcom_common    12288  1 snd_soc_sdm845
+snd_soc_qcom_sdw       12288  1 snd_soc_sdm845
+snd_soc_rl6231         12288  1 snd_soc_rt5663
+snd_soc_rt5663         73728  1 snd_soc_sdm845
+snd_soc_sdm845         12288  1
+snd_soc_tfa989x        16384  1
+snd_soc_wcd934x       266240  1
+snd_soc_wcd_classh     16384  1 snd_soc_wcd934x
+snd_soc_wcd_common     12288  1 snd_soc_wcd934x
+snd_soc_wcd_mbhc       28672  1 snd_soc_wcd934x
+snd_timer              45056  1 snd_pcm
+socinfo                24576  0
+soundcore              12288  1 snd
+soundwire_bus        1138688  3 snd_soc_wcd_common,snd_soc_qcom_sdw,soundwire_qcom
+soundwire_qcom         28672  0
+v4l2_async             20480  2 v4l2_fwnode,qcom_camss
+v4l2_fwnode            20480  1 qcom_camss
+videobuf2_common       69632  4 qcom_camss,videobuf2_v4l2,videobuf2_dma_sg,videobuf2_memops
+videobuf2_dma_sg       16384  1 qcom_camss
+videobuf2_memops       12288  1 videobuf2_dma_sg
+videobuf2_v4l2         32768  1 qcom_camss
+videodev              303104  4 v4l2_async,v4l2_fwnode,qcom_camss,videobuf2_v4l2
+wcd934x                12288  0

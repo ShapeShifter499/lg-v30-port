@@ -1,0 +1,59 @@
+
+== system
+7.2.0-rc2
+panic=5 pmos.force-partition-resize ipa.lowmem=1  pmos_boot_uuid=ca984cf4-a54d-429a-91b0-1fae66c9f085 pmos_root_uuid=ff480c16-a01c-4563-859b-9281241c4b36 pmos_rootfsopts=defaults androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+running
+capability,bpf
+
+== cpu
+policy0 qcom-cpufreq-osm gov=schedutil max=1900800
+policy4 qcom-cpufreq-osm gov=schedutil max=2361600
+
+== gpu
+[    2.213498] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.214796] adreno 5000000.gpu: gfx-mem interconnect: 5680000 Bps
+[    2.219875] msm_dpu c901000.display-controller: [drm:adreno_request_fw] loaded qcom/a540_gpmu.fw2 from new location
+257000000 628000 uV
+342000000 644000 uV
+414000000 704000 uV
+515000097 792000 uV
+596000097 856000 uV
+670000048 908000 uV
+710000097 936000 uV
+devfreq gov=simple_ondemand cur=257000000
+gpu faults+hangchecks: 0
+
+== audio
+[   13.558759] platform wcd934x-soundwire.4.auto: DMA mask not set
+[   13.665133] qcom-soundwire wcd934x-soundwire.4.auto: din-ports (2) mismatch with controller (6)
+[   13.665325] genirq: Flags mismatch irq 160. 00002001 (soundwire) vs. 00002001 (mbhc sw intr)
+[   13.665459] qcom-soundwire wcd934x-soundwire.4.auto: error -EBUSY: request_irq(160) 0x0 qcom_swrm_irq_handler [soundwire_qcom] soundwire
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+
+== thermal
+gpu-top-thermal 29300 90000 80000
+pm8998-thermal 29145 105000 125000
+cpu4-thermal 31200 75000 110000
+
+== devices
+no haptics input
+iio pmi8998-rradc
+iio 800f000.spmi:pmic@0:adc@3100
+i2c dw7800 driver=
+i2c sx9320 driver=
+i2c imx351 driver=
+i2c vl53l0x driver=
+
+== userspace
+Sep 26 00:32:50 lge-joan systemd[1]: bpf-restrict-fs: Failed to link 'restrict_filesystems' LSM BPF program: Not supported
+Sep 26 00:32:50 lge-joan systemd-modules-load[386]: Failed to find module 'uinput'
+Sep 26 00:32:50 lge-joan systemd-modules-load[386]: Failed to find module 'uhid'
+Sep 26 00:33:09 lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Hands-Free Voice gateway: socket(STREAM, RFCOMM): Protocol not supported (93)
+Sep 26 00:33:09 lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Hands-Free unit: socket(STREAM, RFCOMM): Protocol not supported (93)
+nxp_nci_i2c nxp_nci 
+
+== bootlog
+kernel err+warn lines: 74
+journal warning+ lines: 453
+root dir root:root 555

@@ -1,0 +1,125 @@
+[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+[    0.000000] ITS: No ITS available, not enabling LPIs
+[    1.885087] ufshcd-qcom 1da4000.ufshc: Disabling inline encryption support
+[    2.210732] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.230999] debugfs: 'pfp' already exists in 'c901000.display-controller'
+[    2.231055] debugfs: 'me' already exists in 'c901000.display-controller'
+[    2.231068] debugfs: 'meq' already exists in 'c901000.display-controller'
+[    2.231075] debugfs: 'roq' already exists in 'c901000.display-controller'
+[    2.231082] debugfs: 'reset' already exists in 'c901000.display-controller'
+[    2.233495] qcom-qmp-usbc-phy c010000.phy: PHY is configured for USB, can not enable DP
+[    2.233526] phy phy-c010000.phy.1: phy init failed --> -16
+[    2.713651] fb0: sys_imageblit: framebuffer is not in virtual address space.
+[    2.810053] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[    2.869500] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[    3.981196] stmfts 1-0049: error code: 0x00dec000d0ba
+[    4.218346] stmfts 1-0049: error code: 0x00dec000d0ba
+[    4.370295] stmfts 1-0049: error code: 0x00dec000d0ba
+[    6.735945] systemd[1]: bpf-restrict-fs: Failed to link 'restrict_filesystems' LSM BPF program: Not supported
+[    7.566614] fb0: sys_fillrect: framebuffer is not in virtual address space.
+[    9.866368] stmfts 1-0049: error code: 0x00dec000d0ba
+[    9.928891] stmfts 1-0049: error code: 0x00dec000d0ba
+[   10.002519] stmfts 1-0049: error code: 0x00dec000d0ba
+[   10.789217] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   10.869540] qcom_q6v5_pas 17300000.remoteproc: Handover signaled, but it already happened
+[   10.897736] tfa989x 3-0034: supply vddd not found, using dummy regulator
+[   10.926122] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   10.926767] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   10.926933] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   10.927076] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   11.188412] platform wcd934x-gpio.3.auto: DMA mask not set
+[   11.190965] platform wcd934x-soundwire.4.auto: DMA mask not set
+[   11.251983] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+[   11.252129] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+[   11.252186] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+[   11.252255] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+[   11.252317] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+[   11.252377] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+[   11.255608] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+[   11.255629] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+[   11.255634] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+[   11.255638] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+[   11.255644] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+[   11.255649] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+[   11.297510] qcom-soundwire wcd934x-soundwire.4.auto: din-ports (2) mismatch with controller (6)
+[   11.297751] genirq: Flags mismatch irq 160. 00002001 (soundwire) vs. 00002001 (mbhc sw intr)
+[   11.297894] qcom-soundwire wcd934x-soundwire.4.auto: error -EBUSY: request_irq(160) 0x0 qcom_swrm_irq_handler [soundwire_qcom] soundwire
+[   11.297921] qcom-soundwire wcd934x-soundwire.4.auto: Failed to request soundwire irq
+[   11.298182] qcom-soundwire wcd934x-soundwire.4.auto: probe with driver qcom-soundwire failed with error -16
+[   11.371635] EXT4-fs (mmcblk0p1): warning: mounting unchecked fs, running e2fsck is recommended
+[   12.055475] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   12.106557] Bluetooth: hci0: Frame reassembly failed (-84)
+[   12.115958] Bluetooth: hci0: Frame reassembly failed (-84)
+[   12.127244] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   13.592629] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   14.829177] qcom-q6v5-mss 4080000.remoteproc: Handover signaled, but it already happened
+[   19.111468] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   19.111621] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   19.111658] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   19.120069] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+[   19.535750] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   19.535861] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   19.535900] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   20.794410] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   23.835091]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+===JOURNAL
+[    7.826877] lge-joan systemd[1]: bpf-restrict-fs: Failed to link 'restrict_filesystems' LSM BPF program: Not supported
+[    7.695147] lge-joan systemd-modules-load[385]: Failed to find module 'uhid'
+[    7.695148] lge-joan systemd-modules-load[385]: Failed to find module 'uinput'
+[    7.902852] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    7.903036] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    7.903198] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    7.903345] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    7.903554] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/snd.
+[    7.903705] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    7.903896] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/loop-control.
+[    7.904070] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/net/tun.
+[    7.904209] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/fuse.
+[    7.904348] lge-joan systemd-tmpfiles[417]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/vfio/vfio.
+[    8.017073] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    8.017280] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    8.017457] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    8.017633] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    8.017804] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/snd.
+[    8.017982] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev.
+[    8.018193] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/loop-control.
+[    8.018360] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/net/tun.
+[    8.018517] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/fuse.
+[    8.018693] lge-joan systemd-tmpfiles[454]: Detected unsafe path transition / (owned by 1023) → /dev (owned by root) during canonicalization of dev/vfio/vfio.
+[   11.535531] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc/profile.d.
+[   11.535758] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc/profile.d.
+[   11.535946] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc/ssh/ssh_config.d.
+[   11.536100] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run.
+[   11.536356] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/varlink.
+[   11.536619] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/varlink/registry.
+[   11.536913] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/varlink/registry.
+[   11.537187] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/varlink/registry.
+[   11.537447] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run.
+[   11.537810] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var.
+[   11.538098] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.538418] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib/colord.
+[   11.538654] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.538908] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.539206] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.539540] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib/dbus.
+[   11.539736] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.539946] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.540111] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.540269] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.540446] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.540717] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.540858] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.541033] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc/polkit-1.
+[   11.541166] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.541338] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/systemd.
+[   11.541583] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/systemd/netif.
+[   11.541705] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run/systemd/netif.
+[   11.541820] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.541940] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib/systemd.
+[   11.542057] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run.
+[   11.542203] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib.
+[   11.542267] lge-joan systemd-tmpfiles[572]: Failed to check if symlink source path '/run/host/io.systemd.NamespaceResource' exists: Link has been severed
+[   11.542306] lge-joan systemd-tmpfiles[572]: Failed to check if symlink source path '/run/host/io.systemd.MountFileSystem' exists: Link has been severed
+[   11.542411] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /var (owned by root) during canonicalization of var/lib/systemd.
+[   11.542570] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /etc (owned by root) during canonicalization of etc.
+[   11.542675] lge-joan systemd-tmpfiles[572]: Detected unsafe path transition / (owned by 1023) → /run (owned by root) during canonicalization of run.

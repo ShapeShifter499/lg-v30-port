@@ -11,14 +11,17 @@ R=$(cat "$D/include/config/kernel.release")
 SP=${SP:-/tmp/joan-bench}; mkdir -p "$SP"
 ST=$SP/mods-$NAME
 rm -rf "$ST"
-make -s -C ~/vibe-coding-projects/coding/linux-mainline-v30 O="$D" ARCH=arm64 \
+# RAMDISK (a file in the nest unpack dir) defaults to the r26 on-device initramfs.
+# The kernel source tree that configured $D (a worktree works too)
+SRC=${SRC:-~/vibe-coding-projects/coding/linux-mainline-v30}
+make -s -C "$SRC" O="$D" ARCH=arm64 \
 	CROSS_COMPILE=aarch64-linux-gnu- CC="ccache aarch64-linux-gnu-gcc" INSTALL_MOD_PATH="$ST" INSTALL_MOD_STRIP=1 modules_install </dev/null
 rm -f "$ST/lib/modules/$R/build" "$ST/lib/modules/$R/source"
 tar -C "$ST/lib/modules" --owner=0 --group=0 -czf "$SP/mods-$NAME.tgz" "$R"
 cat "$D/arch/arm64/boot/Image.gz" "$D/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb" > "$SP/kernel-$NAME"
 scp -q "$SP/mods-$NAME.tgz" "$SP/kernel-$NAME" nym-nest-family:/tmp/ember-f08d8c5-unpack/
 ssh nym-nest-family "set -e; cd /tmp/ember-f08d8c5-unpack
-mkbootimg --header_version 0 --kernel kernel-$NAME --ramdisk initramfs-r26-ondevice \
+mkbootimg --header_version 0 --kernel kernel-$NAME --ramdisk ${RAMDISK:-initramfs-r26-ondevice} \
 	--pagesize 0x00001000 --base 0x00000000 --kernel_offset 0x00008000 \
 	--ramdisk_offset 0x02000000 --second_offset 0x00f00000 --tags_offset 0x00000100 \
 	--board '' --cmdline 'panic=5 pmos.force-partition-resize ipa.lowmem=1 log_buf_len=8M $EXTRA' \
