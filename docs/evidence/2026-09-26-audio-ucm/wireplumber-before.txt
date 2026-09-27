@@ -1,0 +1,44 @@
+== packages
+alsa-lib-1.2.16.1-r0
+alsa-ucm-conf-1.2.16.1-r0
+alsa-ucm-conf-lge-joan-1.0-r4
+callaudiod-0.1.99-r0
+callaudiod-libs-0.1.99-r0
+device-lge-joan-1-r18
+pipewire-1.6.8-r5
+pipewire-alsa-1.6.8-r5
+wireplumber-0.5.17-r0
+== cards
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+== ucm dirs
+sdm845
+/usr/share/alsa/ucm2/Tegra/max98089/lge-x3.conf
+/usr/share/alsa/ucm2/Tegra/max98089/lge-x3-HiFi.conf
+/usr/share/alsa/ucm2/Tegra/max98089/lge-x3-VoiceCall.conf
+/usr/share/alsa/ucm2/conf.d/sdm845/LG-V30.conf
+/usr/share/alsa/ucm2/conf.d/tegra/LG Optimus 4X HD MAX98089.conf
+/usr/share/alsa/ucm2/conf.d/tegra/LG Optimus Vu MAX98089.conf
+/usr/share/alsa/ucm2/Qualcomm/sdm845-lge-joan
+== alsaucm
+  0: HiFi
+    Play HiFi quality music
+== wpctl
+Audio
+ ├─ Devices:
+ │  
+ ├─ Sinks:
+ │  
+ ├─ Sources:
+ │  
+ ├─ Filters:
+ │    - echo-cancel-2853-29                                         
+ │      35. echo-cancel-capture                                          [Stream/Input/Audio]
+ │      36. joan_echo_cancel_source                                      [Audio/Source]
+ │      37. joan_echo_cancel_sink                                        [Audio/Sink]
+ │      38. echo-cancel-playback                                         [Stream/Output/Audio]
+ │  
+ └─ Streams:
+
+Video
+== default sink
