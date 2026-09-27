@@ -1,0 +1,652 @@
+[  111.828705] fmcheck start
+[  111.828902] fmscan tune 87900
+[  111.830896] Bluetooth: hci0: sending FM command, 7 bytes
+[  111.889555] Bluetooth: hci0: FM event (6 bytes)
+[  111.889656] qca fm evt: 00000000: 10 04 00 01 01 54
+[  111.932622] Bluetooth: hci0: FM event (14 bytes)
+[  111.932703] qca fm evt: 00000000: 01 0c 00 5c 57 01 00 00 9d 00 00 00 fd 67
+[  111.956082] fmscan tune 88100
+[  111.960723] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.017122] Bluetooth: hci0: FM event (6 bytes)
+[  112.017204] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.063240] Bluetooth: hci0: FM event (14 bytes)
+[  112.063311] qca fm evt: 00000000: 01 0c 00 24 58 01 00 00 9e 00 00 00 fe 67
+[  112.087461] fmscan tune 88300
+[  112.090782] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.143857] Bluetooth: hci0: FM event (6 bytes)
+[  112.143941] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.190970] Bluetooth: hci0: FM event (14 bytes)
+[  112.191079] qca fm evt: 00000000: 01 0c 00 ec 58 01 00 00 9e 00 00 00 ff 67
+[  112.215310] fmscan tune 88500
+[  112.218144] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.270787] Bluetooth: hci0: FM event (6 bytes)
+[  112.270950] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.318341] Bluetooth: hci0: FM event (14 bytes)
+[  112.318449] qca fm evt: 00000000: 01 0c 00 b4 59 01 00 00 9b 00 00 00 fc 67
+[  112.340775] fmscan tune 88700
+[  112.346349] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.402705] Bluetooth: hci0: FM event (6 bytes)
+[  112.402784] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.448610] Bluetooth: hci0: FM event (14 bytes)
+[  112.448681] qca fm evt: 00000000: 01 0c 00 7c 5a 01 00 00 9c 01 00 00 fb 66
+[  112.473771] fmscan tune 88900
+[  112.477614] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.533676] Bluetooth: hci0: FM event (6 bytes)
+[  112.533787] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.580929] Bluetooth: hci0: FM event (14 bytes)
+[  112.581000] qca fm evt: 00000000: 01 0c 00 44 5b 01 00 00 9c 00 00 00 fe 67
+[  112.602495] fmscan tune 89100
+[  112.607057] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.663845] Bluetooth: hci0: FM event (6 bytes)
+[  112.663916] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.710824] Bluetooth: hci0: FM event (14 bytes)
+[  112.710989] qca fm evt: 00000000: 01 0c 00 0c 5c 01 00 00 9c 00 00 00 fd 60
+[  112.732667] fmscan tune 89300
+[  112.735187] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.790379] Bluetooth: hci0: FM event (6 bytes)
+[  112.790449] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.838014] Bluetooth: hci0: FM event (14 bytes)
+[  112.838096] qca fm evt: 00000000: 01 0c 00 d4 5c 01 00 00 9b 00 00 00 fe 65
+[  112.862279] fmscan tune 89500
+[  112.865916] Bluetooth: hci0: sending FM command, 7 bytes
+[  112.922926] Bluetooth: hci0: FM event (6 bytes)
+[  112.923060] qca fm evt: 00000000: 10 04 00 01 01 54
+[  112.969989] Bluetooth: hci0: FM event (14 bytes)
+[  112.970080] qca fm evt: 00000000: 01 0c 00 9c 5d 01 00 00 9c 00 00 00 fc 66
+[  112.989984] fmscan tune 89700
+[  112.993684] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.050851] Bluetooth: hci0: FM event (6 bytes)
+[  113.051104] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.096956] Bluetooth: hci0: FM event (14 bytes)
+[  113.097028] qca fm evt: 00000000: 01 0c 00 64 5e 01 00 00 9c 00 00 00 fd 65
+[  113.118194] fmscan tune 89900
+[  113.121933] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.178415] Bluetooth: hci0: FM event (6 bytes)
+[  113.178503] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.225576] Bluetooth: hci0: FM event (14 bytes)
+[  113.225642] qca fm evt: 00000000: 01 0c 00 2c 5f 01 00 00 9c 00 00 00 fd 69
+[  113.246499] fmscan tune 90100
+[  113.250001] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.307314] Bluetooth: hci0: FM event (6 bytes)
+[  113.307389] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.354380] Bluetooth: hci0: FM event (14 bytes)
+[  113.354460] qca fm evt: 00000000: 01 0c 00 f4 5f 01 00 00 9c 00 00 00 fd 74
+[  113.374631] fmscan tune 90300
+[  113.378571] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.433390] Bluetooth: hci0: FM event (6 bytes)
+[  113.433465] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.483413] Bluetooth: hci0: FM event (14 bytes)
+[  113.483495] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 07 72
+[  113.503214] fmscan tune 90500
+[  113.506648] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.562313] Bluetooth: hci0: FM event (6 bytes)
+[  113.562390] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.609569] Bluetooth: hci0: FM event (14 bytes)
+[  113.609650] qca fm evt: 00000000: 01 0c 00 84 61 01 00 00 9c 00 00 00 fe 60
+[  113.630669] fmscan tune 90700
+[  113.633565] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.689694] Bluetooth: hci0: FM event (6 bytes)
+[  113.689814] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.736695] Bluetooth: hci0: FM event (14 bytes)
+[  113.736766] qca fm evt: 00000000: 01 0c 00 4c 62 01 00 00 9c 00 00 00 ff 5a
+[  113.760135] fmscan tune 90900
+[  113.763494] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.818722] Bluetooth: hci0: FM event (6 bytes)
+[  113.818835] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.866986] Bluetooth: hci0: FM event (14 bytes)
+[  113.867054] qca fm evt: 00000000: 01 0c 00 14 63 01 00 00 99 00 00 00 fb 5f
+[  113.888309] fmscan tune 91100
+[  113.891248] Bluetooth: hci0: sending FM command, 7 bytes
+[  113.946634] Bluetooth: hci0: FM event (6 bytes)
+[  113.946694] qca fm evt: 00000000: 10 04 00 01 01 54
+[  113.994550] Bluetooth: hci0: FM event (14 bytes)
+[  113.994616] qca fm evt: 00000000: 01 0c 00 dc 63 01 00 00 9d 01 00 00 fa 67
+[  114.016293] fmscan tune 91300
+[  114.019855] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.076811] Bluetooth: hci0: FM event (6 bytes)
+[  114.076900] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.123709] Bluetooth: hci0: FM event (14 bytes)
+[  114.123788] qca fm evt: 00000000: 01 0c 00 a4 64 01 00 00 9c 00 00 00 fc 66
+[  114.144705] fmscan tune 91500
+[  114.146637] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.201557] Bluetooth: hci0: FM event (6 bytes)
+[  114.201642] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.249618] Bluetooth: hci0: FM event (14 bytes)
+[  114.249688] qca fm evt: 00000000: 01 0c 00 6c 65 01 00 00 99 00 00 00 fd 64
+[  114.270322] fmscan tune 91700
+[  114.273900] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.330438] Bluetooth: hci0: FM event (6 bytes)
+[  114.330510] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.377154] Bluetooth: hci0: FM event (14 bytes)
+[  114.377222] qca fm evt: 00000000: 01 0c 00 34 66 01 00 00 9c 00 00 00 fd 66
+[  114.398479] fmscan tune 91900
+[  114.403833] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.459685] Bluetooth: hci0: FM event (6 bytes)
+[  114.459773] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.508258] Bluetooth: hci0: FM event (14 bytes)
+[  114.508332] qca fm evt: 00000000: 01 0c 00 fc 66 01 00 00 9d 00 00 00 fb 66
+[  114.529351] fmscan tune 92100
+[  114.533164] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.590542] Bluetooth: hci0: FM event (6 bytes)
+[  114.590710] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.635132] Bluetooth: hci0: FM event (14 bytes)
+[  114.635196] qca fm evt: 00000000: 01 0c 00 c4 67 01 00 00 99 00 00 00 fb 64
+[  114.658107] fmscan tune 92300
+[  114.660783] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.717986] Bluetooth: hci0: FM event (6 bytes)
+[  114.718119] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.764500] Bluetooth: hci0: FM event (14 bytes)
+[  114.764566] qca fm evt: 00000000: 01 0c 00 8c 68 01 00 00 9b 00 00 00 ff 66
+[  114.784970] fmscan tune 92500
+[  114.788586] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.843675] Bluetooth: hci0: FM event (6 bytes)
+[  114.843787] qca fm evt: 00000000: 10 04 00 01 01 54
+[  114.892092] Bluetooth: hci0: FM event (14 bytes)
+[  114.892163] qca fm evt: 00000000: 01 0c 00 54 69 01 00 00 9c 00 00 00 fb 67
+[  114.912613] fmscan tune 92700
+[  114.914242] Bluetooth: hci0: sending FM command, 7 bytes
+[  114.968303] Bluetooth: hci0: FM event (6 bytes)
+[  114.968391] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.016274] Bluetooth: hci0: FM event (14 bytes)
+[  115.016341] qca fm evt: 00000000: 01 0c 00 1c 6a 01 00 00 9d 00 00 00 fb 66
+[  115.038064] fmscan tune 92900
+[  115.042823] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.100588] Bluetooth: hci0: FM event (6 bytes)
+[  115.100672] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.146520] Bluetooth: hci0: FM event (14 bytes)
+[  115.146597] qca fm evt: 00000000: 01 0c 00 e4 6a 01 00 00 9c 00 00 00 fb 66
+[  115.167731] fmscan tune 93100
+[  115.169985] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.226757] Bluetooth: hci0: FM event (6 bytes)
+[  115.226926] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.274077] Bluetooth: hci0: FM event (14 bytes)
+[  115.274145] qca fm evt: 00000000: 01 0c 00 ac 6b 01 00 00 9c 01 00 00 f9 66
+[  115.294230] fmscan tune 93300
+[  115.298933] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.353453] Bluetooth: hci0: FM event (6 bytes)
+[  115.353523] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.400878] Bluetooth: hci0: FM event (14 bytes)
+[  115.400943] qca fm evt: 00000000: 01 0c 00 74 6c 01 00 00 9c 00 00 00 f9 66
+[  115.423548] fmscan tune 93500
+[  115.425721] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.480586] Bluetooth: hci0: FM event (6 bytes)
+[  115.480684] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.527271] Bluetooth: hci0: FM event (14 bytes)
+[  115.527346] qca fm evt: 00000000: 01 0c 00 3c 6d 01 00 00 9c 00 00 00 fa 66
+[  115.549270] fmscan tune 93700
+[  115.551498] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.607197] Bluetooth: hci0: FM event (6 bytes)
+[  115.607364] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.655892] Bluetooth: hci0: FM event (14 bytes)
+[  115.655957] qca fm evt: 00000000: 01 0c 00 04 6e 01 00 00 9b 00 00 00 fc 64
+[  115.675807] fmscan tune 93900
+[  115.678466] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.734157] Bluetooth: hci0: FM event (6 bytes)
+[  115.734286] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.782941] Bluetooth: hci0: FM event (14 bytes)
+[  115.783006] qca fm evt: 00000000: 01 0c 00 cc 6e 01 00 00 9d 00 00 00 fd 66
+[  115.804762] fmscan tune 94100
+[  115.807093] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.863214] Bluetooth: hci0: FM event (6 bytes)
+[  115.863322] qca fm evt: 00000000: 10 04 00 01 01 54
+[  115.910714] Bluetooth: hci0: FM event (14 bytes)
+[  115.910797] qca fm evt: 00000000: 01 0c 00 94 6f 01 00 00 9a 00 00 00 fc 66
+[  115.933788] fmscan tune 94300
+[  115.935993] Bluetooth: hci0: sending FM command, 7 bytes
+[  115.991727] Bluetooth: hci0: FM event (6 bytes)
+[  115.991833] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.038309] Bluetooth: hci0: FM event (14 bytes)
+[  116.038379] qca fm evt: 00000000: 01 0c 00 5c 70 01 00 00 9b 00 00 00 fc 64
+[  116.061239] fmscan tune 94500
+[  116.063887] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.118844] Bluetooth: hci0: FM event (6 bytes)
+[  116.118993] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.167812] Bluetooth: hci0: FM event (14 bytes)
+[  116.167881] qca fm evt: 00000000: 01 0c 00 24 71 01 00 00 9c 00 00 00 fb 65
+[  116.188080] fmscan tune 94700
+[  116.192439] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.249759] Bluetooth: hci0: FM event (6 bytes)
+[  116.249835] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.296487] Bluetooth: hci0: FM event (14 bytes)
+[  116.296557] qca fm evt: 00000000: 01 0c 00 ec 71 01 00 00 9c 00 00 00 ff 67
+[  116.318013] fmscan tune 94900
+[  116.322015] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.374986] Bluetooth: hci0: FM event (6 bytes)
+[  116.375064] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.422003] Bluetooth: hci0: FM event (14 bytes)
+[  116.422079] qca fm evt: 00000000: 01 0c 00 b4 72 01 00 00 9b 00 00 00 fc 64
+[  116.447607] fmscan tune 95100
+[  116.449933] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.504777] Bluetooth: hci0: FM event (6 bytes)
+[  116.504886] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.553649] Bluetooth: hci0: FM event (14 bytes)
+[  116.553725] qca fm evt: 00000000: 01 0c 00 7c 73 01 00 00 9b 00 00 00 fe 65
+[  116.574329] fmscan tune 95300
+[  116.578983] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.635960] Bluetooth: hci0: FM event (6 bytes)
+[  116.636030] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.682704] Bluetooth: hci0: FM event (14 bytes)
+[  116.682769] qca fm evt: 00000000: 01 0c 00 44 74 01 00 00 9a 00 00 00 ff 65
+[  116.703716] fmscan tune 95500
+[  116.706110] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.763893] Bluetooth: hci0: FM event (6 bytes)
+[  116.763985] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.809705] Bluetooth: hci0: FM event (14 bytes)
+[  116.809786] qca fm evt: 00000000: 01 0c 00 0c 75 01 00 00 99 00 00 00 fc 65
+[  116.830549] fmscan tune 95700
+[  116.833314] Bluetooth: hci0: sending FM command, 7 bytes
+[  116.888088] Bluetooth: hci0: FM event (6 bytes)
+[  116.888195] qca fm evt: 00000000: 10 04 00 01 01 54
+[  116.934700] Bluetooth: hci0: FM event (14 bytes)
+[  116.934764] qca fm evt: 00000000: 01 0c 00 d4 75 01 00 00 9a 00 00 00 fb 68
+[  116.960217] fmscan tune 95900
+[  116.963415] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.019725] Bluetooth: hci0: FM event (6 bytes)
+[  117.019804] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.067622] Bluetooth: hci0: FM event (14 bytes)
+[  117.067687] qca fm evt: 00000000: 01 0c 00 9c 76 01 00 00 9c 00 00 00 fc 64
+[  117.087772] fmscan tune 96100
+[  117.090837] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.145553] Bluetooth: hci0: FM event (6 bytes)
+[  117.145652] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.193388] Bluetooth: hci0: FM event (14 bytes)
+[  117.193454] qca fm evt: 00000000: 01 0c 00 64 77 01 00 00 9c 00 00 00 fc 63
+[  117.217119] fmscan tune 96300
+[  117.219584] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.275600] Bluetooth: hci0: FM event (6 bytes)
+[  117.275707] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.322669] Bluetooth: hci0: FM event (14 bytes)
+[  117.322734] qca fm evt: 00000000: 01 0c 00 2c 78 01 00 00 99 00 00 00 fe 60
+[  117.344398] fmscan tune 96500
+[  117.346564] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.402526] Bluetooth: hci0: FM event (6 bytes)
+[  117.402639] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.450080] Bluetooth: hci0: FM event (14 bytes)
+[  117.450166] qca fm evt: 00000000: 01 0c 00 f4 78 01 00 00 99 00 00 00 fd 61
+[  117.473363] fmscan tune 96700
+[  117.475653] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.530492] Bluetooth: hci0: FM event (6 bytes)
+[  117.530607] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.578702] Bluetooth: hci0: FM event (14 bytes)
+[  117.578768] qca fm evt: 00000000: 01 0c 00 bc 79 01 00 00 99 00 00 00 fc 5f
+[  117.599679] fmscan tune 96900
+[  117.602985] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.659559] Bluetooth: hci0: FM event (6 bytes)
+[  117.659628] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.706383] Bluetooth: hci0: FM event (14 bytes)
+[  117.706448] qca fm evt: 00000000: 01 0c 00 84 7a 01 00 00 99 00 00 00 fe 64
+[  117.726850] fmscan tune 97100
+[  117.729412] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.785395] Bluetooth: hci0: FM event (6 bytes)
+[  117.785483] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.835210] Bluetooth: hci0: FM event (14 bytes)
+[  117.835276] qca fm evt: 00000000: 01 0c 00 4c 7b 01 00 00 99 00 00 00 ff 63
+[  117.853820] fmscan tune 97300
+[  117.857483] Bluetooth: hci0: sending FM command, 7 bytes
+[  117.913176] Bluetooth: hci0: FM event (6 bytes)
+[  117.913253] qca fm evt: 00000000: 10 04 00 01 01 54
+[  117.960511] Bluetooth: hci0: FM event (14 bytes)
+[  117.960579] qca fm evt: 00000000: 01 0c 00 14 7c 01 00 00 98 00 00 00 ff 61
+[  117.982418] fmscan tune 97500
+[  117.986166] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.041805] Bluetooth: hci0: FM event (6 bytes)
+[  118.041931] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.088139] Bluetooth: hci0: FM event (14 bytes)
+[  118.088209] qca fm evt: 00000000: 01 0c 00 dc 7c 01 00 00 98 00 00 00 fc 63
+[  118.110328] fmscan tune 97700
+[  118.113417] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.170221] Bluetooth: hci0: FM event (6 bytes)
+[  118.170315] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.217799] Bluetooth: hci0: FM event (14 bytes)
+[  118.217873] qca fm evt: 00000000: 01 0c 00 a4 7d 01 00 00 96 00 00 00 fd 61
+[  118.237816] fmscan tune 97900
+[  118.241049] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.297085] Bluetooth: hci0: FM event (6 bytes)
+[  118.297197] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.345598] Bluetooth: hci0: FM event (14 bytes)
+[  118.345666] qca fm evt: 00000000: 01 0c 00 6c 7e 01 00 00 97 00 00 00 fc 61
+[  118.366062] fmscan tune 98100
+[  118.368885] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.426058] Bluetooth: hci0: FM event (6 bytes)
+[  118.426198] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.473212] Bluetooth: hci0: FM event (14 bytes)
+[  118.473279] qca fm evt: 00000000: 01 0c 00 34 7f 01 00 00 97 00 00 00 fc 63
+[  118.493812] fmscan tune 98300
+[  118.496658] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.553989] Bluetooth: hci0: FM event (6 bytes)
+[  118.554121] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.601237] Bluetooth: hci0: FM event (14 bytes)
+[  118.601307] qca fm evt: 00000000: 01 0c 00 fc 7f 01 00 00 94 00 00 00 fb 63
+[  118.622640] fmscan tune 98500
+[  118.628134] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.683303] Bluetooth: hci0: FM event (6 bytes)
+[  118.683373] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.731845] Bluetooth: hci0: FM event (14 bytes)
+[  118.731914] qca fm evt: 00000000: 01 0c 00 c4 80 01 00 00 96 00 00 00 fe 62
+[  118.753224] fmscan tune 98700
+[  118.755677] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.813106] Bluetooth: hci0: FM event (6 bytes)
+[  118.813216] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.859862] Bluetooth: hci0: FM event (14 bytes)
+[  118.859931] qca fm evt: 00000000: 01 0c 00 8c 81 01 00 00 96 00 00 00 fd 62
+[  118.880905] fmscan tune 98900
+[  118.882939] Bluetooth: hci0: sending FM command, 7 bytes
+[  118.940396] Bluetooth: hci0: FM event (6 bytes)
+[  118.940484] qca fm evt: 00000000: 10 04 00 01 01 54
+[  118.985506] Bluetooth: hci0: FM event (14 bytes)
+[  118.985577] qca fm evt: 00000000: 01 0c 00 54 82 01 00 00 94 00 00 00 fd 62
+[  119.006935] fmscan tune 99100
+[  119.010289] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.064067] Bluetooth: hci0: FM event (6 bytes)
+[  119.064162] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.111436] Bluetooth: hci0: FM event (14 bytes)
+[  119.111518] qca fm evt: 00000000: 01 0c 00 1c 83 01 00 00 99 00 00 00 fc 64
+[  119.135513] fmscan tune 99300
+[  119.139678] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.195696] Bluetooth: hci0: FM event (6 bytes)
+[  119.195799] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.242978] Bluetooth: hci0: FM event (14 bytes)
+[  119.243046] qca fm evt: 00000000: 01 0c 00 e4 83 01 00 00 96 00 00 00 fc 60
+[  119.264849] fmscan tune 99500
+[  119.268556] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.322950] Bluetooth: hci0: FM event (6 bytes)
+[  119.323016] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.370150] Bluetooth: hci0: FM event (14 bytes)
+[  119.370211] qca fm evt: 00000000: 01 0c 00 ac 84 01 00 00 98 00 00 00 fd 63
+[  119.392566] fmscan tune 99700
+[  119.394002] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.448077] Bluetooth: hci0: FM event (6 bytes)
+[  119.448129] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.494552] Bluetooth: hci0: FM event (14 bytes)
+[  119.494599] qca fm evt: 00000000: 01 0c 00 74 85 01 00 00 96 00 00 00 fe 60
+[  119.517222] fmscan tune 99900
+[  119.520372] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.577577] Bluetooth: hci0: FM event (6 bytes)
+[  119.577696] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.624853] Bluetooth: hci0: FM event (14 bytes)
+[  119.624921] qca fm evt: 00000000: 01 0c 00 3c 86 01 00 00 96 00 00 00 fc 5f
+[  119.645452] fmscan tune 100100
+[  119.647573] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.703622] Bluetooth: hci0: FM event (6 bytes)
+[  119.703746] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.749986] Bluetooth: hci0: FM event (14 bytes)
+[  119.750055] qca fm evt: 00000000: 01 0c 00 04 87 01 00 00 95 00 00 00 fb 5f
+[  119.771187] fmscan tune 100300
+[  119.774124] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.830646] Bluetooth: hci0: FM event (6 bytes)
+[  119.830751] qca fm evt: 00000000: 10 04 00 01 01 54
+[  119.877296] Bluetooth: hci0: FM event (14 bytes)
+[  119.877369] qca fm evt: 00000000: 01 0c 00 cc 87 01 00 00 95 00 00 00 fe 5f
+[  119.900737] fmscan tune 100500
+[  119.903172] Bluetooth: hci0: sending FM command, 7 bytes
+[  119.958801] Bluetooth: hci0: FM event (6 bytes)
+[  119.958943] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.008555] Bluetooth: hci0: FM event (14 bytes)
+[  120.008646] qca fm evt: 00000000: 01 0c 00 94 88 01 00 00 95 00 00 00 fd 5e
+[  120.029455] fmscan tune 100700
+[  120.032688] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.089119] Bluetooth: hci0: FM event (6 bytes)
+[  120.089279] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.136223] Bluetooth: hci0: FM event (14 bytes)
+[  120.136293] qca fm evt: 00000000: 01 0c 00 5c 89 01 00 00 95 00 00 00 fd 5e
+[  120.157745] fmscan tune 100900
+[  120.160677] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.215365] Bluetooth: hci0: FM event (6 bytes)
+[  120.215468] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.264288] Bluetooth: hci0: FM event (14 bytes)
+[  120.264354] qca fm evt: 00000000: 01 0c 00 24 8a 01 00 00 94 00 00 00 fb 5e
+[  120.286310] fmscan tune 101100
+[  120.291097] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.346742] Bluetooth: hci0: FM event (6 bytes)
+[  120.346811] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.393626] Bluetooth: hci0: FM event (14 bytes)
+[  120.393691] qca fm evt: 00000000: 01 0c 00 ec 8a 01 00 00 94 00 00 00 fb 5d
+[  120.415473] fmscan tune 101300
+[  120.417627] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.473605] Bluetooth: hci0: FM event (6 bytes)
+[  120.473713] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.521807] Bluetooth: hci0: FM event (14 bytes)
+[  120.521872] qca fm evt: 00000000: 01 0c 00 b4 8b 01 00 00 94 00 00 00 fe 5d
+[  120.541077] fmscan tune 101500
+[  120.542909] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.599417] Bluetooth: hci0: FM event (6 bytes)
+[  120.599493] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.646221] Bluetooth: hci0: FM event (14 bytes)
+[  120.646300] qca fm evt: 00000000: 01 0c 00 7c 8c 01 00 00 93 00 00 00 fe 5d
+[  120.666665] fmscan tune 101700
+[  120.670396] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.726459] Bluetooth: hci0: FM event (6 bytes)
+[  120.726538] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.771964] Bluetooth: hci0: FM event (14 bytes)
+[  120.772029] qca fm evt: 00000000: 01 0c 00 44 8d 01 00 00 93 00 00 00 fa 59
+[  120.794261] fmscan tune 101900
+[  120.797599] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.852443] Bluetooth: hci0: FM event (6 bytes)
+[  120.852520] qca fm evt: 00000000: 10 04 00 01 01 54
+[  120.901985] Bluetooth: hci0: FM event (14 bytes)
+[  120.902056] qca fm evt: 00000000: 01 0c 00 0c 8e 01 00 00 93 00 00 00 ff 5c
+[  120.920927] fmscan tune 102100
+[  120.923960] Bluetooth: hci0: sending FM command, 7 bytes
+[  120.980015] Bluetooth: hci0: FM event (6 bytes)
+[  120.980087] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.027179] Bluetooth: hci0: FM event (14 bytes)
+[  121.027247] qca fm evt: 00000000: 01 0c 00 d4 8e 01 00 00 93 00 00 00 fb 5b
+[  121.047663] fmscan tune 102300
+[  121.050363] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.107358] Bluetooth: hci0: FM event (6 bytes)
+[  121.107433] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.153525] Bluetooth: hci0: FM event (14 bytes)
+[  121.153591] qca fm evt: 00000000: 01 0c 00 9c 8f 01 00 00 93 00 00 00 fd 59
+[  121.174613] fmscan tune 102500
+[  121.178062] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.232117] Bluetooth: hci0: FM event (6 bytes)
+[  121.232189] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.279211] Bluetooth: hci0: FM event (14 bytes)
+[  121.279278] qca fm evt: 00000000: 01 0c 00 64 90 01 00 00 93 00 00 00 fd 5a
+[  121.301082] fmscan tune 102700
+[  121.304192] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.360315] Bluetooth: hci0: FM event (6 bytes)
+[  121.360393] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.407127] Bluetooth: hci0: FM event (14 bytes)
+[  121.407205] qca fm evt: 00000000: 01 0c 00 2c 91 01 00 00 93 00 00 00 fb 5d
+[  121.453099] fmscan tune 102900
+[  121.455871] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.510595] Bluetooth: hci0: FM event (6 bytes)
+[  121.510656] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.557208] Bluetooth: hci0: FM event (14 bytes)
+[  121.557277] qca fm evt: 00000000: 01 0c 00 f4 91 01 00 00 93 00 00 00 fc 5a
+[  121.580294] fmscan tune 103100
+[  121.583325] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.640101] Bluetooth: hci0: FM event (6 bytes)
+[  121.640177] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.686989] Bluetooth: hci0: FM event (14 bytes)
+[  121.687056] qca fm evt: 00000000: 01 0c 00 bc 92 01 00 00 93 00 00 00 fd 59
+[  121.708483] fmscan tune 103300
+[  121.710603] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.766250] Bluetooth: hci0: FM event (6 bytes)
+[  121.766329] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.812492] Bluetooth: hci0: FM event (14 bytes)
+[  121.812560] qca fm evt: 00000000: 01 0c 00 84 93 01 00 00 93 00 00 00 fe 59
+[  121.835954] fmscan tune 103500
+[  121.840770] Bluetooth: hci0: sending FM command, 7 bytes
+[  121.897550] Bluetooth: hci0: FM event (6 bytes)
+[  121.897719] qca fm evt: 00000000: 10 04 00 01 01 54
+[  121.943376] Bluetooth: hci0: FM event (14 bytes)
+[  121.943445] qca fm evt: 00000000: 01 0c 00 4c 94 01 00 00 93 00 00 00 fd 59
+[  121.965496] fmscan tune 103700
+[  121.968940] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.025848] Bluetooth: hci0: FM event (6 bytes)
+[  122.025925] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.073059] Bluetooth: hci0: FM event (14 bytes)
+[  122.073155] qca fm evt: 00000000: 01 0c 00 14 95 01 00 00 92 00 00 00 fd 59
+[  122.093903] fmscan tune 103900
+[  122.097416] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.153000] Bluetooth: hci0: FM event (6 bytes)
+[  122.153073] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.202117] Bluetooth: hci0: FM event (14 bytes)
+[  122.202186] qca fm evt: 00000000: 01 0c 00 dc 95 01 00 00 93 00 00 00 fd 57
+[  122.221829] fmscan tune 104100
+[  122.225115] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.280957] Bluetooth: hci0: FM event (6 bytes)
+[  122.281054] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.327096] Bluetooth: hci0: FM event (14 bytes)
+[  122.327173] qca fm evt: 00000000: 01 0c 00 a4 96 01 00 00 91 00 00 00 fb 55
+[  122.349874] fmscan tune 104300
+[  122.353545] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.409161] Bluetooth: hci0: FM event (6 bytes)
+[  122.409231] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.458005] Bluetooth: hci0: FM event (14 bytes)
+[  122.458100] qca fm evt: 00000000: 01 0c 00 6c 97 01 00 00 92 00 00 00 fd 56
+[  122.477921] fmscan tune 104500
+[  122.481730] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.538190] Bluetooth: hci0: FM event (6 bytes)
+[  122.538278] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.584495] Bluetooth: hci0: FM event (14 bytes)
+[  122.584562] qca fm evt: 00000000: 01 0c 00 34 98 01 00 00 91 00 00 00 fe 56
+[  122.606104] fmscan tune 104700
+[  122.609966] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.666305] Bluetooth: hci0: FM event (6 bytes)
+[  122.666425] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.712280] Bluetooth: hci0: FM event (14 bytes)
+[  122.712351] qca fm evt: 00000000: 01 0c 00 fc 98 01 00 00 91 00 00 00 fc 55
+[  122.733983] fmscan tune 104900
+[  122.737286] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.794264] Bluetooth: hci0: FM event (6 bytes)
+[  122.794344] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.842809] Bluetooth: hci0: FM event (14 bytes)
+[  122.842978] qca fm evt: 00000000: 01 0c 00 c4 99 01 00 00 92 00 00 00 fb 57
+[  122.861675] fmscan tune 105100
+[  122.864713] Bluetooth: hci0: sending FM command, 7 bytes
+[  122.922681] Bluetooth: hci0: FM event (6 bytes)
+[  122.922754] qca fm evt: 00000000: 10 04 00 01 01 54
+[  122.969138] Bluetooth: hci0: FM event (14 bytes)
+[  122.969214] qca fm evt: 00000000: 01 0c 00 8c 9a 01 00 00 91 00 00 00 fc 56
+[  122.988032] fmscan tune 105300
+[  122.991099] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.047101] Bluetooth: hci0: FM event (6 bytes)
+[  123.047174] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.094252] Bluetooth: hci0: FM event (14 bytes)
+[  123.094319] qca fm evt: 00000000: 01 0c 00 54 9b 01 00 00 91 01 00 00 fc 53
+[  123.116068] fmscan tune 105500
+[  123.118372] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.173337] Bluetooth: hci0: FM event (6 bytes)
+[  123.173407] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.220072] Bluetooth: hci0: FM event (14 bytes)
+[  123.220137] qca fm evt: 00000000: 01 0c 00 1c 9c 01 00 00 95 00 00 00 01 61
+[  123.242606] fmscan tune 105700
+[  123.246889] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.305425] Bluetooth: hci0: FM event (6 bytes)
+[  123.305532] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.350828] Bluetooth: hci0: FM event (14 bytes)
+[  123.350988] qca fm evt: 00000000: 01 0c 00 e4 9c 01 00 00 91 01 00 00 ff 54
+[  123.372672] fmscan tune 105900
+[  123.377165] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.432492] Bluetooth: hci0: FM event (6 bytes)
+[  123.432566] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.480233] Bluetooth: hci0: FM event (14 bytes)
+[  123.480302] qca fm evt: 00000000: 01 0c 00 ac 9d 01 00 00 91 00 00 00 fd 53
+[  123.502293] fmscan tune 106100
+[  123.506619] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.562295] Bluetooth: hci0: FM event (6 bytes)
+[  123.562378] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.608722] Bluetooth: hci0: FM event (14 bytes)
+[  123.608798] qca fm evt: 00000000: 01 0c 00 74 9e 01 00 00 90 00 00 00 fb 54
+[  123.630060] fmscan tune 106300
+[  123.634133] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.691601] Bluetooth: hci0: FM event (6 bytes)
+[  123.691678] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.737809] Bluetooth: hci0: FM event (14 bytes)
+[  123.737884] qca fm evt: 00000000: 01 0c 00 3c 9f 01 00 00 91 00 00 00 fc 55
+[  123.757150] fmscan tune 106500
+[  123.760267] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.815845] Bluetooth: hci0: FM event (6 bytes)
+[  123.815924] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.863323] Bluetooth: hci0: FM event (14 bytes)
+[  123.863388] qca fm evt: 00000000: 01 0c 00 04 a0 01 00 00 91 00 00 00 fb 54
+[  123.884151] fmscan tune 106700
+[  123.887738] Bluetooth: hci0: sending FM command, 7 bytes
+[  123.945197] Bluetooth: hci0: FM event (6 bytes)
+[  123.945282] qca fm evt: 00000000: 10 04 00 01 01 54
+[  123.992219] Bluetooth: hci0: FM event (14 bytes)
+[  123.992301] qca fm evt: 00000000: 01 0c 00 cc a0 01 00 00 91 00 00 00 fb 53
+[  124.011720] fmscan tune 106900
+[  124.014513] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.070407] Bluetooth: hci0: FM event (6 bytes)
+[  124.070481] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.118608] Bluetooth: hci0: FM event (14 bytes)
+[  124.118676] qca fm evt: 00000000: 01 0c 00 94 a1 01 00 00 91 00 00 00 fd 53
+[  124.139665] fmscan tune 107100
+[  124.141922] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.197067] Bluetooth: hci0: FM event (6 bytes)
+[  124.197148] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.244026] Bluetooth: hci0: FM event (14 bytes)
+[  124.244092] qca fm evt: 00000000: 01 0c 00 5c a2 01 00 00 90 00 00 00 fc 52
+[  124.266182] fmscan tune 107300
+[  124.269750] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.322941] Bluetooth: hci0: FM event (6 bytes)
+[  124.323013] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.372335] Bluetooth: hci0: FM event (14 bytes)
+[  124.372405] qca fm evt: 00000000: 01 0c 00 24 a3 01 00 00 90 00 00 00 fd 53
+[  124.392652] fmscan tune 107500
+[  124.395598] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.451146] Bluetooth: hci0: FM event (6 bytes)
+[  124.451237] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.499224] Bluetooth: hci0: FM event (14 bytes)
+[  124.499302] qca fm evt: 00000000: 01 0c 00 ec a3 01 00 00 91 00 00 00 fd 54
+[  124.520640] fmscan tune 107700
+[  124.523215] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.578741] Bluetooth: hci0: FM event (6 bytes)
+[  124.578812] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.626402] Bluetooth: hci0: FM event (14 bytes)
+[  124.626468] qca fm evt: 00000000: 01 0c 00 b4 a4 01 00 00 90 00 00 00 fe 53
+[  124.648461] fmscan tune 107900
+[  124.650758] Bluetooth: hci0: sending FM command, 7 bytes
+[  124.707048] Bluetooth: hci0: FM event (6 bytes)
+[  124.707123] qca fm evt: 00000000: 10 04 00 01 01 54
+[  124.753745] Bluetooth: hci0: FM event (14 bytes)
+[  124.753821] qca fm evt: 00000000: 01 0c 00 7c a5 01 00 00 91 00 00 00 fc 52
+[  124.776133] fmcheck antenna 0
+[  124.776435] Bluetooth: hci0: sending FM command, 4 bytes
+[  124.778260] Bluetooth: hci0: FM event (6 bytes)
+[  124.778332] qca fm evt: 00000000: 0f 04 01 07 4c 00
+[  124.979558] fmscan tune 90300
+[  124.982499] Bluetooth: hci0: sending FM command, 7 bytes
+[  125.037769] Bluetooth: hci0: FM event (6 bytes)
+[  125.037852] qca fm evt: 00000000: 10 04 00 01 01 54
+[  125.085671] Bluetooth: hci0: FM event (14 bytes)
+[  125.085737] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 07 72
+[  125.287460] fmscan tune 90300
+[  125.290063] Bluetooth: hci0: sending FM command, 7 bytes
+[  125.347875] Bluetooth: hci0: FM event (6 bytes)
+[  125.347954] qca fm evt: 00000000: 10 04 00 01 01 54
+[  125.394816] Bluetooth: hci0: FM event (14 bytes)
+[  125.394961] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 09 72
+[  125.594281] fmscan tune 90300
+[  125.597981] Bluetooth: hci0: sending FM command, 7 bytes
+[  125.655573] Bluetooth: hci0: FM event (6 bytes)
+[  125.655660] qca fm evt: 00000000: 10 04 00 01 01 54
+[  125.702292] Bluetooth: hci0: FM event (14 bytes)
+[  125.702359] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 07 72
+[  125.900865] fmcheck antenna 1
+[  125.901199] Bluetooth: hci0: sending FM command, 4 bytes
+[  125.908973] Bluetooth: hci0: FM event (6 bytes)
+[  125.909051] qca fm evt: 00000000: 0f 04 01 07 4c 00
+[  126.104849] fmscan tune 90300
+[  126.108000] Bluetooth: hci0: sending FM command, 7 bytes
+[  126.164159] Bluetooth: hci0: FM event (6 bytes)
+[  126.164248] qca fm evt: 00000000: 10 04 00 01 01 54
+[  126.211645] Bluetooth: hci0: FM event (14 bytes)
+[  126.211711] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 09 72
+[  126.413453] fmscan tune 90300
+[  126.416209] Bluetooth: hci0: sending FM command, 7 bytes
+[  126.473191] Bluetooth: hci0: FM event (6 bytes)
+[  126.473270] qca fm evt: 00000000: 10 04 00 01 01 54
+[  126.522153] Bluetooth: hci0: FM event (14 bytes)
+[  126.522229] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 08 72
+[  126.729658] fmscan tune 90300
+[  126.732384] Bluetooth: hci0: sending FM command, 7 bytes
+[  126.788892] Bluetooth: hci0: FM event (6 bytes)
+[  126.789001] qca fm evt: 00000000: 10 04 00 01 01 54
+[  126.835856] Bluetooth: hci0: FM event (14 bytes)
+[  126.835921] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 08 72
+[  127.037001] fmcheck end

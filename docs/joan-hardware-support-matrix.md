@@ -69,7 +69,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | GNSS | modem QMI LOC | ❓ | |
 | Wi-Fi | WCN3990 (ath10k_snoc) | 🟡 | Works. SMMU faults on SID 0x1900 at iova 0 at bring-up. `invalid MAC address; choosing random`. firmware-lge-joan r9 adds the proper WCN3990 board data. |
 | Bluetooth | WCN3990 (btqca) | 🟡 | Works. Frame reassembly errors (-84). Branch/config adds RFCOMM, BNEP, UHID. |
-| FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | ❌→🟡 | **Hardware confirmed 2026-09-26**: recv enable/disable return FM_CMD_COMPLETE status 0 (`evidence/2026-09-26-bench-bl1/fm-hci-probe.txt`). Needs a mainline V4L2 radio driver on hci_qca FM packets plus the audio path. Deck #163. |
+| FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | 🟡 | **Tuner verified 2026-09-26** without an antenna: finds a station at 90.3 MHz (-91 dBm, SINR +7..+10) and gets RDS sync lock (`evidence/2026-09-26-fm-rx/`). Protocol = Qualcomm iris FM HCI. Missing: V4L2 radio driver, audio path (2nd SLIMbus, BT-FM codec, DSP routing). Deck #163. |
 | FM transmit | — | ❌ (firmware) | Probed 2026-09-26: the transmit command group (OGF 0x14) gets no response while receiver commands on the same link do, so the V30's FM firmware does not offer transmit. No upstream or LG/Qualcomm driver drives FM TX on this chip either. |
 | NFC | NXP PN547 (+ eSE) | ✅ | nxp-nci bound; neard (default since device-lge-joan r17) exposes `/org/neard/nfc0`: Felica, MIFARE, Jewel, ISO-DEP, NFC-DEP, ISO-15693; powers on and polls (2026-09-26). Tag read/write not yet tried with a physical tag. eSE unused. |
 | USB | DWC3, Type-C (TCPM) | ✅ | Gadget networking, host. |

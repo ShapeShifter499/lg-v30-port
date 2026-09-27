@@ -1,0 +1,99 @@
+[  182.892927] fmrds start
+[  182.893132] Bluetooth: hci0: sending FM command, 4 bytes
+[  182.897304] Bluetooth: hci0: FM event (6 bytes)
+[  182.897356] qca fm evt: 00000000: 0f 04 01 16 4c 00
+[  183.096621] Bluetooth: hci0: sending FM command, 15 bytes
+[  183.099520] Bluetooth: hci0: FM event (6 bytes)
+[  183.099607] qca fm evt: 00000000: 0f 04 01 04 4c 00
+[  183.302347] Bluetooth: hci0: sending FM command, 15 bytes
+[  183.303211] Bluetooth: hci0: FM event (6 bytes)
+[  183.303249] qca fm evt: 00000000: 0f 04 01 12 4c 00
+[  183.505708] Bluetooth: hci0: sending FM command, 7 bytes
+[  183.507332] Bluetooth: hci0: FM event (6 bytes)
+[  183.507408] qca fm evt: 00000000: 0f 04 01 13 4c 00
+[  183.709491] Bluetooth: hci0: sending FM command, 7 bytes
+[  183.762378] Bluetooth: hci0: FM event (6 bytes)
+[  183.762450] qca fm evt: 00000000: 10 04 00 01 01 54
+[  183.804502] Bluetooth: hci0: FM event (5 bytes)
+[  183.804567] qca fm evt: 00000000: 04 03 01 0a 72
+[  183.808788] Bluetooth: hci0: FM event (14 bytes)
+[  183.808852] qca fm evt: 00000000: 01 0c 00 bc 60 01 00 01 a5 00 00 00 0a 72
+[  184.713747] Bluetooth: hci0: sending FM command, 3 bytes
+[  184.721844] Bluetooth: hci0: FM event (14 bytes)
+[  184.721919] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  185.168648] Bluetooth: hci0: FM event (3 bytes)
+[  185.168720] qca fm evt: 00000000: 02 01 01
+[  185.717108] Bluetooth: hci0: sending FM command, 3 bytes
+[  185.720614] Bluetooth: hci0: FM event (11 bytes)
+[  185.720700] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  186.721408] Bluetooth: hci0: sending FM command, 3 bytes
+[  186.724362] Bluetooth: hci0: FM event (14 bytes)
+[  186.724442] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  187.671795] Bluetooth: hci0: FM event (3 bytes)
+[  187.671887] qca fm evt: 00000000: 02 01 01
+[  187.725064] Bluetooth: hci0: sending FM command, 3 bytes
+[  187.728420] Bluetooth: hci0: FM event (11 bytes)
+[  187.728501] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  188.729048] Bluetooth: hci0: sending FM command, 3 bytes
+[  188.732325] Bluetooth: hci0: FM event (14 bytes)
+[  188.732394] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  189.732653] Bluetooth: hci0: sending FM command, 3 bytes
+[  189.736957] Bluetooth: hci0: FM event (11 bytes)
+[  189.737048] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  190.517210] Bluetooth: hci0: FM event (3 bytes)
+[  190.517289] qca fm evt: 00000000: 02 01 01
+[  190.736775] Bluetooth: hci0: sending FM command, 3 bytes
+[  190.739691] Bluetooth: hci0: FM event (14 bytes)
+[  190.739777] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  191.423042] Bluetooth: hci0: FM event (3 bytes)
+[  191.423149] qca fm evt: 00000000: 02 01 01
+[  191.740656] Bluetooth: hci0: sending FM command, 3 bytes
+[  191.744337] Bluetooth: hci0: FM event (11 bytes)
+[  191.744416] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  192.744644] Bluetooth: hci0: sending FM command, 3 bytes
+[  192.749995] Bluetooth: hci0: FM event (14 bytes)
+[  192.750094] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  193.747986] Bluetooth: hci0: sending FM command, 3 bytes
+[  193.751800] Bluetooth: hci0: FM event (11 bytes)
+[  193.751871] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  193.941695] Bluetooth: hci0: FM event (3 bytes)
+[  193.941763] qca fm evt: 00000000: 02 01 01
+[  194.752269] Bluetooth: hci0: sending FM command, 3 bytes
+[  194.755869] Bluetooth: hci0: FM event (14 bytes)
+[  194.755950] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  195.755636] Bluetooth: hci0: sending FM command, 3 bytes
+[  195.759479] Bluetooth: hci0: FM event (11 bytes)
+[  195.759563] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  196.759223] Bluetooth: hci0: sending FM command, 3 bytes
+[  196.763059] Bluetooth: hci0: FM event (14 bytes)
+[  196.763136] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  196.997976] Bluetooth: hci0: FM event (3 bytes)
+[  196.998064] qca fm evt: 00000000: 02 01 01
+[  197.764805] Bluetooth: hci0: sending FM command, 3 bytes
+[  197.767690] Bluetooth: hci0: FM event (11 bytes)
+[  197.767778] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  198.057116] Bluetooth: hci0: FM event (3 bytes)
+[  198.057207] qca fm evt: 00000000: 02 01 01
+[  198.078457] Bluetooth: hci0: FM event (15 bytes)
+[  198.078527] qca fm evt: 00000000: 08 0d 01 00 00 a8 0a eb 01 d0 71 00 7a 7b 05
+[  198.769723] Bluetooth: hci0: sending FM command, 3 bytes
+[  198.773610] Bluetooth: hci0: FM event (14 bytes)
+[  198.773686] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  199.774401] Bluetooth: hci0: sending FM command, 3 bytes
+[  199.778480] Bluetooth: hci0: FM event (11 bytes)
+[  199.778530] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  200.241777] Bluetooth: hci0: FM event (3 bytes)
+[  200.241876] qca fm evt: 00000000: 02 01 01
+[  200.780218] Bluetooth: hci0: sending FM command, 3 bytes
+[  200.783074] Bluetooth: hci0: FM event (14 bytes)
+[  200.783149] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  201.784277] Bluetooth: hci0: sending FM command, 3 bytes
+[  201.787072] Bluetooth: hci0: FM event (11 bytes)
+[  201.787153] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  202.790552] Bluetooth: hci0: sending FM command, 3 bytes
+[  202.792792] Bluetooth: hci0: FM event (14 bytes)
+[  202.792931] qca fm evt: 00000000: 0f 0c 01 0b 4c 00 00 00 00 00 00 00 00 00
+[  203.808155] Bluetooth: hci0: sending FM command, 3 bytes
+[  203.809722] Bluetooth: hci0: FM event (11 bytes)
+[  203.809967] qca fm evt: 00000000: 0f 09 01 0c 4c 00 00 00 00 00 00
+[  204.813007] fmrds end
