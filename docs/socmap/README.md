@@ -43,10 +43,10 @@ Mainline providers present: bimc, cnoc, snoc, a1noc, a2noc, mnoc (and gnoc).
 | UFS | ufs1 | `ufs-ddr`, `cpu-ufs` | ✅ |
 | SD card (SDHC2) | sdhc2, up to 400 MB/s ib | yes | ✅ |
 | IPA | ipa | yes | ✅ |
-| **Camera VFE0/1** | msm_camera_vfe, MAS_VFE -> EBI (DT value is a placeholder; the ISP driver sets it per stream) | **none** | ❌ CAMSS votes nothing. Suspected in the camera reset. |
-| **Camera register (AHB) path** | msm-cam `qcom,bus-votes`: 0 / 300 / 640 / 640 MB/s (suspend/SVS/nominal/turbo) | **none** | ❌ |
+| Camera VFE0/1 | msm_camera_vfe, MAS_VFE -> EBI (DT value is a placeholder; the ISP driver sets it per stream) | `vfe-mem` (9adb93cf654c, d3924b5f5221) | ✅ since 2026-09-26; not the cause of the camera reset (that was the sensor/CCI autosuspend overlap) |
+| Camera register (AHB) path | msm-cam `qcom,bus-votes`: 0 / 300 / 640 / 640 MB/s (suspend/SVS/nominal/turbo) | `ahb` | ✅ |
 | **MMSS SMMU** | smmu-bus-client-mmss: MAS_VFE -> EBI and CNOC -> MMSS_SMMU_CFG, 1 MB/s keep-alive while the SMMU is active | **none** | ❌ Page-table walks for camera/display/video go over this path. |
-| **USB 3** | usb3, MAS_USB3 -> EBI, 240 MB/s avg / 800 MB/s peak | **none** | ❌ Likely limits USB throughput. |
+| USB 3 | usb3, MAS_USB3 -> EBI, 240 MB/s avg / 800 MB/s peak | `usb-ddr`, `apps-usb` (989ceae882e6) | ✅ since 2026-09-26 |
 | Venus video | pil-venus, MAS_VIDEO_P0 -> EBI, 304 MB/s | none (Venus disabled) | ⏳ with the Venus series |
 | Crypto engine, TSIF, PCIe, BLSP UARTs, A1/A2NOC SMMUs | small votes | none | low priority |
 | CPP, JPEG, FD, rotator | votes | no mainline drivers use them | n/a |
