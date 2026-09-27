@@ -69,7 +69,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | GNSS | modem QMI LOC | ❓ | |
 | Wi-Fi | WCN3990 (ath10k_snoc) | 🟡 | Works. SMMU faults on SID 0x1900 at iova 0 at bring-up. `invalid MAC address; choosing random`. firmware-lge-joan r9 adds the proper WCN3990 board data. |
 | Bluetooth | WCN3990 (btqca) | 🟡 | Works. Frame reassembly errors (-84). Branch/config adds RFCOMM, BNEP, UHID. |
-| FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | 🟡 | **Tuner verified 2026-09-26** without an antenna: finds a station at 90.3 MHz (-91 dBm, SINR +7..+10) and gets RDS sync lock (`evidence/2026-09-26-fm-rx/`). Protocol = Qualcomm iris FM HCI. Missing: V4L2 radio driver, audio path (2nd SLIMbus, BT-FM codec, DSP routing). Deck #163. |
+| FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | 🟡 | **V4L2 driver done 2026-09-26** (`/dev/radio0`, `radio-qca-fm`, kernel 621a3778bf10 + hci_qca 4a04a4310739): tune 76-108 MHz, seek, signal/stereo, mute, de-emphasis, RDS raw blocks (rds-ctl decodes PI/PTY/PS); v4l2-compliance clean. Headphone cable is the antenna (15 stations with it, 1 marginal without). Needs Bluetooth on. `evidence/2026-09-26-fm-radio-driver/`. Missing: audio path (2nd SLIMbus, BT-FM codec, DSP routing), pmaports config, an app. Deck #163. |
 | FM transmit | — | ❌ (firmware) | Probed 2026-09-26: the transmit command group (OGF 0x14) gets no response while receiver commands on the same link do, so the V30's FM firmware does not offer transmit. No upstream or LG/Qualcomm driver drives FM TX on this chip either. |
 | NFC | NXP PN547 (+ eSE) | ✅ | nxp-nci bound; neard (default since device-lge-joan r17) exposes `/org/neard/nfc0`: Felica, MIFARE, Jewel, ISO-DEP, NFC-DEP, ISO-15693; powers on and polls (2026-09-26). Tag read/write not yet tried with a physical tag. eSE unused. |
 | USB | DWC3, Type-C (TCPM) | ✅ | Gadget networking, host. |
@@ -79,7 +79,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
 | ISP | CAMSS: CSIPHY v5.0.1, CSID, ISPIF, VFE 4.8 | ✅ | porthole-dev's msm8998 CAMSS (own `CAMSS_8998`, gen2 CSIPHY lane table, ISPIF, VFE 4.8 write-master fixes) replaced this tree's untested CAMSS_660 reuse on 2026-09-26, plus the CAMSS TOP GDSC and the CSID `vdd_sec` supply. RDI raw capture runs at 30 fps. Evidence `evidence/2026-09-26-camera/`. |
-| Rear main | Sony IMX351 (CCI 5-0010, CSIPHY0 4-lane) | ✅ | Probes and streams. MCLK needed porthole's GPLL0_DIV/2 and MCLK `mnd_width` fixes (it ran at 48 MHz). libcamera (simple pipeline + GPU software ISP) captures 1280x720 at 30 fps; gain helper and measured black level (64 at 10 bit) in pmaports libcamera. Close/reopen SoC reset fixed (sensor powers down at stream-off; `evidence/2026-09-26-camera-reset/`). Next: AF actuator and OIS, colour calibration. |
+| Rear main | Sony IMX351 (CCI 5-0010, CSIPHY0 4-lane) | ✅ | Probes and streams. MCLK needed porthole's GPLL0_DIV/2 and MCLK `mnd_width` fixes (it ran at 48 MHz). libcamera (simple pipeline + GPU software ISP) captures 1280x720 at 30 fps; gain helper and measured black level (64 at 10 bit) in pmaports libcamera. Close/reopen SoC reset fixed (sensor powers down at stream-off; `evidence/2026-09-26-camera-reset/`). Upside-down picture fixed (rotation 270, kernel 0e456d986954). Next: lens driver for the ROHM/Renesas AF-OIS controller (protocol in `evidence/2026-09-26-camera-quality/`), LG's colour matrices (candidate tuning there, untested). |
 | Rear wide, front | Samsung S5K3M3 13 MP wide (CSIPHY1), Hynix HI553 5 MP front (CSIPHY2), both on CCI1 | ❌ | Identified from LG's sensor libraries (`libmmcamera_s5k3m3.so`, `libmmcamera_hi553.so`). No V4L2 driver exists anywhere; upstream `s5k3m5` and `hi556` are the templates, LG's libraries the register source. Not in DT yet. |
 | Laser AF | ST VL53L0X (CCI 5-0029) | ✅ | Ranges (`in_distance_raw` x 0.001 m). CCI0 answers only with LVS1 (main camera I/O rail) up, so LVS1 is always-on. Driver gained runtime PM (camera AVDD off between readings, verified). Nothing in userspace reads it yet. |
 | SAR proximity | Semtech SX9320 (I2C 3-0028) | ❌ | `sx9324` is built and loaded but does not bind the SX9320; it needs support of its own. |
@@ -95,7 +95,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Sound panel | phosh quick settings + pwvucontrol (per-app) | ✅ default since device-lge-joan r17 |
 | Voice recorder | gnome-sound-recorder | ✅ default since device-lge-joan r17 |
 | Camera | Snapshot (phosh default, libcamera) | 🟡 libcamera captures from the IMX351; Snapshot on screen not tried yet |
-| FM tuner | TBD | blocked on FM driver |
+| FM tuner | none yet (kernel `/dev/radio0` ready; CLI: `v4l2-ctl`, `rds-ctl`) | 🟡 no audio path and no GUI app in Alpine known yet |
 | NFC | neard daemon (enabled by preset); no GUI tag app in Alpine yet | 🟡 |
 | Flashlight | phosh torch toggle | ✅ (flash LED present) |
 
