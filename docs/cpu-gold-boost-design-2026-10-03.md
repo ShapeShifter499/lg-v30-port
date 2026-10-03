@@ -1,6 +1,11 @@
 # Gold single-core boost (2457.6 MHz) — design note (2026-10-03)
 
 Written-by: Ember (Claude-Code:claude-opus-5-5). Status: **design only, no code.**
+
+Ceiling for this phone: the fuses say speed bin 2, whose qualified maximum is
+2361.6 MHz all-core and 2457.6 MHz single-core. Other bins go higher (bin 3:
+2457.6 all-core; bin 0: 2496.0) on their own voltage tables; running bin-2
+silicon at those points would be unvalidated, so it is out of scope.
 Follows `docs/cpu-gpu-audit-2026-10-02.md` §4 item 3.
 
 ## What stock does
@@ -61,10 +66,13 @@ the same level, which one it returns changes the corner voltage.
 3. cpufreq table: readback already flags core-count-1 rows as boost
    (`LUT_TURBO_IND`); check `target_index` maps cpufreq index → LUT row
    (not VC) and that boost is off by default (`boost` sysfs).
-4. CPR3: pick the corner frequency deterministically when two CPU OPPs share a
-   level. **Open question, settle against downstream `cprh-kbss` before coding:**
-   which frequency stock uses for that corner's interpolation (the 4-core or the
-   1-core one). Do not guess — this sets the voltage.
+4. CPR3: when two CPU OPPs share a level, the corner frequency must be the
+   **4-core** OPP's. Settled from stock: `apc1_perfcl_vreg`
+   `qcom,corner-frequencies` for speed bin 2 ends `… 2208000000 2265600000
+   2323200000 2342400000 2361600000` (corners 26–30 = the 4-core rows), and
+   `cprh-kbss-regulator.c` interpolates open-loop voltage from those
+   `proc_freq` values. The 1-core row runs faster at the 4-core row's voltage.
+   `cpr_get_opp_hz_for_req()` must therefore skip core-count-1 OPPs.
 
 ## Validation plan
 
