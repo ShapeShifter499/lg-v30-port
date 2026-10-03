@@ -84,8 +84,30 @@ Bench-only gotchas found on the way:
    LUT row with virtual corner — MEM-ACC pairs, APM threshold and the LUT VC field
    all key on `i`; downstream keys them on `virtual_corner` and interleaves 1-core
    rows on the same corner as their 4-core partner. Not a DT-only change.
-7. Kernel config trim: the pmaports config builds nouveau, mlx5, XFS, …;
+7. SX9320 SAR: disabled (`f184bc3341bb`) — orphan LG dtsi, absent from all 20 stock DTBs, NACKs on the US998.
+8. DP alt mode: driver + DT are in; the boot-time `phy init failed -16` is the DP side meeting the USB3-held PHY (exclusive on this PHY). Needs a USB-C→HDMI/DP adapter on the bench.
+9. Kernel config trim: the pmaports config builds nouveau, mlx5, XFS, …;
    ccache already hits 90%, the rest of the build time is the module set.
+
+## Decision needed: per-variant Wi-Fi calibration (and model string)
+
+The blob mirror carries three different stock WLAN board files —
+`h930` (`a0413c22…`), `h932` (`36ed7a78…`), `us998` (`0ff6ab82…`) — and a
+`common/…/board-2.bin` holding all three as
+`bus=snoc,qmi-board-id=ff,qmi-chip-id=30214,variant=LG_joan_{h930,h932,us998}`.
+ath10k only picks a variant when the DT sets `qcom,calibration-variant`; the
+single joan DT sets none, so the lookup misses (the boot-time "failed to fetch
+board data … board-2.bin" line) and ath10k falls back to `board.bin`, which on
+a US998 is the **H930** file from `firmware-lg-joan-h930` — non-US
+regulatory/power tuning on a US unit.
+
+Upstream-style fix: `msm8998-lg-joan.dtsi` + per-model `msm8998-lg-joan-h930.dts`,
+`-h932.dts`, `-us998.dts`, each with its `qcom,calibration-variant` and a true
+`model` (today every unit reports "LG V30 (US998)"). All variants share the
+same board-ids, so aboot cannot choose between appended DTBs: the US998 needs
+its own pmbootstrap device (`lg-joan-us998`, firmware = h930 set, which matches
+US998's NON-HLOS byte for byte per the blob README). That adds a device a user
+has to pick, so it is Lance's call; nothing is changed yet.
 
 ## Bench tooling added
 
