@@ -132,6 +132,24 @@ its own pmbootstrap device (`lg-joan-us998`, firmware = h930 set, which matches
 US998's NON-HLOS byte for byte per the blob README). That adds a device a user
 has to pick, so it is Lance's call; nothing is changed yet.
 
+## Clocks, thermal, FM — checked against stock (2026-10-03, offline)
+
+- **Clock ceilings vs stock:** GPU 710 MHz = stock's only v2 table (no GPU bins).
+  Silver 1900.8 MHz = stock's single `pwrcl-speedbin0` table (no other silver bins).
+  Gold 2361.6 MHz all-core = bin-2 max; only the 1-core 2457.6 boost is missing
+  (design: `docs/cpu-gold-boost-design-2026-10-03.md`).
+- **Thermal vs LG's `thermal-engine-8998.conf`:** skin ladder (vts weighted sensor),
+  CPU 85/80 and GPU 85/65 junction rules were already ported. Added the missing
+  SS-POPMEM rule: `233f7e59dfa7` (gold cluster throttled at 85 C pop_mem, release 65 C;
+  pop_mem = tsens1 hw ch2 via downstream's client map `<0 1 3 4 5 6 7 2>`).
+  Not ported: CHG_MONITOR/WLCHG_MONITOR (charge-current limits by skin temp) —
+  needs a charger cooling device.
+- **FM transmitter:** joan has none. WCN3990 Helium FM is receive-only; LG builds only
+  `SND_FM_RX_MI2S`, and the `*tx*` strings in stock `libfm-hci.so` are the HCI command
+  path. FM RX tuner works (radio0); FM audio still blocked on slim2.
+- **r44 package** (PCI off + SAR off + bu24235): 44 MB vs 51 MB, 1262 modules; staged
+  on nest `~/joan-images/linux-lg-joan-7.2.0_rc2-r44.apk`, not booted.
+
 ## Bench tooling added
 
 - `tools/bench/ramboot.sh <img>` — from pmOS/LineageOS/fastboot to RAM boot;
