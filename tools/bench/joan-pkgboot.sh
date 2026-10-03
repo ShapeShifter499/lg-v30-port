@@ -19,10 +19,10 @@ NEST_APKS=""; for a in "$@"; do NEST_APKS="$NEST_APKS /tmp/$(basename "$a")"; do
 
 ssh nym-nest-family "set -e; export JOAN_PW=\$(cat ~/.config/joan-bench-pw); J=$J
 for a in $NEST_APKS; do \$J scp \$a user@172.16.42.1:/home/user/; done
-echo '== before'; \$J 'ls -la --full-time /boot/boot.img /boot/initramfs /boot/vmlinuz 2>/dev/null; apk info -v 2>/dev/null | grep -E \"^(linux|device)-lge\"'
+echo '== before'; \$J 'ls -la --full-time /boot/boot.img /boot/initramfs /boot/vmlinuz 2>/dev/null; apk info -v 2>/dev/null | grep -E \"^(linux|device)-lge?-joan\"'
 echo '== apk add'
 \$J \"echo \$JOAN_PW | sudo -S -p '' apk add --allow-untrusted $APKS 2>&1\"
-echo '== after'; \$J 'ls -la --full-time /boot/boot.img /boot/initramfs /boot/vmlinuz; apk info -v 2>/dev/null | grep -E \"^(linux|device)-lge\"; cat /usr/share/kernel/*/kernel.release 2>/dev/null'
+echo '== after'; \$J 'ls -la --full-time /boot/boot.img /boot/initramfs /boot/vmlinuz; apk info -v 2>/dev/null | grep -E \"^(linux|device)-lge?-joan\"; cat /usr/share/kernel/*/kernel.release 2>/dev/null'
 \$J scp user@172.16.42.1:/boot/boot.img ~/joan-images/boot-joan-$NAME.img
 sha256sum ~/joan-images/boot-joan-$NAME.img
 \$J \"echo \$JOAN_PW | sudo -S -p '' sh -c 'sync && systemd-run --on-active=2 systemctl reboot >/dev/null 2>&1'\" || true
