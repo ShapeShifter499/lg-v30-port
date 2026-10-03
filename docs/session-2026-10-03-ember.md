@@ -72,8 +72,14 @@ Bench-only gotchas found on the way:
    `Qualcomm/sdm845-lg-joan`). `70-joan-rmnet-nodad.rules.apk-new` was not applied.
 4. **SLPI**: boot `boot-joan-r41-slpi.img`. Userspace: SMGR (sensor1) QMI —
    libssc only speaks SEE (sdm845+), so this needs RE.
-5. **Venus**: bisect `stop_at` 6..10 on `joan/venus-porthole-canonical`
-   (joan survives `stop_at=5`; Pixel 2's wedge was earlier, at the VBIF presets).
+5. **Venus**: bisect on `joan/venus-porthole-canonical`. `stop_at=N` runs the
+   checkpoints *below* N, so joan surviving `stop_at=5` means only steps 1-4 ran
+   (clocks/IRQ/runtime PM/bus votes); `core_power()` (5) was never exercised.
+   Next: `stop_at=6`; if that wedges, porthole's `clk_limit` / `preset_limit`
+   inside step 5 (the Pixel 2 wedge was there: first VBIF preset write). If 5
+   passes, suspect step 6, the probe-time `set_remote_state(RESUME)` on a
+   never-booted core: porthole notes Google's TZ answers -EINVAL, and LG's TZ
+   is a different build.
 6. **Gold single-core boost (2457.6 MHz)**: needs the OSM driver to stop equating
    LUT row with virtual corner — MEM-ACC pairs, APM threshold and the LUT VC field
    all key on `i`; downstream keys them on `virtual_corner` and interleaves 1-core
