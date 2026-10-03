@@ -89,6 +89,29 @@ Bench-only gotchas found on the way:
 9. Kernel config trim: the pmaports config builds nouveau, mlx5, XFS, …;
    ccache already hits 90%, the rest of the build time is the module set.
 
+## Bench queue for the next window (all RAM boot; nest `~/joan-images/`)
+
+Tools: `tools/bench/ramboot.sh <img>`, `tools/bench/validate.sh <tag>`.
+Phone must first be back in LineageOS (power-hold) — Deck #180.
+
+1. **Memory-map A/B** (order new → old → new):
+   `boot-joan-r41-lg.img` (new map) / `boot-joan-r41-oldmapdtb.img` (same image,
+   pre-map DTB). Per boot: `validate.sh`, then cellular IPv6 ping over
+   `qmapmux0.0`, `wpctl status`, and `journalctl --user -u wireplumber -b`.
+   If audio is empty on both, it is the pipewire 1.6.9 / UCM side, not the map.
+2. **bootmac**: install `device-lg-joan-1-r21.apk`; after reboot `ip link show
+   wlan0` twice across reboots — same `02:00:…` address both times.
+3. **SLPI**: `boot-joan-r41-slpi.img`; expect `remoteproc … slpi is now up`;
+   any reset → try adding the `aggre2` NoC clock vote stock uses.
+4. **Venus bisect**: install `linux-lg-joan-7.2.0_rc2-r42.apk` (Venus test
+   build), repack the device boot.img with
+   `modprobe.blacklist=venus_core,venus_dec,venus_enc`, then
+   `modprobe venus_core stop_at=6` (reboot between rounds; never rmmod).
+   Go back to r41 afterwards.
+5. **DP alt mode**: needs a USB-C→HDMI/DP adapter (Lance).
+6. Read `/mnt/vendor/persist-lg/wifi/wlan_mac.bin` from LineageOS (`adb root`,
+   drm partition) to confirm its format — read only.
+
 ## Decision needed: per-variant Wi-Fi calibration (and model string)
 
 The blob mirror carries three different stock WLAN board files —
