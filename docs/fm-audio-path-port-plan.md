@@ -3,7 +3,10 @@
 Written-by: Fulgor Nymvale (agent-fulgor-zcode)
 Agent-harness: ZCode:GLM-5.3-Flash
 Date: 2026-09-27
-Status: plan only, no code written yet
+Status: IMPLEMENTED 2026-10-02, kernel branch joan/btfm-fm-audio
+(commits 2ae06449228c..ddfaf16673ec, pushed).  Build/boot test pending
+(see the session journal).  Deviations from the plan below are noted
+inline as [2026-10-02].
 
 ## Hardware path to reproduce
 
