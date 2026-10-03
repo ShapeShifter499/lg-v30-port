@@ -74,6 +74,27 @@ the same level, which one it returns changes the corner voltage.
    `proc_freq` values. The 1-core row runs faster at the 4-core row's voltage.
    `cpr_get_opp_hz_for_req()` must therefore skip core-count-1 OPPs.
 
+## Two more constraints found reading the readback path
+
+- **Duplicate frequencies.** Stock carries 2265.6 and 2342.4 both as a 1-core and
+  a 4-core row. Neither an OPP table nor a cpufreq table can hold duplicates, so
+  the 1-core rows cannot come from OPPs. Describe them separately (e.g. a
+  `qcom,boost-rows = <freq vc pll-override spare>` list on the OSM or OPP-table
+  node) and splice each in after its 4-core partner, reproducing stock's exact
+  35-row layout — the OSM's fallback rule when more cores are active than a row
+  allows is not documented, so do not compact the table. Only the 1-core
+  frequencies without a 4-core twin (2419.2, 2438.4, 2457.6) become cpufreq
+  entries (`CPUFREQ_BOOST_FREQ`); the twins stay `CPUFREQ_ENTRY_INVALID`, which is
+  also what stock's `clk_osm_search_table()` does (it prefers the 4-core row).
+- **End-of-table heuristic.** `qcom_cpufreq_hw_read_lut()` (inherited from
+  qcom-cpufreq-hw, where only the last row can be turbo) stops at the first row
+  whose frequency equals the previous row's. With interleaving that is the
+  2265.6 (1c) → 2265.6 (4c) pair, so everything above 2208.0 would be dropped.
+  The table end must instead come from the number of rows written. The table
+  will not be ascending (… 2323.2, 2419.2B, 2342.4, 2438.4B, 2361.6, 2457.6B);
+  cpufreq accepts unsorted tables, and index must stay = LUT row because
+  `target_index()` writes the index straight to `reg_perf_state`.
+
 ## Validation plan
 
 - Readback: `/sys/kernel/debug/qcom_osm/policy4` LUT dump must show 35 rows with
