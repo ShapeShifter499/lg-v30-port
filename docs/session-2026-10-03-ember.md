@@ -112,6 +112,24 @@ Phone must first be back in LineageOS (power-hold) — Deck #180.
 6. Read `/mnt/vendor/persist-lg/wifi/wlan_mac.bin` from LineageOS (`adb root`,
    drm partition) to confirm its format — read only.
 
+## Afternoon additions (still no bench)
+
+- **Bug fixed, `a4c931d8c550` (pushed to latest-clean-test, also on master's
+  base):** qcom_smbx wrote the FCC limit as 16-bit mA to CHGR+0x40/0x41, which on
+  PMI8998 is the step-charge threshold (LG `smb-reg.h`); FCC is CHGR+0x61 in
+  25 mA steps. Since 2026-08-07 every boot corrupted step-charge config and never
+  set the 3.3 A FCC. Promote to master after a bench read of the register.
+- `joan/charge-thermal` (`3b46281a1663`, local): FCC cooling device +
+  LG CHG_MONITOR steps (2.6/1.5/0.8/0.6 A at 10/40/42/45 C skin).
+- `joan/gold-boost` (`8f45281b82ea`, local): see the design doc.
+- **r45** = `joan/bench-r45` (canonical + boost + charge-thermal), pmaports
+  config r44 (PCI off): `~/joan-images/linux-lg-joan-7.2.0_rc2-r45.apk`.
+  Bench checks: `scaling_available_frequencies` / `boost`; LUT dump in
+  debugfs `qcom-cpufreq-osm/policy4`; skin trips still map to
+  1958.4/1728/1056/729.6 (`cat /sys/class/thermal/cooling_device*/cur_state`
+  under a heat gun or by forcing trips); FCC register via regmap debugfs;
+  `pmi8998-charger-fcc` cooling device present.
+
 ## Decision needed: per-variant Wi-Fi calibration (and model string)
 
 The blob mirror carries three different stock WLAN board files —

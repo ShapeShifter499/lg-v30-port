@@ -1,6 +1,7 @@
 # Gold single-core boost (2457.6 MHz) — design note (2026-10-03)
 
-Written-by: Ember (Claude-Code:claude-opus-5-5). Status: **design only, no code.**
+Written-by: Ember (Claude-Code:claude-opus-5-5). Status: **implemented on kernel branch
+`joan/gold-boost` (`8f45281b82ea`, local), in bench build r45 — not booted.**
 
 Ceiling for this phone: the fuses say speed bin 2, whose qualified maximum is
 2361.6 MHz all-core and 2457.6 MHz single-core. Other bins go higher (bin 3:
@@ -103,3 +104,22 @@ the same level, which one it returns changes the corner voltage.
   frequency (`cpumhz2.c` / perf counters) must stay ≤ 2361.6.
 - Single-thread load at 2457.6 for 30 min: no errors, LMh/thermal behaviour,
   CPR closed-loop voltage within ceiling (cpr debugfs).
+
+## Implementation notes (2026-10-03, afternoon)
+
+- Boost rows are DT OPPs with `turbo-mode` and `required-opps` = the partner's
+  CPRh level (2419.2/2438.4/2457.6 on levels 28/29/30). Only the three steps
+  without an all-core twin are described; stock's 1-core 2265.6/2342.4 rows are
+  never requested by the vendor driver.
+- OSM driver: per-row `vc` + `core_count`; boost rows interleaved behind their
+  partner; APM/MEM-ACC/sequencer use corners. Without turbo OPPs the programmed
+  LUT and sequencer values are unchanged (host simulation: 33 rows / 30 corners,
+  MEM-ACC pairs `[11,12] [22,23]` either way).
+- **Trap found and fixed before any boot:** the thermal cpufreq cooling code
+  indexes the frequency table by position assuming it is sorted. With
+  interleaved boost rows the table is unsorted, and the 37 C skin step for
+  1958.4 MHz would have selected row 7 = **806.4 MHz**. The driver now keeps the
+  cpufreq table sorted with the LUT row in `driver_data` (`target_index`,
+  `fast_switch`, `get` translate through it). Boost entries also count as
+  cooling states, so all numeric gold cooling states in the joan DTS moved +3.
+- CPR: `cpr_get_opp_hz_for_req()` skips turbo-mode OPPs.
