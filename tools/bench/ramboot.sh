@@ -19,16 +19,21 @@ while [ $SECONDS -lt $end ]; do
 done
 sudo fastboot devices | grep -q . || { log "NO FASTBOOT after 300s"; exit 2; }
 ok=0
+# Let aboot settle after enumerating, then probe it before sending.  On a failed
+# send do NOT reboot-bootloader: that drives LG aboot into its "any key to
+# shutdown" error screen (2026-10-03, twice).  Retry the send only.
+sleep 5
 for t in 1 2 3; do
   sudo fastboot devices | grep -q . || { log "fastboot gone before try $t"; break; }
-  sudo timeout 15 fastboot getvar product >/dev/null 2>&1; sleep 1
-  log "fastboot boot try $t"; out=$(sudo timeout 90 fastboot boot "$IMG" 2>&1 | tail -1); log "${out:-timeout}"
-  if echo "$out" | grep -q "Finished"; then ok=1; break; fi
-  # a failed or hung transfer leaves aboot stuck in its download loop: reset fastboot, wait, retry
-  sudo timeout 20 fastboot reboot-bootloader >/dev/null 2>&1; sleep 12
-  end2=$((SECONDS+60)); while [ $SECONDS -lt $end2 ]; do sudo fastboot devices | grep -q . && break; sleep 1; done
+  mds=$(sudo timeout 15 fastboot getvar max-download-size 2>&1 | head -1); log "aboot: $mds"
+  echo "$mds" | grep -q "max-download-size: " || { log "aboot fastboot DEGRADED (no download buffer): not sending, not rebooting -- power-cycle needed"; exit 4; }
+  log "fastboot boot try $t"
+  sudo timeout 90 fastboot boot "$IMG" > /tmp/fb-send.log 2>&1
+  sed 's/^/    /' /tmp/fb-send.log
+  if grep -q "Finished" /tmp/fb-send.log && ! grep -qi "fail" /tmp/fb-send.log; then ok=1; break; fi
+  sleep 8
 done
-[ $ok = 1 ] || { log "fastboot boot FAILED after retries"; exit 3; }
+[ $ok = 1 ] || { log "fastboot boot FAILED; phone left as-is (no reset)"; exit 3; }
 end=$((SECONDS+200))
 while [ $SECONDS -lt $end ]; do
   IF=$(ip -br link | awk '/^enp0s29u1u5/ {print $1}' | head -1)
