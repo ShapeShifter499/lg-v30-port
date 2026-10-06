@@ -103,12 +103,13 @@ Open, and part of feature work:
 | Calls / SMS | modem + VoLTE packages | calls, chatty (via Phosh) |
 | Voice recorder | audio works | gnome-sound-recorder (in device pkg) |
 | Volume panel | — | pwvucontrol (in device pkg) |
-| NFC | nxp-nci (PN5xx) | neard daemon only; no GUI reader/writer app packaged |
+| NFC | nxp-nci (PN5xx); neard now D-Bus activated (r22) | nfctool CLI; no GUI reader/writer app exists in Alpine |
 | Video decode/encode HW | **Venus working (this doc)** | GStreamer v4l2codecs / ffmpeg v4l2m2m |
 | FM tuner | `radio-qca-fm` tunes 76-108 MHz, RSSI, RDS, seek | **no FM audio PCM yet** (btfm slim2), so no app |
-| FM transmitter | — | WCN3990 is RX only in LG's stack; not planned |
+| FM transmitter | **not in hardware** (firmware probe, see below) | — |
 | Camera | CAMSS + imx351 + bu24235 subdevs register | no working pipeline/app yet |
 | USB-C display | DP PHY refuses (see above) | — |
+| TV tuner | **not fitted on US998** (KR/JP boards only) | — |
 
 ## Bench gotchas from today
 
@@ -120,3 +121,76 @@ Open, and part of feature work:
 - Plain `scp` to the phone fails (sshd penalty); use the `jssh scp` wrapper.
 
 Assisted-by: Claude-Code:claude-opus-5-5
+
+## Second pass, same day (02:00-02:40)
+
+### Venus: unsized streams no longer reset the SoC — `6c9d1bca`
+Measured first: the firmware's own `HFI_BUFFER_INPUT` requirement for an
+unsized session is **6144 bytes**, so it is no floor (8 KiB already overflows).
+LG `msm_vdec.c` `get_frame_size_compressed()` sizes every bitstream buffer from
+the codec's *maximum* macroblocks per frame. Fix: floor the compressed
+sizeimage at the driver formula's 1280x720 value (708608 B for H.264), in
+try_fmt and queue_setup. Bench: the unsized decode that reset the phone now
+decodes all 57 frames, byte-identical to ffmpeg.
+
+### Charger float voltage above the battery maximum — `75307f90` (upstream bug)
+`qcom_smbx` programmed `FLOAT_VOLTAGE_CFG = (vmax - 3487500) / 7500 + 1`. The
+register means 3487.5 + 7.5·n mV, so it rounded **up**. For the 4400 mV cell the
+register read 0x7a = 4402.5 mV, and the charger tripped `battery overvoltage
+detected` at full (vbat 4.396 V, health "Over voltage", charging stopped).
+Qualcomm downstream `smblib_set_charge_param()` rounds down. Now 0x79 =
+4395.0 mV, health Good. This affects every PMI8998 device on mainline: an
+upstream candidate.
+
+### NFC: neard could never start — device-lg-joan r22
+Alpine's `neard.service` has only `Alias=dbus-org.neard.service` (meant to be
+bus-activated) and no activation file, so the `enable neard.service` preset
+did nothing. The device package now ships
+`/usr/share/dbus-1/system-services/org.neard.service`. Bench: neard inactive at
+boot; an *unprivileged* `busctl get-property org.neard /org/neard/nfc0 …`
+starts it. Adapter powers; protocols Felica/MIFARE/Jewel/ISO-DEP/NFC-DEP/
+ISO-15693; `StartPollLoop(Initiator)` works. **Physical tag read untested.**
+No GUI NFC reader/writer app is packaged in Alpine. `nfctool` (neard) is the
+CLI.
+
+### FM transmitter: not possible on this hardware (measured)
+Debug-only probe through `radio-qca-fm` (since dropped), with positive
+controls:
+
+| opcode | meaning | firmware reply |
+|---|---|---|
+| 0x4c0a | GET_STATION (real) | idle: status 0x0c "disallowed" + data; RX on: 0x00 + data |
+| 0x4c3f | bogus OCF in RX group | silence |
+| 0x7c01 | bogus OGF 0x1f | silence |
+| 0x5003 | GET_TRANS_CONF (TX group) | **silence**, identical to bogus |
+
+The firmware answers commands it has, even ones it refuses, and drops unknown
+ones. The transmit group behaves as unknown. Qualcomm's helium HAL
+(`radio_helium_hal.c`, `HCI_FM_HELIUM_STATE`) only implements FM_RECV and
+FM_OFF. The TX defines are left over from the older iris (WCN36xx) stack. The FM
+core is mask ROM plus a Qualcomm patch (`crbtfw21.tlv`, BTFM.CHE.2.1.2), and
+the board has no FM-TX RF path. "Enable transmit" (0x5001) was deliberately
+not sent.
+Bands: helium defines 76-108 MHz only. **AM is impossible** (VHF-only front
+end, no AM demodulator). OIRT 65.8-74 MHz is untested and would be a
+receive-only driver band change.
+
+### TV tuner: not fitted on the US998
+LG trees: KR (`joan_kr`) = T-DMB `lge,tdmb` on BLSP1 QUP2 **SPI** (GPIO
+31-34), INT GPIO 95, EN GPIO 96, LDO28 1.8 V, ln_bb_clk3. JP (`dcm_jp`,
+`kddi_jp`) = ISDB-T **Telechips TCC3535 @ I2C 0x58** on the same QUP (GPIO
+32/33), EN GPIO 31, RST GPIO 34, LDO28 1.8 V, plus TSIF. The tuner driver is
+built only in the KR/JP (and non-perf global_com) defconfigs, never in
+`joan_nao_us`. The US998 DT references none of these resources, and live they
+are all UNCLAIMED.
+Active test (DT-swap RAM boot): LDO28 enabled at 1.8 V. GPIO 32/33 stay low
+against the internal pull-down both before and after, so **there are no I2C
+pull-ups and no I2C tuner bus is populated**. Not tested: a KR-style SPI tuner
+(SPI has no pull-ups; it would need GPIO 96 driven plus an SPI ID read).
+
+### Open: one unexplained reset into LineageOS
+It happened a few minutes after the final-r47 checks (idle, 02:13-02:16). It
+did not reproduce in 10+ min of idle plus the same tests under a live `dmesg
+-w` stream, and pstore was empty. The charger OV trip happened on the next
+boot but only stops charging. Keep a live stream running on bench sessions
+until it recurs.

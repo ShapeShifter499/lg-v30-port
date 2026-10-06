@@ -7797,3 +7797,26 @@ Date: 2026-09-24
 
 Assisted-by: Claude-Code:claude-opus-5-5
 Date: 2026-10-06
+
+## Venus input floor + charger float voltage (2026-10-06, second pass)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test-merged` (local), on top of
+  `f59a1b9b`: `6c9d1bca` media: venus: vdec: floor the bitstream buffer at the
+  720p size; `75307f90` power: supply: qcom_smbx: do not round the float
+  voltage above the battery maximum. pmaports: `2fae02d32c` r47 pin,
+  `4eaef5ff75` device-lg-joan r22 neard D-Bus activation (its APKBUILD half
+  landed in debug-pin commit `eebb044cb2`; squash before publishing).
+- Class: both kernel commits `upstream-candidate` (the smbx one is a generic
+  PMI8998 bug).
+- Evidence: register 0x1070 on PMI8998 SID 2 = 0x7a before, 0x79 after;
+  "battery overvoltage detected" gone, health Good. Venus unsized decode
+  57/57 frames byte-identical, no SMMU fault. LG downstream refs:
+  `qpnp-smb2.c` .fv param + `smb-lib.c` smblib_set_charge_param;
+  `msm_vdec.c` get_frame_size_compressed.
+- Also measured (no code kept): FM TX absent in WCN3990 firmware (positive-
+  controlled HCI probe); US998 has no I2C TV tuner bus (LDO28 + pull-up test).
+  Details in `docs/ember-2026-10-06-venus-and-boot-log.md`.
+- Public/PR disposition: unpushed; Lance approval pending (Deck #190).
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-06
