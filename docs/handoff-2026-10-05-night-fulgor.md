@@ -94,3 +94,20 @@ APKBUILD _commit + sha512 (the build-cycle.sh pattern on nest /tmp).
 - US998 hardware: RAM clean (memtester), abl stock (673263a7), flash chain
   healthy. Bench phone: US998 with its own SD (pmOS rootfs mmcblk0p2,
   boot p1 on that card; UFS = sda in LineageOS).
+
+## 6. FINAL CYCLE ADDENDUM (2026-10-05 19:0x) — one more frontier moved
+
+Second build+test cycle with Lance: the icc-optional fix (e84d90c0 + 9b69e05e)
+and noc_axi (01fd102a) are deployed and verified on the bench:
+- core_get now returns 0: all three venus PM domains attach by name and ALL
+  five+ clocks resolve (the DT clock list needed mnoc_ahb AND noc_axi
+  = GCC_MMSS_SYS_NOC_AXI_CLK; both committed, 01fd102a is the pin).
+- The probe frontier moved to: **venus_runtime_resume → core_power(POWER_ON)
+  fails -EBUSY** (venus_runtime_resume+0x90 [venus_core]). Next session opens
+  here: instrument core_power_v1 (clock enable vs gdsc enable) — suspect a
+  clock prepared twice or a GDSC poll timeout. VENUSDBG/PROBEDBG prints are
+  still in the tree to trace it; strip when Venus probes clean.
+- Kernel canonical pushed through 01fd102a (includes the DT fixes + icc fix
+  + debug prints — strip prints before promoting to master).
+- pmaports local pin = 01fd102a pkgrel 46 (unpushed, debug).
+- Deploy loop validated end-to-end 4× tonight; each cycle ~15 min.
