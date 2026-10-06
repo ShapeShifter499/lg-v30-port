@@ -230,3 +230,20 @@ md5 equals the image). RAM-booted that install's own boot.img. Result: root grow
 no manual setup**, Venus decode bit-exact, FM receiver + sound card + modem present,
 neard D-Bus activation works. Wi-Fi needed only its credentials. Not tested here:
 calls/SMS, camera (not working yet), FM audio (slim2), USB-C display.
+
+### Calls / SMS on a fresh install (2026-10-06 04:00)
+Installed by default: `calls`, `chatty`, `snapshot`, `gnome-sound-recorder`,
+`pwvucontrol`, `neard`, `feedbackd`, `lg-joan-volte`, `joan-imsd`. Modem: LTE,
+T-Mobile, home, packet attached, SMS storage supported, voice not emergency-only.
+- **Calls app cannot place calls on T-Mobile US.** It uses ModemManager CS voice;
+  T-Mobile has no CS. VoLTE is the separate `joan-ims` UA (`joan-ims dial`).
+  Making Calls work means a ModemManager IMS voice path (large project).
+- **VoLTE is not automatic on a fresh install:** there is no IMS PDN (only bearers
+  0 and 1 exist), `joan-imsd` stays inert until `/etc/joan-imsd/isim.env` exists, and
+  the UA hard-codes `mmcli -b 2`, `qmapmux0.1`, a `2607:` (T-Mobile) address
+  prefix and a fixed WDS QRTR port. All of these need fixing before auto-start.
+- **Fixed now (joan-imsd r5, `9f0b2b452b`):** register mode auto-answered every
+  incoming call with 200 OK (a silent call the user never sees). It now declines
+  with 480 so callers reach voicemail. Offline-tested; live incoming call untested.
+- **SMS:** untested. It may work over SGs without IMS; it needs a test message from
+  Lance (sending is outward-facing, so not done unattended).
