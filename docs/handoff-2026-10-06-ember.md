@@ -66,3 +66,45 @@ phone-side tuner command (read-only GPIO/regulator) found the phone already rese
 into LineageOS. The only active tuner test (LDO28 at 1.8 V) was at 02:30 on a later
 boot, and the phone stayed up through it. The cause is still unknown and was not
 reproduced (10+ min idle plus the same tests under a live dmesg stream).
+
+## Addendum 08:20 — CPU/GPU/media pass (paused at 95% usage)
+
+**Kernel (skyforge, local, unpushed):** `joan/latest-clean-test-merged` =
+`56b9e9e5` (gold 2457.6 MHz rows, verified) → `b9bd3534` (Venus EOS on a real
+zero-length buffer, verified: GStreamer v4l2h264dec to clean EOS, decodebin picks it)
+→ `d6e7bf12` **DEBUG (do not ship)** icc write-debugfs test client. **Drop d6e7bf12
+before any release.** Parked: branch `ember/gpu-bw-wip` (367616ca, GPU per-OPP
+bandwidth on gfx-mem only).
+**pmaports:** linux-lg-joan pin currently points at a DEBUG build. **Re-pin r47 to
+b9bd3534** (`/tmp/build-cycle.sh` with a proper message) before publishing.
+New `temp/ffmpeg` (Alpine 8.1.2-r3 + v4l2-m2m-default-timebase.patch, pkgrel 4).
+Its aarch64 build was started 08:03 (log
+`/data/buildcache/pmbootstrap-joan/build-ffmpeg.log`), not yet tested or committed.
+**Bench:** the phone may be in LineageOS or hung after the last icc test. Release r47
+boot.img: skyforge-built 56b9e9e5; the SD /boot holds the DEBUG kernel → reinstall.
+
+### Findings (all measured)
+- **GPU bandwidth hang = DDR downward frequency switch**, not the GPU. icc test client
+  on mas-oxili→slv-ebi with the GPU idle: static 8.1 → 12.4 → 14.4 GB/s ok;
+  toggling 3.3↔14.4 hangs; a **single step 14.4→12.4 hangs**. Upward steps pass. Our
+  msm8998 icc driver is local (7d9b74b7, Aug 4), not upstream; nobody upstream or in
+  pmOS scales a5xx/msm8998 DDR. The adreno placeholder (fast_rate*8 = 5.68 GB/s) is
+  never released in our a5xx_gpu.c, so DDR never drops below ~710 MHz today (a power
+  cost). The earlier GPU lockup with per-OPP votes was this hang plus the unused
+  gfx-l3 path. Next: compare the downward BIMC request sequence with downstream msm_bus
+  / RPM (active vs sleep set, keep_alive, channels=2 rate math), then retry
+  ember/gpu-bw-wip.
+- **Firefox HW decode:** WebRender + WebGL on FD540 OK. V4L2 decode needs
+  `media.hardware-video-decoding.force-enabled`. With FFmpeg 8.1 the DRM-PRIME frame
+  now arrives (Mozilla bug 1852765's old blocker is gone), but pts=NOPTS because
+  Firefox sets no timebase and upstream v4l2_get_timebase divides by 0/1. The RPi
+  FFmpeg fork already falls back to microseconds (`tb.num && tb.den ? tb :
+  v4l2_timebase`); our temp/ffmpeg patch does the same. Then: test Firefox playback
+  (decoder must hold /dev/video* for the whole clip) and decide on a device pref for
+  force-enabled.
+- **Venus encoder via GStreamer** (v4l2h264enc) asserts the firmware mid-stream
+  (vbuffer.c:1219) → failed recovery → SoC reset. Lower its GStreamer rank in the
+  device package until fixed. Venus firmware-crash recovery resets the SoC (separate bug).
+- **CPU:** done (see the earlier sections). GPU = FD540 GLES 3.1, no Vulkan, glmark2 119.
+- Research sources: Mozilla bugs 1852765 and 1852560; jc-kynesim/rpi-ffmpeg
+  v4l2_buffers.c; msm8939 Venus RFC (uses HW_CTRL, msm8998 needs HW_CTRL_TRIGGER).
