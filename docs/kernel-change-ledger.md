@@ -7752,3 +7752,48 @@ Date: 2026-08-07
 
 Assisted-by: Claude-Code:Claude Opus 5.5
 Date: 2026-09-24
+
+## Venus works on msm8998 + boot-log sweep (2026-10-06, bench-validated)
+
+- Handle: `linux-lg-v30-joan` branch `joan/latest-clean-test-merged` (local,
+  skyforge), on top of `01fd102a` (last pushed, `origin/joan/latest-clean-test`):
+  - `896747fa` clk: qcom: mmcc-msm8998: video subcore gdscs are HW_CTRL_TRIGGER
+    (Giuseppe Maggio; cherry-pick of porthole `8ee9762c`)
+  - `d933643a`..`b4119158` five reverts of the 2026-10-05 DEBUG print commits
+  - `7474d148` media: venus: drop the msm8998 bring-up bisect knobs
+  - `13bca0d0` arm64: dts: qcom: msm8998: vote the bus for the video codec
+    (Giuseppe Maggio; cherry-pick of porthole `a8a62bb6`)
+  - `be74d03d` Input: stmfts - warn only on defined error types
+  - `f59a1b9b` drm/msm: mark the fbdev framebuffer as system memory
+- Class: `upstream-candidate`. The two Giuseppe commits are his porthole
+  series (https://github.com/porthole-dev/pmaports, kernel
+  linux-postmarketos-qcom-msm8998-7.2). The 2026-10-05 fold-in (`68ba44d0`)
+  copied only `venus/`, so these `drivers/clk` and `dts` commits never landed.
+- Root cause of the 10-05 `core_power -EBUSY`: subcore GDSCs were `HW_CTRL`, so
+  `gdsc_enable()` handed them to hardware at power-on and `video_subcore0_clk`
+  read "stuck at 'off'". LG downstream `msm8998.dtsi` marks
+  `gdsc_venus_core0/1` `qcom,support-hw-trigger` (software on, then clocks, then
+  hardware mode). `HW_CTRL_TRIGGER` is the mainline form. Re-derived
+  independently from the downstream DT, then found to match Giuseppe's commit
+  byte for byte. His commit is the one kept.
+- Verification (US998, armed `fastboot boot` RAM-boot, kernel #47 built 07:51 UTC):
+  H.264 640x480 decode of an ffmpeg testsrc2 clip: 57 frames byte-identical
+  (`cmp`) to ffmpeg's software decode. H.264 encode: valid stream (ffprobe 26
+  frames, avg luma PSNR 31.7 dB). Venus interconnect votes visible in
+  `interconnect_summary` (mas-venus, slv-cnoc-mnoc-mmss-cfg). All remaining
+  module params at defaults.
+- Known gaps: (1) `/dev/videoN` order changes between boots (pick nodes by
+  name). (2) An 8 KiB bitstream buffer (OUTPUT format set without a resolution)
+  lets the firmware read 0x84 B past the end, which gives an SMMU fault, then a
+  firmware exception, then recovery failing 5 times, then a SoC reset. Real
+  clients set the resolution. Still open: a minimum compressed-buffer floor and
+  making recovery not take the SoC down. (3) Encoder EOS drain gives HFI
+  0x1006/0x1004 (non-fatal; the last 4 frames are lost).
+- Boot-log sweep: err+warn lines 127 → 46. stmfts type 0xba is a
+  firmware debug message per LG `touch_ftm4.c`, now dev_dbg. msm fbdev lacked
+  FBINFO_VIRTFB. Triaged harmless and documented in
+  `docs/ember-2026-10-06-venus-and-boot-log.md`.
+- Public/PR disposition: unpushed; push needs Lance's approval.
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-06
