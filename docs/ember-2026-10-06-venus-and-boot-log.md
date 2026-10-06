@@ -194,3 +194,29 @@ did not reproduce in 10+ min of idle plus the same tests under a live `dmesg
 -w` stream, and pstore was empty. The charger OV trip happened on the next
 boot but only stops charging. Keep a live stream running on bench sessions
 until it recurs.
+
+### FM audio (slim2): where it stands and the next bench plan (needs Lance present)
+The FM tuner works (`radio-qca-fm`). FM **audio** needs the second SLIMbus
+NGD engine (`slim2` @ 0x17240000, cell-index 3, ADSP instance 1) for the
+WCN3990 `slim217,220` device and the SLIMBUS_8_TX "FM Capture" backend.
+- History (Fulgor 10-02/03): with the downstream-correct NGD base (odd
+  instance → +0x1000, `89e91627`), enabling slim2 **hard-hangs the SoC ~10 s
+  into boot, with no watchdog recovery**. The phone stays off until someone
+  power-holds it. The old wrong base pointed at an unused window and only
+  "worked" because it touched nothing real.
+- Desk comparison 2026-10-06: mainline `qcom_slim_ngd_power_up()` matches
+  downstream `ngd_slim_power_up()` step for step (wait for QMI, power request
+  ACTIVE, read the version at base, then NGD_STATUS). Downstream gives slim_qca
+  **no clocks or power domains** (ADSP-managed via QMI), same as mainline. So
+  the hang is not in the power-up ordering itself.
+- Remaining suspects, in test order:
+  1. `slimbam2` (BAM @ 0x17204000, controlled-remotely): channel setup writes
+     BAM registers when the NGD enables DMA. Downstream maps BAM as a second reg
+     range of the same NGD device and never runs a separate bam_dma probe.
+  2. The QMI power ACK for instance 1 is honoured late: add a delay/poll of a
+     harmless register via the *first* engine's view before the first slim2 MMIO.
+  3. The per-engine PDR name (`appsngd%d`) vs the shared audio PD.
+- Safe method: `CONFIG_SLIM_QCOM_NGD_CTRL=m` and gate slim2 with a module
+  parameter (default off), so that each stage can be armed after boot with a
+  live `dmesg -w` stream to nest. **Only with Lance at the phone**, since a hang
+  needs a power-hold.
