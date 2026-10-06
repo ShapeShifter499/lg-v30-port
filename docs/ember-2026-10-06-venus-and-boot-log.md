@@ -247,3 +247,59 @@ T-Mobile, home, packet attached, SMS storage supported, voice not emergency-only
   with 480 so callers reach voicemail. Offline-tested; live incoming call untested.
 - **SMS:** untested. It may work over SGs without IMS; it needs a test message from
   Lance (sending is outward-facing, so not done unattended).
+
+## CPU / GPU / hardware acceleration pass (2026-10-06 05:00-07:15)
+
+### CPU — gold 2457.6 MHz single-core rows: DONE (`56b9e9e5`, bench-verified)
+LG's bin-2/3 gold table has five 1-core rows sharing their 4-core twin's corner
+(2265.6/2342.4/2419.2/2438.4/2457.6). No mainline msm8998 device ever ran them; the
+OSM/CPRh lineage wrote core count 4 and used row = corner. Getting there exposed three
+bugs that bit in sequence, each found on the bench:
+1. the APM/MEM-ACC sequencer crossovers were written as **row** counts (vendor
+   clock-osm.c uses the **corner** count; LG CPRh dump: 30 corners + APM 31 + MEM-ACC
+   32). Rows ≠ corners crashed or hard-hung early boot;
+2. the LUT read-back ended the table on two equal frequencies (the comment said
+   "same core counts"), which cut the table at 2265.6 MHz;
+3. `dev_pm_opp_add()` of a dynamic OPP on a table with required-opps oopses in
+   `_required_opps_available()` (NULL required_opps[0]), which hard-hung boot. The fix
+   uses a real turbo-mode DT OPP after its twin (CPR maps a corner to the first OPP
+   requiring it).
+schedutil never targets cpufreq "boost" entries (capacity_freq_ref is taken before
+boost is applied), so 2457.6 is offered as the top regular frequency, as LG does.
+Measured (OSM operating point sampled from a silver core): 1 task → 2457 MHz @ 1136 mV
+(55 s soak, 39 °C after); 4 tasks → 1.9-2.0 GHz (LMh); silver 1 task → 1900 MHz.
+Corner 28-30 voltage = 1136 mV = LG's CPR ceiling. The skin ladder (37 °C) throttles
+gold under bench heat plus charging, by design.
+
+### GPU — Adreno 540: working, one bandwidth limitation open
+- freedreno FD540, Mesa 26.2.4, **OpenGL ES 3.1 / GL 3.1**. **No Vulkan:** turnip
+  supports a6xx/a7xx only, so vkmark and Vulkan apps won't run on the a540.
+- 257-710 MHz devfreq (simple_ondemand); 710 MHz = LG v2 max.
+- glmark2-es2-drm @ 1440x2880: **score 119**, GPU at 710 MHz for 84% of samples.
+  Weakest scenes are memory-heavy (refract 11, terrain 19, desktop-blur 45 FPS).
+- **Open:** the GPU's only DDR vote is the fixed adreno placeholder `fast_rate*8` =
+  5.68 GB/s; LG votes per level up to 14.43 GB/s (bus index 12). Adding LG's
+  `opp-peak-kBps` (in the joan GPU OPP override; msm8998.dtsi's table is replaced
+  there) made the **first GPU submit lock up** (hangcheck, fence 0/1) and the SoC
+  reset. Suspect: high BIMC/DDR votes through our locally patched msm8998 icc BIMC
+  QoS (mas-oxili, bypass, qport 1). Not shipped. Next: bisect the vote level with
+  CONFIG_INTERCONNECT_DEBUG's test client, compare BIMC QoS with downstream.
+
+### Hardware acceleration in apps
+- **Firefox 154** (installed for the test, not yet a default dependency): about:support
+  via Marionette `Troubleshoot.snapshot()` under a GPU-backed headless sway:
+  **WebRender (hardware), WebGL1/2 = "freedreno -- FD540", accelerated Canvas2D,
+  DMABUF**, no failures. Codec table: H264/VP8/VP9/HEVC = SWDEC+HWDEC, AV1 SW only
+  (it matches Venus). Firefox's v4l2test finds the Venus decoder.
+- **Firefox HW video decode: not working yet.** It is off by default on Linux for
+  non-allowlisted drivers. With `media.hardware-video-decoding.force-enabled=true` it
+  initialises the V4L2-DRM FFmpeg decoder (h264_v4l2m2m), gets one frame with
+  pts=AV_NOPTS_VALUE, then flushes and falls back to software. The FFmpeg CLI decodes
+  the same file through h264_v4l2m2m with correct pts, so the suspect is Firefox's
+  timebase setup for the V4L2 path. Needs a Firefox source dive.
+- **GStreamer (Showtime, the default video player):** v4l2h264dec decodes 593/600
+  frames of a 720p clip on Venus, then **EOS fails**: firmware session error 0x1001
+  with the placeholder EOS address 0xdeadb000. A NULL EOS address (the SM8250 quirk)
+  makes this firmware assert (`vbuffer.c:1219`, VIDEO.VE.4.4-00058) and reset the
+  SoC. Encoder drain has the same problem. Fix design: EOS on a real, mapped,
+  zero-length buffer, as LG's msm_vidc does. Not yet done.
