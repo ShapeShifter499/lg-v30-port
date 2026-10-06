@@ -58,3 +58,11 @@ ledger entries dated 2026-10-06. Journal: nest `~/.hermes/journal/joan-pmos-main
 4. DP alt-mode (qmp-usbc "configured for USB, cannot enable DP"), camera pipeline,
    per-model DTBs (Lance decision: wifi calibration variant + H932 model string).
 5. Open mystery: one unexplained reset into Lineage ~02:15 (not reproduced).
+
+### The 02:15 reset was not the TV-tuner probe (timeline)
+02:13 final r47 RAM boot plus check set, all passing. Tuner research then ran on
+skyforge only (LG DT/defconfig greps, nothing on the phone). ~02:16 the first
+phone-side tuner command (read-only GPIO/regulator) found the phone already reset
+into LineageOS. The only active tuner test (LDO28 at 1.8 V) was at 02:30 on a later
+boot, and the phone stayed up through it. The cause is still unknown and was not
+reproduced (10+ min idle plus the same tests under a live dmesg stream).
