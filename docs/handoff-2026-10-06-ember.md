@@ -108,3 +108,15 @@ boot.img: skyforge-built 56b9e9e5; the SD /boot holds the DEBUG kernel → reins
 - **CPU:** done (see the earlier sections). GPU = FD540 GLES 3.1, no Vulkan, glmark2 119.
 - Research sources: Mozilla bugs 1852765 and 1852560; jc-kynesim/rpi-ffmpeg
   v4l2_buffers.c; msm8939 Venus RFC (uses HW_CTRL, msm8998 needs HW_CTRL_TRIGGER).
+
+### Banked state (08:35, supersedes the "drop/re-pin" notes above)
+- Kernel `joan/latest-clean-test-merged` reset to **b9bd3534** (shippable). The debug
+  commit is kept as local tag `ember/icc-debugfs-client-20261006`.
+- pmaports `aa10320088` pins linux-lg-joan r47 to b9bd3534 (distfile staged, sha512
+  set; **not built yet**: run `pmbootstrap build linux-lg-joan --force`). The debug
+  pin commits db6834cbfa..c3a453d428 should be squashed before pushing.
+- `temp/ffmpeg/` stays **uncommitted**. The timebase patch applies cleanly, but
+  configure fails with `SvtAv1Enc >= 0.9.0 not found using pkg-config` (a build
+  dependency problem, not the patch). Next: check the svt-av1-dev version and .pc
+  name in the aarch64 buildroot, or drop `--enable-libsvtav1` for this override.
+- Nothing pushed. Push and squash need Lance's approval (Deck #190).
