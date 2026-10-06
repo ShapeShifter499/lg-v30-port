@@ -74,3 +74,13 @@ first: list PDC configs (`qmicli --pdc-list-configs`) and compare with LG's
 
 ## Safety rules carried forward
 - Never auto-answer (r5). Never dial without Lance. Identity values never logged.
+
+### PDC read-only result (2026-10-06 04:30)
+`qmicli --pdc-list-configs=software` lists 7 MCFG configs: **TMO (Active, 21808 B,
+v0x8010510)**, Commercial-US_Cellular ×2, **hVoLTE-Verizon ×2 (53076/53204 B)**,
+CCA, ATT. The active TMO config is small next to the hVoLTE ones, consistent
+with LG's AP-IMS design on T-Mobile. Even with TMO active, no IMSA/IMSS service
+exists. The next read-only step is to diff what each MBN sets (pull them through
+the PDC `get-config-info` / EFS, or from LG's `mcfg_sw` in the KDZ) for the IMS
+enable items. Activating a different config on a T-Mobile SIM changes radio and
+carrier behaviour, so it needs Lance.
