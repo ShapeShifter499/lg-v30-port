@@ -220,3 +220,13 @@ WCN3990 `slim217,220` device and the SLIMBUS_8_TX "FM Capture" backend.
   parameter (default off), so that each stage can be armed after boot with a
   live `dmesg -w` stream to nest. **Only with Lance at the phone**, since a hang
   needs a power-hold.
+
+### Fresh default install from pmaports — PASS (2026-10-06 03:50, Lance-approved)
+`pmbootstrap install --sector-size 512` from this pmaports tree (linux-lg-joan r47 =
+`75307f90`, device-lg-joan r22, Phosh), written to the bench microSD from LineageOS
+(`adb exec-in dd`, then read back; the tail-2 KiB drop was caught and fixed, so the card
+md5 equals the image). RAM-booted that install's own boot.img. Result: root grown to
+182.9 GB, system `running`, no failed units, Phosh up, **cellular data connected with
+no manual setup**, Venus decode bit-exact, FM receiver + sound card + modem present,
+neard D-Bus activation works. Wi-Fi needed only its credentials. Not tested here:
+calls/SMS, camera (not working yet), FM audio (slim2), USB-C display.
