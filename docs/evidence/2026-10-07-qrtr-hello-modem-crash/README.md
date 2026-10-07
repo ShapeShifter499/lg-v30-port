@@ -50,3 +50,11 @@ tested-safe state.
   streams (CAMSS waits on every endpoint, so a disabled sensor node would break
   the rear camera).
 - Upstream report candidate: 544d85de4dc2 regresses MSM8998 MPSS (post 7.2-rc2).
+
+## r60 reboot loop (2026-10-07 14:05-14:17)
+
+Six hands-free RAM boots of r60 (tools/bench/ramboot.sh, armed send), checked at
+~92 s uptime each: 6/6 sound card present, 58 QRTR services, 0 modem crashes,
+ModemManager modem present, 0 failed units. Dropping 544d85de4dc2 does not
+bring back the ADSP sound-card race that the backport set was meant to fix (in
+this sample).
