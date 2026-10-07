@@ -19,7 +19,7 @@ log() { echo "$(date +%T) $*"; }
 
 # 1. ARM the send: fastboot boot parks on "waiting for device".
 sudo fastboot devices | grep -q . && { log "phone already in fastboot; sending directly"; sudo timeout 90 fastboot boot "$IMG" 2>&1 | sed 's/^/    /'; exit 0; }
-sudo nohup timeout 120 fastboot boot "$IMG" > /tmp/fb-armed.log 2>&1 &
+sudo nohup timeout 420 fastboot boot "$IMG" > /tmp/fb-armed.log 2>&1 &
 ARMED=$!
 log "armed: fastboot boot waiting for device (pid $ARMED)"
 
@@ -37,7 +37,7 @@ fi
 [ $triggered = 1 ] || { log "no pmOS/adb path to reboot; kill the armed send"; sudo kill $ARMED 2>/dev/null; exit 2; }
 
 # 3. Wait for the armed send to complete (it fires on enumeration).
-end=$((SECONDS+120)); ok=0
+end=$((SECONDS+420)); ok=0
 while [ $SECONDS -lt $end ]; do
   if grep -q "Finished" /tmp/fb-armed.log 2>/dev/null && ! grep -qi "fail" /tmp/fb-armed.log 2>/dev/null; then ok=1; break; fi
   grep -qi "error\|FAILED" /tmp/fb-armed.log 2>/dev/null && break
