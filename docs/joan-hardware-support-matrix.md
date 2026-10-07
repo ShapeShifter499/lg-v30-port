@@ -8,9 +8,16 @@ Status: **✅ works** (observed on the phone, source given) · **🟡 partial** 
 Evidence without a path is from `evidence/2026-09-26-r27/` (the r27 default
 install, 2026-09-26, US998).
 
-Last full pass: 2026-09-26 (Ember, Claude-Code:claude-opus-5-5).
+Last full pass: 2026-09-26 (Ember, Claude-Code:claude-opus-5-5). Rows marked
+**(10-07)** were re-measured on 2026-10-06/07 (kernel `b3dc8621`, pmaports
+`linux-lg-joan` r55); details in `ember-2026-10-06-venus-and-boot-log.md` and
+`ember-2026-10-07-osm-bootlog-ipa.md`.
 
-**Default install status (2026-09-26):** `pmbootstrap install --no-split --sector-size 512` from
+**Default install status (2026-10-06):** a fresh `pmbootstrap install --no-split --sector-size 512`
+(r47) written to the bench SD booted to Phosh with 0 failed units, cellular data connected out of
+the box, Venus, FM tuner, sound card and modem present (`docs/handoff-2026-10-06-ember.md`).
+
+**Earlier (2026-09-26):** `pmbootstrap install --no-split --sector-size 512` from
 pmaports-lge-joan → microSD → fastboot RAM boot: sshd in 25 s, systemd `running`, 0 failed
 units. Blockers found and fixed on the way: 4096-byte image on SD (README), root fs
 not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-install/`.
@@ -20,18 +27,18 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
 | CPU silver ×4 | Kryo 280, 300–1900.8 MHz | ✅ | OSM + CPRh DVFS; ~1893 MHz measured at max (`r27-dvfs.txt`). |
-| CPU gold ×4 | Kryo 280, 300–2361.6 MHz | 🟡 | 2357 MHz measured; LMh 1120/1136 mV. Missing: single-core boost rows to 2457.6 MHz; LMh IRQ → cpufreq. |
+| CPU gold ×4 | Kryo 280, 300–2361.6 MHz all-core, 2457.6 MHz single-core | ✅ (10-07) | LG's bin-2 1-core rows in the OSM LUT; one busy core runs 2457.6 MHz, four 2361.6 (the rated max). OSM ACD fix keeps the policy on every boot (8/8), survives cluster hotplug. Gold CPR voltages are still 28–52 mV below LG on the top corners (mainline clamps TURBO_L1 before interpolating). |
 | CPU speed bins | fuse bin 0–3 | 🟡 | Bins 2/3 only. Other bins fail safe (no DVFS, gold at LK's 300 MHz). LG's bin 0/1 tables are available to port. |
-| Scheduler | schedutil, EAS | 🟡 | schedutil is the default (pmOS TuneD `balanced` picks it). No EAS energy model (no `dynamic-power-coefficient`). |
-| GPU | Adreno 540, 257–710 MHz | 🟡 | Works, but r27 hangs under GL load (see GPU row below). |
+| Scheduler | schedutil, EAS | 🟡 | schedutil on both clusters. EAS still off: msm8998.dtsi has capacity-dmips-mhz but no `dynamic-power-coefficient`. LG's `sched-energy-costs` tables (msm8998.dtsi CPU_COST_0/1) give per-OPP power to fit coefficients against the runtime CPRh voltages; bench item. |
+| GPU | Adreno 540, 257–710 MHz | ✅ (10-06) | devfreq 257–710 MHz (= stock max), GLES 3.1, glmark2-es2-drm 119 at 1440×2880. No Vulkan (turnip is a6xx+). DDR stays at the GPU's placeholder vote: a downward DDR step hangs the SoC in our local icc driver, so per-OPP bandwidth is not shipped (power cost only). |
 | GPU voltage | pm8005 S1 | 🟡 | r27 uses one phone's CPR floor. Fixed on `joan/bootlog-fixes`: per-part fused open-loop + MEM-ACC. Not yet booted. |
 | GPU stability | A540 VM / resume | ❌→🟡 | r27: GPU VM at 2^48 → faults, hangcheck, phoc SEGV (Firefox/YouTube). Fixed on the branch by porthole-dev 0030/0031/0168/0176. Not yet booted. |
 | GPU limiter | A540 GPMU | 🟡 | Branch: GPMU throttling on, 5-level table (porthole 0251). Not yet booted. |
-| Video codec | Venus (msm8998) | ❌→🟡 | Driver supports it; firmware now in firmware-lge-joan r9; DT enabled on the branch. Not yet booted. |
-| Thermal (junction) | tsens | ✅/🟡 | Zones and cpufreq/GPU cooling work. Branch moves CPU trips 75→85 °C, GPU 80→85 °C (LG stock). |
-| Thermal (skin) | xo_therm, bd_therm_2 (VTS) | ❌→🟡 | Branch: weighted-adc-thermal VTS + LG's skin caps. Not yet booted. |
+| Video codec | Venus (msm8998) | ✅ decode / 🟡 encode (10-06) | H.264/VP9 decode on Venus in GStreamer, FFmpeg (`h264_v4l2m2m`) and Firefox 154 (with the `ffmpeg` override package); 1080p30 at 0.14 core. Encoder asserts the firmware mid-stream, so GStreamer's v4l2h264enc is demoted. HEVC/VP8 untested. |
+| Thermal (junction) | tsens | ✅ (10-06) | Core zones passive 85 °C → their cluster, critical 110 °C; GPU 85 °C → GPU devfreq; DRAM (pop_mem) 85/65 °C → gold (LG SS-POPMEM); LMh reliability algorithm on. |
+| Thermal (skin) | xo_therm, bd_therm_2 (VTS) | ✅ (10-07) | weighted-adc VTS `skin-thermal` with LG's ladder (37–46 °C → GPU + both clusters) and LG CHG_MONITOR charge steps. LG's charger-attached thermistor offset is not carried over. |
 | Battery / fuel gauge | PMI8998 | ✅ | `qcom-battery`, capacity reported. |
-| Wired charging | PMI8998 + BQ25898S parallel | ✅ | `pmi8998-charger` charging. Skin-based charge current (LG: 1.5/0.8/0.6 A) needs `CHARGE_CONTROL_LIMIT` in the drivers. |
+| Wired charging | PMI8998 + BQ25898S parallel | ✅ (10-07) | Charging; float voltage 4395 mV (was 4402.5, tripped battery OV). Charge current follows LG's skin steps 2.6/1.5/0.8/0.6 A at 10/40/42/45 °C through the `pmi8998-charger-fcc` cooling device (bound; state 1 at 31 °C). Current at each state not yet measured. msoc-full now reported. |
 | Wireless charging | IDT P9223 → PMI8998 DC-IN | ❓ | No P9223 driver in mainline; DC-IN handling needs a Qi-pad test. |
 | Storage | UFS 2.1 | 🟡 | Works at ~82 MB/s; stock is about 4× faster (second limiter not yet found). |
 | microSD | SDHC | ✅ | pmOS root. |
@@ -43,7 +50,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 |---|---|---|---|
 | Panel | LG SW43402, 1440×2880 DSC cmd | ✅ | Branch adds porthole 0204 (pageflip at rd_ptr; taimen measured a 30 fps lock without it) and 0210 (encoder lookup; fixes `no encoder found for crtc 0`). |
 | Backlight | DSI | ✅ | |
-| Touch | ST FTS (fts3670) | ✅ | Recurring `stmfts error code 0x00dec000d0ba`; `stmfts_set_power` has no prototype (W=1). |
+| Touch | ST FTS (fts3670) | ✅ | stmfts 0xba wake-status messages at debug level (LG treats them as debug). |
 | Buttons | power, vol ±, headset | ✅ | |
 | DisplayPort alt mode | QMP USB3-DP PHY, DP ctrl, SBU mux (TLMM 100/80) | 🟡 | Paused mid-port. See `handoff-2026-09-25-dp-altmode.md`. |
 | Vibration | Dongwoon DW7800 (I2C 0-0059) | ❌→fix | Driver already in the tree (50f1b6f7ef38); `CONFIG_INPUT_DW7800_HAPTICS` was never enabled. Enabled on the bench config. |
@@ -54,7 +61,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
 | Stack | PipeWire + WirePlumber, UCM `alsa-ucm-conf-lge-joan` | ✅ | `device-lge-joan` depends on them. |
-| Codec | WCD9340 over SLIMbus | 🟡 | Boot log: SLIMbus QMI timeout, `no backend DAIs`. porthole 0076-0104 carry wcd934x/SLIMbus fixes — review first. |
+| Codec | WCD9340 over SLIMbus | ✅/🟡 (10-07) | Works. On 1 of 8 RAM boots the ADSP brought up APR but no QRTR services (no SLIMbus QMI 769), so no sound card; open. |
 | Speaker amp | TFA9872 (bound by tfa989x) | ✅ | |
 | Hi-Fi DAC | ES9218P | 🟡 | Driver bound. Headset detection root cause: ES9218P bypass (see memory/handoff notes). |
 | SoundWire | WCD934x master | ✅ (branch) | No WSA amps on joan. Branch disables the master and restores irq 20 (it was colliding with MBHC). |
@@ -64,10 +71,10 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
-| Modem / data | X16 LTE (MSS) | ✅ | `rmnet_ipa0`. |
+| Modem / data | X16 LTE (MSS) | ✅ | Cellular data auto-connects on a fresh install. A modem restart oopsed in ipa_open (NAPI enabled twice); fix ef74a2f4 is local and not yet booted. |
 | Calls / SMS | ModemManager + joan-imsd VoLTE | 🟡 | VoLTE work in `joan-volte-lineage` / joan-imsd. |
 | GNSS | modem QMI LOC | ❓ | |
-| Wi-Fi | WCN3990 (ath10k_snoc) | 🟡 | Works. SMMU faults on SID 0x1900 at iova 0 at bring-up. `invalid MAC address; choosing random`. firmware-lge-joan r9 adds the proper WCN3990 board data. |
+| Wi-Fi | WCN3990 (ath10k_snoc) | ✅ | Works; stable MAC from bootmac (serialno). Three read faults at IOVA 0 (SID 0x1900) at firmware boot are harmless (LG maps WLAN IOVAs from 0xa0000000 too). Per-model board data needs per-model DTBs (Lance decision). |
 | Bluetooth | WCN3990 (btqca) | 🟡 | Works. Frame reassembly errors (-84). Branch/config adds RFCOMM, BNEP, UHID. |
 | FM radio (RX) | WCN3990 FM block, over the BT UART (H4 0x11/0x14) + BT-FM SLIMbus audio | 🟡 | **V4L2 driver done 2026-09-26** (`/dev/radio0`, `radio-qca-fm`, kernel 621a3778bf10 + hci_qca 4a04a4310739): tune 76-108 MHz, seek, signal/stereo, mute, de-emphasis, RDS raw blocks (rds-ctl decodes PI/PTY/PS); v4l2-compliance clean. Headphone cable is the antenna (15 stations with it, 1 marginal without). Needs Bluetooth on. `evidence/2026-09-26-fm-radio-driver/`. Audio path IMPLEMENTED 2026-10-02 (branch joan/btfm-fm-audio): SLIMBUS_7/8 AFE ports (0x400e/0f/0x4011), second msm8998 NGD engine (0x17240000 + BAM 0x17204000), WCN399x btfm-slim codec (FM TX group on PGD ports 1+2, channels 159/160, IFD port regs at 0x800), sdm845 machine BE "FM Capture". Pmaports pkgrel 32 pin ddfaf16673ec CONFIG_SND_SOC_BTFM_SLIM=m. Bench test pending: FM audio route FM TX -> SLIMBUS_8_TX -> ADSP. Still missing: userspace app. Deck #163. |
 | FM transmit | — | ❌ (firmware) | Probed 2026-09-26: the transmit command group (OGF 0x14) gets no response while receiver commands on the same link do, so the V30's FM firmware does not offer transmit. No upstream or LG/Qualcomm driver drives FM TX on this chip either. |
@@ -94,9 +101,9 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | SMS | chatty | phosh default |
 | Sound panel | phosh quick settings + pwvucontrol (per-app) | ✅ default since device-lge-joan r17 |
 | Voice recorder | gnome-sound-recorder | ✅ default since device-lge-joan r17 |
-| Camera | Snapshot (phosh default, libcamera) | 🟡 libcamera captures from the IMX351; Snapshot on screen not tried yet |
-| FM tuner | none yet (kernel `/dev/radio0` ready; CLI: `v4l2-ctl`, `rds-ctl`) | 🟡 no audio path and no GUI app in Alpine known yet |
-| NFC | neard daemon (enabled by preset); no GUI tag app in Alpine yet | 🟡 |
+| Camera | Snapshot (phosh default, libcamera) | 🟡 libcamera captures from the IMX351; Snapshot on screen not tried yet (needs Lance) |
+| FM tuner | none (kernel `/dev/radio0`; CLI `v4l2-ctl`, `rds-ctl`) | 🟡 tuner works; audio needs the slim2 NGD, which hard-hangs the SoC — bench only with Lance present |
+| NFC | nfc-tags (GTK4, ours) + neard, D-Bus activated (device-lg-joan r22/r23) | 🟡 adapter, poll loop and UI tested; physical tag read/write untested |
 | Flashlight | phosh torch toggle | ✅ (flash LED present) |
 
 ## Kernel config (pmaports `linux-lge-joan`)
