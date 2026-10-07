@@ -7846,3 +7846,18 @@ Date: 2026-10-06
 
 Assisted-by: Claude-Code:claude-opus-5-5
 Date: 2026-10-07
+
+## IPA: no BUG on interface down/up, data survives a modem restart (2026-10-07)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test` b3dc8621 → `ee468f34`:
+  `ef74a2f4` net: ipa: disable NAPI when a channel stop fails; `64e28e86` net: ipa:
+  close an open aggregation frame before stopping an RX channel; `ee468f34` net: ipa:
+  finish a pending stop before starting a GSI channel. pmaports r56, r57.
+- Class: `upstream-candidate` (all three; mainline has the same code).
+- Evidence: US998 r56/r57, Wi-Fi off: down/up → data back, 0 BUG; WWAN off/on → data;
+  modem remoteproc restart → data back without reboot (r57). Before ef74a2f4: kernel
+  BUG at net/core/dev.c (napi_enable) in ipa_open, RTNL held, phone wedged.
+- Public/PR disposition: pushed 2026-10-07.
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-07

@@ -27,7 +27,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
 | CPU silver ×4 | Kryo 280, 300–1900.8 MHz | ✅ | OSM + CPRh DVFS; ~1893 MHz measured at max (`r27-dvfs.txt`). |
-| CPU gold ×4 | Kryo 280, 300–2361.6 MHz all-core, 2457.6 MHz single-core | ✅ (10-07) | LG's bin-2 1-core rows in the OSM LUT; one busy core runs 2457.6 MHz, four 2361.6 (the rated max). OSM ACD fix keeps the policy on every boot (8/8), survives cluster hotplug. Gold CPR voltages are still 28–52 mV below LG on the top corners (mainline clamps TURBO_L1 before interpolating). |
+| CPU gold ×4 | Kryo 280, 300–2361.6 MHz all-core, 2457.6 MHz single-core | ✅ (10-07) | LG's bin-2 1-core rows in the OSM LUT; one busy core runs 2457.6 MHz, four 2361.6 (the rated max). OSM ACD fix keeps the policy on every boot (8/8), survives cluster hotplug. Gold CPR voltages match LG since 8d7f34b0 (interpolate from unclamped fuses; `fulgor-2026-09-26-gold-cpr-fix.md`). |
 | CPU speed bins | fuse bin 0–3 | 🟡 | Bins 2/3 only. Other bins fail safe (no DVFS, gold at LK's 300 MHz). LG's bin 0/1 tables are available to port. |
 | Scheduler | schedutil, EAS | 🟡 | schedutil on both clusters. EAS still off: msm8998.dtsi has capacity-dmips-mhz but no `dynamic-power-coefficient`. LG's `sched-energy-costs` tables (msm8998.dtsi CPU_COST_0/1) give per-OPP power to fit coefficients against the runtime CPRh voltages; bench item. |
 | GPU | Adreno 540, 257–710 MHz | ✅ (10-06) | devfreq 257–710 MHz (= stock max), GLES 3.1, glmark2-es2-drm 119 at 1440×2880. No Vulkan (turnip is a6xx+). DDR stays at the GPU's placeholder vote: a downward DDR step hangs the SoC in our local icc driver, so per-OPP bandwidth is not shipped (power cost only). |
@@ -71,7 +71,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 
 | Block | Part | Status | Notes / next |
 |---|---|---|---|
-| Modem / data | X16 LTE (MSS) | ✅ | Cellular data auto-connects on a fresh install. A modem restart oopsed in ipa_open (NAPI enabled twice); fix ef74a2f4 is local and not yet booted. |
+| Modem / data | X16 LTE (MSS) | ✅ | Cellular data auto-connects on a fresh install. Survives `rmnet_ipa0` down/up, airplane mode and a modem restart without a reboot (r57: ef74a2f4 no NAPI BUG, 64e28e86 close aggregation before RX stop, ee468f34 finish a pending stop before start). |
 | Calls / SMS | ModemManager + joan-imsd VoLTE | 🟡 | VoLTE work in `joan-volte-lineage` / joan-imsd. |
 | GNSS | modem QMI LOC | ❓ | |
 | Wi-Fi | WCN3990 (ath10k_snoc) | ✅ | Works; stable MAC from bootmac (serialno). Three read faults at IOVA 0 (SID 0x1900) at firmware boot are harmless (LG maps WLAN IOVAs from 0xa0000000 too). Per-model board data needs per-model DTBs (Lance decision). |

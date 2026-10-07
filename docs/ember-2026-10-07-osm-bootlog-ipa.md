@@ -90,3 +90,26 @@ then decide between a root-cause fix and an ADSP restart when 769 never appears.
   (176 KB headroom). Watch kernel/initramfs growth.
 - `systemctl reboot -ff --reboot-argument=bootloader` did not get through after the
   RTNL-held oops (sshd was already unresponsive).
+
+## Addendum 05:20 — IPA modem-restart recovery verified, CPU recheck, banked
+
+- **r56 (ef74a2f4)**: modem restart → no BUG, phone usable. `rmnet_ipa0` down/up with
+  the modem *running* also times out the RX (channel 8) stop — so on every earlier
+  kernel a plain interface down/up could BUG with RTNL held. The stop completes by
+  itself a moment later.
+- **r57 (64e28e86 + ee468f34)**: force-close an open aggregation frame before an RX
+  stop (helps on some runs, not all), and finish a pending stop before START.
+  Modem restart → NetworkManager re-establishes data (qmapmux1.0), pings answer, no
+  reboot. down/up → data back at once. Measuring trap: with Wi-Fi up, cellular routes
+  live in table 1430 and `ping -I qmapmux0.0` fails; switch Wi-Fi off and wait 15-20 s.
+- Pushed: kernel `joan/latest-clean-test` → ee468f34; pmaports r56 (ec61d46416),
+  r57 (3382c88650).
+- **CPU recheck**: the gold CPR deficit noted 09-26 was already fixed by 8d7f34b0
+  (my memory note was stale and I had copied it into the matrix; corrected).
+  Still open: EAS — the CPU OPPs carry no voltage (CPRh owns them), so
+  `dev_pm_opp_of_register_em()` registers nothing; the OSM driver needs its own
+  `em_dev_register_perf_domain()` with the LUT voltages, plus coefficients fitted to
+  LG's `sched-energy-costs` (msm8998.dtsi CPU_COST_0/1). Speed bins 0/1 are refused
+  on purpose (no tables); LG's tables exist to port.
+- Cameras (Lance asked): only the rear IMX351 (+ BU24235 AF) is bound. HI553 front
+  has a driver on `joan/hi553-front-camera-v2` (never booted); S5K3M3 wide has none.

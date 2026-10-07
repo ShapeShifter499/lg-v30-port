@@ -49,3 +49,20 @@ once the battery is below full.
 9. **Decision**: per-model DTBs (correct H932/H930 model string + Wi-Fi calibration
    variant) — one DTB today says "US998" on every model.
 10. **H932**: if you have one at hand, the r55 image on it (laf boot from the SD).
+
+## Banked 05:20 (after the power cycle)
+
+- Phone: running r57 (`#58-lg-joan`) RAM-booted; SD /boot holds r57.
+- IPA: fixed and pushed (r56, r57) — see the findings addendum.
+- Uncommitted in skyforge pmaports working tree: `device/testing/fm-radio/` and the
+  `nfc-tags` r1 icon change (built: nest `~/joan-images/apps/`). Not yet run on the
+  phone. Commit after an on-device run.
+- **Next, in Lance's order:**
+  1. CPU: EAS energy model in qcom-cpufreq-osm (LUT voltages + coefficients fitted to
+     LG's cost tables); then LG bin 0/1 tables so other users' units get DVFS.
+  2. Tethering from cellular: Wi-Fi hotspot + USB tethering; test clients with a
+     temporary network on a spare Wi-Fi chip of skyforge or nest, never touching
+     their LAN links.
+  3. Cameras, full bring-up: boot the HI553 front driver (joan/hi553-front-camera-v2,
+     Fulgor 10-02), write the S5K3M3 wide driver from libmmcamera_s5k3m3.so tables,
+     then Snapshot on screen (needs Lance) for all three.
