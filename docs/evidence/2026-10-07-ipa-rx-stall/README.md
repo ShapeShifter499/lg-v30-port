@@ -38,3 +38,23 @@ no recovery. Once also on r57 (12:59). Earlier the same day several boots had wo
 Instrumented ipa.ko (it is a module; SD /lib/modules swap + reboot): log RX/TX endpoint and GSI
 channel state, aggregation state and the 9 TX drops (where and why) at ipa_open, ipa_modem_start
 and first traffic; compare a stalled boot, a good boot and a post-restart session.
+
+## Later the same day (16:15-17:00): instrumented ipa.ko and two disproven hypotheses
+
+Instrumented ipa.ko (branch joan/debug-ipa-rx-stall 179f3332dda0, bench only):
+- The 9 TX drops per boot are IPv6 packets (proto 0x86dd) sent directly on rmnet_ipa0, which
+  only takes QMAP frames: rmnet_ipa0's own IPv6 housekeeping. Benign.
+- Boot order is identical on stalled and good boots: modem running ~16.5 s, QMI ready
+  (modem_ready, uc_ready, initial_boot=1) -> ipa_modem_start ~16.8 s, ipa_open ~30.1 s.
+  On stalled boots 3-17 downlink packets arrive right after ipa_open, then none.
+- The "ipa" interrupt fires 2-3 times per boot.
+
+| hypothesis | test | result |
+|---|---|---|
+| IPA IRQ (SPI 333) should be level, not edge (downstream uses type 0) | DTB with IRQ_TYPE_LEVEL_HIGH, 4 boots | 3/4 stalled; IRQ still 2-3 per boot. Disproven. |
+| runtime suspend loses the wake | udev power/control=on from boot, 4 boots | 3/4 ok, 0 suspends on all, but boot 1 stalled with IPA never suspended. Not the cause (maybe a contributor). |
+
+Root cause still open. Untested next ideas: the modem-side QMI exchange on first boot vs after
+restart (the restart path also flushes/resets the modem filter/route tables and zeroes modem
+memory before the next start); compare the IPA QMI init_modem_driver request contents between
+first boot and post-restart.
