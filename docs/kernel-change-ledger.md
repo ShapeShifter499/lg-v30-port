@@ -7820,3 +7820,29 @@ Date: 2026-10-06
 
 Assisted-by: Claude-Code:claude-opus-5-5
 Date: 2026-10-06
+
+## OSM dropout, boot-log pass, charge throttling, IPA SSR (2026-10-07)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test` pushed 01fd102a → `b3dc8621`:
+  `1c6b4ecf` cpufreq: qcom-osm: keep gold DVFS when the ACD transfer is slow;
+  `1f1ac5f1` drm/msm/adreno: create the GPU debugfs files once; `c70c6206`,
+  `b641fd48`, `df05b214`, `b3dc8621` pmi8998_fg msoc-full (mask, binding, dtsi,
+  handler); `67d14598` slimbus NGD early QMI wait at debug level; `41f97fc7`
+  qcom_smbx charge-current cooling device + LG CHG_MONITOR trips (the 10-03
+  `joan/charge-thermal` commit, first boot). Local only, not booted:
+  `ef74a2f4` net: ipa: disable NAPI when a channel stop fails.
+- pmaports `joan/readme-build-guide`: 57 local commits rebuilt as 9 (tree-identical
+  apart from the pin); `linux-lg-joan` r55 → b3dc8621. GitHub's archive of b3dc8621
+  is byte-identical to the local `git archive` (sha512 e302ceb8…).
+- Class: `upstream-candidate`: 1f1ac5f1 (adreno debugfs), ef74a2f4 (IPA NAPI) after
+  bench. Board/local: the rest.
+- Evidence: 8 RAM boots of b3dc8621 (policies=2, osm_err=0, gold 2457.6 MHz single
+  task, hotplug cycle OK, FCC cdev bound at state 1 / 31 °C skin). One of the 8
+  had no ADSP QRTR services → no sound card (open). Modem restart → kernel BUG in
+  ipa_open (fixed by ef74a2f4, unverified). Details:
+  `docs/ember-2026-10-07-osm-bootlog-ipa.md`.
+- Public/PR disposition: kernel and pmaports pushed 2026-10-07 per Lance's goal
+  ("repositories ... updated with all found fixes").
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-07
