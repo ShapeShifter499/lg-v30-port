@@ -58,3 +58,21 @@ Root cause still open. Untested next ideas: the modem-side QMI exchange on first
 restart (the restart path also flushes/resets the modem filter/route tables and zeroes modem
 memory before the next start); compare the IPA QMI init_modem_driver request contents between
 first boot and post-restart.
+
+## 17:00-18:00: more hypotheses tested
+
+| hypothesis | test | result |
+|---|---|---|
+| RX ring drains (replenish/doorbell batching) | instrumented replenish, 3 boots | identical on stalled and good boots (249 queued at open, 1 per completion). Disproven. |
+| bearer connected too early | autoconnect off, `nmcli con up` at 60 s, 4 boots | 3/4 stalled. Disproven. |
+| my CLAT/DAD userspace (lg-joan-cellular-data 0.2) | downgrade to 0.1-r1, clatd removed, 4 boots | 2/4 stalled. Not mine. |
+| band / carrier aggregation | qmicli rf-band + CA info, 4 boots | stalled and good boots on the same B66 cell. Disproven. |
+| IMS data daemon (81voltd) sharing mux id 1 | 81voltd masked | first boot stalled. Disproven. |
+
+Only consistent correlate: network attach time. Stalled boots attach ("packet service attached")
+at ~28-30 s and open the IPA netdev at ~30-32 s; good boots attach at ~38 s and open at ~40 s
+(11 boots). Forcing a late connect did not help, so the attach-time difference is a symptom of
+modem-side state at attach, not a cause we control from the AP.
+
+Bench note: scripted pmOS reboots dropped the phone off USB three times on 2026-10-07 (no
+fastboot, no LineageOS) until a manual power-cycle.
