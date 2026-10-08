@@ -11,7 +11,7 @@ Detailed day log: nest `~/.zcode/journal/joan-mainline-goal-2026-10-07.md`. Deck
 - **Top blocker for a working default install: boot-time cellular RX stall** (~60-70% of boots the
   bearer connects but downlink stops after a few packets). Root cause NOT found; 9 hypotheses and
   3 workarounds disproven (table below). Only a modem restart restores data, and that kills Wi-Fi.
-- **Pushed 2026-10-07 19:40:** linux-lg-v30-joan `joan/latest-clean-test` = 3f7fcabf (r60 + camss csiN rate). Everything else below is local on nym-skyforge.
+- **Pushed 2026-10-07 ~19:50 (Lance approved):** kernel `joan/latest-clean-test` = 3f7fcabf (r60 + camss); pmaports-lge-joan `joan/readme-build-guide` = 54122b0df1 (r60 pin + CLAT package + nfc-tags; r59 NOT pushed); lg-v30-joan-pmos-packages master = 145a26f (cellular-data + nfc-tags resync); lg-v30-port = this branch. Not pushed on purpose: kernel joan/r59-candidate (qrtr HELLO), joan/debug-ipa-rx-stall, joan/ipa-irq-level. The r58 hi553 prep that sat uncommitted in pmaports-lg-v30-clean is in `git stash` there.
 
 ## Phone / bench state (19:15)
 
