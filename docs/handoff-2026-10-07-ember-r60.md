@@ -11,7 +11,7 @@ Detailed day log: nest `~/.zcode/journal/joan-mainline-goal-2026-10-07.md`. Deck
 - **Top blocker for a working default install: boot-time cellular RX stall** (~60-70% of boots the
   bearer connects but downlink stops after a few packets). Root cause NOT found; 9 hypotheses and
   3 workarounds disproven (table below). Only a modem restart restores data, and that kills Wi-Fi.
-- **Nothing is pushed.** Everything below is local on nym-skyforge.
+- **Pushed 2026-10-07 19:40:** linux-lg-v30-joan `joan/latest-clean-test` = 3f7fcabf (r60 + camss csiN rate). Everything else below is local on nym-skyforge.
 
 ## Phone / bench state (19:15)
 
