@@ -42,3 +42,23 @@ Stock ipa.ko.zst restored (sha256
 `78f647350a68cd14335dd7b1e9cd167633da4d4a083a4b6c60cb12ea0d592c35`).
 Running kernel still has the debug module until the next reboot.
 That reboot was not done. Password files removed.
+
+## Still stuck at 597 s (follow-up, no second write)
+
+Modem state file still `running`. ADSP still `running`. Sound card still
+present. No `JOANDBG ch8 stop`, no `crash-path modem_stop`, no
+`no transaction for hash flush`.
+
+`ipa_table_reset()` returned, so its `gsi_trans_commit_wait()` calls
+completed. The next call is `ipa_table_hash_flush()`, which allocates
+one command transaction and waits in `gsi_trans_commit_wait()`. That
+wait has no timeout. The missing `no transaction for hash flush` line
+means the transaction was allocated. The notifier is blocked in the
+wait, not in the allocator.
+
+ath10k then timed out a WMI scan and failed a hardware restart
+(`failed to send qmi config: -110`, mac80211 warnings at 377 s). That
+is a casualty of the stuck modem stop, not a separate IPA fault.
+Wi-Fi was not associated.
+
+No start, no second stop, no reboot. Stock module remains on disk.
