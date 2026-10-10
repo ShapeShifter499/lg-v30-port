@@ -57,3 +57,20 @@ armed send). Nothing flashed.
   ~/.ember/workspace/joan-camera-tuning-20261009/ (to go into temp/libcamera after a lit check).
 - Autofocus: libcamera 0.7.2/master has no AF for the simple pipeline; patchwork series 5814
   (manual LensPosition) is the starting point.
+
+## Update 2026-10-10 (r2-r4)
+- r2 (c8789cfe): all three cameras stream from the packaged modules (main 2328x1744@30,
+  wide 1040x584@121, front 1280x720@30 and 2560x1920@30).
+- r3 (ccf8b6ba): GPU VDD_MX vote. genpd shows genpd:1:5000000.gpu at 384 while the GPU runs
+  710 MHz under glmark2 (166), 0 when suspended; gpu_gx collapses as before. S9 (MX) reads
+  896 mV with and without the vote.
+- SLPI (fd1e2507, DT only): "remote processor slpi is now up"; QRTR node 9 lists services
+  263, 264, 280, 288, 306 plus 66/43/15. No failed units; modem and ADSP unaffected.
+- Sensors plan (research, not implemented): SMGR generation (not libssc/SEE). Needs a
+  registry server (gitlab.com/msm8996-mainline/sns-reg) and the QRTR-bus + Sensor Manager
+  kernel series (LKML 2025-04, unmerged), then mount matrices from registry keys 700-702 /
+  720-722 / 900-902. Estimated several days plus device sessions.
+- libcamera r7: gain helpers for s5k3m3 (code/32) and hi553 ((code+16)/16), taken from the
+  disassembled LG sensor libraries.
+- FM: the fm-radio app's own classes, run headless as the user: tunes, seeks (88.9 MHz,
+  signal 15728), decodes RDS; no FM capture PCM (expected).

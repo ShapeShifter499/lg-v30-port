@@ -38,7 +38,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | CPU speed bins | fuse bin 0–3 | 🟡 | Bins 2/3 only. Other bins fail safe (no DVFS, gold at LK's 300 MHz). LG's bin 0/1 tables are available to port. |
 | Scheduler | schedutil, EAS | 🟡 | schedutil on both clusters. EAS still off: msm8998.dtsi has capacity-dmips-mhz but no `dynamic-power-coefficient`. LG's `sched-energy-costs` tables (msm8998.dtsi CPU_COST_0/1) give per-OPP power to fit coefficients against the runtime CPRh voltages; bench item. |
 | GPU | Adreno 540, 257–710 MHz | ✅ (10-06) | devfreq 257–710 MHz (= stock max), GLES 3.1, glmark2-es2-drm 119 at 1440×2880. No Vulkan (turnip is a6xx+). DDR stays at the GPU's placeholder vote: a downward DDR step hangs the SoC in our local icc driver, so per-OPP bandwidth is not shipped (power cost only). |
-| GPU voltage | pm8005 S1 (VDD_GFX), pm8998 S9 (VDD_MX) | 🟡 (10-09) | VDD_GFX: fused open-loop + MEM-ACC; regulator max now the stock 1088 mV (27dc01c8c3fb). VDD_MX: Linux casts no MX vote; S9 set-point reads 896 mV idle and at 710 MHz under glmark2 (score 168, stable). Downstream votes MX TURBO at 670/710 MHz; a per-OPP MX vote is being written (branch `joan/a540-mx-vote-v73`). |
+| GPU voltage | pm8005 S1 (VDD_GFX), pm8998 S9 (VDD_MX) | ✅ (10-10) | VDD_GFX: fused open-loop + MEM-ACC; regulator max the stock 1088 mV (27dc01c8). VDD_MX: the GPU now votes MX per OPP like the vendor kernel (SVS ≤414, NOM 515/596, TURBO 670/710; kernel 3eff7f0f/ccf8b6ba): bench shows the GPU's MX device at 384 (TURBO) at 710 MHz and 0 when suspended, GX collapses, glmark2 166, no faults. S9 stays at 896 mV under the vote (other RPM masters already hold MX there). |
 | GPU stability | A540 VM / resume | ❌→🟡 | r27: GPU VM at 2^48 → faults, hangcheck, phoc SEGV (Firefox/YouTube). Fixed on the branch by porthole-dev 0030/0031/0168/0176. Not yet booted. |
 | GPU limiter | A540 GPMU | 🟡 | Branch: GPMU throttling on, 5-level table (porthole 0251). Not yet booted. |
 | Video codec | Venus (msm8998) | ✅ decode / 🟡 encode (10-09) | H.264/VP9 decode on Venus in GStreamer, FFmpeg (`h264_v4l2m2m`) and Firefox 154 (with the `ffmpeg` override package); 1080p30 at 0.14 core. On 7.3: 300/300 frames of 1080p30 H.264 through `h264_v4l2m2m` at 194 fps (6.5× realtime). Encoder asserts the firmware mid-stream, so GStreamer's v4l2h264enc is demoted. HEVC/VP8 untested. |
@@ -99,7 +99,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Laser AF | ST VL53L0X (CCI 5-0029) | ✅ | Ranges (`in_distance_raw` x 0.001 m). CCI0 answers only with LVS1 (main camera I/O rail) up, so LVS1 is always-on. Driver gained runtime PM (camera AVDD off between readings, verified). Nothing in userspace reads it yet. |
 | SAR proximity | Semtech SX9320 (I2C 3-0028) | ❌ | `sx9324` is built and loaded but does not bind the SX9320; it needs support of its own. |
 | Flash LED | PMI8998 flash | ✅ | `white:flash`. |
-| Motion / light / proximity | on the SLPI (sensor DSP) | ❌ | Deck #162. SLPI firmware ships in firmware-lge-joan r9. Needs a 15 MiB region and an SMGR-era QMI client. |
+| Motion / light / proximity | on the SLPI (sensor DSP): LSM6DSM-class accel/gyro, AK09916 mag, LPS22HB-class baro, TMD4904 prox/light (LG sensor_def_*.conf) | 🟡 (10-10) | **SLPI boots** (`slpi_v2.mdt`, 15 MiB carve-out, kernel fd1e2507) and announces QRTR services on node 9 (263/264/280/288/306 + registry notification + SSCTL). Sensors still need: an SMGR-era registry server (sns-reg) fed from LG's .conf / the phone's own sns.reg, and the unmerged QRTR-bus + Sensor Manager IIO series (Yassine Oudjana, 2025). Plan in `evidence/2026-10-09-v73-port/README.md`. Deck #162. |
 
 ## Default apps (pmOS phosh)
 
@@ -110,7 +110,7 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Sound panel | phosh quick settings + pwvucontrol (per-app) | ✅ default since device-lge-joan r17 |
 | Voice recorder | gnome-sound-recorder | ✅ default since device-lge-joan r17 |
 | Camera | Snapshot (phosh default, libcamera) | 🟡 (10-09) libcamera lists all three cameras (two back, one front). LG chromatix colour matrices extracted for all three (tuning files staged, untested in light); Snapshot on screen, colour and autofocus need Lance |
-| FM tuner | none (kernel `/dev/radio0`; CLI `v4l2-ctl`, `rds-ctl`) | 🟡 tuner works; audio needs the slim2 NGD, which hard-hangs the SoC — bench only with Lance present |
+| FM tuner | FM Radio (`fm-radio`, ours, GTK4, default since device-lg-joan r27) + kernel `/dev/radio0` | 🟡 (10-09) app tunes, seeks (found 88.9 MHz) and decodes RDS on 7.3; says plainly that there is no sound path yet: audio needs the slim2 NGD, which hard-hangs the SoC — bench only with Lance present |
 | NFC | nfc-tags (GTK4, ours) + neard, D-Bus activated (device-lg-joan r22/r23) | 🟡 adapter, poll loop and UI tested; physical tag read/write untested |
 | Flashlight | phosh torch toggle | ✅ (flash LED present) |
 
