@@ -1,0 +1,40 @@
+7.3.0-rc6
+65.52 364.33
+[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+[    0.000000] ITS: No ITS available, not enabling LPIs
+[    1.675370] ufshcd-qcom 1da4000.ufshc: Disabling inline encryption support
+[    1.987425] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.010079] qcom-qmp-usbc-phy c010000.phy: PHY is configured for USB, can not enable DP
+[    2.010106] phy phy-c010000.phy.1: phy init failed --> -16
+[   11.622975] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   11.633371] tfa989x 3-0034: supply vddd not found, using dummy regulator
+[   11.924293] platform wcd934x-gpio.3.auto: DMA mask not set
+[   11.999778] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+[   11.999979] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+[   12.000064] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+[   12.000156] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+[   12.000233] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+[   12.000310] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+[   12.004830] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+[   12.004854] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+[   12.004867] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+[   12.004879] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+[   12.004892] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+[   12.004904] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+[   12.255864] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   12.844564] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   12.893621] Bluetooth: hci0: Frame reassembly failed (-84)
+[   14.286784] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   17.303459] ath10k_snoc 18800000.wifi: failed to fetch board data for bus=snoc,qmi-board-id=ff,qmi-chip-id=30214 from ath10k/WCN3990/hw1.0/board-2.bin
+[   19.075871] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   19.075983] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   19.076021] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   19.082741] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+[   19.561553] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   19.561697] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   19.561739] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   19.985881] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   19.986134] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   19.986231] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   22.391971] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   33.260619]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile

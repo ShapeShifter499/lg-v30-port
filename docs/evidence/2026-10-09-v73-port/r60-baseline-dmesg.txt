@@ -1,0 +1,58 @@
+7.2.0-rc2
+5383.57 42738.73
+[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+[    0.000000] ITS: No ITS available, not enabling LPIs
+[    2.264156] ufshcd-qcom 1da4000.ufshc: Disabling inline encryption support
+[    2.545344] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.568763] qcom-qmp-usbc-phy c010000.phy: PHY is configured for USB, can not enable DP
+[    2.568781] phy phy-c010000.phy.1: phy init failed --> -16
+[    3.170090] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[    3.208330] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   11.568296] ipa: loading out-of-tree module taints kernel.
+[   11.736067] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   11.932506] tfa989x 3-0034: supply vddd not found, using dummy regulator
+[   11.960688] qcom_q6v5_pas 17300000.remoteproc: Handover signaled, but it already happened
+[   12.239727] platform wcd934x-gpio.3.auto: DMA mask not set
+[   12.306997] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+[   12.307187] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+[   12.307252] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+[   12.307359] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+[   12.307427] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+[   12.307493] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+[   12.311558] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+[   12.311577] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+[   12.311588] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+[   12.311599] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+[   12.311610] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+[   12.311621] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+[   13.001018] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   14.493154] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   17.609976] qcom-q6v5-mss 4080000.remoteproc: Handover signaled, but it already happened
+[   18.293472] ath10k_snoc 18800000.wifi: failed to fetch board data for bus=snoc,qmi-board-id=ff,qmi-chip-id=30214 from ath10k/WCN3990/hw1.0/board-2.bin
+[   20.082069] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   20.082230] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   20.082295] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   20.091580] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+[   20.576413] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   20.576457] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   20.576472] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   21.011120] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   21.011175] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   21.011195] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   21.819884] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   32.846882]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+[   61.359004] ipa 1e40000.ipa: JOANDBG tx drop len=76 proto=0x86dd qmap=1 ret=0
+[   61.359107] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[   61.369316] ipa 1e40000.ipa: JOANDBG tx drop len=76 proto=0x86dd qmap=1 ret=0
+[   61.484980] ipa 1e40000.ipa: JOANDBG tx drop len=76 proto=0x86dd qmap=1 ret=0
+[   62.305197] ipa 1e40000.ipa: JOANDBG tx drop len=76 proto=0x86dd qmap=1 ret=0
+[   65.505257] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[   74.209216] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[   91.105211] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[  125.913742] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[  191.398290] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[  332.660070] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[  611.223083] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[ 1135.503303] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[ 2151.302749] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0
+[ 4232.070925] ipa 1e40000.ipa: JOANDBG tx drop len=48 proto=0x86dd qmap=1 ret=0

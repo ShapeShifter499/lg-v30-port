@@ -1,0 +1,117 @@
+[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+[    0.000000] ITS: No ITS available, not enabling LPIs
+[    1.730763] ufshcd-qcom 1da4000.ufshc: Disabling inline encryption support
+[    2.030227] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.058396] qcom-qmp-usbc-phy c010000.phy: PHY is configured for USB, can not enable DP
+[    2.058423] phy phy-c010000.phy.1: phy init failed --> -16
+[   12.263709] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   12.265686] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   12.415758] tfa989x 3-0034: supply vddd not found, using dummy regulator
+[   12.729633] Bluetooth: hci0: Frame reassembly failed (-84)
+[   13.032974] platform wcd934x-gpio.3.auto: DMA mask not set
+[   13.153230] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+[   13.153465] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+[   13.153544] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+[   13.153702] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+[   13.153797] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+[   13.153870] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+[   13.158565] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+[   13.158614] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+[   13.158624] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+[   13.158634] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+[   13.158644] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+[   13.158654] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+[   13.802162] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   13.849701] Bluetooth: hci0: Frame reassembly failed (-84)
+[   14.161354] Bluetooth: hci0: Frame reassembly failed (-84)
+[   15.063471] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   19.718622] ath10k_snoc 18800000.wifi: failed to fetch board data for bus=snoc,qmi-board-id=ff,qmi-chip-id=30214 from ath10k/WCN3990/hw1.0/board-2.bin
+[   21.506868] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   21.507036] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   21.507102] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   21.516820] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+[   22.251052] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   22.251094] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   22.251107] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   22.646163] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   22.646218] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   22.646241] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   23.529088] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   33.810136]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+[  122.188075] qcom-camss ca00020.camss: Failed to start media pipeline: -32
+[   13.991853] lg-joan (bluetoothd)[641]: bluetooth.service: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
+[   14.049006] lg-joan 81voltd[636]: ModemManager QRTR modem not detected on startup
+[   14.392564] lg-joan avahi-daemon[640]: WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
+[   19.097410] lg-joan dbus-broker[635]: A security policy denied :1.31 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[   19.720789] lg-joan dbus-broker[635]: A security policy denied :1.35 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[   22.267155] lg-joan NetworkManager[654]: <warn>  [1791588777.8664] device (wlan0): device not up after timeout!
+[   23.194551] lg-joan NetworkManager[654]: <warn>  [1791588778.7938] device (p2p-dev-wlan0): error setting IPv4 forwarding to '0': Resource temporarily unavailable
+[   25.254404] lg-joan gnome-session-service[1194]: App at-spi-dbus-bus.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.259309] lg-joan gnome-session-service[1194]: App gnome-keyring-secrets.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.263385] lg-joan gnome-session-service[1194]: App xdg-user-dirs.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.264264] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Housekeeping.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.265388] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Keyboard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.265715] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.UsbProtection.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.265992] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.ScreensaverProxy.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.266251] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Sharing.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.266542] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Datetime.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.266810] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.PrintNotifications.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.267385] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Rfkill.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.268026] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Wwan.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.268742] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Sound.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.269164] lg-joan gnome-session-service[1194]: App gnome-keyring-pkcs11.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.269448] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Smartcard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.270077] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Power.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.271254] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.A11ySettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.271493] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.Color.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.271697] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.MediaKeys.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   25.271901] lg-joan gnome-session-service[1194]: App org.gnome.SettingsDaemon.XSettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   26.007208] lg-joan gsd-power[1215]: Error setting property 'PowerSaveMode' on interface org.gnome.Mutter.DisplayConfig: Cannot invoke method; proxy is for the well-known name org.gnome.Mutter.DisplayConfig without an owner, and proxy was constructed with the G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START flag (g-io-error-quark, 0)
+[   26.353673] lg-joan mmsdtng[1221]: Lost Dbus Connection! Exiting....
+[   27.153517] lg-joan callaudiod[1361]: No suitable card found, stopping here...
+[   27.423705] lg-joan systemd[872]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   28.731648] lg-joan phrog[1209]: Failed to get handle position
+[   29.002449] lg-joan systemd[872]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   29.024194] lg-joan phosh-osk-stevia[1213]: Animation did not finish in time: 0.000000
+[   29.167584] lg-joan phosh-osk-stevia[1213]: Failed to get session: GDBus.Error:org.freedesktop.login1.NoSuchSession: No session 'user.slice' known
+[   29.901658] lg-joan sm.puri.Chatty[1216]: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+[   30.523803] lg-joan systemd[872]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   31.877419] lg-joan accounts-daemon[2379]: Unable to open /etc/tcb: No such file or directory
+[   31.884500] lg-joan accounts-daemon[2379]: couldn't list homed users: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name is not activatable
+[   34.866531] lg-joan gnome-calls[2677]: backend-store.vala:435: Error preparing Backend 'telepathy': The name is not activatable
+[   36.062691] lg-joan systemd[901]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[   36.305189] lg-joan gnome-contacts[2896]: backend-store.vala:435: Error preparing Backend 'telepathy': The name is not activatable
+[   56.652432] lg-joan dbus-broker[635]: A security policy denied :1.118 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[   59.233594] lg-joan NetworkManager[654]: <warn>  [1791588814.8329] device (qrtr0): error setting IPv4 forwarding to '0': No error information
+[   59.503546] lg-joan gnome-calls[2677]: Could not query call waiting status: GDBus.Error:org.freedesktop.ModemManager1.Error.Core.Failed: QMI protocol error: Couldn't query call waiting: QMI protocol error (3): 'Internal'
+[   64.479667] lg-joan vvmd[1236]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   64.480322] lg-joan vvmd[3189]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   64.480460] lg-joan vvmd[1236]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   64.480895] lg-joan vvmd[3189]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   64.480987] lg-joan vvmd[1236]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   64.484564] lg-joan vvmd[3189]: Modem is not ready to process any unsent/unreceived VVM messages.
+[   66.826603] lg-joan vvmd[1236]: You are not subscribed to the Visual Voicemail.
+[   66.830678] lg-joan vvmd[3189]: You are not subscribed to the Visual Voicemail.
+[   66.841993] lg-joan NetworkManager[654]: <warn>  [1791588822.4413] device (qrtr0): retrieving IP configuration failed: modem IP method unsupported
+[   67.467912] lg-joan systemd-resolved[460]: Using degraded feature set UDP+EDNS0 instead of UDP+EDNS0+DO for DNS server fd00:976a::10.
+[   68.081202] lg-joan sm.puri.Chatty[1216]: Bearer Handler emitted an error, the mmsc is not configured right.
+[   68.184162] lg-joan mmsdtng[949]: Could not find settings: Operator ID '310260' with APN '' not found in service provider database
+[   68.184256] lg-joan mmsdtng[949]: Your MMS settings are not in the database! Please file a merge request at https://gitlab.gnome.org/GNOME/mobile-broadband-provider-info so they can be added
+[   96.314326] lg-joan systemd[3160]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[   99.254852] lg-joan dbus-broker[635]: A security policy denied :1.137 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  100.472426] lg-joan vvmd[3788]: You are not subscribed to the Visual Voicemail.
+[  117.034815] lg-joan systemd[3770]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[  121.006963] lg-joan dbus-broker[635]: A security policy denied :1.146 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  122.264763] lg-joan vvmd[3920]: You are not subscribed to the Visual Voicemail.
+[  132.782282] lg-joan systemd[3899]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[  138.409945] lg-joan dbus-broker[635]: A security policy denied :1.154 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  139.691716] lg-joan vvmd[4035]: You are not subscribed to the Visual Voicemail.
+[  157.270282] lg-joan systemd[4016]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[  178.367360] lg-joan dbus-broker[635]: A security policy denied :1.164 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  179.972770] lg-joan vvmd[4202]: You are not subscribed to the Visual Voicemail.
+[  205.807791] lg-joan systemd[4183]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[  211.455939] lg-joan dbus-broker[635]: A security policy denied :1.173 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  212.986399] lg-joan vvmd[4388]: You are not subscribed to the Visual Voicemail.
+[  222.046294] lg-joan systemd[4367]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+[  279.880560] lg-joan dbus-broker[635]: A security policy denied :1.181 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[  281.313607] lg-joan vvmd[4473]: You are not subscribed to the Visual Voicemail.

@@ -1,0 +1,78 @@
+status	kind	confidence	needs_change	line
+NEW	benign_driver_noise	0.82	0.72	(bluetoothd)[641]: bluetooth.service: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
+NEW	functional_failure	0.60	0.64	16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+NEW	benign_driver_noise	0.77	0.48	16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+NEW	functional_failure	0.94	0.74	16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+NEW	benign_driver_noise	0.91	0.68	1da4000.ufshc: Disabling inline encryption support
+NEW	functional_failure	0.84	0.66	81voltd[636]: ModemManager QRTR modem not detected on startup
+NEW	functional_failure	0.76	0.58	[   12.729633] Bluetooth: hci0: Frame reassembly failed (-84)
+same	benign_driver_noise	1.00	0.59	[   13.802162] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+same	benign_driver_noise	0.76	0.61	[    0.000000] ITS: No ITS available, not enabling LPIs
+same	functional_failure	0.22	0.78	[   33.810136]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+NEW	benign_driver_noise	0.66	0.72	3-0034: supply vddd not found, using dummy regulator
+NEW	benign_driver_noise	0.64	0.76	5000000.gpu: supply vddcx not found, using dummy regulator
+NEW	functional_failure	0.42	0.44	NetworkManager[654]: <warn>  [1791588778.7938] device (p2p-dev-wlan0): error setting IPv4 forwarding to '0': Resource temporarily unavailable
+NEW	benign_driver_noise	0.49	0.52	NetworkManager[654]: <warn>  [1791588814.8329] device (qrtr0): error setting IPv4 forwarding to '0': No error information
+NEW	functional_failure	0.68	0.58	NetworkManager[654]: <warn>  [1791588822.4413] device (qrtr0): retrieving IP configuration failed: modem IP method unsupported
+NEW	functional_failure	1.00	0.58	NetworkManager[654]: <warn>  [1791588777.8664] device (wlan0): device not up after timeout!
+NEW	bootloader_firmware	1.00	0.61	[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+NEW	benign_driver_noise	0.49	0.67	accounts-daemon[2379]: Unable to open /etc/tcb: No such file or directory
+NEW	functional_failure	0.82	0.63	accounts-daemon[2379]: couldn't list homed users: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name is not activatable
+same	functional_failure	0.49	0.69	[   19.718622] ath10k_snoc 18800000.wifi: failed to fetch board data for bus=snoc,qmi-board-id=ff,qmi-chip-id=30214 from ath10k/WCN3990/hw1.0/board-2.bin
+same	benign_driver_noise	0.61	0.59	[   21.516820] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+same	benign_driver_noise	0.69	0.75	[   12.265686] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+NEW	benign_driver_noise	0.71	0.81	avahi-daemon[640]: WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
+NEW	benign_driver_noise	0.49	0.66	c010000.phy: PHY is configured for USB, can not enable DP
+NEW	functional_failure	0.99	0.76	ca00020.camss: Failed to start media pipeline: -32
+NEW	functional_failure	0.95	0.74	callaudiod[1361]: No suitable card found, stopping here...
+NEW	benign_driver_noise	0.66	0.61	dbus-broker[635]: A security policy denied :1.31 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+NEW	functional_failure	0.86	0.62	gnome-calls[2677]: Could not query call waiting status: GDBus.Error:org.freedesktop.ModemManager1.Error.Core.Failed: QMI protocol error: Couldn't query call waiting: QMI protocol error (3): 'Internal'
+NEW	functional_failure	0.82	0.65	gnome-calls[2677]: backend-store.vala:435: Error preparing Backend 'telepathy': The name is not activatable
+NEW	functional_failure	0.61	0.65	gnome-contacts[2896]: backend-store.vala:435: Error preparing Backend 'telepathy': The name is not activatable
+NEW	benign_driver_noise	0.90	0.76	gnome-session-service[1194]: App at-spi-dbus-bus.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.89	0.78	gnome-session-service[1194]: App gnome-keyring-pkcs11.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.80	gnome-session-service[1194]: App gnome-keyring-secrets.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.85	0.79	gnome-session-service[1194]: App org.gnome.SettingsDaemon.A11ySettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.84	0.80	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Color.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.85	0.77	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Datetime.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.78	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Housekeeping.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.76	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Keyboard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.86	0.78	gnome-session-service[1194]: App org.gnome.SettingsDaemon.MediaKeys.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.78	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Power.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.86	0.80	gnome-session-service[1194]: App org.gnome.SettingsDaemon.PrintNotifications.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.90	0.78	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Rfkill.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.85	0.79	gnome-session-service[1194]: App org.gnome.SettingsDaemon.ScreensaverProxy.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.79	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Sharing.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.86	0.80	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Smartcard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.90	0.79	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Sound.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.90	0.81	gnome-session-service[1194]: App org.gnome.SettingsDaemon.UsbProtection.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.85	0.80	gnome-session-service[1194]: App org.gnome.SettingsDaemon.Wwan.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.89	0.77	gnome-session-service[1194]: App org.gnome.SettingsDaemon.XSettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	benign_driver_noise	0.87	0.79	gnome-session-service[1194]: App xdg-user-dirs.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+NEW	functional_failure	0.62	0.59	gsd-power[1215]: Error setting property 'PowerSaveMode' on interface org.gnome.Mutter.DisplayConfig: Cannot invoke method; proxy is for the well-known name org.gnome.Mutter.DisplayConfig without an owner, and proxy was constructed with the G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START flag (g-io-error-quark, 0)
+NEW	functional_failure	0.80	0.64	mmsdtng[949]: Could not find settings: Operator ID '310260' with APN '' not found in service provider database
+NEW	functional_failure	0.95	0.67	mmsdtng[1221]: Lost Dbus Connection! Exiting....
+NEW	functional_failure	0.26	0.72	mmsdtng[949]: Your MMS settings are not in the database! Please file a merge request at https://gitlab.gnome.org/GNOME/mobile-broadband-provider-info so they can be added
+NEW	benign_driver_noise	0.35	0.63	phosh-osk-stevia[1213]: Animation did not finish in time: 0.000000
+NEW	functional_failure	0.80	0.62	phosh-osk-stevia[1213]: Failed to get session: GDBus.Error:org.freedesktop.login1.NoSuchSession: No session 'user.slice' known
+NEW	functional_failure	0.77	0.65	phrog[1209]: Failed to get handle position
+NEW	functional_failure	0.99	0.75	phy-c010000.phy.1: phy init failed --> -16
+NEW	functional_failure	0.74	0.81	phy-c010000.phy.1: phy_power_on was called before phy_init
+NEW	functional_failure	0.91	0.73	sm.puri.Chatty[1216]: Bearer Handler emitted an error, the mmsc is not configured right.
+NEW	benign_driver_noise	0.90	0.73	sm.puri.Chatty[1216]: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+NEW	benign_driver_noise	0.86	0.50	systemd-resolved[460]: Using degraded feature set UDP+EDNS0 instead of UDP+EDNS0+DO for DNS server fd00:976a::10.
+NEW	functional_failure	0.86	0.57	systemd[901]: call-audio-idle-suspend-workaround.service: Failed with result 'exit-code'.
+NEW	functional_failure	0.91	0.63	systemd[872]: usb-moded-notify.service: Failed with result 'exit-code'.
+NEW	benign_driver_noise	0.96	0.66	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+NEW	benign_driver_noise	0.96	0.66	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+NEW	benign_driver_noise	0.94	0.67	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+NEW	benign_driver_noise	0.96	0.67	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+NEW	benign_driver_noise	0.96	0.67	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+NEW	benign_driver_noise	0.96	0.68	wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+NEW	benign_driver_noise	0.96	0.64	wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+NEW	benign_driver_noise	0.96	0.62	wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+NEW	benign_driver_noise	0.96	0.63	wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+NEW	benign_driver_noise	0.97	0.64	wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+NEW	benign_driver_noise	0.96	0.62	wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+NEW	benign_driver_noise	0.97	0.61	wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+NEW	benign_driver_noise	0.30	0.73	wcd934x-gpio.3.auto: DMA mask not set
