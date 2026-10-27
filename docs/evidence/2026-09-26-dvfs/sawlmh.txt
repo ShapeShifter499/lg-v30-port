@@ -1,0 +1,7 @@
+   untouched: b04 silver 0x05dc00ff gold 0x05dc00ff
+0x17912904: 0000000000 -> 0x01010031 (readback 0x01010031)
+0x17912908: 0000000000 -> 0x04200420 (readback 0x04200420)
+   silver SAW avs set (1056): b04 silver 0x05dc00ff gold 0x05dc00ff
+0x17812904: 0000000000 -> 0x01010031 (readback 0x01010031)
+0x17812908: 0000000000 -> 0x04700470 (readback 0x04700470)
+   gold SAW avs set (1136): b04 silver 0x05dc00ff gold 0x05dc00ff

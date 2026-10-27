@@ -1,0 +1,18 @@
+Terminated
+Using camera /base/soc@0/cci@ca0c000/i2c-bus@0/camera@10 as cam0
+[0:00:29.876336392] [2192]  INFO SimplePipeline simple.cpp:1578 Input buffer stride ignored by the driver. Requested 3072, got 2912
+[0:00:29.876584309] [2192]  INFO IPASoft soft_simple.cpp:270 IPASoft: Exposure 1-2760, gain 0-960 (1)
+[0:00:29.878565819] [2192]  INFO SoftwareIsp software_isp.cpp:308 Input 2328x1744-RGGB-10-CSI2P stride 2912
+[0:00:30.031411705] [2199]  INFO eGL egl.cpp:412 EGL: EGL_VERSION: 1.5
+[0:00:30.031631809] [2199]  INFO eGL egl.cpp:413 EGL: EGL_VENDOR: Mesa Project
+[0:00:30.031661548] [2199]  INFO eGL egl.cpp:414 EGL: EGL_CLIENT_APIS: OpenGL OpenGL_ES 
+[0:00:30.031677798] [2199]  INFO eGL egl.cpp:415 EGL: EGL_EXTENSIONS: EGL_ANDROID_blob_cache EGL_ANDROID_native_fence_sync EGL_EXT_config_select_group EGL_EXT_create_context_robustness EGL_EXT_image_dma_buf_import EGL_EXT_image_dma_buf_import_modifiers EGL_EXT_query_reset_notification_strategy EGL_EXT_surface_compression EGL_IMG_context_priority EGL_KHR_cl_event2 EGL_KHR_config_attribs EGL_KHR_context_flush_control EGL_KHR_create_context EGL_KHR_create_context_no_error EGL_KHR_fence_sync EGL_KHR_get_all_proc_addresses EGL_KHR_gl_colorspace EGL_KHR_gl_renderbuffer_image EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_3D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_image_base EGL_KHR_no_config_context EGL_KHR_reusable_sync EGL_KHR_surfaceless_context EGL_EXT_pixel_format_float EGL_KHR_wait_sync EGL_MESA_configless_context EGL_MESA_gl_interop EGL_MESA_image_dma_buf_export EGL_MESA_query_driver EGL_MESA_x11_native_visual_id 
+[0:00:30.046511028] [2199]  INFO eGL egl.cpp:456 EGL: GL_RENDERER: FD540
+[0:00:30.046841392] [2199]  INFO eGL egl.cpp:457 EGL: GL_VERSION: OpenGL ES 3.1 Mesa 26.2.3
+cam0: Capture 10 frames
+rc=0
+[   55.168563] qcom-camss ca00020.camss: VFE sof timeout
+[   55.680618] qcom-camss ca00020.camss: VFE reg update timeout
+ 150:          0          0          0          0          0          0          0          0  GICv3        110 Edge      ca00020.camss_msm_csiphy0
+ 153:          2          0          0          0          0          0          0          0  GICv3        346 Edge      ca00020.camss_msm_vfe0
+ 155:          1          0          0          0          0          0          0          0  GICv3        328 Edge      ca00020.camss_msm_csid0
