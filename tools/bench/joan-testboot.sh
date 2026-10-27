@@ -18,7 +18,7 @@ make -s -C "$SRC" O="$D" ARCH=arm64 \
 	CROSS_COMPILE=aarch64-linux-gnu- CC="ccache aarch64-linux-gnu-gcc" INSTALL_MOD_PATH="$ST" INSTALL_MOD_STRIP=1 modules_install </dev/null
 rm -f "$ST/lib/modules/$R/build" "$ST/lib/modules/$R/source"
 tar -C "$ST/lib/modules" --owner=0 --group=0 -czf "$SP/mods-$NAME.tgz" "$R"
-cat "$D/arch/arm64/boot/Image.gz" "$D/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb" > "$SP/kernel-$NAME"
+cat "$D/arch/arm64/boot/Image.gz" "$D/arch/arm64/boot/dts/qcom/msm8998-lg-joan.dtb" > "$SP/kernel-$NAME"
 scp -q "$SP/mods-$NAME.tgz" "$SP/kernel-$NAME" nym-nest-family:/tmp/ember-f08d8c5-unpack/
 ssh nym-nest-family "set -e; cd /tmp/ember-f08d8c5-unpack
 mkbootimg --header_version 0 --kernel kernel-$NAME --ramdisk ${RAMDISK:-initramfs-r26-ondevice} \

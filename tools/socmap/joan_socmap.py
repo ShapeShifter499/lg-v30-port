@@ -11,7 +11,7 @@ Inputs are flattened device trees, so what is compared is exactly what each
 kernel boots with:
   --ds   the downstream DTB (e.g. /sys/firmware/fdt pulled from LineageOS on
          the phone, which boots LineageOS/android_kernel_lge_msm8998)
-  --ml   the mainline DTB (arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb)
+  --ml   the mainline DTB (arch/arm64/boot/dts/qcom/msm8998-lg-joan.dtb)
   --ds-tree / --ml-tree  kernel source trees, for the dt-bindings headers
          that turn clock, power-domain and bus IDs back into names.
 
@@ -460,7 +460,7 @@ def to_md(rows, out, ds=None, ml=None):
                   'fine if that firmware is loaded by address from the DT. Check each '
                   '**none** and each partial overlap.']
         lines += table('Downstream (LineageOS kernel on this phone)', dsr, mlr, 'mainline')
-        lines += table('Mainline (msm8998-lge-joan.dtb)', mlr, dsr, 'downstream')
+        lines += table('Mainline (msm8998-lg-joan.dtb)', mlr, dsr, 'downstream')
     Path(out).write_text('\n'.join(lines) + '\n')
 
 
