@@ -80,9 +80,6 @@ Open issues (details and evidence in the matrix):
   while `smgr-iio-build` pins `dc9c6692` (current kernel head). The
   `lg-v30-joan-pmos-packages` mirror's `gtk4.0` (r3, 3 patches) differs from
   `readme-build-guide`'s (r1, 2 patches).
-- **Code that still uses the old name:** `scripts/lib/bootimg.sh` looks for
-  `msm8998-lge-joan.dtb`; the kernel DTB is now `msm8998-lg-joan.dtb`.
-  Untested here; pass the new path or fix the script before relying on it.
 
 Next steps, in order:
 
@@ -158,7 +155,7 @@ state on 2026-10-27:
 | `make-testimage.sh` | bring-up image: kernel + [USB-gadget initramfs](initramfs/root/init) |
 | `make-pmos-image.sh` | pmOS image: new kernel + ramdisk/cmdline reused from a working pmOS image |
 | `make-pmos-image-fw.sh` | as above, plus GPU/BT firmware injected into the initramfs (legacy path) |
-| `scripts/lib/bootimg.sh` | shared helpers: kernel lookup, joan `mkbootimg` offsets, (un)packing (still looks for `msm8998-lge-joan.dtb`; the DTB is now `msm8998-lg-joan.dtb`) |
+| `scripts/lib/bootimg.sh` | shared helpers: kernel lookup, joan `mkbootimg` offsets, (un)packing |
 | `scripts/tethered-test.sh` | safe tethered RAM-boot + classify runner (read its safety header) |
 | `scripts/make-pmos-image-recovery.sh`, `scripts/patch-initramfs-recovery.sh` | pmOS initramfs with bounded, self-healing boot waits |
 | `scripts/sd-fsck-repair.sh`, `scripts/sd-throughput.sh` | SD rootfs fsck (from LineageOS) and read-only SD benchmark |
