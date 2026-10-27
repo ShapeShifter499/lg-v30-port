@@ -7,7 +7,7 @@ Ceiling for this phone: the fuses say speed bin 2, whose qualified maximum is
 2361.6 MHz all-core and 2457.6 MHz single-core. Other bins go higher (bin 3:
 2457.6 all-core; bin 0: 2496.0) on their own voltage tables; running bin-2
 silicon at those points would be unvalidated, so it is out of scope.
-Follows `docs/cpu-gpu-audit-2026-10-02.md` §4 item 3.
+Follows `cpu-gpu-audit-2026-10-02.md` (not in repo) §4 item 3.
 
 ## What stock does
 

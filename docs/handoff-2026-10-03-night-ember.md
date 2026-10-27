@@ -63,8 +63,8 @@ progress): nest `~/.ember/workspace/joan-r37-bench-2026-10-03/tools/{fbboot,fbdr
 | packages repo `master` | pushed `260ecfd` (rename + resync from pmaports) |
 | docs `claude/lucid-dijkstra-bxx3r9` | pushed `9e7e59d` |
 
-Untracked in lg-v30-port (Fulgor's / earlier, **not mine — leave them**): `docs/cpu-gpu-audit-2026-10-02.md`,
-`docs/hardware-gap-sweep-2026-10-02.md`, `docs/hi553-port-2026-10-02.md`, `docs/evidence/2026-10-02-hi553/`, `fw/`, logs.
+Untracked in lg-v30-port (Fulgor's / earlier, **not mine — leave them**): `cpu-gpu-audit-2026-10-02.md`,
+`hardware-gap-sweep-2026-10-02.md`, `hi553-port-2026-10-02.md` (these three: not in repo, see the note in docs/README.md), `docs/evidence/2026-10-02-hi553/`, `fw/`, logs.
 
 Fork default branch is still `device-lge-joan` (2026-09-06 pre-alpha, 134 behind) — Lance's call.
 

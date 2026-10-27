@@ -34,8 +34,9 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
 Newest first. October 2026 (added by the 2026-10-27 docs refresh from the
 kernel PR #11 branch; not re-read for accuracy). The October handoffs link to
 `cpu-gpu-audit-2026-10-02.md`, `hardware-gap-sweep-2026-10-02.md` and
-`hi553-port-2026-10-02.md`, which are not in the repo (`scripts/check.sh`
-reports them as broken links):
+`hi553-port-2026-10-02.md`, which are not in the repo: they were committed by accident in `431bfd6` and
+deliberately unpublished again in `69492f7` (2026-10-07), so the references
+are plain text marked "(not in repo)":
 
 - [handoff-2026-10-09-aurel-ipa-stall.md](handoff-2026-10-09-aurel-ipa-stall.md)
   — cellular boot-time RX stall on r60; evidence in

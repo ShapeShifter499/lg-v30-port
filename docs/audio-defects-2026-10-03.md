@@ -50,7 +50,7 @@ Not new. The failure has existed since the amp was wired to tert
 (`2d3b27bf51d8`, 2026-08-21, "support the TFA9872, and wire joan's
 loudspeaker to it"); `2ff3b6eec5e8` (same day) only made it visible. Both
 commits predate r31 (FM-focused build, per
-`docs/cpu-gpu-audit-2026-10-02.md`), so r31 printed the same lines; the
+`cpu-gpu-audit-2026-10-02.md`, not in repo), so r31 printed the same lines; the
 joan/btfm-fm-audio merge (eeb0335090a2) did not introduce or change this
 path.
 
@@ -125,7 +125,7 @@ object add/remove in `pw-mon`, and try `session.suspend-timeout-seconds =
   `es9218p.c:543-545`). A part in reset does not answer on I2C, so any
   mixer access made while the DAC is idled NACKs. This commit was
   "untested" on the bench until this boot
-  (`docs/hardware-gap-sweep-2026-10-02.md` row 22) — the correlation is
+  (`hardware-gap-sweep-2026-10-02.md` row 22, not in repo) — the correlation is
   exact: jack detection now works, and the first idle-time mixer write
   (WirePlumber restoring card state, or the UCM HeadphonesHiFi
   `EnableSequence` cset `name='Headphone Playback Switch' on`) produced
