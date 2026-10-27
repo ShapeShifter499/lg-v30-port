@@ -8,6 +8,19 @@ Status: **✅ works** (observed on the phone, source given) · **🟡 partial** 
 Evidence without a path is from `evidence/2026-09-26-r27/` (the r27 default
 install, 2026-09-26, US998).
 
+Note added 2026-10-27 (docs refresh, nothing re-tested): `evidence/…` paths
+below are under `docs/evidence/`. Several rows were written before the
+2026-10-03 rename of the packages from `lge-joan` to `lg-joan` (and of the
+board DTS to `msm8998-lg-joan.dts`), so `linux-lge-joan` / `device-lge-joan` in
+the rows and in the last section mean today's `linux-lg-joan` /
+`device-lg-joan`. Kernel hashes cited in the rows predate a history rewrite
+for some commits; see [kernel-history-rewrite.md](kernel-history-rewrite.md)
+(`7732a4cd245a`→`fb289020514a`, `c77bb2415e75`→`d351a20a06ae`; the DP range
+`9d99d011..65405bda` is only partly mappable). The "Scheduler | schedutil, EAS"
+row in the SoC table is the older text and is superseded by the
+"CPU scheduler (EAS)" row above it (✅ r60). Rows without a date tag come from
+the 2026-09-26 pass.
+
 Last full pass: 2026-09-26 (Ember, Claude-Code:claude-opus-5-5). Cellular RX stall row updated 2026-10-09 (Aurel, Hermes:grok-4.7); see evidence/2026-10-09-ipa-rx-stall. Rows marked
 **(10-07)** were re-measured on 2026-10-06/07 (kernel `b3dc8621`, pmaports
 `linux-lg-joan` r55); details in `ember-2026-10-06-venus-and-boot-log.md` and
