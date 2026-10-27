@@ -1,0 +1,156 @@
+-rw-r--r-- 1 kumo02 kumo02 12645681 Sep 26 11:40 initramfs-fresh-r27
+[    0.000000] [Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
+[    0.000000] ITS: No ITS available, not enabling LPIs
+[    1.878056] ufshcd-qcom 1da4000.ufshc: Disabling inline encryption support
+[    2.213498] adreno 5000000.gpu: supply vddcx not found, using dummy regulator
+[    2.232530] debugfs: 'pfp' already exists in 'c901000.display-controller'
+[    2.232580] debugfs: 'me' already exists in 'c901000.display-controller'
+[    2.232591] debugfs: 'meq' already exists in 'c901000.display-controller'
+[    2.232597] debugfs: 'roq' already exists in 'c901000.display-controller'
+[    2.232603] debugfs: 'reset' already exists in 'c901000.display-controller'
+[    2.235017] qcom-qmp-usbc-phy c010000.phy: PHY is configured for USB, can not enable DP
+[    2.235042] phy phy-c010000.phy.1: phy init failed --> -16
+[    2.501109] GPT:Primary header thinks Alt. header is not at the end of the disk.
+[    2.501120] GPT:6307839 != 384503807
+[    2.501124] GPT:Alternate GPT header not at the end of the disk.
+[    2.501126] GPT:6307839 != 384503807
+[    2.501130] GPT: Use GNU Parted to correct GPT errors.
+[    2.710278] fb0: sys_imageblit: framebuffer is not in virtual address space.
+[    2.806212] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[    2.833502] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[    4.015469] stmfts 1-0049: error code: 0x00dec000d0ba
+[    4.222428] stmfts 1-0049: error code: 0x00dec000d0ba
+[    4.371285] stmfts 1-0049: error code: 0x00dec000d0ba
+[    6.956720] systemd[1]: bpf-restrict-fs: Failed to link 'restrict_filesystems' LSM BPF program: Not supported
+[    8.247339] fb0: sys_fillrect: framebuffer is not in virtual address space.
+[   12.064391] stmfts 1-0049: error code: 0x00dec000d0ba
+[   12.130361] stmfts 1-0049: error code: 0x00dec000d0ba
+[   12.192575] stmfts 1-0049: error code: 0x00dec000d0ba
+[   13.154607] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not found, using dummy regulator
+[   13.253103] qcom_q6v5_pas 17300000.remoteproc: Handover signaled, but it already happened
+[   13.263243] tfa989x 3-0034: supply vddd not found, using dummy regulator
+[   13.438809] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   13.440901] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   13.441151] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   13.441317] qcom-camss ca00020.camss: supply vdd_sec not found, using dummy regulator
+[   13.555417] platform wcd934x-gpio.3.auto: DMA mask not set
+[   13.558759] platform wcd934x-soundwire.4.auto: DMA mask not set
+[   13.623245] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT0 MIX2 INP has no paths
+[   13.623495] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT1 MIX2 INP has no paths
+[   13.623566] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT2 MIX2 INP has no paths
+[   13.623637] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT3 MIX2 INP has no paths
+[   13.623706] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT4 MIX2 INP has no paths
+[   13.623785] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux RX INT7 MIX2 INP has no paths
+[   13.628364] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX9 MUX has no paths
+[   13.628388] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX10 MUX has no paths
+[   13.628398] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 MUX has no paths
+[   13.628407] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX11 INP1 MUX has no paths
+[   13.628416] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 MUX has no paths
+[   13.628425] wcd934x-codec wcd934x-codec.2.auto: ASoC: mux CDC_IF TX13 INP1 MUX has no paths
+[   13.665133] qcom-soundwire wcd934x-soundwire.4.auto: din-ports (2) mismatch with controller (6)
+[   13.665325] genirq: Flags mismatch irq 160. 00002001 (soundwire) vs. 00002001 (mbhc sw intr)
+[   13.665459] qcom-soundwire wcd934x-soundwire.4.auto: error -EBUSY: request_irq(160) 0x0 qcom_swrm_irq_handler [soundwire_qcom] soundwire
+[   13.665485] qcom-soundwire wcd934x-soundwire.4.auto: Failed to request soundwire irq
+[   13.665737] qcom-soundwire wcd934x-soundwire.4.auto: probe with driver qcom-soundwire failed with error -16
+[   14.277232] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   14.323947] Bluetooth: hci0: Frame reassembly failed (-84)
+[   14.495548] qcom,slim-ngd-ctrl 171c0000.slim-ngd: QMI wait timeout
+[   15.863450] Bluetooth: hci0: Frame reassembly failed (-84)
+[   16.775517] Bluetooth: hci0: HCI Read Transmit Power Level command is advertised, but not supported.
+[   18.529476] qcom-q6v5-mss 4080000.remoteproc: Handover signaled, but it already happened
+[   18.878735] qcom-q6v5-mss 4080000.remoteproc: Handover signaled, but it already happened
+[   19.547527] ath10k_snoc 18800000.wifi: failed to fetch board data for bus=snoc,qmi-board-id=ff,qmi-chip-id=30214 from ath10k/WCN3990/hw1.0/board-2.bin
+[   21.501100] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   21.501245] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   21.501311] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   21.508826] ath10k_snoc 18800000.wifi: invalid MAC address; choosing random
+[   21.967064] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   21.967449] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   21.967678] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   22.392583] arm-smmu 16c0000.iommu: Unhandled context fault: fsr=0x402, iova=0x00000000, fsynr=0x1, cbfrsynra=0x1900, cb=1
+[   22.392631] arm-smmu 16c0000.iommu: FSR    = 00000402 [Format=2 TF], SID=0x1900
+[   22.392648] arm-smmu 16c0000.iommu: FSYNR0 = 00000001 [S1CBNDX=0 PLVL=1]
+[   23.529079] phy phy-c010000.phy.1: phy_power_on was called before phy_init
+[   24.713845] [drm:dpu_crtc_get_vblank_counter] *ERROR* no encoder found for crtc 0
+[   26.664924]  MultiMedia1: ASoC: no backend DAIs enabled for MultiMedia1, possibly missing ALSA mixer-based routing or UCM profile
+===JOURNAL
+[    8.540480] lge-joan systemd[1]: bpf-restrict-fs: Failed to link 'restrict_filesystems' LSM BPF program: Not supported
+[    8.431328] lge-joan systemd-modules-load[386]: Failed to find module 'uinput'
+[    8.431331] lge-joan systemd-modules-load[386]: Failed to find module 'uhid'
+[   14.754867] lge-joan (bluetoothd)[604]: bluetooth.service: ConfigurationDirectory 'bluetooth' already exists but the mode is different. (File system: 755 ConfigurationDirectoryMode: 555)
+[   15.202622] lge-joan avahi-daemon[603]: WARNING: No NSS support for mDNS detected, consider installing nss-mdns!
+[   15.258059] lge-joan bluetoothd[604]: profiles/network/bnep.c:bnep_init() kernel lacks bnep-protocol support
+[   15.300496] lge-joan 81voltd[598]: ModemManager QRTR modem not detected on startup
+[   15.517715] lge-joan systemd-resolved[463]: Using degraded feature set UDP+EDNS0 instead of UDP+EDNS0+DO for DNS server 172.16.1.1.
+[   20.520992] lge-joan dbus-broker[597]: A security policy denied :1.25 to send method call /org/freedesktop/DBus:org.freedesktop.DBus.Monitoring.BecomeMonitor to org.freedesktop.DBus.
+[   20.594658] lge-joan [776]: gkr-pam: couldn't unlock the login keyring.
+[   21.667783] lge-joan systemd-resolved[463]: Using degraded feature set UDP instead of UDP+EDNS0 for DNS server 172.16.1.1.
+[   21.985944] lge-joan NetworkManager[736]: <warn>  [1790407983.8762] device (wlan0): device not up after timeout!
+[   22.674225] lge-joan [723]: <wrn> [location-cache] Error loading cached location from /var/lib/ModemManager/location.ini: No such file or directory
+[   24.575364] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.ScreensaverProxy.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.575691] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Wwan.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.576490] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Sharing.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.577402] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Datetime.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.578029] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.A11ySettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.578568] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Rfkill.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.579055] lge-joan gnome-session-service[973]: App gnome-keyring-secrets.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.580030] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Sound.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.581645] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.XSettings.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.583344] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.MediaKeys.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.584032] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.PrintNotifications.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.584280] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Smartcard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.584643] lge-joan gnome-session-service[973]: App at-spi-dbus-bus.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.584955] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Power.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.585589] lge-joan gnome-session-service[973]: App xdg-user-dirs.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.585914] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Color.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.586459] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Housekeeping.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.588507] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.UsbProtection.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.589085] lge-joan gnome-session-service[973]: App org.gnome.SettingsDaemon.Keyboard.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.589562] lge-joan gnome-session-service[973]: App gnome-keyring-pkcs11.desktop sets X-GNOME-Autostart-Phase, but gnome-session no longer manages session services
+[   24.915268] lge-joan gsd-power[983]: Error setting property 'PowerSaveMode' on interface org.gnome.Mutter.DisplayConfig: Cannot invoke method; proxy is for the well-known name org.gnome.Mutter.DisplayConfig without an owner, and proxy was constructed with the G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START flag (g-io-error-quark, 0)
+[   24.925661] lge-joan mmsdtng[989]: Lost Dbus Connection! Exiting....
+[   26.437627] lge-joan callaudiod[1093]: No suitable card found, stopping here...
+[   26.478473] lge-joan systemd[806]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   26.683124] lge-joan callaudiod[1093]: No suitable card found, stopping here...
+[   27.762004] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Hands-Free Voice gateway: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   27.774881] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Hands-Free unit: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   27.808629] lge-joan systemd-resolved[463]: Using degraded feature set TCP instead of UDP for DNS server 172.16.1.1.
+[   28.439261] lge-joan systemd[806]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   29.118302] lge-joan (coredump-worker)[1190]: Process 1093 (callaudiod) of user 108 dumped core.
+                                                 
+                                                 Module libmp3lame.so.0 without build-id.
+                                                 Stack trace of thread 1093:
+                                                 #0  0x0000aaaaaaee666c n/a (callaudiod + 0x666c)
+                                                 #1  0x0000ffff8c91e144 n/a (libpulse.so.0 + 0x18144)
+                                                 #2  0x0000ffff8bfa673c n/a (libpulsecommon-17.0.so + 0x4173c)
+                                                 #3  0x0000ffff8bfa6a60 pa_pdispatch_run (libpulsecommon-17.0.so + 0x41a60)
+                                                 #4  0x0000ffff8c917e98 n/a (libpulse.so.0 + 0x11e98)
+                                                 #5  0x0000ffff8bfa74b8 n/a (libpulsecommon-17.0.so + 0x424b8)
+                                                 #6  0x0000ffff8bfa89f0 n/a (libpulsecommon-17.0.so + 0x439f0)
+                                                 #7  0x0000ffff8c8e6fac n/a (libpulse-mainloop-glib.so.0 + 0x1fac)
+                                                 #8  0x0000ffff8c4e58e0 n/a (libglib-2.0.so.0 + 0x578e0)
+                                                 #9  0x0000ffff8c4e9270 n/a (libglib-2.0.so.0 + 0x5b270)
+                                                 #10 0x0000ffff8c4e9e70 g_main_loop_run (libglib-2.0.so.0 + 0x5be70)
+                                                 #11 0x0000aaaaaaee3d68 main (callaudiod + 0x3d68)
+                                                 #12 0x0000ffff8caabdf8 n/a (n/a + 0x0)
+                                                 #13 0x0000ffff8caabdf8 n/a (n/a + 0x0)
+                                                 ELF object binary architecture: AARCH64
+[   29.173101] lge-joan systemd[806]: dbus-:1.1-org.mobian_project.CallAudio@0.service: Main process exited, code=dumped, status=11/SEGV
+[   29.173186] lge-joan systemd[806]: dbus-:1.1-org.mobian_project.CallAudio@0.service: Failed with result 'core-dump'.
+[   29.580366] lge-joan phrog[979]: Failed to get handle position
+[   29.814589] lge-joan phosh-osk-stevia[981]: Animation did not finish in time: 0.000000
+[   30.079480] lge-joan phosh-osk-stevia[981]: Failed to get session: GDBus.Error:org.freedesktop.login1.NoSuchSession: No session 'user.slice' known
+[   30.114187] lge-joan systemd[806]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   30.259091] lge-joan sm.puri.Chatty[984]: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+[   31.626881] lge-joan systemd[806]: usb-moded-notify.service: Failed with result 'exit-code'.
+[   32.178072] lge-joan accounts-daemon[2132]: Unable to open /etc/tcb: No such file or directory
+[   32.181790] lge-joan accounts-daemon[2132]: couldn't list homed users: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name is not activatable
+[   33.100482] lge-joan phrog[979]: gvc_mixer_stream_get_port: assertion 'stream->priv->ports != NULL' failed
+[   33.100583] lge-joan phrog[979]: gvc_mixer_stream_get_port: assertion 'stream->priv->ports != NULL' failed
+[   33.431787] lge-joan callaudiod[2475]: No suitable card found, stopping here...
+[   34.945261] lge-joan gnome-calls[2514]: backend-store.vala:435: Error preparing Backend 'telepathy': The name is not activatable
+[   35.270937] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Message Notification: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   35.281818] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Message Access: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   35.294400] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Phone Book Access: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   35.304507] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for Synchronization: socket(STREAM, RFCOMM): Protocol not supported (93)
+[   35.318818] lge-joan bluetoothd[604]: src/profile.c:ext_start_servers() RFCOMM server failed for File Transfer: socket(STREAM, RFCOMM): Protocol not supported (93)

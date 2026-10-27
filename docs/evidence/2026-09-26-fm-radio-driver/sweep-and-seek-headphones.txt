@@ -1,0 +1,22 @@
+103.5 72 stereo
+106.5 66 stereo
+105.1 64 stereo
+107.9 62 stereo
+96.9 58 stereo
+88.9 58 stereo
+100.5 58 stereo
+92.5 56 stereo
+101.1 50 stereo
+90.9 48 stereo
+106.9 48 stereo
+96.1 44 stereo
+91.5 44 stereo
+107.7 44 mono
+107.5 44 stereo
+== seeks up from 87.9, wrap
+MHz) (88.900000
+MHz) (90.900000
+MHz) (92.500000
+MHz) (94.700000
+MHz) (96.100000
+MHz) (96.900000

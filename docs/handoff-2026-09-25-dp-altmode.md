@@ -127,8 +127,56 @@ repeats it. Checked register by register against LG's `mdss-dp-pll-8998.h`:
      to the SBU mux.
    - usb3phy `mode-switch`; `mdss_dp_out` `data-lanes = <2 3 1 0>`.
    - Hog TLMM 11/16 low.
-5. **pmaports:** `TYPEC_DP_ALTMODE`, `TYPEC_MUX_GPIO_SBU` (both =m at least;
-   `DRM_MSM_DP` is already y).
+5. **pmaports:** `CONFIG_TYPEC=y`, `CONFIG_DRM_AUX_BRIDGE=y`, and
+   `CONFIG_PHY_QCOM_QMP_COMBO=y` are now in
+   `config-lge-joan.aarch64` (pkgrel 23). A RAM-boot initramfs does not
+   carry kernel modules, and dwc3 waits forever for a modular USB3 PHY.
+   `olddefconfig` on the live tree kept those three as `y`. The alt-mode
+   and SBU mux symbols can stay modular.
 
-Assisted-by: Claude-Code:Claude Opus 5.5
+## 2026-09-25 continuation (host-only, not booted)
+
+The uncommitted tree on `claude/lucid-dijkstra-bxx3r9` already had the
+combo PHY, the disabled SoC DP node, and the joan overlay. Two host
+fixes landed on top:
+
+- TCSR mode is written while the PHY resets are asserted, including
+  the Type-C mux restore path. The previous combo attempt wrote it
+  after deassert and hung the bus.
+- The USB-C connector advertises SVID `0xff01` / VDO `0x1c46`.
+
+Compiled evidence: `phy-qcom-qmp-usbc.o`, `msm8998-lge-joan.dtb`, and
+`msm8998-mtp.dtb`. Decompiled joan DTB has the USB cell, resets
+`phy`/`phy_phy`/`dp_phy`, and the alt mode. Decompiled MTP DTB stays
+on `qcom,msm8998-qmp-usb3-phy` with two resets and no cell. Not a
+device test. Do not RAM-boot until Lance approves a specific image.
+
+Checked against LG's kernel (`android_kernel_lge_msm8998`):
+- DP PLL rate constants match `mdss-dp-pll-8998-util.c` for RBR, HBR,
+  and HBR2. The v3 COM offsets used by those tables match
+  `mdss-dp-pll-8998.h`. `CLK_SELECT` and LG's `CLK_SEL` are the same
+  address, `0x138`.
+- The DP controller base `0xc990000` matches LG's `dp_ctrl`. LG maps
+  one region of `0xa84`; mainline splits it the way the DP driver
+  expects. The highest register the driver uses is inside that map.
+- Do not fold `qcom,msm8998-qmp-usb3-dp-phy` into the QCS615 schema.
+  That schema allows two resets and omits `phy`. A separate binding
+  that requires `phy`, `phy_phy`, and `dp_phy` is the safe one.
+
+The pmaports pin is `f08d8c5f0da9074b0cad557e31699ebdfebf7d23`
+(pkgrel 24, commit `9eaabed77a`). The source checksum matches a
+`git archive` of that kernel commit. Both commits are local and
+unpushed. A `pmbootstrap build` will fail to fetch the GitHub
+tarball until the kernel commit is pushed.
+
+Assisted-by: Hermes-Agent:grok-4.7
 Date: 2026-09-25
+
+2026-09-26 update (Fulgor, ZCode:GLM-5.3-Flash), added when committing
+this note from the uncommitted worktree: the state has moved since the
+section above was written. pmaports pins `989ceae882e6` (pkgrel 30,
+r30) and is pushed at `1c56389204`; the kernel branch
+`joan/bootlog-fixes` is pushed at `4aef1e1c44eb`, so the tarball-fetch
+blocker is resolved. The three `=y` options above are still in
+`config-lge-joan.aarch64`. Current state and what is left:
+`handoff-2026-09-26-fm-camera-bench.md`.

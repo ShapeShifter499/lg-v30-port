@@ -4,10 +4,54 @@ These are the dated status snapshots that used to accumulate at the bottom
 of the top-level README, moved here verbatim on 2026-09-23 so the README can
 stay a short, current entry point. Nothing below was rewritten; newer
 snapshots are at the top, and each section is superseded by the ones above
-it. For the current state, read [the README](../README.md) and
+it. For the current state, read [the README](../README.md),
+[`joan-hardware-support-matrix.md`](joan-hardware-support-matrix.md) and
 [`test-results/README.md`](test-results/README.md).
 
 Relative paths below were written from the repo root (e.g. `docs/...`).
+
+## Current state (2026-08-10), superseded by README 2026-10-27
+
+Moved verbatim from the README on 2026-10-27; the README now carries a
+2026-10-27 summary and points to
+[`joan-hardware-support-matrix.md`](joan-hardware-support-matrix.md). Known
+to be stale in this section: the "7.2-rc base" (it is now v7.3-rc6), "Wi-Fi
+blocked" (Wi-Fi works; see the matrix), and the PR #11 "build-tested only"
+status (merged into `master`). Links in this block were rewritten from repo-root to docs-relative paths; the text is otherwise unchanged.
+
+Mainline (7.2-rc base) boots postmarketOS/Phosh from the microSD with:
+
+| Area | State | Evidence |
+|---|---|---|
+| Display (SW43402, DSC, DPU1) + brightness 6–255 | works; rainbow-on-wake fixed (prepare() no longer forces DBV_MAX) | [rainbow write-up](ember-2026-08-10-rainbow-on-wake-was-brightness.md) |
+| GPU (Adreno 540, freedreno FD540) | renders, DVFS works; **never runtime-suspends** (deliberate PM pin) | [GPU-FULL3](test-results/GPU-FULL3-2026-08-04.md), [unpin retest](ember-2026-08-10-unpin-result-was-confounded.md) |
+| Touch (FTS3670 / stmfts) | works; phantom-contact keypad freeze fixed | [touch fix](ember-handoff-2026-08-10-touch-phantom-contacts.md) |
+| Bluetooth (WCN3990) | works; stable derived BD address via `device/` service | [BT root cause](ember-handoff-2026-08-09-bt-unconfigured-root-cause.md) |
+| Interconnect / QoS | 17/17 masters programmed | [mas_ipa](test-results/mas-ipa-2026-08-07.md) |
+| Battery fuel gauge | works (`CONFIG_BATTERY_PMI8998_FG=y` required) | [FG test](pmi8998-fg-rfc-test-report-2026-08-07.md) |
+| Power key | vendor 31.25 ms debounce adopted | [session close](ember-handoff-2026-08-10-session-close.md) |
+| Wi-Fi | **blocked** on `wlanmdsp.mbn` (WLFW service 69) | [firmware reqs](joan-firmware-and-package-requirements.md) |
+| Modem | brought up; `rmtfs` still started by hand | [modem handoff](ember-handoff-2026-08-08-modem-layer1-and-integration.md) |
+| Charging path | open; needs the pack to drain to ~90 % to test | [session close](ember-handoff-2026-08-10-session-close.md) |
+| Suspend (s2idle) | open; a 2026-08-03 accidental s2idle rebooted | [A184](test-results/A184-2026-08-03-host-only.md) |
+
+### Update 2026-09-24 (build-tested only, nothing booted), same README
+
+Kernel PR #11 (branch `claude/lucid-dijkstra-bxx3r9`, towards
+`joan/latest-clean-test`) adds, on top of the August audio/voice/cellular
+work: removal of the bring-up instrumentation, a PMI8998 USB-C port driver
+(TCPM + PD, dual role, OTG VBUS, SuperSpeed with orientation), the IPA v3.1
+header-table fix that should retire `ipa.lowmem`, CAMSS/CCI plus an IMX351
+main-camera driver and the rear flash, and a narrowed-down jack-detection
+diagnosis. **A RAM boot of it needs `CONFIG_TYPEC=y`,
+`CONFIG_PHY_QCOM_QMP_COMBO=y` and `CONFIG_DRM_AUX_BRIDGE=y`.** Hand-off
+and test checklist:
+[`docs/handoff-2026-09-24-usbc-camera-audio-cleanup.md`](handoff-2026-09-24-usbc-camera-audio-cleanup.md);
+camera: [`docs/camera/README.md`](camera/README.md).
+
+Kernel `master` and `joan/latest-clean-test` were both `c861d1217` at the
+2026-08-10 session close. The full hand-off, including the open lanes, is
+[`docs/ember-handoff-2026-08-10-session-close.md`](ember-handoff-2026-08-10-session-close.md).
 
 ## Latest status (2026-08-03)
 

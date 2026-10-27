@@ -1,0 +1,18 @@
+- entity 1: msm_csiphy0 (2 pads, 5 links, 0 routes)
+- entity 10: msm_csid0 (5 pads, 7 links, 0 routes)
+- entity 34: msm_ispif0 (2 pads, 10 links, 0 routes)
+- entity 37: msm_ispif1 (2 pads, 10 links, 0 routes)
+cam rc=0 in 1s
+37.975090 (30.02 fps) cam0-stream0 seq: 000002 bytesused: 3686400
+38.008343 (30.07 fps) cam0-stream0 seq: 000003 bytesused: 3686400
+38.041624 (30.05 fps) cam0-stream0 seq: 000004 bytesused: 3686400
+38.074879 (30.07 fps) cam0-stream0 seq: 000005 bytesused: 3686400
+38.108380 (29.85 fps) cam0-stream0 seq: 000006 bytesused: 3686400
+38.141419 (30.27 fps) cam0-stream0 seq: 000007 bytesused: 3686400
+38.174727 (30.02 fps) cam0-stream0 seq: 000008 bytesused: 3686400
+38.207992 (30.06 fps) cam0-stream0 seq: 000009 bytesused: 3686400
+frames written: 10
+ca00020.camss_msm_csiphy0 0
+ca00020.camss_msm_vfe0 33
+ca00020.camss_msm_csid0 1
+ca00020.camss_msm_ispif 19

@@ -1,0 +1,101 @@
+--- a/drivers/bluetooth/hci_qca.c	2026-09-26 11:55:01.518631204 -0700
++++ b/drivers/bluetooth/hci_qca.c	2026-09-26 11:59:45.283739336 -0700
+@@ -651,6 +651,56 @@
+ 	return 0;
+ }
+ 
++/* BENCH PROBE ONLY: Qualcomm FM command packets on the BT UART */
++#define QCA_FM_CMD_PKT		0x11
++
++static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb);
++
++static ssize_t qca_fm_cmd_write(struct file *file, const char __user *ubuf,
++				size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	char buf[256], *p, *tok;
++	u8 bytes[64];
++	int n = 0, ret;
++	struct sk_buff *skb;
++
++	if (count >= sizeof(buf))
++		return -EINVAL;
++	if (copy_from_user(buf, ubuf, count))
++		return -EFAULT;
++	buf[count] = 0;
++
++	p = buf;
++	while ((tok = strsep(&p, " \t\n")) && n < ARRAY_SIZE(bytes)) {
++		if (!*tok)
++			continue;
++		ret = kstrtou8(tok, 16, &bytes[n]);
++		if (ret)
++			return ret;
++		n++;
++	}
++	if (n < 3)
++		return -EINVAL;
++
++	skb = bt_skb_alloc(n, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++	skb_put_data(skb, bytes, n);
++	hci_skb_pkt_type(skb) = QCA_FM_CMD_PKT;
++	bt_dev_info(hdev, "sending FM command, %d bytes", n);
++	qca_enqueue(hu, skb);
++	hci_uart_tx_wakeup(hu);
++
++	return count;
++}
++
++static const struct file_operations qca_fm_cmd_fops = {
++	.open = simple_open,
++	.write = qca_fm_cmd_write,
++};
++
+ static void qca_debugfs_init(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+@@ -665,6 +715,8 @@
+ 		return;
+ 
+ 	ibs_dir = debugfs_create_dir("ibs", hdev->debugfs);
++	debugfs_create_file("fm_cmd", 0200, hdev->debugfs, hdev,
++			    &qca_fm_cmd_fops);
+ 
+ 	/* read only */
+ 	mode = 0444;
+@@ -1263,7 +1315,32 @@
+ 	.lsize = 0, \
+ 	.maxlen = HCI_MAX_IBS_SIZE
+ 
++/*
++ * BENCH PROBE ONLY -- not for merging. Qualcomm carries FM over the BT UART
++ * as H4 packet type 0x11 (command: opcode le16, len, params) and 0x14
++ * (event: code, len, params). Log any FM event so a probe can tell whether
++ * the controller has an FM block at all.
++ */
++#define QCA_FM_EVENT_PKT	0x14
++
++static int qca_recv_fm_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	bt_dev_info(hdev, "FM event (%u bytes)", skb->len);
++	print_hex_dump(KERN_INFO, "qca fm evt: ", DUMP_PREFIX_OFFSET, 16, 1,
++		       skb->data, skb->len, false);
++	kfree_skb(skb);
++	return 0;
++}
++
++#define QCA_FM_EVENT \
++	.type = QCA_FM_EVENT_PKT, \
++	.hlen = 2, \
++	.loff = 1, \
++	.lsize = 1, \
++	.maxlen = HCI_MAX_EVENT_SIZE
++
+ static const struct h4_recv_pkt qca_recv_pkts[] = {
++	{ QCA_FM_EVENT,            .recv = qca_recv_fm_event },
+ 	{ H4_RECV_ACL,             .recv = qca_recv_acl_data },
+ 	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
+ 	{ H4_RECV_EVENT,           .recv = qca_recv_event    },

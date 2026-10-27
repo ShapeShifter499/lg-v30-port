@@ -1,0 +1,18 @@
+FM HCI probe on the LG V30 US998 (WCN3990), 2026-09-26, bench kernel 7.2.0-rc2-joan-bl+
+Method: bench-only hci_qca hook (scratch fmprobe.patch, never committed): debugfs
+bluetooth/hci0/fm_cmd writes an H4 type 0x11 frame; H4 type 0x14 frames are logged.
+Packet types 0x11/0x14 and FM event codes (0x0f complete, 0x10 status) from Qualcomm's
+BT/FM HAL headers (interop facts only).
+
+cmd 01 4c 00  (FM recv enable,  OGF 0x13 OCF 0x0001)
+  evt 0f 10 01 01 4c 00 00 00 02 00 cc 55 01 00 e0 a5 01 00   -> COMPLETE, status 0x00, ~20 ms
+cmd 02 4c 00  (FM recv disable, OGF 0x13 OCF 0x0002)
+  evt 0f 04 01 02 4c 00                                       -> COMPLETE, status 0x00, ~2 ms
+cmd 01 50 00  (FM trans enable, OGF 0x14 OCF 0x0001)          -> no event within 1 s and within 4 s
+cmd 02 50 00  (FM trans disable, OGF 0x14 OCF 0x0002)         -> no event
+control: recv enable/disable issued right after the TX attempt are answered normally;
+Bluetooth stays powered.
+
+Conclusion: the WCN3990 in the V30 HAS an FM receiver (contradicting distributor summaries that
+list FM only for WCN3980). The FM firmware does not implement the transmit command group, so
+there is no FM transmitter to support.

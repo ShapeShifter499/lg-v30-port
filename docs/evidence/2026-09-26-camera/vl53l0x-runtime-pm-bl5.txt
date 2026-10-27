@@ -1,0 +1,14 @@
+idle       rpm=suspended lvs1 use=1  cam0_avdd_2p8 use=0  
+iio=/sys/bus/iio/devices/iio:device2
+read=82 in 0 ms
+after-read rpm=active    lvs1 use=1  cam0_avdd_2p8 use=1  
++2s        rpm=suspended lvs1 use=1  cam0_avdd_2p8 use=0  
+84 84 84 83 83 (5 reads)
++2s        rpm=suspended lvs1 use=1  cam0_avdd_2p8 use=0  
+unbound    rpm=unsupported lvs1 use=1  cam0_avdd_2p8 use=0  
+bind rc=0
+rebound+2s rpm=suspended lvs1 use=1  cam0_avdd_2p8 use=0  
+84
+rmmod      rpm=unsupported lvs1 use=1  cam0_avdd_2p8 use=0  
+modprobe+2s rpm=suspended lvs1 use=1  cam0_avdd_2p8 use=0  
+0
