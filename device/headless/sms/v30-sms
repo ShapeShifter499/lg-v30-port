@@ -1,0 +1,41 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: GPL-3.0-only
+"""纯TTY短信：状态、列表、阅读、明确发送；不自动重试。"""
+from pathlib import Path
+import argparse,json,os,sys
+sys.path.insert(0,'/opt/v30-sms')
+from sms_core import Store,send_once,terminal
+from sms_bus import Bus
+p=argparse.ArgumentParser(description='TTY短信：status / list / read 编号 / send 完整号码 --text 正文')
+s=p.add_subparsers(dest='action',required=True)
+s.add_parser('status');l=s.add_parser('list');l.add_argument('--unread',action='store_true');l.add_argument('--limit',type=int,default=50,choices=range(1,201),metavar='1..200')
+r=s.add_parser('read');r.add_argument('id',type=int)
+r=s.add_parser('send');r.add_argument('number');g=r.add_mutually_exclusive_group(required=True);g.add_argument('--text');g.add_argument('--file',type=Path);r.add_argument('--request-id',help='同一标识只提交一次；重用不重发')
+a=p.parse_args()
+if os.geteuid()!=0:p.error('请使用 sudo v30-sms')
+os.umask(0o077)
+def main():
+    store=Store('/var/lib/v30-sms/messages.sqlite')
+    try:
+        if a.action=='status':
+            state=Path('/run/v30-sms/status.json');print(json.dumps({'archive':store.counts(),'receiver':json.loads(state.read_text()) if state.exists() else {'ready':False}},ensure_ascii=False))
+        elif a.action=='list':
+            for row in store.listing(a.limit,a.unread):
+                print(row['id'],('-' if row['direction']=='outgoing' else '未读' if row['unread'] else '已读'),row['direction'],row['state'],terminal(row['timestamp']),terminal(row['number']))
+        elif a.action=='read':
+            row=store.get(a.id,mark_read=True);print('编号:',row['id'],'方向:',row['direction'],'状态:',row['state']);print('号码:',terminal(row['number']),'时间:',terminal(row['timestamp']));print(terminal(row['text']))
+            data=json.loads(row['data'])
+            if data:print('[二进制短信，共',len(data),'字节；保存在私有收件箱]')
+        else:
+            text=a.file.read_text(encoding='utf-8') if a.file else a.text
+            row,fresh,info=send_once(store,Bus(),a.number,text,a.request_id)
+            print(json.dumps({'id':row['id'],'request_id':row['request_id'],'state':row['state'],'new_submission':fresh,**info},ensure_ascii=False))
+            if row['state'] in ('unknown','creating','created','sending'):
+                print('发送结果未确认，记录已保留；请查询状态，不要重复发送。',file=sys.stderr);return 2
+            print('已排队，尚未确认网络收到。' if row['state']=='queued' else '已提交给网络；是否收到以对端确认或送达报告为准。')
+        return 0
+    finally:store.close()
+try:raise SystemExit(main())
+except Exception as exc:
+    # Driver/D-Bus error text can carry private content. Keep it out of logs.
+    print('短信操作失败：'+(str(exc) if isinstance(exc,ValueError) else type(exc).__name__),file=sys.stderr);raise SystemExit(1)

@@ -159,3 +159,10 @@ record each artifact's hash so it can be matched if it is shared later.
 Assisted-by: Claude-Code
 Date: 2026-09-23
 Update-scope: New index.
+
+## External headless telephony
+
+[Source, prior local results and limits](headless-telephony-2026-10-31.md); [host-only closure](test-results/headless-telephony-2026-10-31.md).
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31

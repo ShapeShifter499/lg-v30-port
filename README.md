@@ -248,3 +248,10 @@ For reading older docs only; any layout works if you set `KDIR`.
 Assisted-by: Claude-Code
 Date: 2026-09-23
 Update-scope: README restructured around the 2026-08-10 state; history moved to docs/status-history.md.
+
+## External headless contribution (2026-10-31)
+
+See [headless voice/SMS source and validation](docs/headless-telephony-2026-10-31.md). This opt-in external US998 work does not change the upstream default profile.
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31

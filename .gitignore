@@ -17,3 +17,6 @@ initramfs/root/lib/firmware/qcom/a540_*
 
 # tools/Makefile build output
 tools/out/
+
+# Host-side headless telephony tests
+/device/headless/**/__pycache__/

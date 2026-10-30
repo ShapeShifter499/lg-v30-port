@@ -154,3 +154,10 @@ Update-scope: Initial provenance inventory.
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-03
 Update-scope: A530/A540 firmware-distribution boundary and current-tip credential redaction.
+
+## External headless bundle (2026-10-31)
+
+The Python SMS archive/CLI and headless supervisor/audio wrappers are original external contribution source. Original code in this bundle is offered under GPL-3.0-only. The copied IMS PDN script and D-Bus/polkit policies derive from Catcrafts imsd at 2b5de7a60b3d9ecedab5fa34da40b2d3c8b26cab; their GPL-3.0-only and copyright headers are preserved. The source manifest records file digests. No imsd binary, codec library, firmware, modem/SIM state or private capture is distributed. Separate GCC fixes derive from Dmitry Baryshkov's published October 19 patch series; see [the report](docs/headless-telephony-2026-10-31.md).
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31
