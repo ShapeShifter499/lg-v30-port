@@ -1,0 +1,20 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="LG V30 persistent IMS and headless call audio"
+supervisor=supervise-daemon
+command=/opt/v30-mobile/libexec/ims_supervisor.py
+respawn_delay=15
+respawn_max=3
+respawn_period=900
+output_log=/run/v30-ims/supervisor.log
+error_log=/run/v30-ims/supervisor.log
+retry="TERM/45/KILL/5"
+depend() {
+    need v30-cellular v30-audio dbus nftables
+    after chronyd
+}
+start_pre() {
+    [ "$(uname -r)" = "7.2.0-rc2-v30-r30" ] || return 1
+    checkpath --directory --mode 0700 --owner root:root /run/v30-ims /var/lib/v30-mobile
+    pkaction --action-id net.catcrafts.IMS1.Voice >/dev/null || return 1
+}

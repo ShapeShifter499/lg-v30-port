@@ -7752,3 +7752,10 @@ Date: 2026-08-07
 
 Assisted-by: Claude-Code:Claude Opus 5.5
 Date: 2026-09-24
+
+## 2026-10-31 external power/IPA/GCC candidates
+
+Class: `upstream-candidate`; public disposition: needs maintainer review. Kernel base dc9c6692dbfba9c114eb116f48be9cf3e283ac0f. Four affected files: drivers/power/supply/pmi8998_fg.c, drivers/power/supply/qcom_smbx.c, drivers/net/ipa/ipa_qmi_msg.h and drivers/clk/qcom/gcc-msm8998.c (separate kernel repository). Scope, original GCC provenance and object-build limits are in [the contribution report](headless-telephony-2026-10-31.md); [closure](test-results/headless-telephony-2026-10-31.md). No debug clock/ICC holds submitted.
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31

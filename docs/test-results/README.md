@@ -106,3 +106,10 @@ This pattern is intentionally generic. Future hardware/device projects should co
 The A182/A183/A184 packets were published in commit
 `3251c9558477aa7be81367f73642bf1170f420e4` (github.com/ShapeShifter499/lg-v30-port,
 master, 2026-08-03), verified remotely, and mirrored to shared Deck card 43.
+
+## 2026-10-31 external headless source publication
+
+[HEADLESS-VOICE-SMS closure](headless-telephony-2026-10-31.md): host tests pass; prepared source/new kernel not device-tested.
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31
