@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: GPL-3.0-only
+"""纯 TTY 电话控制；每次呼出/接听必须由用户明确调用。"""
+import argparse, json, os, re, subprocess, sys
+sys.path.insert(0, '/opt/v30-mobile/libexec')
+from gvariant_json import parse_gvariant
+
+p = argparse.ArgumentParser(description='V30 电话：status / calls / dial 号码 / answer / hangup')
+p.add_argument('action', choices=['status', 'calls', 'dial', 'answer', 'hangup'])
+p.add_argument('number', nargs='?'); a = p.parse_args()
+if os.geteuid() != 0: p.error('请使用 sudo v30-phone')
+
+def call(method, *args):
+    out = subprocess.check_output(['gdbus', 'call', '--system', '--dest', 'net.catcrafts.IMS1',
+        '--object-path', '/net/catcrafts/IMS1', '--method', 'net.catcrafts.IMS1.'+method, *args], text=True, timeout=10)
+    return parse_gvariant(out)
+
+if a.action == 'status': print(json.dumps(call('GetStatus')[0], ensure_ascii=False))
+elif a.action == 'calls': print(json.dumps(call('GetCalls')[0], ensure_ascii=False))
+elif a.action == 'dial':
+    if not a.number or not re.fullmatch(r'\+?[0-9]{3,20}', a.number): p.error('请输入完整号码')
+    print(call('Dial', a.number)[0])
+else:
+    calls = call('GetCalls')[0]
+    chosen = [c for c in calls if c['state'] == 'incoming'] if a.action == 'answer' else [c for c in calls if c['state'] != 'terminated']
+    if len(chosen) != 1: p.error('没有唯一可操作的通话；请先查看 calls')
+    call('Accept' if a.action == 'answer' else 'HangUp', chosen[0]['uni'])

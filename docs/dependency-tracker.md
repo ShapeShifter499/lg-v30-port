@@ -60,3 +60,10 @@ Date: 2026-07-11
 
 Assisted-by: Hermes-Agent:openai-codex/gpt-5.6-sol
 Date: 2026-08-02
+
+## 2026-10-31 external headless contribution dependencies
+
+No new host package was installed. Used existing Lima/Ubuntu aarch64 VM and Alpine chroots with clang 23.1.4/libc++/lld/pkg-config/Gio for imsd, GCC/make/binutils for kernel object builds, Python 3/SQLite/PyGObject/Gio, util-linux unshare and dbus-run-session for synthetic SMS tests. Runtime prerequisites and GPL-derived imsd files are documented in [the bundle](../device/headless/README.md). Source downloads: imsd at 2b5de7a60b3d9ecedab5fa34da40b2d3c8b26cab from Forgejo; linux-lg-v30-joan at dc9c6692dbfba9c114eb116f48be9cf3e283ac0f from GitHub; this harness at a5de2cf76da8733dfbf09ce75e08d24eb07d3787. Checkouts and source tarball stayed in external local build caches, not in this repository. No firmware downloaded or published for this work.
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31
