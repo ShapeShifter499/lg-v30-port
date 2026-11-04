@@ -19,6 +19,10 @@ the joan line (`joan/latest-clean-test`), qrtr HELLO-on-register (544d85de, in m
 failed units and no new kernel warnings against r60. Rows marked **(10-09)** were measured on it;
 evidence in `evidence/2026-10-09-v73-port/`.
 
+**2026-11-04 (Ember, Claude-Code:claude-opus-5-5):** see `CHANGELOG.md`. UI jitter fixed, USB detach
+and boot-time cable detection work, DDR true floor measured, DDR max stays 1555 MHz, joan-imsd
+registers from the SIM, kernel `master` 1ab006fc10ee passed 20/20 boots. Rows below predate this.
+
 **Default install status (2026-10-06):** a fresh `pmbootstrap install --no-split --sector-size 512`
 (r47) written to the bench SD booted to Phosh with 0 failed units, cellular data connected out of
 the box, Venus, FM tuner, sound card and modem present (`docs/handoff-2026-10-06-ember.md`).

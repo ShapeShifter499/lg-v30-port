@@ -12,6 +12,11 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
 ## 2026-11-04
 
+**Release state:** kernel `master` `1ab006fc10ee`, 20 of 20 boots with Wi-Fi,
+sound and touch up each time. pmaports default branch `device-lge-joan` now
+carries every package: linux-lg-joan r22, device-lg-joan r34, joan-imsd r8.
+`joan/latest-clean-test` has not taken these commits yet.
+
 ### Display
 
 - **Fixed: UI jitter while scrolling and navigating.** The kernel refused
@@ -105,5 +110,6 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
   declines incoming calls. postmarketOS's direction on Qualcomm is OpenIMSd
   with 81voltd, which uses the modem's own IMS so that Calls works normally.
   That is the route for a default install and is not done.
-- Brightness can still come up very low after boot, though the saved level
-  restores correctly. Something in the session lowers it afterwards.
+- Brightness can still come up very low after boot. A saved 255 was seen coming
+  back as 9 once; the cause is not found, and a timeline logger started too late
+  to catch it.
