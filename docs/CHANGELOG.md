@@ -12,9 +12,9 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
 ## 2026-11-04
 
-**Release state:** kernel `master` `1ab006fc10ee`, 20 of 20 boots with Wi-Fi,
-sound and touch up each time. pmaports default branch `device-lge-joan` now
-carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
+**Release state:** kernel `master` `15666334cc98`; the code before the Bluetooth
+fix passed 20 of 20 boots with Wi-Fi, sound and touch up each time. pmaports default branch `device-lge-joan` now
+carries every package: linux-lg-joan r23, device-lg-joan r36, joan-imsd r13, UCM r13.
 `joan/latest-clean-test` has not taken these commits yet.
 
 ### Display
@@ -64,6 +64,23 @@ carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
   DDR fall on battery.
 - Boot log: a normal hard-reset signal no longer logs as an error.
 
+### Calling
+
+- **New: outgoing VoLTE from the normal Calls app**, with audio both ways on the
+  earpiece and a working speaker button, tested on T-Mobile US. This modem has
+  no IMS of its own, so `joan-imsd` runs it on the main processor, and a small
+  local SIP bridge connects Calls to it. Calls itself is unchanged, and the
+  account is created on first login.
+- New `Voice Call` UCM verb for in-call audio; HiFi is untouched.
+- `joan-imsd` now starts with no manual setup, reads its identity from the SIM,
+  and survives quick restarts.
+
+### Bluetooth
+
+- **Fixed: discovery.** The kernel used extended advertising with legacy
+  scanning, and the chip rejects that mix. Discovery now finds nearby devices.
+  Jev flagged the log line that led to this.
+
 ### Packaging
 
 - **Fixed: the default branch had no device packages**, and the working set
@@ -111,13 +128,13 @@ carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
 - VL53L0X laser autofocus sensor fails to probe (`-ENXIO`).
 - wcd934x logs twelve harmless "no paths" warnings; ath10k logs a harmless
   board-data fallback; Bluetooth logs harmless reassembly errors during setup.
-- Calls: the normal Calls app does not work on T-Mobile US, because it uses
-  circuit-switched voice and that network is gone. This modem has no QMI IMSS
-  (service 18), so OpenIMSd and similar modem-side IMS cannot work on the V30.
-  LG's own stack runs IMS on the application processor, and so does `joan-imsd`,
-  which registers and has made an outgoing call. It still has no dialer and
-  declines incoming calls. Planned: let GNOME Calls use it through a local SIP
-  bridge.
+- Incoming calls do not work yet. The network delivers them over TCP inside
+  IPsec, which `joan-imsd`'s user-space ESP cannot carry. Kernel ESP is in the
+  code as an opt-in, but registration through it gets no reply yet.
+- No ringback tone on outgoing calls: Calls 50 crashes when an alerting call is
+  answered, so the bridge does not forward ringing.
+- No VoLTE or VoWiFi indicator: neither Calls nor Phosh has one. VoWiFi is not
+  implemented.
 - Brightness can still come up very low after boot. A saved 255 was seen coming
   back as 9 once; the cause is not found, and a timeline logger started too late
   to catch it.
