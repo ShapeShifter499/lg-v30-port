@@ -94,6 +94,8 @@ carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
 - A Type-C fix went into the PM8150B driver, which this phone does not run. It
   was dropped and rewritten in `qcom_pmic_typec_pmi8998.c`.
 - r71, which removed the 1555 MHz cap, crashed on boot; see Memory.
+- "OpenIMSd is the route for calling on this phone": wrong. Our 2026-08-26 notes
+  had already shown the modem firmware lacks the service it needs.
 - "The backlight file is corrupted": the leftover line is harmless, since only
   the first line is read. The real error was the panel driver.
 
@@ -110,11 +112,12 @@ carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
 - wcd934x logs twelve harmless "no paths" warnings; ath10k logs a harmless
   board-data fallback; Bluetooth logs harmless reassembly errors during setup.
 - Calls: the normal Calls app does not work on T-Mobile US, because it uses
-  circuit-switched voice and that network is gone. `joan-imsd` registers but is
-  a developer tool: its launcher opens a terminal with no number, and it
-  declines incoming calls. postmarketOS's direction on Qualcomm is OpenIMSd
-  with 81voltd, which uses the modem's own IMS so that Calls works normally.
-  That is the route for a default install and is not done.
+  circuit-switched voice and that network is gone. This modem has no QMI IMSS
+  (service 18), so OpenIMSd and similar modem-side IMS cannot work on the V30.
+  LG's own stack runs IMS on the application processor, and so does `joan-imsd`,
+  which registers and has made an outgoing call. It still has no dialer and
+  declines incoming calls. Planned: let GNOME Calls use it through a local SIP
+  bridge.
 - Brightness can still come up very low after boot. A saved 255 was seen coming
   back as 9 once; the cause is not found, and a timeline logger started too late
   to catch it.
