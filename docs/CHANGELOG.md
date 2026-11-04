@@ -14,7 +14,7 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
 **Release state:** kernel `master` `1ab006fc10ee`, 20 of 20 boots with Wi-Fi,
 sound and touch up each time. pmaports default branch `device-lge-joan` now
-carries every package: linux-lg-joan r22, device-lg-joan r34, joan-imsd r8.
+carries every package: linux-lg-joan r22, device-lg-joan r35, joan-imsd r8.
 `joan/latest-clean-test` has not taken these commits yet.
 
 ### Display
@@ -80,6 +80,11 @@ carries every package: linux-lg-joan r22, device-lg-joan r34, joan-imsd r8.
 - joan-imsd needs no manual setup. It reads the identity from the SIM, waits
   for the modem, and configures the IMS interface. Tested on T-Mobile US with
   only the SIM: `REGISTERED` with SIP 200 OK.
+
+- Waydroid: the kernel meets the wiki's requirements, and a new
+  `device-lg-joan-waydroid` subpackage, pulled in automatically with `waydroid`,
+  opens the firewall for `waydroid0`. Images install and the container starts.
+  Waydroid stays optional. A running Android session is not tested yet.
 
 ### Withdrawn claims from this session
 
