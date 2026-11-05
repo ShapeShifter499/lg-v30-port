@@ -15,7 +15,8 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 **Release state:** kernel `master` `15666334cc98`; the code before the Bluetooth
 fix passed 20 of 20 boots with Wi-Fi, sound and touch up each time. pmaports default branch `device-lge-joan` now
 carries every package: linux-lg-joan r23, device-lg-joan r36, joan-imsd r13, UCM r13.
-`joan/latest-clean-test` has not taken these commits yet.
+`joan/latest-clean-test` carries the same fixes at `de3bd3e3639c`, boot-tested as
+r74: no failed units, and VoLTE registers by itself at boot.
 
 ### Display
 
