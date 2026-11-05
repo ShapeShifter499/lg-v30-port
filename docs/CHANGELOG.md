@@ -14,7 +14,7 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
 **Release state:** kernel `master` `15666334cc98`; the code before the Bluetooth
 fix passed 20 of 20 boots with Wi-Fi, sound and touch up each time. pmaports default branch `device-lge-joan` now
-carries every package: linux-lg-joan r23, device-lg-joan r36, joan-imsd r13, UCM r13.
+carries every package: linux-lg-joan r23, device-lg-joan r37, joan-imsd r13, UCM r13.
 `joan/latest-clean-test` carries the same fixes at `de3bd3e3639c`, boot-tested as
 r74: no failed units, and VoLTE registers by itself at boot.
 
@@ -82,6 +82,12 @@ r74: no failed units, and VoLTE registers by itself at boot.
   scanning, and the chip rejects that mix. Discovery now finds nearby devices.
   Jev flagged the log line that led to this.
 
+### Brightness
+
+- **Fixed: dark start.** The level that kept appearing, 9 of 255, was Phosh's idle
+  dim: 30 on its logarithmic range lands there on this OLED panel, and the login
+  screen hands it on to the session. `idle-brightness` is now 60, raw 37.
+
 ### Packaging
 
 - **Fixed: the default branch had no device packages**, and the working set
@@ -146,6 +152,3 @@ r74: no failed units, and VoLTE registers by itself at boot.
   answered, so the bridge does not forward ringing.
 - No VoLTE or VoWiFi indicator: neither Calls nor Phosh has one. VoWiFi is not
   implemented.
-- Brightness can still come up very low after boot. A saved 255 was seen coming
-  back as 9 once; the cause is not found, and a timeline logger started too late
-  to catch it.
