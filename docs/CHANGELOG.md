@@ -104,6 +104,16 @@ r74: no failed units, and VoLTE registers by itself at boot.
   opens the firewall for `waydroid0`. Images install and the container starts.
   Waydroid stays optional. A running Android session is not tested yet.
 
+### Checked remotely on r74
+
+- All three cameras streamed 15 of 15 frames. Colour and focus still need eyes.
+- Venus decoded an H.264 clip through `h264_v4l2m2m`, with 222 Venus interrupts.
+  Firefox itself is not retested.
+- FM tuner opens as `radio-qca-fm`; NFC exposes `/org/neard/nfc0`, with neard
+  started on demand over D-Bus. No station or tag tested.
+- All 8 cores at full load for 42 seconds: CPUs near 80 C, under the 85 C trip,
+  with the big cores easing from 2457 to 2208 MHz. Longer runs are untested.
+
 ### Withdrawn claims from this session
 
 - "30 of 30 from 1804 MHz" on r69: the clock was not moving, so that run proved
