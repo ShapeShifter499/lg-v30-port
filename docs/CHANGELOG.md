@@ -15,9 +15,11 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 ### Headphones
 
 **State:** four kernel patches fix the alarm flood and the lasting silence on the
-bench US998. They are on a local test branch, `ember/hph-ocp-20261106` at
-`312847c85fcb`, built as package r76. They are not on `master` or
-`joan/latest-clean-test` yet. Tested with one phone, one headset and one boot,
+bench US998. They are on `joan/latest-clean-test` at `312847c85fcb`, tested as
+package r76, and on `master` at `b81e29658fd7`. pmaports `device-lge-joan` at
+`64e1b4f0ed72` carries linux-lg-joan r24 and alsa-ucm-conf-lg-joan r14. The `master`
+build compiled but was not booted. It differs from the tested branch in tfa989x,
+q6asm-dai and qcom_smgr. Tested with one phone, one headset and one boot,
 using test tones, speech and Firefox music, which sounded fine. No alarms or
 clock warnings over the whole session.
 
@@ -56,8 +58,7 @@ clock warnings over the whole session.
 - **Found by Lance on r76, cause known: Hi-Fi was not treated as headphones.** It
   had a speaker icon, and Firefox kept playing on the loudspeaker after an unplug
   instead of pausing. Two separate causes, both fixed in `alsa-ucm-conf-lg-joan`
-  r14 (local branch `ember/hifi-headphones-20261106`, installed on the phone and
-  retested: paused on both outputs):
+  r14 (installed on the phone and retested: paused on both outputs):
   - The icon: PipeWire reads the port type from the UCM device name up to the first
     non-letter, so `HeadphonesHiFi` came out as Unknown. Renaming the device to
     `Headphones2` gives type Headphones and the headphone icon. Heard and seen on
@@ -82,12 +83,18 @@ clock warnings over the whole session.
 - **Open, not explained: Hi-Fi sounded noticeably quieter than its slider** after a
   few switches, until a re-plug. The slider, mixer, chip volume, analog volume and
   Firefox's stream volume read the same before and after that re-plug. The stuck
-  slider does not account for this on its own. A full wide snapshot exists only
-  for the good state, so the next case can be compared against it. Firefox also
-  writes the page's volume into its stream volume, which moved from 82% to 78%
-  with nobody touching it. That is a separate volume from the slider, but only
-  1.5 dB. A test stream held its exact level through four output switches, so
-  PipeWire does not drift. Past PipeWire, nothing has been measured.
+  slider does not account for this on its own. Caught live: on the same video, the
+  signal entering the sink rose from -23.9 to -15.0 dBFS RMS after a re-plug, with
+  the same reported Firefox volume, sink volume, mixer controls and chip settings.
+  So the loss is before the sink. A test stream held its exact level through four
+  output switches, which points at Firefox or how its stream is handled, but that
+  is not proven. Firefox also writes the page's volume into its stream volume, so
+  that number can move by itself.
+- **Upstream:** no matching report found. Phosh issue 1273 plans to drop Phosh's
+  pause on unplug in favour of WirePlumber, which would likely lose it here,
+  because our sinks are not removed on unplug. In Phosh, slider updates also write
+  back to the stream without checking `setting_volume`, which may explain the
+  jumpy slider. Not proven.
 - **Corrections to this entry as first written:** loud music was not the cause.
   On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
   sink volume raised no interrupts. The 23 ohm figure was one reading, not a
@@ -95,7 +102,7 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Decide on moving the kernel patches and UCM r14 to the verified branches.
+- Boot `master` r24 on the phone.
 - Find why Phosh misses the output change, and catch the quiet Hi-Fi case with a
   full snapshot.
 - Consider a Phosh change so numbered headphone ports count without a form factor

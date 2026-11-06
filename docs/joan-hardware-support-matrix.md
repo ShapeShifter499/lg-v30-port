@@ -74,8 +74,8 @@ not grown (postmarketos-initramfs r2). Evidence `evidence/2026-09-26-fresh-insta
 | Stack | PipeWire + WirePlumber, UCM `alsa-ucm-conf-lge-joan` | ✅ | `device-lge-joan` depends on them. |
 | Codec | WCD9340 over SLIMbus | ✅/🟡 (10-07) | Works. On 1 of 8 RAM boots the ADSP brought up APR but no QRTR services (no SLIMbus QMI 769), so no sound card; open. |
 | Speaker amp | TFA9872 (bound by tfa989x) | ✅ | |
-| Hi-Fi DAC | ES9218P | 🟡 (11-06) | `HeadphonesHiFi` and the low-power bypass both heard by ear on test build r76, correct left and right. Reached by card profile switch, small click on the switch. Real music untested. |
-| Headphone jack | WCD9340 MBHC | 🟡 (11-06) | Plug, unplug, headset mic and button work. r76 test patches (`ember/hph-ocp-20261106`, not on verified branches) stop the unplug alarm flood and the lasting silence. See `CHANGELOG.md`. |
+| Hi-Fi DAC | ES9218P | 🟡 (11-06) | Hi-Fi output (UCM device `Headphones2`) and the low-power bypass both heard by ear on r76, correct left and right, Firefox music fine. Reached by card profile switch, small click on the switch. |
+| Headphone jack | WCD9340 MBHC | 🟡 (11-06) | Plug, unplug, headset mic and button work. Kernel `master` `b81e29658fd7` stops the unplug alarm flood and the lasting silence, tested on the same patches as r76. Known issues in `CHANGELOG.md`. |
 | SoundWire | WCD934x master | ✅ (branch) | No WSA amps on joan. Branch disables the master and restores irq 20 (it was colliding with MBHC). |
 | Call audio | callaudiod | ❌ | callaudiod SEGV'd on r27 (2026-09-26). |
 
