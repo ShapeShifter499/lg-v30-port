@@ -69,12 +69,15 @@ clock warnings over the whole session.
     its port is exactly `[Out] Headphones`. The rename alone did not fix this. A
     WirePlumber rule setting `device.form_factor = "headphone"` on the Hi-Fi sink
     did: Firefox paused on 2 of 2 unplugs.
-- **Not reproduced: a random slow switch back after plugging in on Hi-Fi.** Lance
-  saw it now and then, not badly. In the logged re-plugs, the plug interrupt to
-  the jack report took 0.19 seconds (2 on Hi-Fi, 1 on normal), and the default
-  output followed 0.3 to 0.4 seconds later on both. No slow case was captured. LG
-  puts the chip back in bypass on unplug and we leave it in Hi-Fi, so that is the
-  first thing to check.
+- **Found on r24, not fixed: a plug-in can go undetected on Hi-Fi.** After fast
+  output switching with nothing playing, the ES9218P stayed in Hi-Fi mode. A
+  re-plug then raised no interrupt, and the jack stayed `off` for about two
+  minutes. Setting `Headphone Mode` to Low Power Bypass made the plug interrupt fire
+  within a second, with no re-plug. Seen once. The driver is meant to idle in
+  bypass, but selecting Hi-Fi powers the chip up with no stream, so nothing ever
+  returns it to bypass. This may also be the random slow switch back Lance noticed
+  on Hi-Fi. In the logged re-plugs where detection worked, it took 0.16 to 0.20
+  seconds.
 - **Open: the Phosh slider can get stuck on the wrong output.** After several
   switches and a re-plug, audio was on Hi-Fi and PipeWire's default was Hi-Fi, but
   Phosh showed a speaker icon, and nudging its slider moved the Speaker sink from
@@ -105,6 +108,9 @@ clock warnings over the whole session.
 
 **To do:**
 
+- Keep the ES9218P in bypass until a stream opens, so plug detection always works.
+- Check whether callaudiod causes the default output's brief flip to Speaker on
+  each switch. It forces the first new sink as default, even outside calls.
 - Try a WirePlumber script that pauses when the headphone port goes unavailable,
   and offer it on issue 860 if it works.
 - Find why Phosh misses the output change, and catch the quiet Hi-Fi case with a
