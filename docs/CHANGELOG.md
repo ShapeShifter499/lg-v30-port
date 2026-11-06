@@ -10,6 +10,34 @@ board. Longer notes live in `status-history.md`, `kernel-change-ledger.md` and
 See the list at the end of the 2026-11-04 entry. Items that need someone at
 the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
+## 2026-11-06
+
+### Headphones
+
+- **Working: jack detection.** Plug, unplug, headset mic and the headset button
+  all report correctly on r74. The headset measured 23 ohms per side.
+- **Not fixed: static on real music through the `Headphones` path.** The headset
+  button resumed a paused Firefox video, and the codec raised about 30,000
+  over-current interrupts per side in 13 seconds, heard as static, until the
+  button paused it again. Sink volume was 52%. Two very quiet test tones raised
+  none. Whether the current is real or a false trip is not known yet.
+- **Lead, from reading the source:** LG's driver sets `RX_OCP_CTL` and
+  `HPH_OCP_CTL` at start-up, stops retrying after 20 attempts, and has an HPH
+  register recovery step. Our driver has none of these and retries without
+  limit. No fix is written or tested yet.
+- **Not tested: `HeadphonesHiFi`.** It is in a separate card profile, so the
+  test found no sink and played nothing on it. Whether the quiet tones on
+  `Headphones` were audible is also unconfirmed.
+- Seen once: an `ln_bb_clk1 already disabled` warning when the audio stream
+  closed 5 seconds after an unplug. Cause not traced.
+
+### Bench note
+
+- A diagnostic script read debugfs regmaps it should not have, including
+  interconnect and clock-controller hardware registers. It never returned, and
+  the phone then answered ping but not SSH. The script is the likely cause. This
+  was a test mistake, not a phone fault.
+
 ## 2026-11-04
 
 **Release state:** kernel `master` `15666334cc98`; the code before the Bluetooth
