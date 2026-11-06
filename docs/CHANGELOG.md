@@ -43,19 +43,21 @@ clock warnings over the whole session.
   fired in these tests, so it is unexercised. Its patch needs rework before
   upstream, because pm4125 sends no PA-off event.
 - **Working on r76: `HeadphonesHiFi`.** Speech was heard at all three test levels.
-  It needs a card profile switch to reach. The chip's own volume sits at -17 dB,
-  and a tone 6 dB below the quietest speech level was not heard.
+  It needs a card profile switch to reach. Its slider is a hardware control: 52%
+  is the chip's -17 dB. A tone 6 dB below the quietest speech level was not heard.
 - **Working on r76: left and right.** Speech reached the correct ear on both
   outputs, with no bleed reported.
 - **Not reproduced, so not proven fixed: the first flood.** On r74 a Firefox video
   resumed 3 seconds after plugging in, with the jack reported present, raised
   about 30,000 interrupts per side in 13 seconds. r76 gave 0 interrupts with a tone
-  started 0, 1, 2 and 3 seconds after plug-in, but that case was never reproduced
-  on r74 to compare against.
+  started 0, 1, 2 and 3 seconds after plug-in, and with Firefox resumed about 1.3
+  seconds after plug-in, which played clean. That case was never reproduced on r74
+  to compare against.
 - **Found by Lance on r76, cause known: Hi-Fi was not treated as headphones.** It
   had a speaker icon, and Firefox kept playing on the loudspeaker after an unplug
-  instead of pausing. Two separate causes, both tested on the phone by live edit
-  and not yet packaged:
+  instead of pausing. Two separate causes, both fixed in `alsa-ucm-conf-lg-joan`
+  r14 (local branch `ember/hifi-headphones-20261106`, installed on the phone and
+  retested: paused on both outputs):
   - The icon: PipeWire reads the port type from the UCM device name up to the first
     non-letter, so `HeadphonesHiFi` came out as Unknown. Renaming the device to
     `Headphones2` gives type Headphones and the headphone icon. Heard and seen on
@@ -71,6 +73,11 @@ clock warnings over the whole session.
   output followed 0.3 to 0.4 seconds later on both. No slow case was captured. LG
   puts the chip back in bypass on unplug and we leave it in Hi-Fi, so that is the
   first thing to check.
+- **Open: volume can stop matching the slider after switching outputs.** A re-plug
+  brought it back into line without moving the slider. Each output remembers its
+  own slider position, 37% and 52% at the time. A silent switch and back showed
+  the slider, PipeWire gain, mixer and chip register all agreeing, so it was not
+  reproduced. Which output and which direction are not known yet.
 - **Corrections to this entry as first written:** loud music was not the cause.
   On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
   sink volume raised no interrupts. The 23 ohm figure was one reading, not a
@@ -78,8 +85,8 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Package the `Headphones2` rename and the WirePlumber rule, then decide on moving
-  the kernel patches to the verified branches.
+- Decide on moving the kernel patches and UCM r14 to the verified branches.
+- Catch the volume mismatch while it is happening.
 - Consider a Phosh change so numbered headphone ports count without a form factor
   rule.
 - Small click when switching between `Headphones` and `HeadphonesHiFi`. LG has
