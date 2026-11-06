@@ -14,22 +14,56 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
 ### Headphones
 
-- **Working: jack detection.** Plug, unplug, headset mic and the headset button
-  all report correctly on r74. The headset measured 23 ohms per side.
-- **Not fixed: static on real music through the `Headphones` path.** The headset
-  button resumed a paused Firefox video, and the codec raised about 30,000
-  over-current interrupts per side in 13 seconds, heard as static, until the
-  button paused it again. Sink volume was 52%. Two very quiet test tones raised
-  none. Whether the current is real or a false trip is not known yet.
-- **Lead, from reading the source:** LG's driver sets `RX_OCP_CTL` and
-  `HPH_OCP_CTL` at start-up, stops retrying after 20 attempts, and has an HPH
-  register recovery step. Our driver has none of these and retries without
-  limit. No fix is written or tested yet.
-- **Not tested: `HeadphonesHiFi`.** It is in a separate card profile, so the
-  test found no sink and played nothing on it. Whether the quiet tones on
-  `Headphones` were audible is also unconfirmed.
-- Seen once: an `ln_bb_clk1 already disabled` warning when the audio stream
-  closed 5 seconds after an unplug. Cause not traced.
+**State:** four kernel patches fix the alarm flood and the lasting silence on the
+bench US998. They are on a local test branch, `ember/hph-ocp-20261106` at
+`312847c85fcb`, built as package r76. They are not on `master` or
+`joan/latest-clean-test` yet. Tested with one phone, one headset and one boot,
+using test tones and speech. Real music has not been played on r76.
+
+- **Working on r74 and r76: jack detection.** Plug, unplug, headset mic and the
+  headset button all report correctly. Impedance readings moved between 11 and
+  23 ohms across boots, so treat them as rough.
+- **Fixed in r76: alarm flood when the plug is pulled during playback.** The
+  codec's headphone amplifier kept driving the open jack, raising about 2,000
+  over-current interrupts per second per side. One pull on r74 gave 13,365. LG
+  turns the amplifier off on removal and back on after insertion, and our driver
+  did not. On r76, 10 pulls and 10 re-inserts in 25 seconds during a tone,
+  including wiggling and partial insertion, gave 0 interrupts, and the tone came
+  back by ear.
+- **Fixed in r76: silence on all headphone paths after the flood, until reboot.**
+  Repeated micbias disables released the codec clock too many times, giving the
+  `ln_bb_clk1 already disabled` warning. The likely result is `sysclk_users`
+  going to -1, which would skip clock setup for later streams. The counter was
+  never read directly, so this link is inferred. Silent streams on r74 reported
+  no errors. On r76 there were 0 clock warnings, and speech on both outputs was
+  heard after the same abuse.
+- **Added in r76:** the over-current registers LG sets at start-up
+  (`RX_OCP_CTL`, `HPH_OCP_CTL`) and a limit of 20 retries. The retry limit never
+  fired in these tests, so it is unexercised. Its patch needs rework before
+  upstream, because pm4125 sends no PA-off event.
+- **Working on r76: `HeadphonesHiFi`.** Speech was heard at all three test levels.
+  It needs a card profile switch to reach. The chip's own volume sits at -17 dB,
+  and a tone 6 dB below the quietest speech level was not heard.
+- **Working on r76: left and right.** Speech reached the correct ear on both
+  outputs, with no bleed reported.
+- **Not reproduced, so not proven fixed: the first flood.** On r74 a Firefox video
+  resumed 3 seconds after plugging in, with the jack reported present, raised
+  about 30,000 interrupts per side in 13 seconds. r76 gave 0 interrupts with a tone
+  started 0, 1, 2 and 3 seconds after plug-in, but that case was never reproduced
+  on r74 to compare against.
+- **Corrections to this entry as first written:** loud music was not the cause.
+  On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
+  sink volume raised no interrupts. The 23 ohm figure was one reading, not a
+  stable measurement.
+
+**To do:**
+
+- Play real music on r76, then decide on moving the patches to the verified
+  branches.
+- Small click when switching between `Headphones` and `HeadphonesHiFi`. LG has
+  register sequences for this transition, and our driver does not.
+- ES9218P differences from LG: no power-down on unplug, no wait for the impedance
+  result before Hi-Fi, and Hi-Fi is not the default output.
 
 ### Bench note
 
@@ -37,6 +71,9 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
   interconnect and clock-controller hardware registers. It never returned, and
   the phone then answered ping but not SSH. The script is the likely cause. This
   was a test mistake, not a phone fault.
+- The `sink []` failures in the audio tests were also a test problem. The user's
+  PipeWire only runs while that user has a session, so it stops when the last SSH
+  session closes. Keep one session open during a test run.
 
 ## 2026-11-04
 
