@@ -18,7 +18,8 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 bench US998. They are on a local test branch, `ember/hph-ocp-20261106` at
 `312847c85fcb`, built as package r76. They are not on `master` or
 `joan/latest-clean-test` yet. Tested with one phone, one headset and one boot,
-using test tones and speech. Real music has not been played on r76.
+using test tones, speech and Firefox music, which sounded fine. No alarms or
+clock warnings over the whole session.
 
 - **Working on r74 and r76: jack detection.** Plug, unplug, headset mic and the
   headset button all report correctly. Impedance readings moved between 11 and
@@ -51,6 +52,25 @@ using test tones and speech. Real music has not been played on r76.
   about 30,000 interrupts per side in 13 seconds. r76 gave 0 interrupts with a tone
   started 0, 1, 2 and 3 seconds after plug-in, but that case was never reproduced
   on r74 to compare against.
+- **Found by Lance on r76, cause known: Hi-Fi was not treated as headphones.** It
+  had a speaker icon, and Firefox kept playing on the loudspeaker after an unplug
+  instead of pausing. Two separate causes, both tested on the phone by live edit
+  and not yet packaged:
+  - The icon: PipeWire reads the port type from the UCM device name up to the first
+    non-letter, so `HeadphonesHiFi` came out as Unknown. Renaming the device to
+    `Headphones2` gives type Headphones and the headphone icon. Heard and seen on
+    the phone.
+  - The pause: Phosh pauses when the output stops being headphones, and only
+    counts a sink as headphones if its form factor is `headphone` or `headset`, or
+    its port is exactly `[Out] Headphones`. The rename alone did not fix this. A
+    WirePlumber rule setting `device.form_factor = "headphone"` on the Hi-Fi sink
+    did: Firefox paused on 2 of 2 unplugs.
+- **Not reproduced: a random slow switch back after plugging in on Hi-Fi.** Lance
+  saw it now and then, not badly. In the logged re-plugs, the plug interrupt to
+  the jack report took 0.19 seconds (2 on Hi-Fi, 1 on normal), and the default
+  output followed 0.3 to 0.4 seconds later on both. No slow case was captured. LG
+  puts the chip back in bypass on unplug and we leave it in Hi-Fi, so that is the
+  first thing to check.
 - **Corrections to this entry as first written:** loud music was not the cause.
   On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
   sink volume raised no interrupts. The 23 ohm figure was one reading, not a
@@ -58,8 +78,10 @@ using test tones and speech. Real music has not been played on r76.
 
 **To do:**
 
-- Play real music on r76, then decide on moving the patches to the verified
-  branches.
+- Package the `Headphones2` rename and the WirePlumber rule, then decide on moving
+  the kernel patches to the verified branches.
+- Consider a Phosh change so numbered headphone ports count without a form factor
+  rule.
 - Small click when switching between `Headphones` and `HeadphonesHiFi`. LG has
   register sequences for this transition, and our driver does not.
 - ES9218P differences from LG: no power-down on unplug, no wait for the impedance
