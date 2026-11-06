@@ -83,7 +83,11 @@ clock warnings over the whole session.
   few switches, until a re-plug. The slider, mixer, chip volume, analog volume and
   Firefox's stream volume read the same before and after that re-plug. The stuck
   slider does not account for this on its own. A full wide snapshot exists only
-  for the good state, so the next case can be compared against it.
+  for the good state, so the next case can be compared against it. Firefox also
+  writes the page's volume into its stream volume, which moved from 82% to 78%
+  with nobody touching it. That is a separate volume from the slider, but only
+  1.5 dB. A test stream held its exact level through four output switches, so
+  PipeWire does not drift. Past PipeWire, nothing has been measured.
 - **Corrections to this entry as first written:** loud music was not the cause.
   On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
   sink volume raised no interrupts. The 23 ohm figure was one reading, not a
