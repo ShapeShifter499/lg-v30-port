@@ -77,7 +77,11 @@ clock warnings over the whole session.
   bypass, but selecting Hi-Fi powers the chip up with no stream, so nothing ever
   returns it to bypass. This may also be the random slow switch back Lance noticed
   on Hi-Fi. In the logged re-plugs where detection worked, it took 0.16 to 0.20
-  seconds.
+  seconds. A fix is on local branch `ember/es9218p-idle-bypass-20261106` at
+  `fe54d49f576e`, built as r25 and booted, not pushed. Checked with a silent
+  stream: with Hi-Fi selected and idle the chip stays in reset, it comes up with
+  the right registers when a stream opens, and it returns to reset afterwards.
+  Sound and re-plugging on r25 still need testing by ear.
 - **Open: the Phosh slider can get stuck on the wrong output.** After several
   switches and a re-plug, audio was on Hi-Fi and PipeWire's default was Hi-Fi, but
   Phosh showed a speaker icon, and nudging its slider moved the Speaker sink from
@@ -108,7 +112,7 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Keep the ES9218P in bypass until a stream opens, so plug detection always works.
+- Test r25 by ear and with re-plugs on idle Hi-Fi, then decide on pushing it.
 - Check whether callaudiod causes the default output's brief flip to Speaker on
   each switch. It forces the first new sink as default, even outside calls.
 - Try a WirePlumber script that pauses when the headphone port goes unavailable,
