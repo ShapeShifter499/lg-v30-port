@@ -73,11 +73,17 @@ clock warnings over the whole session.
   output followed 0.3 to 0.4 seconds later on both. No slow case was captured. LG
   puts the chip back in bypass on unplug and we leave it in Hi-Fi, so that is the
   first thing to check.
-- **Open: volume can stop matching the slider after switching outputs.** A re-plug
-  brought it back into line without moving the slider. Each output remembers its
-  own slider position, 37% and 52% at the time. A silent switch and back showed
-  the slider, PipeWire gain, mixer and chip register all agreeing, so it was not
-  reproduced. Which output and which direction are not known yet.
+- **Open: the Phosh slider can get stuck on the wrong output.** After several
+  switches and a re-plug, audio was on Hi-Fi and PipeWire's default was Hi-Fi, but
+  Phosh showed a speaker icon, and nudging its slider moved the Speaker sink from
+  67% to 53% and left Hi-Fi at 52%. Phosh only follows the output when
+  libgnome-volume-control reports a change. Why that was missed is not known.
+  Each output also keeps its own slider position.
+- **Open, not explained: Hi-Fi sounded noticeably quieter than its slider** after a
+  few switches, until a re-plug. The slider, mixer, chip volume, analog volume and
+  Firefox's stream volume read the same before and after that re-plug. The stuck
+  slider does not account for this on its own. A full wide snapshot exists only
+  for the good state, so the next case can be compared against it.
 - **Corrections to this entry as first written:** loud music was not the cause.
   On r74 full-scale sine, noise, bass, bursts and square waves at 52, 75 and 100%
   sink volume raised no interrupts. The 23 ohm figure was one reading, not a
@@ -86,7 +92,8 @@ clock warnings over the whole session.
 **To do:**
 
 - Decide on moving the kernel patches and UCM r14 to the verified branches.
-- Catch the volume mismatch while it is happening.
+- Find why Phosh misses the output change, and catch the quiet Hi-Fi case with a
+  full snapshot.
 - Consider a Phosh change so numbered headphone ports count without a form factor
   rule.
 - Small click when switching between `Headphones` and `HeadphonesHiFi`. LG has
