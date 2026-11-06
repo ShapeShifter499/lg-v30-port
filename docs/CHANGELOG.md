@@ -17,9 +17,10 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 **State:** four kernel patches fix the alarm flood and the lasting silence on the
 bench US998. They are on `joan/latest-clean-test` at `312847c85fcb`, tested as
 package r76, and on `master` at `b81e29658fd7`. pmaports `device-lge-joan` at
-`64e1b4f0ed72` carries linux-lg-joan r24 and alsa-ucm-conf-lg-joan r14. The `master`
-build compiled but was not booted. It differs from the tested branch in tfa989x,
-q6asm-dai and qcom_smgr. Tested with one phone, one headset and one boot,
+`64e1b4f0ed72` carries linux-lg-joan r24 and alsa-ucm-conf-lg-joan r14. r24 is booted
+and passed on the phone: speech heard on both outputs, and 3 pulls during a tone
+on the normal output gave 0 interrupts with the tone returning each time. It
+differs from r76 in tfa989x, q6asm-dai and qcom_smgr. Tested with one phone and one headset,
 using test tones, speech and Firefox music, which sounded fine. No alarms or
 clock warnings over the whole session.
 
@@ -90,9 +91,11 @@ clock warnings over the whole session.
   output switches, which points at Firefox or how its stream is handled, but that
   is not proven. Firefox also writes the page's volume into its stream volume, so
   that number can move by itself.
-- **Upstream:** no matching report found. Phosh issue 1273 plans to drop Phosh's
-  pause on unplug in favour of WirePlumber, which would likely lose it here,
-  because our sinks are not removed on unplug. In Phosh, slider updates also write
+- **Upstream:** no matching report found for the slider or the quiet stream. The
+  pause gap is known: WirePlumber issue 860 asks for pausing on 3.5mm unplug and is
+  open with no comments. WirePlumber only pauses when an output is removed. Phosh
+  issue 1273 plans to drop Phosh's own pause in favour of WirePlumber, which would
+  likely lose it here, because our sinks are not removed on unplug. In Phosh, slider updates also write
   back to the stream without checking `setting_volume`, which may explain the
   jumpy slider. Not proven.
 - **Corrections to this entry as first written:** loud music was not the cause.
@@ -102,7 +105,8 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Boot `master` r24 on the phone.
+- Try a WirePlumber script that pauses when the headphone port goes unavailable,
+  and offer it on issue 860 if it works.
 - Find why Phosh misses the output change, and catch the quiet Hi-Fi case with a
   full snapshot.
 - Consider a Phosh change so numbered headphone ports count without a form factor
