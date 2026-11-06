@@ -81,7 +81,11 @@ clock warnings over the whole session.
   `fe54d49f576e`, built as r25 and booted, not pushed. Checked with a silent
   stream: with Hi-Fi selected and idle the chip stays in reset, it comes up with
   the right registers when a stream opens, and it returns to reset afterwards.
-  Sound and re-plugging on r25 still need testing by ear.
+  Tested by Lance on r25: 4 re-plugs on idle Hi-Fi all detected, including after
+  fast switching, speech heard on both outputs, and clean Firefox resumes with the
+  chip registers matching the good snapshot. Hi-Fi sounded louder than on r24 at
+  the same settings, with Lance turning it down from 41% to 29%. The cause is not
+  measured.
 - **Open: the Phosh slider can get stuck on the wrong output.** After several
   switches and a re-plug, audio was on Hi-Fi and PipeWire's default was Hi-Fi, but
   Phosh showed a speaker icon, and nudging its slider moved the Speaker sink from
@@ -112,7 +116,7 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Test r25 by ear and with re-plugs on idle Hi-Fi, then decide on pushing it.
+- Decide on pushing r25.
 - Check whether callaudiod causes the default output's brief flip to Speaker on
   each switch. It forces the first new sink as default, even outside calls.
 - Try a WirePlumber script that pauses when the headphone port goes unavailable,
@@ -125,6 +129,22 @@ clock warnings over the whole session.
   register sequences for this transition, and our driver does not.
 - ES9218P differences from LG: no power-down on unplug, no wait for the impedance
   result before Hi-Fi, and Hi-Fi is not the default output.
+
+### Sensors
+
+- **Found: ambient light.** The sensor DSP lists "LGE Light" (AMS TAOS) as data type
+  1 of sensor 0x28, and the driver only requested type 0. Read directly over QRTR it
+  gives about 20 samples per second, but it read 0 lux in the one lighting condition
+  tried, so accuracy is not checked. Driver support and a fix for a lock left held
+  after a failed request are on local branch `ember/smgr-light-20261106` at
+  `7fb5e47ff160`, built as r26, not yet booted.
+- **Read directly from the DSP:** accelerometer and gyro (InvenSense), magnetometer
+  (AKM) and barometer (Bosch, 1018.5 hPa) all returned sensible values.
+- **Not explained:** one driver request for the gyro failed with -EINVAL. A test read
+  then stayed stuck in the driver until reboot.
+- **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
+  bound. It was not retried with nobody at the phone, because a past probe of it or
+  the camera sensor hung the SoC.
 
 ### Bench note
 
