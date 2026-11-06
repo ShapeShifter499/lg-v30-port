@@ -116,7 +116,6 @@ clock warnings over the whole session.
 
 **To do:**
 
-- Decide on pushing r25.
 - Check whether callaudiod causes the default output's brief flip to Speaker on
   each switch. It forces the first new sink as default, even outside calls.
 - Try a WirePlumber script that pauses when the headphone port goes unavailable,
@@ -132,16 +131,51 @@ clock warnings over the whole session.
 
 ### Sensors
 
-- **Found: ambient light.** The sensor DSP lists "LGE Light" (AMS TAOS) as data type
-  1 of sensor 0x28, and the driver only requested type 0. Read directly over QRTR it
-  gives about 20 samples per second, but it read 0 lux in the one lighting condition
-  tried, so accuracy is not checked. Driver support and a fix for a lock left held
-  after a failed request are on local branch `ember/smgr-light-20261106` at
-  `7fb5e47ff160`, built as r26, not yet booted.
-- **Read directly from the DSP:** accelerometer and gyro (InvenSense), magnetometer
-  (AKM) and barometer (Bosch, 1018.5 hPa) all returned sensible values.
-- **Not explained:** one driver request for the gyro failed with -EINVAL. A test read
-  then stayed stuck in the driver until reboot.
+- **State:** pushed. Kernel `master` at `7c1fbdb63002` (tested as r29),
+  `joan/latest-clean-test` at `0f643b34c44a` (same seven commits, not booted; its
+  sensor and ES9218P code differs from r29 only by its existing typed QMI release
+  callback), pmaports `device-lge-joan` at `7d98db529a` (linux r29). The GitHub
+  tarball matches the recipe. r29 is booted and every SMGR sensor reads through the
+  driver: accelerometer, gyro, magnetometer, barometer, proximity and light. 0 QMI
+  encode errors. Lance tested proximity, gyro and rotation by hand on r29.
+- **Added: ambient light.** The sensor DSP lists "LGE Light" (AMS TAOS) as data type
+  1 of sensor 0x28, and the driver only requested type 0. It is now a `qcom-smgr-light`
+  IIO device, and iio-sensor-proxy reports it in lux (7 lux at the desk, lit by a lamp
+  and sunlight through blinds).
+- **Light level check:** peak 33 lux against about 60 on a Samsung Fold 5 in the same
+  room, a rough check by one other phone, not a calibration. It read 0 under every
+  cover. Streaming and single reads agree. LG's black glass coefficients are loaded;
+  the silver glass ones are not, and this phone's glass colour is not confirmed.
+- **Fixed: failed sensor requests.** The gyro's -EINVAL, and the test read stuck
+  after it, had two causes. The kernel's QMI code treats length fields as 32-bit,
+  but the driver declared them 8-bit, so stray bytes could corrupt a request. The
+  one-shot read also kept its lock after a failed request. Both fixed.
+- **Fixed: proximity on the desktop.** The driver reported 0 for near, opposite to
+  the IIO rule, and published no near level, so iio-sensor-proxy refused the sensor.
+  `fd43578cc244` fixes both in the driver, with no device-specific udev rule. On r29
+  the warning is gone and the proxy tracks covers (near level 1638). It also went
+  near during the spin and rotation steps, probably from Lance's hand, not confirmed.
+  Blanking the screen during a call is not tested.
+- **Fixed: gyro timeouts.** About 1 read in 8 timed out on r27. On r29 a one-shot
+  read takes about 293 ms when the gyro has been idle for 2 seconds, which is why
+  the 250 ms wait was marginal. `2ccc6a540306` waits up to 1 s. 372 reads on r29, 0
+  errors.
+- **Fixed: Z axis flipped.** Lying screen up, the phone reported face-down (-9.71
+  m/s^2) because the driver's mount matrix was a reflection, not a rotation.
+  `7c1fbdb63002` negates Z. r29 reports face-up. Gyro Z after the matrix is positive
+  for the counter-clockwise spin, as the kernel docs require, assuming the spins were
+  done in the order asked. One 1-second face-down reading appeared while the phone
+  was being put down.
+- **Rotation still works:** iio-sensor-proxy reported left-up, right-up, bottom-up
+  and normal on r29. Whether the screen itself follows was not reported.
+- **Open: no desktop compass.** The magnetometer reads through IIO, but
+  iio-sensor-proxy never uses raw magnetometers. It needs a ready-made heading, the
+  IIO channel `in_rot_from_north_magnetic_tilt_comp`, or its SSC path, which does not
+  apply to this SMGR-era DSP. Raw magnetometers are its open issue 310, and an
+  earlier attempt (MR 316) was closed. Our raw field also reads about 1.5 at rest,
+  which would be too strong for Earth's field if the unit is gauss, so it probably
+  needs calibration before it can give a heading. Next step: find out whether the
+  DSP's own services offer a calibrated heading.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
