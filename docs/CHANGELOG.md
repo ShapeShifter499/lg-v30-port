@@ -229,8 +229,11 @@ clock warnings over the whole session.
   The lock survived stopping every client. The DSP has not written the learned offset
   back to the registry, so it may not survive a reboot. Rotation Vector, Orientation
   and raw IIO all benefit, but the desktop still shows "No compass" until a driver
-  exposes a heading. Rotation logged left and right but not upside down, and proximity
-  logged 11 near events where 3 were asked for; neither is explained yet.
+  exposes a heading. On these settings the screen followed rotation by hand. No
+  upside-down event was logged because the phone was held screen-down, which counts as
+  tilt. Proximity logged 11 near events where 3 were asked for; Lance's arm was
+  brushing near the top. With nothing near it there were 0 events in 80 s idle and 0
+  in about 70 s under the full logging load.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
