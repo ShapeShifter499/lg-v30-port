@@ -187,13 +187,21 @@ clock warnings over the whole session.
   0.5 degrees. Raw gyro bias at rest is about 1.1 deg/s, which matches that 1.03 deg/s
   swing. Rotation Vector drifted more slowly, at 0.57 deg/s, so it is not simply the
   same integration. Cause not yet known.
-- **Lead: calibration may never start.** The firmware contains gyro and magnetometer
-  calibration code, but services 272, 320 and 321 are not published. `sns-reg` answers
-  only group reads (message 0x04) of the 7 request types the registry defines, and
-  drops the rest silently, including writes. All 328 LG registry items are installed,
-  so missing items are not the cause. The DSP sent `sns-reg` nothing while six fusion
-  services were started (50 s strace, control packets only), so any such traffic
-  happens at boot. A boot-time trace is the next step; none has been taken yet.
+- **Cause found, fix not yet tested: the DSP's algorithms were running on zeros.**
+  A boot-time trace shows the DSP making 79 registry requests. Five reads failed
+  because `sns-reg` had no map for those groups (2500 gyro calibration, 2970 mag
+  calibration, 2610, 2980, 2990), and three writes (2690, 2691, 3050) got no reply.
+  The phone's own registry, `/sns/cal/sns.reg` on the `sns` partition, shows 187
+  non-zero values our registry lacks, including factory gyro bias and scale (group
+  10), accel factory calibration (group 0), and tuning for Filtered Mag, Gravity and
+  Orientation. An earlier note here said missing items were not the cause; that was
+  wrong, it only held for the 328 items in LG's config. Group layouts come from the
+  tables in LG's `sensors.qti`, checked against `sns-reg`'s map (64 of 68 groups
+  identical, all sizes equal) and against `sns.reg`, whose size matches exactly.
+  `sns-reg` r1 adds the groups and answers writes. It and 95 registry values are
+  staged on the bench phone, not yet booted. Groups 2690 and 2800 were left alone
+  because they hold working hardware setup. Factory values are per handset, so they
+  cannot ship in a package as they are.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
