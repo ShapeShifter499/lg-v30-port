@@ -234,6 +234,13 @@ clock warnings over the whole session.
   tilt. Proximity logged 11 near events where 3 were asked for; Lance's arm was
   brushing near the top. With nothing near it there were 0 events in 80 s idle and 0
   in about 70 s under the full logging load.
+- **Shared settings alone do most of it.** Device package r38 adds 84 values and
+  leaves out factory biases and the magnetometer preload. Booted with `sns-reg` r1:
+  services 320 and 321 appear, Rotation Vector held still at rest, and the DSP learned
+  the gyro bias by itself within a few minutes (1.17 to 0.07 deg/s, group 2610 values
+  close to factory plus learned on the earlier boot). So factory gyro values are not
+  needed. The 84 come from one handset, so "shared" is a judgement by kind. Compass
+  lock has not been tried on this set.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
