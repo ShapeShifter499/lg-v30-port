@@ -174,8 +174,26 @@ clock warnings over the whole session.
   apply to this SMGR-era DSP. Raw magnetometers are its open issue 310, and an
   earlier attempt (MR 316) was closed. Our raw field also reads about 1.5 at rest,
   which would be too strong for Earth's field if the unit is gauss, so it probably
-  needs calibration before it can give a heading. Next step: find out whether the
-  DSP's own services offer a calibrated heading.
+  needs calibration before it can give a heading.
+- **Compass, DSP services checked: no usable heading yet.** The DSP offers Rotation
+  Vector (274), Orientation (279) and Filtered Mag (273). Orientation stops changing
+  0.3 s after it starts. Rotation Vector does follow turns: four clockwise quarter
+  turns read +83, +86, +91 and +77 degrees. It is not a compass, though: its accuracy
+  byte stayed 0 after a figure-8, and it reported about 62 degrees of tilt on a phone
+  lying flat by the end of a 157 s run. The phone also read about 205 degrees at what
+  appears to be the north hold (which hold it was is inferred from the turn sequence).
+  Filtered Mag is not live field data: its strength stayed within 0.0002 through a
+  figure-8, and at rest it swung 37 degrees in 36 s while the raw magnetometer moved
+  0.5 degrees. Raw gyro bias at rest is about 1.1 deg/s, which matches that 1.03 deg/s
+  swing. Rotation Vector drifted more slowly, at 0.57 deg/s, so it is not simply the
+  same integration. Cause not yet known.
+- **Lead: calibration may never start.** The firmware contains gyro and magnetometer
+  calibration code, but services 272, 320 and 321 are not published. `sns-reg` answers
+  only group reads (message 0x04) of the 7 request types the registry defines, and
+  drops the rest silently, including writes. All 328 LG registry items are installed,
+  so missing items are not the cause. The DSP sent `sns-reg` nothing while six fusion
+  services were started (50 s strace, control packets only), so any such traffic
+  happens at boot. A boot-time trace is the next step; none has been taken yet.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
