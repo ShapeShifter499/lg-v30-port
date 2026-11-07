@@ -198,10 +198,24 @@ clock warnings over the whole session.
   wrong, it only held for the 328 items in LG's config. Group layouts come from the
   tables in LG's `sensors.qti`, checked against `sns-reg`'s map (64 of 68 groups
   identical, all sizes equal) and against `sns.reg`, whose size matches exactly.
-  `sns-reg` r1 adds the groups and answers writes. It and 95 registry values are
-  staged on the bench phone, not yet booted. Groups 2690 and 2800 were left alone
+  `sns-reg` r1 adds the groups and answers writes. It and 95 registry values were
+  booted on the bench phone (kernel still r29). Groups 2690 and 2800 were left alone
   because they hold working hardware setup. Factory values are per handset, so they
   cannot ship in a package as they are.
+- **Result on the phone: drift fixed, compass still open.** Services 320 (mag cal) and
+  321 (gyro cal) now exist. At rest, raw gyro bias fell from 1.10 to 0.04 deg/s,
+  Filtered Mag's swing from 37 degrees in 36 s to 0.07 in 44 s, and Rotation Vector's
+  drift from 20 degrees in 36 s to under 0.1 in 44 s. The phone now reads flat when
+  flat. Orientation no longer freezes. Gyro calibration reports accuracy 3 and writes
+  learned values back. Magnetometer calibration does not converge: after a 60 s tumble
+  it sent no reports, its 2980 writes held zero bias, and accuracy stayed 0. A sphere
+  fit on the raw magnetometer gives a fixed offset of about 1.47 and a field of about
+  0.45 (close to Earth's if the unit is gauss), so the offset is about three times the
+  signal. That matches Orientation's heading barely moving through a full turn. Heading
+  from the raw data with that fit removed stepped +106, +81, +69 and +43 degrees and
+  read about 157 at the north hold, so one rough fit is not a usable compass.
+  iio-sensor-proxy still sees tilt, light and proximity. Rotation and proximity have
+  not been hand-tested on these settings. Learned values last for one boot only.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
