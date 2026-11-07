@@ -214,8 +214,23 @@ clock warnings over the whole session.
   signal. That matches Orientation's heading barely moving through a full turn. Heading
   from the raw data with that fit removed stepped +106, +81, +69 and +43 degrees and
   read about 157 at the north hold, so one rough fit is not a usable compass.
-  iio-sensor-proxy still sees tilt, light and proximity. Rotation and proximity have
-  not been hand-tested on these settings. Learned values last for one boot only.
+  iio-sensor-proxy still sees tilt, light and proximity.
+- **Compass now works on the bench phone, roughly.** Preloading that fitted offset
+  into group 2980 (`3901` = 1, `3903`-`3905`, the negated fit, inferred from how the
+  DSP applies gyro bias) did not change readings at boot. About 110 s into a hand test
+  the DSP's calibration locked: accuracy rose from 0 to 2, the field fell from about
+  1.6 to 0.4-0.7, and the raw IIO magnetometer became calibrated too. Against a Fold 5
+  compass, Rotation Vector read 131 at a 46 degree bearing, 81-91 at north and 172 a
+  quarter turn later, a fixed difference of about 85 degrees, which fits the DSP's axes
+  being swapped from the phone's. The quarter turn after that was noisy (274-293) and
+  the rest was less clear, so expect about 10-15 degrees at best. Near the end 61 of
+  9,537 samples read accuracy 0 with a zero heading. It is not known whether the
+  preload caused the lock: one run without it did not lock and one run with it did.
+  The lock survived stopping every client. The DSP has not written the learned offset
+  back to the registry, so it may not survive a reboot. Rotation Vector, Orientation
+  and raw IIO all benefit, but the desktop still shows "No compass" until a driver
+  exposes a heading. Rotation logged left and right but not upside down, and proximity
+  logged 11 near events where 3 were asked for; neither is explained yet.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
