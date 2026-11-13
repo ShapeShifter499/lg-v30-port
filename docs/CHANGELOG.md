@@ -51,6 +51,23 @@ Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
   ported on 10-02 and is disabled in the DT (`0f648bc9c5d1`) because enabling the
   second SLIMbus engine hung the phone about 10 s into boot.
 
+- **FM audio: the power request itself crashes the audio DSP.** A userspace probe sent
+  the driver's SLIMbus QMI requests for the second engine: select instance 1 was
+  accepted, power ACTIVE got no answer, and in the same second the kernel logged
+  `adsp: fatal error received: SFR Init: wdog or kernel error suspected`. The phone
+  then reset into LineageOS. No AP register had been read, so the 10-03 explanation
+  (the first AP read of the engine block stalls the bus) is wrong; the r34 boot hang
+  was most likely this same crash. LG's DT does use the path (`qcom,wcn-btfm`), so the
+  stock kernel provides something ours does not: not yet found. One run. Probe:
+  `bench/ngd2probe.py`.
+- **LG's userspace thermal rules, for reference** (`thermal-engine-8998.conf` from the
+  phone's vendor files, copy in `bench/lg-thermal-engine/`). Junction: both clusters,
+  GPU and memory sensors limit at 85 C. Skin, big cores: 37 C caps 1958 MHz, 38.5 C
+  1728, 41 C 1056, 44 C 729.6; little cores 1555 at 46 C. Skin, GPU: 38 C caps 670 MHz,
+  39 C 515, 41 C 414, 42.5 C 342. Charge current: 2600 mA from 10 C, 1500 at 40 C, 800
+  at 42 C, 600 at 45 C. Our DT already has the same big-core and charge steps and the
+  same 85 C limit. Nothing changed today.
+
 ## 2026-11-06
 
 ### Headphones
