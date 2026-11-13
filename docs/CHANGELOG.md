@@ -51,15 +51,22 @@ Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
   ported on 10-02 and is disabled in the DT (`0f648bc9c5d1`) because enabling the
   second SLIMbus engine hung the phone about 10 s into boot.
 
-- **FM audio: the power request itself crashes the audio DSP.** A userspace probe sent
-  the driver's SLIMbus QMI requests for the second engine: select instance 1 was
-  accepted, power ACTIVE got no answer, and in the same second the kernel logged
-  `adsp: fatal error received: SFR Init: wdog or kernel error suspected`. The phone
-  then reset into LineageOS. No AP register had been read, so the 10-03 explanation
-  (the first AP read of the engine block stalls the bus) is wrong; the r34 boot hang
-  was most likely this same crash. LG's DT does use the path (`qcom,wcn-btfm`), so the
-  stock kernel provides something ours does not: not yet found. One run. Probe:
-  `bench/ngd2probe.py`.
+- **FM audio: the second SLIMbus engine powers up and reads fine; the boot hang is
+  still unexplained.** Correction: an earlier wording of this entry said the power
+  request crashes the audio DSP. That was a bug in the test probe, which asked the DSP
+  to be "satellite" on that engine; LG's driver and ours ask for "master". With the
+  right mode (`select instance 1`, mode master, then power ACTIVE) the DSP answers OK
+  every time and stays up. With the engine powered, the version register reads
+  `0x02000000`, the engine block reads (`NGD_STATUS` `0x40c`), and the BAM reads
+  (`BAM_REVISION` `0x20419`, 4 execution environments, 19 pipes; our DT says 23
+  channels). Unpowered, the same addresses return junk (`0x78`) without hanging. So
+  the 10-03 explanation (an unpowered first read stalls the bus) is ruled out. A later
+  probe read then wedged the phone hard: either `NGD_INT_STAT` or `0x17207000`, the
+  BAM interrupt-source register of execution environment 0, which is not ours (we and
+  LG use 1). Which one is in the on-disk log, not yet read. LG's kernel powers this
+  engine at every boot (interrupts counted on LineageOS) and its V30 DT enables the
+  path (`qcom,wcn-btfm`). Keeping unused clocks, power domains and regulators on made
+  no difference. Probes: `bench/ngd2probe.py`, `bench/ngd2raw.py`.
 - **LG's userspace thermal rules, for reference** (`thermal-engine-8998.conf` from the
   phone's vendor files, copy in `bench/lg-thermal-engine/`). Junction: both clusters,
   GPU and memory sensors limit at 85 C. Skin, big cores: 37 C caps 1958 MHz, 38.5 C
