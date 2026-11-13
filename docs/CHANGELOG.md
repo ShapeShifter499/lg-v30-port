@@ -240,7 +240,9 @@ clock warnings over the whole session.
   the gyro bias by itself within a few minutes (1.17 to 0.07 deg/s, group 2610 values
   close to factory plus learned on the earlier boot). So factory gyro values are not
   needed. The 84 come from one handset, so "shared" is a judgement by kind. Compass
-  lock has not been tried on this set.
+  lock has not been tried on this set. Pushed on 11-07: `sns-reg` r1 and
+  `device-lg-joan` r38 are on pmaports `device-lge-joan` and
+  `joan/integration-20261104` at `4d1ea924244e`.
 - **Open: VL53L0X laser.** It fails its model ID read at boot on r25 and is not
   bound. It was not retried with nobody at the phone, because a past probe of it or
   the camera sensor hung the SoC.
