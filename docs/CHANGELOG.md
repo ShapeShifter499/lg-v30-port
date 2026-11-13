@@ -34,8 +34,11 @@ Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
   schedutil, little 300-1900.8 MHz, big 300-2457.6 MHz. Real clock read from the OSM:
   one loaded big core runs at 2457 MHz. With two to four big cores loaded the big-core
   sensors reach 84-85 C within 2 s, the 85 C passive trip steps the limit down, and the
-  real clock settles near 1958-2112 MHz; it recovers within seconds. Whether 85 C is
-  the best trip for this phone was not examined. GPU 257-710 MHz, parked at the 27 MHz
+  real clock settles near 1958-2112 MHz; it recovers within seconds. LG uses the same
+  85 C: its kernel lowers the hardware limiter (LMh) high threshold from Qualcomm's
+  95 C to 85 C under CONFIG_LGE_PM, arms it at 65 C, and has msm_thermal limit cores
+  at 70 C, unplug them at 105 C and reset at 115 C. LG's userspace thermal-engine
+  rules were not looked at. GPU 257-710 MHz, parked at the 27 MHz
   sleep step with no memory-bus vote when idle. Memory bus stepped up under a 6.6 GB/s
   copy load and back down with no hang. Display clock 275 MHz, command mode, 0
   underruns. No kernel warnings. Frame pacing in Phosh was not re-run: the phone sat
@@ -43,8 +46,10 @@ Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
 - **FM radio app: added to the packages repo** (`lg-v30-joan-pmos-packages`
   `96d9f36`). It was already in pmaports and a dependency of `device-lg-joan` since
   r27. With headphones as the antenna a seek sweep found 14 stations and RDS gave the
-  station name and radiotext. It plays no sound: the WCN3990 sends FM audio over
-  SLIMbus and the kernel has no driver for that link.
+  station name and radiotext. It plays no sound. Correction to an earlier wording
+  of this entry: the kernel does have the driver. The WCN3990 SLIMbus audio path was
+  ported on 10-02 and is disabled in the DT (`0f648bc9c5d1`) because enabling the
+  second SLIMbus engine hung the phone about 10 s into boot.
 
 ## 2026-11-06
 
