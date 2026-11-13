@@ -10,6 +10,42 @@ board. Longer notes live in `status-history.md`, `kernel-change-ledger.md` and
 See the list at the end of the 2026-11-04 entry. Items that need someone at
 the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
+## 2026-11-13
+
+Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
+
+- **Compass: the shipped settings calibrate by themselves.** With no magnetometer
+  preload, about 80 s of tumbling took the DSP's accuracy from 0 to 1 and the field
+  from 1.48 to about 0.3-0.6. So no per-handset value needs to ship. Accuracy reached
+  1, not the 2 seen on 11-06 with the preload (one run each). A sphere fit on Filtered
+  Mag while tumbling after the lock leaves an offset of 0.05 against a field of 0.37.
+- **Heading at the flat holds was poor in this run, cause not settled.** Rotation
+  Vector read 28 at north, an unsteady 79-110 at east, 267 at south, 317 at west and 32
+  back at north. The field at the holds ranged 0.2-0.6 and changed by about 0.3 while
+  the phone lay still at east, then returned to the same value at the second north.
+  That points at something magnetic moving near the phone, possibly the Fold used as
+  the reference, but this was not tested. Filtered Mag also lags a turn by 3-5 s.
+- **Test trap: do not open the DSP's calibration services directly.** With a client
+  on service 320, Filtered Mag read all zeros and Rotation Vector stayed at identity
+  for a whole 278 s run. Both were live again once it was stopped. The same happened
+  on 11-06 with a client on 321. Two earlier passes today were lost to this and to
+  loggers that died when the SSH session closed; run loggers with `systemd-run`.
+- **CPU, GPU and display re-checked, no change needed.** Both CPU clusters present,
+  schedutil, little 300-1900.8 MHz, big 300-2457.6 MHz. Real clock read from the OSM:
+  one loaded big core runs at 2457 MHz. With two to four big cores loaded the big-core
+  sensors reach 84-85 C within 2 s, the 85 C passive trip steps the limit down, and the
+  real clock settles near 1958-2112 MHz; it recovers within seconds. Whether 85 C is
+  the best trip for this phone was not examined. GPU 257-710 MHz, parked at the 27 MHz
+  sleep step with no memory-bus vote when idle. Memory bus stepped up under a 6.6 GB/s
+  copy load and back down with no hang. Display clock 275 MHz, command mode, 0
+  underruns. No kernel warnings. Frame pacing in Phosh was not re-run: the phone sat
+  at the login screen.
+- **FM radio app: added to the packages repo** (`lg-v30-joan-pmos-packages`
+  `96d9f36`). It was already in pmaports and a dependency of `device-lg-joan` since
+  r27. With headphones as the antenna a seek sweep found 14 stations and RDS gave the
+  station name and radiotext. It plays no sound: the WCN3990 sends FM audio over
+  SLIMbus and the kernel has no driver for that link.
+
 ## 2026-11-06
 
 ### Headphones
