@@ -10,6 +10,92 @@ board. Longer notes live in `status-history.md`, `kernel-change-ledger.md` and
 See the list at the end of the 2026-11-04 entry. Items that need someone at
 the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
+## 2026-11-14
+
+Bench US998. Kernel branch `joan/fm-audio-capture` at `e203148584d2` (13 commits
+on master `7c1fbdb63002`), packaged as linux-lg-joan r30, with
+alsa-ucm-conf-lg-joan r15 and fm-radio 0.2. All three are installed on the bench
+phone and r30 is RAM-booted. **The kernel and pmaports commits are local, not
+pushed: everything below was measured, nobody has listened to it yet.**
+
+### FM radio audio
+
+- **FM audio capture works.** The WCN3990 streams 48 kHz stereo over the second
+  SLIMbus engine to the ADSP port SLIMBUS_8_TX, and the kernel offers it as a
+  capture PCM named "FM Radio" (`hw:,7`). A recording from 98.5 MHz is band-limited
+  to 15 kHz with a left/right correlation of 0.69, which is what a stereo broadcast
+  looks like.
+- **October's boot hang is gone, cause not isolated.** The engine was switched off
+  on 10-03 because enabling it hung the phone about 10 s into boot. A gated test
+  kernel that started the engine on command, with every step logged, showed the
+  engine itself is fine. Three things around it were wrong: the chip's driver
+  deferred forever because the chip is only on the bus while Bluetooth or FM is on
+  (and every deferred-probe pass woke the engine again); the SLIMBUS_8_TX DAI did not
+  exist because of a missing `}, {` in the port table; and the chip was never told to
+  put its audio on SLIMbus (helium `HCI_OCF_FM_ENABLE_SLIMBUS`, opcode 0xfc0e). With
+  those fixed the engine starts by itself: 9 boots, no hang.
+- **Captures after the first one were silent: the chip does not tolerate
+  DISCONNECT_PORT.** Mainline's stream teardown disconnects a device's ports; LG's
+  driver never does that for this chip. After a disconnect the next stream carried
+  digital silence for about 2.5 s, or for its whole length if shorter, alternating
+  with good starts. With a run-time switch for the disconnect: 4 of 7 captures
+  started silent with it, 14 of 14 had audio from the first quarter second without.
+  Fixed with a `keep_ports_connected` device flag in the slimbus core.
+- **The chip only joins the bus if the bus is awake when FM audio is switched on.**
+  With the controller runtime-suspended, 2 of 6 tuner sessions never got a working
+  stream (the register read in prepare timed out for 13-22 s); with it held awake,
+  6 of 6 worked at once. The radio driver now takes a runtime PM reference on the
+  controller around the enable command and holds it 300 ms. After that: 12 of 12
+  sessions worked on the first attempt.
+- **Channel removal ported from LG's NGD driver.** Mainline dropped the "remove
+  channel" step for NGD controllers, so a channel stayed active on the ADSP after its
+  stream stopped. This also applies to the main codec on the first engine: 18
+  microphone and 6 earpiece start/stop cycles were unaffected and the kernel logged no
+  error. It was not the cure for the silent captures.
+- **Sound profile r15:** the HiFi verb routes the FM PCM. It is not a UCM device on
+  purpose, because a device that cannot be opened while the chip is off would make the
+  whole profile unusable when the sound server probes it. A WirePlumber rule drops the
+  "Pro Audio" profile, whose probing opened every PCM at each login and could only
+  fail on this card. r15 needs kernel r30 (the mixer control does not exist before).
+- **fm-radio 0.2:** plays to any output of the sound server (the speaker works with
+  headphones plugged in as the antenna), volume, records to FLAC, WAV, Opus, MP3, Ogg
+  Vorbis or AAC with a quality choice, and one switch saves RDS next to a recording as
+  a time-stamped text log plus the raw block stream (about 140 bytes a second). Tested
+  without sound (volume 0): recordings over five runs all full length with audio
+  throughout, output switched mid-recording, file completed when the app closes, and
+  the real window driven headlessly through every action.
+- **Recorder lesson:** the first design attached an encoder branch to the running
+  pipeline. It lost audio in three different timing-dependent ways (the branch linked
+  before it was running, the file's time origin taken from the wrong clock, and the
+  sink waiting to preroll). Each recording is now a pipeline of its own fed from a tap,
+  with timestamps counted from its first sample.
+- **RDS still works with audio on.** 96.9 and 90.9 MHz decode cleanly (station name
+  and radiotext, about 40 blocks a second). 98.5 MHz, clean on the morning of 11-13,
+  delivered almost nothing in the evening: its signal reading fell from 68% to 56-62%.
+  The decoder now only trusts groups whose programme ID was seen three times in a row.
+
+### Thermal (measured 11-13, no change)
+
+- **LG's limits stay.** A candidate that moved the skin steps up by about 4 C held the
+  real big-core clock near 1789-1555 MHz for 20 minutes of 8-core load, with the skin at
+  43.8 C and the battery at 46.8 C. Lance judged it "noticeably warm, not burning" and
+  chose LG's defaults for the battery's sake. Under all-core load LG's first two skin
+  steps do nothing because the 85 C junction limit already binds; the 41 C step
+  (1056 MHz) is the one that matters. Logs: `bench/heat-*-r29-20261113.log`.
+
+### Not done
+
+- Listening test, then push: kernel to master, pmaports (`3748aac537`,
+  `902efc5f4b`), packages repo (`614907a`).
+- Power draw of FM: not measured (the bench phone is full and on USB).
+- The copy of the sound profile in the packages repo is r6; the fork has r15.
+- Transmit and other bands, desk findings only. The FM chip has no transmit path
+  (measured 09-26). The SoC can put a clock near 100 MHz on a few pins (GP clocks on
+  GPIO 57-59, 78, 81, 82; camera master clocks on GPIO 13-16, fed by fractional PLLs),
+  so a Raspberry-Pi-style clock transmitter is not ruled out; nothing was radiated.
+  Nothing in the phone reaches AM or shortwave. The FM protocol defines register
+  peek/poke commands; whether this firmware honours them is untested.
+
 ## 2026-11-13
 
 Bench US998, kernel r29 (RAM-booted), device package r38, `sns-reg` r1.
