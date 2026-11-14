@@ -15,8 +15,10 @@ the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 Bench US998. Kernel branch `joan/fm-audio-capture` at `e203148584d2` (13 commits
 on master `7c1fbdb63002`), packaged as linux-lg-joan r30, with
 alsa-ucm-conf-lg-joan r15 and fm-radio 0.2. All three are installed on the bench
-phone and r30 is RAM-booted. **The kernel and pmaports commits are local, not
-pushed: everything below was measured, nobody has listened to it yet.**
+phone and r30 is RAM-booted. **Pushed 11-14 after Lance listened on the bench
+phone ("sounds flawless now"):** kernel master `e203148584d2`, pmaports
+`device-lge-joan` `5671aa92da19`, packages repo `7548bfc`. The GitHub archive of the
+kernel commit matches the checksum in the package.
 
 ### FM radio audio
 
@@ -71,7 +73,7 @@ pushed: everything below was measured, nobody has listened to it yet.**
   same branch into a null output forced to the speaker chunk size: 73 gaps in 6 s,
   23% of the audio missing. With `sync=false` on the sink: no gap in 28 s. The raw
   capture off the chip has no gaps. The earlier tests ran at volume 0 and only checked
-  recorded files, which do not pass through the playback branch. Not yet re-listened.
+  recorded files, which do not pass through the playback branch. Lance then listened again: "sounds flawless now".
 - **Recorder lesson:** the first design attached an encoder branch to the running
   pipeline. It lost audio in three different timing-dependent ways (the branch linked
   before it was running, the file's time origin taken from the wrong clock, and the
@@ -93,8 +95,6 @@ pushed: everything below was measured, nobody has listened to it yet.**
 
 ### Not done
 
-- Second listening test, then push: kernel to master, pmaports (`3748aac537`,
-  `902efc5f4b`, `5671aa92da`), packages repo (`614907a`, `7548bfc`).
 - Power draw of FM: not measured (the bench phone is full and on USB).
 - The copy of the sound profile in the packages repo is r6; the fork has r15.
 - Transmit and other bands, desk findings only. The FM chip has no transmit path
