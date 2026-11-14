@@ -64,6 +64,14 @@ pushed: everything below was measured, nobody has listened to it yet.**
   without sound (volume 0): recordings over five runs all full length with audio
   throughout, output switched mid-recording, file completed when the app closes, and
   the real window driven headlessly through every action.
+- **First listening test: playback was very choppy; fixed in the app.** On the
+  loudspeaker the radio stuttered. The playback sink aligned every 10 ms of live audio
+  to the pipeline clock, and the speaker output takes 130 ms at a time, so audio that
+  arrived "late" was dropped. Reproduced without sound with a live tone through the
+  same branch into a null output forced to the speaker chunk size: 73 gaps in 6 s,
+  23% of the audio missing. With `sync=false` on the sink: no gap in 28 s. The raw
+  capture off the chip has no gaps. The earlier tests ran at volume 0 and only checked
+  recorded files, which do not pass through the playback branch. Not yet re-listened.
 - **Recorder lesson:** the first design attached an encoder branch to the running
   pipeline. It lost audio in three different timing-dependent ways (the branch linked
   before it was running, the file's time origin taken from the wrong clock, and the
@@ -85,8 +93,8 @@ pushed: everything below was measured, nobody has listened to it yet.**
 
 ### Not done
 
-- Listening test, then push: kernel to master, pmaports (`3748aac537`,
-  `902efc5f4b`), packages repo (`614907a`).
+- Second listening test, then push: kernel to master, pmaports (`3748aac537`,
+  `902efc5f4b`, `5671aa92da`), packages repo (`614907a`, `7548bfc`).
 - Power draw of FM: not measured (the bench phone is full and on USB).
 - The copy of the sound profile in the packages repo is r6; the fork has r15.
 - Transmit and other bands, desk findings only. The FM chip has no transmit path
