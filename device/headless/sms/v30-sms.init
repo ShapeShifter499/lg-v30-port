@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="V30 private persistent SMS inbox"
+supervisor=supervise-daemon
+command=/opt/v30-sms/smsd.py
+respawn_delay=15
+respawn_max=3
+respawn_period=900
+retry="TERM/10/KILL/3"
+output_log=/run/v30-sms/service.log
+error_log=/run/v30-sms/service.log
+depend() {
+    need dbus
+    after networkmanager
+}
+start_pre() {
+    checkpath --directory --mode 0700 --owner root:root /run/v30-sms /var/lib/v30-sms
+}

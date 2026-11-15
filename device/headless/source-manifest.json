@@ -1,0 +1,98 @@
+{
+  "voice-reference/mobile_common.py": {
+    "sha256": "799aad57ae571f140ef5ade997ff23be038d79f29df719b27b92438dda9c4d8c",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/ims_supervisor.py": {
+    "sha256": "57982de0ffb2506fc1542654123ecca421e9d1d1acdd03bc290e968602d79c65",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/call_media.py": {
+    "sha256": "21a8d209c7091d3eb3ba445e55bb76d756215eead271b244c8d9cafb85181c63",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/audio_session.py": {
+    "sha256": "adb6fddac823d940fcd9aa96b1f13e0afa9e4f8c4456a61ba9998b64df0dcc90",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/media_helpers.py": {
+    "sha256": "d7bef251f0d9be3d4db65d939518ce2d0d94c37f414aad38f45f8fe649f14573",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/link.py": {
+    "sha256": "a6e84da83636bcaa5576c4bdc07afda68c9bc1153e80bd9e9c804ab83f1b2562",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/physical.conf": {
+    "sha256": "61d4472a47c8ef8d52684ff088a007637e10abb3dc8dd325ab7f056a0e40a3f1",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/gvariant_json.py": {
+    "sha256": "cce89d83699ddea5ba88772dee688b2bb954690ee772a9a68494e89efbfc4cf0",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/ims-pdn-up.sh": {
+    "sha256": "b70d148b39dc40c0e71d052397217e70af0ed878910aed8093c7cd36e3ead688",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/v30-ipa": {
+    "sha256": "889956d288d5f2ac90c440f39791ff231fa11c1afbbca81026975c7875cd34f1",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/v30-cellular": {
+    "sha256": "57916b7425e1d81f9621c3c10f2d35e8029b774af740d2e3e928666a0e12409f",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/v30-ims": {
+    "sha256": "26d3a591b7789e700bc900099f8a5eee2f461b6e54c2f5bb234cbf035f9408c0",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/v30-phone": {
+    "sha256": "94cbfc42b6c924c3f47d5115387e4d7eab8d8e972f35b6b96bd70c3a0f267694",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/test_integration.py": {
+    "sha256": "de9cbeeebca5e3a242fff0a5bc89f7dade5ebd76c42e6bc9f4199794c2980eb1",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/net.catcrafts.IMS1.conf": {
+    "sha256": "fb6d5214ce77414c7e6e82ed68068ddea2c41b37de641642b6486068fb407bfc",
+    "scope": "source snapshot; no runtime state"
+  },
+  "voice-reference/net.catcrafts.IMS1.policy": {
+    "sha256": "e3118281a7318c1816f97889b0333557d98686124a466b3d8b187ece361b1c8d",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/sms_core.py": {
+    "sha256": "12d5c127dcec6a6346e817f90c1c07b70ab1f1e17638826988772d80bd46cda8",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/sms_bus.py": {
+    "sha256": "d4ae87063f41717fccf06637352fa33dc9436e8d58e6401e3998f5ef82c1bbe0",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/smsd.py": {
+    "sha256": "2b4d4bd4a2cfa29bca4c0896b28019c19c1fbc7a6f5b65ea87811947a6d1e74c",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/v30-sms": {
+    "sha256": "1c4c8aa2afbcf61c589efe6c0e3bf713964c6cb6adb0d4d4f3888cf0c8b5008f",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/v30-sms.init": {
+    "sha256": "ff8b6b7919004341215e2e68230f9aa7a4421d38ed0da29a33b3cd6f973dfb6d",
+    "scope": "upstream packaging adaptation; host-only verified"
+  },
+  "sms/test_sms.py": {
+    "sha256": "ea75c1fd08cbe05e4771bf22eae2ede9885fce6f9ccd9fa4a45652f7eea714ff",
+    "scope": "source snapshot; no runtime state"
+  },
+  "sms/bench_private_bus.py": {
+    "sha256": "8f306c9349142d7caafc32292fa1e1ba3a058cd2bb4456c551d971f7afcd3c00",
+    "scope": "synthetic test; QA directory made unique; host revalidation required"
+  },
+  "sms/install.sh": {
+    "sha256": "8938b4ad06bdf5b3a6dab5b6003aae60b0a5424479bfee91f531f51322fc8337",
+    "scope": "upstream packaging adaptation; host-only verified"
+  }
+}

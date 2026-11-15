@@ -1,0 +1,20 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="LG V30 controlled IPA startup for cellular and IMS"
+depend() {
+    need localmount v30-audio v30-unicom
+}
+start_pre() {
+    [ "$(uname -r)" = "7.2.0-rc2-v30-r30" ] || return 1
+    grep -q 'LG V30' /proc/device-tree/model || return 1
+    [ "$(cat /sys/fs/ext4/mmcblk0p2/errors_count)" = 0 ] || return 1
+}
+start() {
+    ebegin "Starting LG V30 IPA"
+    # Retain the alias blacklist. Only this dependency-ordered load enables IPA.
+    modprobe ipa qmi_hold=0 lowmem=1 boot_hold=0 || { eend 1; return 1; }
+    [ "$(cat /sys/module/ipa/parameters/qmi_hold)" = N ] &&
+        [ "$(cat /sys/module/ipa/parameters/boot_hold)" = N ] || { eend 1; return 1; }
+    echo 1 > /sys/class/graphics/fbcon/rotate
+    eend 0
+}

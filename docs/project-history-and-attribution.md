@@ -745,3 +745,10 @@ of [`docs/README.md`](README.md), then
 Assisted-by: Claude-Code
 Date: 2026-09-23
 Update-scope: harness refactor; README/docs index; reference cleanup.
+
+## 2026-10-31 external US998 contribution
+
+Prepared headless voice/boot reference, persistent TTY SMS source, host regressions and sanitized local acceptance report. Human contributor identity/DCO is carried by the final commit; it is not the original maintainer Lance. Assisted-by: Codex:OpenAI/GPT-6. The existing exact model route beyond GPT-6 was not exposed to this session. [Report](headless-telephony-2026-10-31.md).
+
+Assisted-by: Codex:OpenAI/GPT-6
+Date: 2026-10-31

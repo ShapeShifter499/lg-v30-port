@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-only
+description="LG V30 cellular data autoconnection"
+depend() {
+    need v30-ipa dbus networkmanager
+}
+start() {
+    ebegin "Enabling LG V30 cellular autoconnection"
+    # MM and polkit use their shipped system D-Bus activation units.
+    # Do not start duplicate OpenRC-owned instances after NetworkManager.
+    gdbus call --system --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus --method org.freedesktop.DBus.StartServiceByName org.freedesktop.ModemManager1 0 >/dev/null || { eend 1; return 1; }
+    nmcli connection reload || { eend 1; return 1; }
+    # NetworkManager activates it when the modem is ready, independently of
+    # IMS. Wi-Fi keeps the lower route metric and higher DNS priority.
+    eend 0
+}
