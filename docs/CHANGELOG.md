@@ -10,6 +10,112 @@ board. Longer notes live in `status-history.md`, `kernel-change-ledger.md` and
 See the list at the end of the 2026-11-04 entry. Items that need someone at
 the phone are in `BENCH-TESTS-NEEDING-LANCE`.
 
+## 2026-11-18
+
+Bench US998. Kernel master `d8946ffa9d68` (linux-lg-joan r31: one fix on top of
+11-14's `e203148584d2`), fm-radio 0.2-r7, alsa-ucm-conf-lg-joan r18. All
+installed on the bench phone; r31 is RAM-booted. **Pushed 11-18 after Lance
+listened to both headphone outputs:** kernel master `d8946ffa9d68`, pmaports
+`device-lge-joan` and `joan/integration-20261104` `73d3eea018`, packages repo
+`7369f2c`. The GitHub archive of the kernel commit matches the checksum in the
+package.
+
+### FM receiver limits (measured)
+
+- **76.000-108.000 MHz, nothing outside.** A test-only build of radio-qca-fm
+  (receive only) asked the WCN3990 for bands reaching 64-75.95 MHz and
+  108.05-115 MHz; the chip rejects every one with status 0x12. So the old
+  Eastern European OIRT band (65.8-74 MHz) is out of reach.
+- **50 kHz tuning resolution.** Anything finer is rounded down (96.86-96.89 MHz
+  tunes 96.85, 96.91-96.94 tunes 96.90).
+- **No SDR view and no transmit.** The chip reports a signal level per tuned
+  frequency (about 114 ms for each tune and read), not samples, so a live
+  waterfall is not possible. FM transmit stays ❌ (see the hardware matrix).
+
+### Kernel r31: seek spacing in Hz
+
+- radio-qca-fm converted the V4L2 seek spacing as if it were in tuner units
+  (62.5 Hz), although the API defines it in Hz, so every request became 200 kHz
+  and a 100 or 50 kHz seek skipped channels. It now compares the value in Hz.
+  On this chip and with the local stations (all on odd tenths) the spacing did
+  not visibly change where a seek stops; the fix is for API correctness and for
+  the app's regions.
+
+### fm-radio 0.2-r1 to r7
+
+All changes came from Lance trying the app on the bench phone.
+
+- **Volume is the output's own volume (r1, r7).** The slider showed the app
+  stream's level on a linear scale, so after switching to the speaker it did not
+  match the system. It now reads and sets the selected output's volume in the
+  sound server and follows changes made elsewhere. What 0% means is left to the
+  sound system (r6 briefly muted at zero; r7 removed that once the profile fix
+  below landed). The value and output show under the heading ("Speaker · 37%"),
+  with a bubble over the knob while it moves.
+- **Region (r2).** Americas and South Korea (87.5-107.9 MHz, 200 kHz, 75 us,
+  RBDS), Europe/Africa/Asia/Oceania (87.5-108.0, 100 kHz, 50 us, RDS), Europe with
+  50 kHz channels (Italy) and Japan (76.0-95.0, 100 kHz, 50 us). The default
+  comes from the locale.
+- **Advanced tuning (r3).** The whole 76-108 MHz range, channel size 50/100/200
+  kHz, de-emphasis 50/75 us and a frequency box.
+- **Treble (r4).** De-emphasis has only the two standard values, so a software
+  high shelf from 3 kHz (-12 to +12 dB) follows the receiver. It applies to
+  playback, and to recordings only if "Apply treble to recordings" is on.
+- **The app no longer mutes the receiver on close (r4).** The mute stayed set in
+  the driver, so anything that opened the radio next got digital silence.
+- **Remember last station (r5),** on by default, also across restarts. Opening
+  the radio now tunes exactly once.
+- **Labels fit at 360 px (r6).**
+
+Tested headlessly on the bench phone (Play off or a null output, real window
+rendered to images) as listed in each commit; Lance tried the settings on the
+phone between versions.
+
+### Sound profile r16 to r18
+
+- **Speaker volume reaches silence (r16).** The speaker device named the
+  amplifier's gain (TDMSPKG, 16 steps, no dB scale) as its hardware volume, and
+  PipeWire put the whole range on it; the lowest step is still audible, so no
+  slider could silence the speaker. The speaker now uses a software volume over
+  the amplifier fixed at 8 of 15: 0, 25, 50 and 100% give 0, 0.0156, 0.125 and
+  1.0. The earpiece and both headphone outputs already reached silence and were
+  checked again. Voice Call keeps the hardware control (call audio never passes
+  PipeWire). r16 also gave the devices readable names: "Headphones Hi-Fi DAC",
+  "Mic bottom", "Mic top", and "Music and media" for the profile.
+- **Both headphone outputs in one profile (r18).** The two headphone paths (the
+  codec, and the ES9218P Hi-Fi DAC) share the jack, so they were two conflicting
+  devices and therefore two profiles with nearly identical names. r17 made each
+  path a profile of its own, but the system output list still did not offer the
+  other profile's headphones. r18 puts both in the one "Music and media" profile
+  as two outputs, "Headphones" and "Headphones (Hi-Fi DAC)", and WirePlumber
+  remembers the choice. The es9218p driver already follows the stream: with the
+  mode set to HiFi once for the profile, it stays in Low Power Bypass (passing
+  the codec through) until a stream powers its DAC, and returns to bypass when
+  that stream stops.
+- **Switching gap.** The DAC keeps the jack until its PCM closes, and WirePlumber
+  closes an idle output after 5 s, so moving a playing stream from the Hi-Fi DAC
+  to the regular headphones gave 5 s of silence. The WirePlumber rule now sets 1 s
+  for the Hi-Fi DAC output. Moving to the DAC is immediate.
+- **Listening test 11-18 (Lance, wired headphones, 440 Hz tone at 17%):** both
+  outputs play and sound clean; the ES9218P mode pins read bypass while the codec
+  plays and HiFi while the DAC plays; the gap after switching back fell from about
+  5 s to about 1 s. There is a small click when the ES9218P switches path, mostly
+  on the way to the DAC: "not bad at all".
+- **After upgrading from r15-r17,** WirePlumber does not find the saved profile and
+  default output under their old names; they may need choosing once more.
+
+### Open
+
+- **Default output jumped to the Earpiece after restarting PipeWire.** On the
+  bench, 3 s after `systemctl --user restart pipewire wireplumber`, the saved
+  default became the (muted) Earpiece; callaudiod had just lost its connection.
+  Restarting WirePlumber alone did not do it. Not yet checked on a normal boot.
+- **After a call,** callaudiod returns to the profile named "HiFi". With r18 that
+  profile holds both headphone outputs, but whether the chosen headphone output
+  survives a call is untested (agents never place calls).
+- The "pause on unplug" behaviour of the Hi-Fi DAC output under r18 has not been
+  rechecked by ear.
+
 ## 2026-11-14
 
 Bench US998. Kernel branch `joan/fm-audio-capture` at `e203148584d2` (13 commits
