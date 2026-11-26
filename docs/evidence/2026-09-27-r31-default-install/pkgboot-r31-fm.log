@@ -1,0 +1,77 @@
+== before
+-rw-r--r--    1 root     root      32108544 2026-09-26 21:45:34 -0700 /boot/boot.img
+-rw-r--r--    1 root     root      14124386 2026-09-26 21:45:33 -0700 /boot/initramfs
+-rw-r--r--    1 root     root      17881680 2026-09-26 18:58:46 -0700 /boot/vmlinuz
+device-lge-joan-1-r19
+linux-lge-joan-7.2.0_rc2-r30
+== apk add
+Downloading 1 packages...
+(1/1) Downloading linux-lge-joan-7.2.0_rc2-r31
+Proceeding with upgrade...
+(1/1) Upgrading linux-lge-joan (7.2.0_rc2-r30 -> 7.2.0_rc2-r31)
+Executing busybox-1.38.0-r7.trigger
+Executing kmod-34.2-r1.trigger
+Executing postmarketos-mkinitfs-2.11.1-r0.trigger
+* 00:50:14.590223 Generating for kernel version: 7.2.0-rc2
+* 00:50:14.593620 Output directory: /boot
+* 00:50:14.593631 Unknown or no compression format set, using gzip
+* 00:50:14.593645 == Generating initramfs ==
+* 00:50:14.593653 - Using compression format gzip with level "default"
+* 00:50:14.593713 - Searching for directories specified in /usr/share/mkinitfs/dirs
+* 00:50:14.595550 -- Creating directories from: /usr/share/mkinitfs/dirs/00-initramfs-base.dirs
+* 00:50:14.597163 - Searching for directories specified in /etc/mkinitfs/dirs
+* 00:50:14.598818 - Searching for file lists from /usr/share/mkinitfs/files
+* 00:50:14.599549 -- Including files from: /usr/share/mkinitfs/files/00-initramfs-base.files
+* 00:50:14.603951 --- Unable to find optional path, skipping...
+* 00:50:14.604039 --- Unable to find optional path, skipping...
+* 00:50:14.618796 -- Including files from: /usr/share/mkinitfs/files/10-wireless-regdb.files
+* 00:50:14.619716 -- Including files from: /usr/share/mkinitfs/files/30-lge-joan-gpu.files
+* 00:50:14.626736 -- Including files from: /usr/share/mkinitfs/files/postmarketos-base.files
+* 00:50:14.627686 - Searching for file lists from /etc/mkinitfs/files
+* 00:50:14.628309 - Searching for hook scripts from /usr/share/mkinitfs/hooks
+* 00:50:14.628915 - Searching for hook scripts from /etc/mkinitfs/hooks
+* 00:50:14.629617 - Searching for hook scripts from /usr/share/mkinitfs/hooks-cleanup
+* 00:50:14.629660 -- Unable to find dir, skipping...
+* 00:50:14.629685 - Searching for hook scripts from /etc/mkinitfs/hooks-cleanup
+* 00:50:14.629713 -- Unable to find dir, skipping...
+* 00:50:14.630182 - Searching for kernel modules from /usr/share/mkinitfs/modules
+* 00:50:14.631110 -- Including modules from: /usr/share/mkinitfs/modules/00-default.modules
+* 00:50:14.736014 - Searching for kernel modules from /etc/mkinitfs/modules
+* 00:50:14.745006 - Searching for file lists from /usr/share/mkinitfs/files-extra
+* 00:50:14.746781 -- Including files from: /usr/share/mkinitfs/files-extra/00-initramfs-extra-base.files
+* 00:50:14.842102 -- Including files from: /usr/share/mkinitfs/files-extra/01-initramfs-base-systemd.files
+* 00:50:14.845281 -- Including files from: /usr/share/mkinitfs/files-extra/30-postmarketos-bootsplash.files
+* 00:50:15.040355 - Searching for file lists from /etc/mkinitfs/files-extra
+* 00:50:15.041015 - Searching for hook scripts from /usr/share/mkinitfs/hooks-extra
+* 00:50:15.041604 - Searching for hook scripts from /etc/mkinitfs/hooks-extra
+* 00:50:15.042497 - Searching for kernel modules from /usr/share/mkinitfs/modules-extra
+* 00:50:15.043174 -- Including modules from: /usr/share/mkinitfs/modules-extra/00-default-extra.modules
+* 00:50:15.045722 - Searching for kernel modules from /etc/mkinitfs/modules-extra
+* 00:50:17.636976 initramfs completed in: 3.04s
+* 00:50:17.637322 == Using boot-deploy to finalize/install files ==
+* ==> Running hooks
+* ==> kernel: device-tree blob operations
+* ==> kernel: appending device-tree qcom/msm8998-lge-joan
+* ==> initramfs: creating boot.img
+* systemd-boot: systemd-boot EFI app or powervm-boot not found, skipping
+* ==> Checking free space at /boot
+* ... OK!
+* ==> Installing: /boot/initramfs
+* ==> Installing: /boot/msm8998-lge-joan.dtb
+* ==> Installing: /boot/boot.img
+* 00:50:26.264216 boot-deploy completed in: 8.63s
+* 00:50:26.280627 mkinitfs completed in: 11.69s
+OK: 1954.3 MiB in 1226 packages
+== after
+-rw-r--r--    1 root     root      32112640 2026-09-27 00:50:20 -0700 /boot/boot.img
+-rw-r--r--    1 root     root      14124699 2026-09-27 00:50:19 -0700 /boot/initramfs
+-rw-r--r--    1 root     root      17882453 2026-09-27 00:21:41 -0700 /boot/vmlinuz
+device-lge-joan-1-r19
+linux-lge-joan-7.2.0_rc2-r31
+7.2.0-rc2
+326c596f925c1d9f9a8dba4e114c10d7a0f69b63fb7f872290476e4f79e4fa88  /home/kumo02/joan-images/boot-joan-r31-fm.img
+Finished. Total time: 5.815s
+== booted
+7.2.0-rc2
+panic=5 pmos.force-partition-resize ipa.lowmem=1  pmos_boot_uuid=ca984cf4-a54d-429a-91b0-1fae66c9f085 pmos_root_uuid=ff480c16-a01c-4563-859b-9281241c4b36 pmos_rootfsopts=defaults androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+running

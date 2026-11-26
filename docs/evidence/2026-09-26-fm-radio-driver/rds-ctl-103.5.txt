@@ -1,0 +1,112 @@
+
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+
+PI: 345a
+Area Coverage: Regional 1
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+
+PI: 345a
+Area Coverage: Regional 1
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS: KNTY Zac
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS:  Brown B
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS:  Brown B
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS: and W/ J
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 545a
+Area Coverage: Regional 1
+PS: and W/ J
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS: and W/ J
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS: KNTY Zac
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: f459
+Area Coverage: Regional 1
+PS: KNTY Zac
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, Static PTY
+
+PI: 345a
+Area Coverage: Regional 1
+PS: KNTY Zac
+PTY: 10 -> Pop Music
+Time: Wed Dec 31 16:00:00 1969
+
+TP: no  TA: no
+MS Flag: Music
+DI: Stereo, No Artificial Head, Not Compressed, 

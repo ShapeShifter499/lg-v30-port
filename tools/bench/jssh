@@ -1,0 +1,10 @@
+#!/bin/sh
+# ssh/scp to the joan bench pmOS over USB networking (password auth, no mux).
+# Lives on nym-nest as /tmp/ember-f08d8c5-unpack/jssh. Needs sshpass and JOAN_PW.
+# Password auth on purpose: repeated key probes trip sshd PerSourcePenalties.
+O="-o ControlMaster=no -o ControlPath=none -o PubkeyAuthentication=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10"
+: "${JOAN_PW:?export JOAN_PW}"
+case "$1" in
+  scp) shift; SSHPASS=$JOAN_PW exec sshpass -e scp -q $O "$@" ;;
+  *) SSHPASS=$JOAN_PW exec sshpass -e ssh $O user@172.16.42.1 "$@" ;;
+esac

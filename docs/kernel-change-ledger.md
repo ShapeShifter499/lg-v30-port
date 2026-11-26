@@ -7752,3 +7752,112 @@ Date: 2026-08-07
 
 Assisted-by: Claude-Code:Claude Opus 5.5
 Date: 2026-09-24
+
+## Venus works on msm8998 + boot-log sweep (2026-10-06, bench-validated)
+
+- Handle: `linux-lg-v30-joan` branch `joan/latest-clean-test-merged` (local,
+  skyforge), on top of `01fd102a` (last pushed, `origin/joan/latest-clean-test`):
+  - `896747fa` clk: qcom: mmcc-msm8998: video subcore gdscs are HW_CTRL_TRIGGER
+    (Giuseppe Maggio; cherry-pick of porthole `8ee9762c`)
+  - `d933643a`..`b4119158` five reverts of the 2026-10-05 DEBUG print commits
+  - `7474d148` media: venus: drop the msm8998 bring-up bisect knobs
+  - `13bca0d0` arm64: dts: qcom: msm8998: vote the bus for the video codec
+    (Giuseppe Maggio; cherry-pick of porthole `a8a62bb6`)
+  - `be74d03d` Input: stmfts - warn only on defined error types
+  - `f59a1b9b` drm/msm: mark the fbdev framebuffer as system memory
+- Class: `upstream-candidate`. The two Giuseppe commits are his porthole
+  series (https://github.com/porthole-dev/pmaports, kernel
+  linux-postmarketos-qcom-msm8998-7.2). The 2026-10-05 fold-in (`68ba44d0`)
+  copied only `venus/`, so these `drivers/clk` and `dts` commits never landed.
+- Root cause of the 10-05 `core_power -EBUSY`: subcore GDSCs were `HW_CTRL`, so
+  `gdsc_enable()` handed them to hardware at power-on and `video_subcore0_clk`
+  read "stuck at 'off'". LG downstream `msm8998.dtsi` marks
+  `gdsc_venus_core0/1` `qcom,support-hw-trigger` (software on, then clocks, then
+  hardware mode). `HW_CTRL_TRIGGER` is the mainline form. Re-derived
+  independently from the downstream DT, then found to match Giuseppe's commit
+  byte for byte. His commit is the one kept.
+- Verification (US998, armed `fastboot boot` RAM-boot, kernel #47 built 07:51 UTC):
+  H.264 640x480 decode of an ffmpeg testsrc2 clip: 57 frames byte-identical
+  (`cmp`) to ffmpeg's software decode. H.264 encode: valid stream (ffprobe 26
+  frames, avg luma PSNR 31.7 dB). Venus interconnect votes visible in
+  `interconnect_summary` (mas-venus, slv-cnoc-mnoc-mmss-cfg). All remaining
+  module params at defaults.
+- Known gaps: (1) `/dev/videoN` order changes between boots (pick nodes by
+  name). (2) An 8 KiB bitstream buffer (OUTPUT format set without a resolution)
+  lets the firmware read 0x84 B past the end, which gives an SMMU fault, then a
+  firmware exception, then recovery failing 5 times, then a SoC reset. Real
+  clients set the resolution. Still open: a minimum compressed-buffer floor and
+  making recovery not take the SoC down. (3) Encoder EOS drain gives HFI
+  0x1006/0x1004 (non-fatal; the last 4 frames are lost).
+- Boot-log sweep: err+warn lines 127 → 46. stmfts type 0xba is a
+  firmware debug message per LG `touch_ftm4.c`, now dev_dbg. msm fbdev lacked
+  FBINFO_VIRTFB. Triaged harmless and documented in
+  `docs/ember-2026-10-06-venus-and-boot-log.md`.
+- Public/PR disposition: unpushed; push needs Lance's approval.
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-06
+
+## Venus input floor + charger float voltage (2026-10-06, second pass)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test-merged` (local), on top of
+  `f59a1b9b`: `6c9d1bca` media: venus: vdec: floor the bitstream buffer at the
+  720p size; `75307f90` power: supply: qcom_smbx: do not round the float
+  voltage above the battery maximum. pmaports: `2fae02d32c` r47 pin,
+  `4eaef5ff75` device-lg-joan r22 neard D-Bus activation (its APKBUILD half
+  landed in debug-pin commit `eebb044cb2`; squash before publishing).
+- Class: both kernel commits `upstream-candidate` (the smbx one is a generic
+  PMI8998 bug).
+- Evidence: register 0x1070 on PMI8998 SID 2 = 0x7a before, 0x79 after;
+  "battery overvoltage detected" gone, health Good. Venus unsized decode
+  57/57 frames byte-identical, no SMMU fault. LG downstream refs:
+  `qpnp-smb2.c` .fv param + `smb-lib.c` smblib_set_charge_param;
+  `msm_vdec.c` get_frame_size_compressed.
+- Also measured (no code kept): FM TX absent in WCN3990 firmware (positive-
+  controlled HCI probe); US998 has no I2C TV tuner bus (LDO28 + pull-up test).
+  Details in `docs/ember-2026-10-06-venus-and-boot-log.md`.
+- Public/PR disposition: unpushed; Lance approval pending (Deck #190).
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-06
+
+## OSM dropout, boot-log pass, charge throttling, IPA SSR (2026-10-07)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test` pushed 01fd102a → `b3dc8621`:
+  `1c6b4ecf` cpufreq: qcom-osm: keep gold DVFS when the ACD transfer is slow;
+  `1f1ac5f1` drm/msm/adreno: create the GPU debugfs files once; `c70c6206`,
+  `b641fd48`, `df05b214`, `b3dc8621` pmi8998_fg msoc-full (mask, binding, dtsi,
+  handler); `67d14598` slimbus NGD early QMI wait at debug level; `41f97fc7`
+  qcom_smbx charge-current cooling device + LG CHG_MONITOR trips (the 10-03
+  `joan/charge-thermal` commit, first boot). Local only, not booted:
+  `ef74a2f4` net: ipa: disable NAPI when a channel stop fails.
+- pmaports `joan/readme-build-guide`: 57 local commits rebuilt as 9 (tree-identical
+  apart from the pin); `linux-lg-joan` r55 → b3dc8621. GitHub's archive of b3dc8621
+  is byte-identical to the local `git archive` (sha512 e302ceb8…).
+- Class: `upstream-candidate`: 1f1ac5f1 (adreno debugfs), ef74a2f4 (IPA NAPI) after
+  bench. Board/local: the rest.
+- Evidence: 8 RAM boots of b3dc8621 (policies=2, osm_err=0, gold 2457.6 MHz single
+  task, hotplug cycle OK, FCC cdev bound at state 1 / 31 °C skin). One of the 8
+  had no ADSP QRTR services → no sound card (open). Modem restart → kernel BUG in
+  ipa_open (fixed by ef74a2f4, unverified). Details:
+  `docs/ember-2026-10-07-osm-bootlog-ipa.md`.
+- Public/PR disposition: kernel and pmaports pushed 2026-10-07 per Lance's goal
+  ("repositories ... updated with all found fixes").
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-07
+
+## IPA: no BUG on interface down/up, data survives a modem restart (2026-10-07)
+
+- Handle: `linux-lg-v30-joan` `joan/latest-clean-test` b3dc8621 → `ee468f34`:
+  `ef74a2f4` net: ipa: disable NAPI when a channel stop fails; `64e28e86` net: ipa:
+  close an open aggregation frame before stopping an RX channel; `ee468f34` net: ipa:
+  finish a pending stop before starting a GSI channel. pmaports r56, r57.
+- Class: `upstream-candidate` (all three; mainline has the same code).
+- Evidence: US998 r56/r57, Wi-Fi off: down/up → data back, 0 BUG; WWAN off/on → data;
+  modem remoteproc restart → data back without reboot (r57). Before ef74a2f4: kernel
+  BUG at net/core/dev.c (napi_enable) in ipa_open, RTNL held, phone wedged.
+- Public/PR disposition: pushed 2026-10-07.
+
+Assisted-by: Claude-Code:claude-opus-5-5
+Date: 2026-10-07

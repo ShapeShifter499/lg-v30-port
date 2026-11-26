@@ -36,7 +36,7 @@ resolve_kernel() {
 		kdir="$JOAN_LEGACY_KDIR"
 	fi
 	KIMAGE="$kdir/arch/arm64/boot/Image.gz"
-	KDTB="$kdir/arch/arm64/boot/dts/qcom/msm8998-lge-joan.dtb"
+	KDTB="$kdir/arch/arm64/boot/dts/qcom/msm8998-lg-joan.dtb"
 	[[ -f "$KIMAGE" && -f "$KDTB" ]] ||
 		die "kernel or dtb missing under $kdir -- build Image.gz and dtbs first"
 }

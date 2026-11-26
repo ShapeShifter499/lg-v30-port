@@ -1,0 +1,39 @@
+[0:04:19.825741044] [3497]  WARN CameraSensorProperties camera_sensor_properties.cpp:548 No static properties available for 'imx351'
+[0:04:19.825817450] [3497]  WARN CameraSensorProperties camera_sensor_properties.cpp:550 Please consider updating the camera sensor properties database
+[0:04:19.825848127] [3497]  WARN CameraSensor camera_sensor_legacy.cpp:502 'imx351 5-0010': No sensor delays found in static properties. Assuming unverified defaults.
+[0:04:19.883002346] [3497]  WARN IPAProxy ipa_proxy.cpp:196 Configuration file 'imx351.yaml' not found for IPA module 'simple', falling back to '/usr/share/libcamera/ipa/simple/uncalibrated.yaml'
+[0:04:19.883303856] [3497]  WARN IPASoft soft_simple.cpp:105 IPASoft: Failed to create camera sensor helper for imx351
+[0:04:19.884569846] [3497]  INFO Camera camera_manager.cpp:223 Adding camera '/base/soc@0/cci@ca0c000/i2c-bus@0/camera@10' for pipeline handler simple
+Available cameras:
+1: Internal back camera (/base/soc@0/cci@ca0c000/i2c-bus@0/camera@10)
+===
+[0:04:20.018682450] [3500]  INFO Camera camera_manager.cpp:340 libcamera v0.7.2
+[0:04:20.074357033] [3502]  WARN CameraSensorProperties camera_sensor_properties.cpp:548 No static properties available for 'imx351'
+[0:04:20.074416669] [3502]  WARN CameraSensorProperties camera_sensor_properties.cpp:550 Please consider updating the camera sensor properties database
+[0:04:20.074445627] [3502]  WARN CameraSensor camera_sensor_legacy.cpp:502 'imx351 5-0010': No sensor delays found in static properties. Assuming unverified defaults.
+[0:04:20.134979377] [3502]  WARN IPAProxy ipa_proxy.cpp:196 Configuration file 'imx351.yaml' not found for IPA module 'simple', falling back to '/usr/share/libcamera/ipa/simple/uncalibrated.yaml'
+[0:04:20.135333491] [3502]  WARN IPASoft soft_simple.cpp:105 IPASoft: Failed to create camera sensor helper for imx351
+[0:04:20.136382294] [3502]  INFO Camera camera_manager.cpp:223 Adding camera '/base/soc@0/cci@ca0c000/i2c-bus@0/camera@10' for pipeline handler simple
+Using camera /base/soc@0/cci@ca0c000/i2c-bus@0/camera@10 as cam0
+0: 4648x3492-ABGR8888/sRGB
+ * Pixelformat: ABGR8888 (4x2)-(4648x3492)/(+4,+2)
+  - 160x120
+  - 240x160
+  - 320x240
+  - 400x240
+  - 480x320
+  - 640x360
+  - 640x480
+  - 720x480
+  - 768x480
+  - 720x576
+  - 800x600
+  - 960x540
+  - 1024x576
+  - 960x640
+  - 1024x600
+  - 1024x768
+  - 1280x720
+  - 1152x864
+  - 1280x800
+  - 1360x768

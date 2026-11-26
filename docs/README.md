@@ -10,8 +10,13 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
 
 ## Start here
 
+- [joan-hardware-support-matrix.md](joan-hardware-support-matrix.md) —
+  **per-block status of the port; the source of truth for what works.**
+  Bench evidence it cites is under [evidence/](evidence/).
+- [kernel-history-rewrite.md](kernel-history-rewrite.md) — old kernel commit
+  hashes in these docs mapped to current `master` (verified ones only).
 - [status-history.md](status-history.md) — dated status snapshots that used
-  to live in the README (2026-07-04 .. 2026-08-03).
+  to live in the README (2026-07-04 .. 2026-09-24).
 - [test-results/README.md](test-results/README.md) — **mandatory** device-test
   index and closure-packet rules.
 - [kernel-change-ledger.md](kernel-change-ledger.md) — every kernel change,
@@ -26,6 +31,44 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
 
 ## Latest handoffs
 
+Newest first. October 2026 (added by the 2026-10-27 docs refresh from the
+kernel PR #11 branch; not re-read for accuracy). The October handoffs link to
+`cpu-gpu-audit-2026-10-02.md`, `hardware-gap-sweep-2026-10-02.md` and
+`hi553-port-2026-10-02.md`, which are not in the repo: they were committed by accident in `431bfd6` and
+deliberately unpublished again in `69492f7` (2026-10-07), so the references
+are plain text marked "(not in repo)":
+
+- [handoff-2026-10-09-aurel-ipa-stall.md](handoff-2026-10-09-aurel-ipa-stall.md)
+  — cellular boot-time RX stall on r60; evidence in
+  [evidence/2026-10-09-ipa-rx-stall/](evidence/2026-10-09-ipa-rx-stall/README.md).
+- [handoff-2026-10-07-ember-r60.md](handoff-2026-10-07-ember-r60.md) — r60,
+  CLAT, qrtr regression, open IPA RX stall;
+  [handoff-2026-10-07-ember.md](handoff-2026-10-07-ember.md) — tests that need
+  Lance;
+  [ember-2026-10-07-osm-bootlog-ipa.md](ember-2026-10-07-osm-bootlog-ipa.md) —
+  gold DVFS dropout, boot-log pass, charge throttling, IPA SSR BUG.
+- [handoff-2026-10-06-ember.md](handoff-2026-10-06-ember.md) — paused on
+  Lance's request;
+  [ember-2026-10-06-venus-and-boot-log.md](ember-2026-10-06-venus-and-boot-log.md)
+  — Venus, boot-log sweep, CPU/thermal audit;
+  [volte-pmos-design-2026-10-06.md](volte-pmos-design-2026-10-06.md).
+- [handoff-2026-10-05-night-fulgor.md](handoff-2026-10-05-night-fulgor.md).
+- [handoff-2026-10-03-boot-and-open-issues.md](handoff-2026-10-03-boot-and-open-issues.md),
+  [handoff-2026-10-03-night-ember.md](handoff-2026-10-03-night-ember.md),
+  [session-2026-10-03-ember.md](session-2026-10-03-ember.md) — r37→r41, the
+  rename to `lg-joan`, memory map; with
+  [slim2-access-ordering-2026-10-03.md](slim2-access-ordering-2026-10-03.md),
+  [memory-map-2026-10-03.md](memory-map-2026-10-03.md) and
+  [lg-aboot-fastboot-download-2026-10-03.md](lg-aboot-fastboot-download-2026-10-03.md).
+- [handoff-2026-09-26-fm-camera-bench.md](handoff-2026-09-26-fm-camera-bench.md),
+  [ember-2026-09-26-cpu-dvfs-handoff.md](ember-2026-09-26-cpu-dvfs-handoff.md),
+  [ember-2026-09-26-boot-storage-thermal-cpu.md](ember-2026-09-26-boot-storage-thermal-cpu.md),
+  [ember-2026-09-26-bootlog-gpu-rail.md](ember-2026-09-26-bootlog-gpu-rail.md),
+  [aurel-handoff-2026-09-25-to-ember-f08d8c5-boot.md](aurel-handoff-2026-09-25-to-ember-f08d8c5-boot.md),
+  [handoff-2026-09-25-dp-altmode.md](handoff-2026-09-25-dp-altmode.md).
+
+September 2026:
+
 - [handoff-2026-09-24-usbc-camera-audio-cleanup.md](handoff-2026-09-24-usbc-camera-audio-cleanup.md)
   — kernel PR #11: cleanup, PMI8998 USB-C, IPA header table, jack-detection
   diagnosis, camera; the config a RAM boot needs; hardware test checklist.
@@ -38,8 +81,8 @@ written. See the attribution policy in [PROVENANCE.md](../PROVENANCE.md).
 ### 2026-08-10
 
 - [ember-handoff-2026-08-10-session-close.md](ember-handoff-2026-08-10-session-close.md)
-  — **current state**: BT, keypad, rainbow and power-key lanes closed; the
-  open lanes listed.
+  — state at the 2026-08-10 close (superseded by the matrix): BT, keypad,
+  rainbow and power-key lanes closed; the open lanes listed.
 - [ember-2026-08-10-unpin-result-was-confounded.md](ember-2026-08-10-unpin-result-was-confounded.md)
   and [ember-handoff-2026-08-10-for-aurel-card94-retest.md](ember-handoff-2026-08-10-for-aurel-card94-retest.md)
   — A540 runtime-PM retest, staged but not yet booted. The uncommitted kernel
@@ -159,3 +202,7 @@ record each artifact's hash so it can be matched if it is shared later.
 Assisted-by: Claude-Code
 Date: 2026-09-23
 Update-scope: New index.
+
+Assisted-by: Grok Bot
+Date: 2026-10-27
+Update-scope: Added the support matrix, hash-rewrite note and the 2026-09-26 .. 2026-10-09 handoffs.

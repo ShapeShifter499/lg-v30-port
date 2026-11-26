@@ -1,0 +1,181 @@
+== /sys/kernel/debug/qcom-cpufreq-osm/policy0
+enable=0x1 perf_state_desired=21
+cc_zero=0x1 spm_cc_dcvs_dis=0x0 llm_intf_dcvs_dis=0x0 seq1=0x11 pdn_fsm=0x500003f
+cycle_ctrl=0x113
+lmh_limit_req(0xb04)=0x420009c b00=0xc463238c b08=0x1
+pstate: deviation=0x0 corrected=0x0 met=0x0 wdog_pstate=0x0
+cycle_status 2754807752 -> 2774139185 (delta 19331433 in ~10 ms)
+lut[ 0] idx=0x0 freq=0x0004000f volt=0x00000280 ovr=0x01200020 spare=0x1
+lut[ 1] idx=0x1 freq=0x05040013 volt=0x00010280 ovr=0x01200020 spare=0x1
+lut[ 2] idx=0x2 freq=0x05040017 volt=0x00020280 ovr=0x02200020 spare=0x1
+lut[ 3] idx=0x3 freq=0x0504001b volt=0x00030280 ovr=0x02200020 spare=0x1
+lut[ 4] idx=0x4 freq=0x0504001f volt=0x00040280 ovr=0x02200020 spare=0x1
+lut[ 5] idx=0x5 freq=0x05040023 volt=0x00050280 ovr=0x03200020 spare=0x1
+lut[ 6] idx=0x6 freq=0x05040027 volt=0x00060280 ovr=0x03200020 spare=0x1
+lut[ 7] idx=0x7 freq=0x0404002b volt=0x00070280 ovr=0x03220022 spare=0x1
+lut[ 8] idx=0x8 freq=0x0404002e volt=0x0008028c ovr=0x04250025 spare=0x1
+lut[ 9] idx=0x9 freq=0x04040032 volt=0x0009029c ovr=0x04280028 spare=0x1
+lut[10] idx=0xa freq=0x04040036 volt=0x000a02a8 ovr=0x042b002b spare=0x1
+lut[11] idx=0xb freq=0x04040039 volt=0x000b02ac ovr=0x052e002e spare=0x2
+lut[12] idx=0xc freq=0x0404003d volt=0x000c02bc ovr=0x05310031 spare=0x2
+lut[13] idx=0xd freq=0x04040041 volt=0x000d02d0 ovr=0x05340034 spare=0x2
+lut[14] idx=0xe freq=0x04040045 volt=0x000e02e8 ovr=0x06370037 spare=0x2
+lut[15] idx=0xf freq=0x04040049 volt=0x000f02fc ovr=0x063a003a spare=0x2
+lut[16] idx=0x10 freq=0x0404004d volt=0x0010030c ovr=0x073e003e spare=0x2
+lut[17] idx=0x11 freq=0x04040051 volt=0x0011031c ovr=0x07410041 spare=0x2
+lut[18] idx=0x12 freq=0x04040057 volt=0x00120344 ovr=0x08460046 spare=0x2
+lut[19] idx=0x13 freq=0x0404005b volt=0x0013035c ovr=0x08490049 spare=0x2
+lut[20] idx=0x14 freq=0x0404005f volt=0x00140374 ovr=0x084c004c spare=0x3
+lut[21] idx=0x15 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[22] idx=0x16 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[23] idx=0x17 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[24] idx=0x18 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[25] idx=0x19 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[26] idx=0x1a freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[27] idx=0x1b freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[28] idx=0x1c freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[29] idx=0x1d freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[30] idx=0x1e freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[31] idx=0x1f freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[32] idx=0x20 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[33] idx=0x21 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[34] idx=0x22 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[35] idx=0x23 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[36] idx=0x24 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[37] idx=0x25 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[38] idx=0x26 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+lut[39] idx=0x27 freq=0x04040063 volt=0x0015038c ovr=0x094f004f spare=0x3
+== /sys/kernel/debug/qcom-cpufreq-osm/policy4
+enable=0x1 perf_state_desired=29
+cc_zero=0x1 spm_cc_dcvs_dis=0x0 llm_intf_dcvs_dis=0x0 seq1=0x13 pdn_fsm=0x500003f
+cycle_ctrl=0x113
+lmh_limit_req(0xb04)=0x420009c b00=0x84762420 b08=0x1
+pstate: deviation=0x0 corrected=0x0 met=0x0 wdog_pstate=0x0
+cycle_status 3073565020 -> 3096810076 (delta 23245056 in ~10 ms)
+lut[ 0] idx=0x0 freq=0x0004000f volt=0x00000290 ovr=0x01200020 spare=0x1
+lut[ 1] idx=0x1 freq=0x05040012 volt=0x00010290 ovr=0x01200020 spare=0x1
+lut[ 2] idx=0x2 freq=0x05040016 volt=0x00020290 ovr=0x02200020 spare=0x1
+lut[ 3] idx=0x3 freq=0x0504001a volt=0x00030290 ovr=0x02200020 spare=0x1
+lut[ 4] idx=0x4 freq=0x0504001e volt=0x00040290 ovr=0x02200020 spare=0x1
+lut[ 5] idx=0x5 freq=0x05040022 volt=0x00050290 ovr=0x03200020 spare=0x1
+lut[ 6] idx=0x6 freq=0x05040026 volt=0x00060290 ovr=0x03200020 spare=0x1
+lut[ 7] idx=0x7 freq=0x0504002a volt=0x00070290 ovr=0x03220022 spare=0x1
+lut[ 8] idx=0x8 freq=0x0404002f volt=0x00080290 ovr=0x04260026 spare=0x1
+lut[ 9] idx=0x9 freq=0x04040033 volt=0x00090290 ovr=0x04290029 spare=0x1
+lut[10] idx=0xa freq=0x04040037 volt=0x000a0290 ovr=0x052c002c spare=0x1
+lut[11] idx=0xb freq=0x0404003b volt=0x000b0290 ovr=0x052f002f spare=0x1
+lut[12] idx=0xc freq=0x0404003e volt=0x000c0290 ovr=0x05320032 spare=0x2
+lut[13] idx=0xd freq=0x04040042 volt=0x000d02a8 ovr=0x06350035 spare=0x2
+lut[14] idx=0xe freq=0x04040046 volt=0x000e02b8 ovr=0x06380038 spare=0x2
+lut[15] idx=0xf freq=0x0404004a volt=0x000f02cc ovr=0x063b003b spare=0x2
+lut[16] idx=0x10 freq=0x0404004e volt=0x001002e4 ovr=0x073e003e spare=0x2
+lut[17] idx=0x11 freq=0x04040052 volt=0x001102f4 ovr=0x07420042 spare=0x2
+lut[18] idx=0x12 freq=0x04040056 volt=0x00120308 ovr=0x07450045 spare=0x2
+lut[19] idx=0x13 freq=0x0404005a volt=0x0013031c ovr=0x08480048 spare=0x2
+lut[20] idx=0x14 freq=0x0404005e volt=0x0014033c ovr=0x084b004b spare=0x2
+lut[21] idx=0x15 freq=0x04040062 volt=0x0015036c ovr=0x094e004e spare=0x2
+lut[22] idx=0x16 freq=0x04040066 volt=0x0016038c ovr=0x09520052 spare=0x2
+lut[23] idx=0x17 freq=0x0404006a volt=0x001703b8 ovr=0x09550055 spare=0x3
+lut[24] idx=0x18 freq=0x0404006e volt=0x001803e0 ovr=0x0a580058 spare=0x3
+lut[25] idx=0x19 freq=0x04040073 volt=0x00190400 ovr=0x0a5c005c spare=0x3
+lut[26] idx=0x1a freq=0x04040076 volt=0x001a0420 ovr=0x0a5e005e spare=0x3
+lut[27] idx=0x1b freq=0x04040079 volt=0x001b043c ovr=0x0a610061 spare=0x3
+lut[28] idx=0x1c freq=0x0404007a volt=0x001c0444 ovr=0x0a620062 spare=0x3
+lut[29] idx=0x1d freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[30] idx=0x1e freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[31] idx=0x1f freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[32] idx=0x20 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[33] idx=0x21 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[34] idx=0x22 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[35] idx=0x23 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[36] idx=0x24 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[37] idx=0x25 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[38] idx=0x26 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+lut[39] idx=0x27 freq=0x0404007b volt=0x001d044c ovr=0x0a620062 spare=0x3
+== /sys/kernel/debug/qcom_cpr3/thread0
+irq_status = 0x80000007
+cpr_ctl = 0x1c1f
+thread 0 - hw tid: 0 - enabled: 0:
+22 corners, derived from 4 fuse corners
+corner 0 - uV=[608000 640000 640000] quot=0 freq=300000000
+corner 1 - uV=[608000 640000 640000] quot=0 freq=364800000
+corner 2 - uV=[608000 640000 640000] quot=0 freq=441600000
+corner 3 - uV=[608000 640000 640000] quot=0 freq=518400000
+corner 4 - uV=[608000 640000 640000] quot=0 freq=595200000
+corner 5 - uV=[608000 640000 640000] quot=0 freq=672000000
+corner 6 - uV=[608000 640000 640000] quot=0 freq=748800000
+corner 7 - uV=[608000 640000 640000] quot=0 freq=825600000
+corner 8 - uV=[632000 652000 652000] quot=110 freq=883200000
+corner 9 - uV=[636000 668000 668000] quot=54 freq=960000000
+corner 10 - uV=[648000 680000 680000] quot=0 freq=1036800000
+corner 11 - uV=[664000 684000 684000] quot=305 freq=1094400000
+corner 12 - uV=[668000 700000 700000] quot=263 freq=1171200000
+corner 13 - uV=[688000 720000 720000] quot=219 freq=1248000000
+corner 14 - uV=[712000 744000 744000] quot=176 freq=1324800000
+corner 15 - uV=[732000 764000 764000] quot=133 freq=1401600000
+corner 16 - uV=[748000 780000 780000] quot=86 freq=1478400000
+corner 17 - uV=[764000 796000 796000] quot=44 freq=1555200000
+corner 18 - uV=[800000 836000 836000] quot=241 freq=1670400000
+corner 19 - uV=[852000 860000 860000] quot=187 freq=1747200000
+corner 20 - uV=[852000 884000 884000] quot=131 freq=1824000000
+corner 21 - uV=[868000 908000 908000] quot=76 freq=1900800000
+fuse 0 - uV=[568000 640000 828000] quot=601 freq=0
+fuse 1 - uV=[632000 680000 900000] quot=753 freq=0
+fuse 2 - uV=[664000 812000 952000] quot=1065 freq=0
+fuse 3 - uV=[772000 936000 1056000] quot=1357 freq=0
+cpr_result_0 = 0x5f0a
+  [busy = 0, step_dn = 1, step_up = 0, error_steps = 1, error = 95, negative = 0]
+cpr_result_1 = 0xbb571560
+  [quot_min = 1376, quot_max = 1393, ro_min = 11, ro_max = 11]
+cpr_result_2 = 0x4050c71
+  [qout_step_min = 49, qout_step_max = 49, sensor_min = 5, sensor_max = 4]
+== /sys/kernel/debug/qcom_cpr3/thread1
+irq_status = 0x8000000f
+cpr_ctl = 0x1c1f
+thread 1 - hw tid: 0 - enabled: 0:
+30 corners, derived from 4 fuse corners
+corner 0 - uV=[624000 656000 656000] quot=0 freq=300000000
+corner 1 - uV=[624000 656000 656000] quot=0 freq=345600000
+corner 2 - uV=[624000 656000 656000] quot=0 freq=422400000
+corner 3 - uV=[624000 656000 656000] quot=0 freq=499200000
+corner 4 - uV=[624000 656000 656000] quot=0 freq=576000000
+corner 5 - uV=[624000 656000 656000] quot=0 freq=652800000
+corner 6 - uV=[624000 656000 656000] quot=0 freq=729600000
+corner 7 - uV=[624000 656000 656000] quot=0 freq=806400000
+corner 8 - uV=[624000 656000 656000] quot=0 freq=902400000
+corner 9 - uV=[624000 656000 656000] quot=0 freq=979200000
+corner 10 - uV=[624000 656000 656000] quot=0 freq=1056000000
+corner 11 - uV=[624000 656000 656000] quot=0 freq=1132800000
+corner 12 - uV=[632000 656000 656000] quot=417 freq=1190400000
+corner 13 - uV=[648000 680000 680000] quot=364 freq=1267200000
+corner 14 - uV=[664000 696000 696000] quot=313 freq=1344000000
+corner 15 - uV=[684000 716000 716000] quot=257 freq=1420800000
+corner 16 - uV=[708000 740000 740000] quot=205 freq=1497600000
+corner 17 - uV=[724000 756000 756000] quot=153 freq=1574400000
+corner 18 - uV=[744000 776000 776000] quot=97 freq=1651200000
+corner 19 - uV=[764000 796000 796000] quot=46 freq=1728000000
+corner 20 - uV=[800000 828000 828000] quot=538 freq=1804800000
+corner 21 - uV=[852000 876000 876000] quot=469 freq=1881600000
+corner 22 - uV=[868000 908000 908000] quot=401 freq=1958400000
+corner 23 - uV=[912000 952000 952000] quot=328 freq=2035200000
+corner 24 - uV=[952000 992000 992000] quot=256 freq=2112000000
+corner 25 - uV=[984000 1024000 1024000] quot=198 freq=2208000000
+corner 26 - uV=[1016000 1056000 1056000] quot=146 freq=2265600000
+corner 27 - uV=[1044000 1084000 1084000] quot=96 freq=2323200000
+corner 28 - uV=[1052000 1092000 1092000] quot=79 freq=2342400000
+corner 29 - uV=[1060000 1100000 1100000] quot=62 freq=2361600000
+fuse 0 - uV=[568000 656000 828000] quot=1072 freq=0
+fuse 1 - uV=[624000 656000 900000] quot=1072 freq=0
+fuse 2 - uV=[632000 812000 952000] quot=1500 freq=0
+fuse 3 - uV=[772000 1128000 1136000] quot=2073 freq=0
+cpr_result_0 = 0x253a
+  [busy = 0, step_dn = 1, step_up = 0, error_steps = 7, error = 37, negative = 0]
+cpr_result_1 = 0xbb7c27ad
+  [quot_min = 1965, quot_max = 1986, ro_min = 11, ro_max = 11]
+cpr_result_2 = 0x2040145
+  [qout_step_min = 5, qout_step_max = 5, sensor_min = 4, sensor_max = 2]
+[    1.420217] qcom-cpufreq-osm 179c0000.cpufreq: CPU speed bin 2
+[    1.942597] qcom-cpufreq-osm 179c0000.cpufreq: CPU speed bin 2
+[    1.945855] qcom-cpufreq-osm 179c0000.cpufreq: OSM clock: cmd=0x2 cfg=0x102
+[    1.958106] qcom-cpr3 179c8000.power-controller: thread 0 initialized with 22 OPPs
+[    1.986684] qcom-cpr3 179c8000.power-controller: thread 1 initialized with 30 OPPs

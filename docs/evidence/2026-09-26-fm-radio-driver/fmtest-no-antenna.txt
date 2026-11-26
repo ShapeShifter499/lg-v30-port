@@ -1,0 +1,63 @@
+Driver Info:
+	Driver name      : radio-qca-fm
+	Card type        : Qualcomm WCN399x FM receiver
+	Bus info         : 
+	Driver version   : 7.2.0
+	Capabilities     : 0x80250400
+		Tuner
+		HW Frequency Seek
+ioctl: VIDIOC_ENUM_FREQ_BANDS
+	Index          : 0
+	Modulation     : FM
+	Capability     : 62.5 Hz hwseek-bounded hwseek-wrap stereo freq-bands hwseek-prog-lim 
+	Frequency Range: 87.500 MHz - 108.000 MHz
+
+	Index          : 1
+	Modulation     : FM
+	Capability     : 62.5 Hz hwseek-bounded hwseek-wrap stereo freq-bands hwseek-prog-lim 
+	Frequency Range: 76.000 MHz - 95.000 MHz
+== tune 90.3
+Frequency for tuner 0 set to 1444800 (90.300000 MHz)
+Frequency for tuner 0: 1444800 (90.300000 MHz)
+	Signal strength/AFC  : 40%/0
+	Current audio mode   : stereo
+	Available subchannels: mono 
+== hold open 3 s, tuner twice
+	Signal strength/AFC  : 38%/0
+	Signal strength/AFC  : 38%/0
+== seek up, wrap
+VIDIOC_S_HW_FREQ_SEEK: failed: No data available
+rc=255 8s
+Frequency for tuner 0: 1444800 (90.300000 MHz)
+== seek up again
+VIDIOC_S_HW_FREQ_SEEK: failed: No data available
+rc=255
+Frequency for tuner 0: 1444800 (90.300000 MHz)
+== seek down, no wrap
+VIDIOC_S_HW_FREQ_SEEK: failed: No data available
+rc=255
+Frequency for tuner 0: 1444800 (90.300000 MHz)
+== mute
+mute: 1
+== bt off
+VIDIOC_G_TUNER: failed: I/O error
+Frequency for tuner 0 set to 1444800 (90.300000 MHz)
+Frequency for tuner 0: 1444800 (90.300000 MHz)
+[   11.840471] radio_qca_fm: module verification failed: signature and/or required key missing - tainting kernel
+[   11.842797] radio_qca_fm hci_uart.fm.0: FM receiver registered as radio0
+[   69.792116] radio_qca_fm hci_uart.fm.0: Bluetooth is off; FM needs it on
+
+Codec ioctls:
+	test VIDIOC_(TRY_)ENCODER_CMD: OK (Not Supported)
+	test VIDIOC_G_ENC_INDEX: OK (Not Supported)
+	test VIDIOC_(TRY_)DECODER_CMD: OK (Not Supported)
+
+Buffer ioctls:
+	test VIDIOC_REQBUFS/CREATE_BUFS/QUERYBUF: OK (Not Supported)
+	test CREATE_BUFS maximum buffers: OK
+	test VIDIOC_REMOVE_BUFS: OK
+	test VIDIOC_EXPBUF: OK (Not Supported)
+	test Requests: OK (Not Supported)
+	test blocking wait: OK (Not Supported)
+
+Total for radio-qca-fm device /dev/radio0: 48, Succeeded: 46, Failed: 2, Warnings: 0

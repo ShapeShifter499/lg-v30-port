@@ -1,0 +1,875 @@
+[   32.817053] bc: netconsole armed
+[   33.953729] bc: pm get
+[   33.954014] bc: csiphy_set_power 1
+[   33.964180] bc: csid_set_power 1
+[   33.964344] bc: vfe_get pc=0
+[   33.966058] bc: ispif_set_power 1
+[   33.966886] bc: vfe_get pc=1
+[   33.967251] bc: pm get done 0
+[   33.967557] bc: on msm_vfe0_rdi0
+[   33.967683] bc: on msm_ispif0
+[   33.967762] bc: on msm_csid0
+[   33.967832] bc: on msm_csiphy0
+[   33.968074] bc: on imx351 5-0010
+[   33.968125] bc: imx351 enable
+[   33.968194] bc: imx351 power on
+[   33.982524] bc: imx351 writes
+[   33.982739] bc: cci resume
+[   34.028737] bc: imx351 stream on
+[   34.683700] bc: off msm_vfe0_rdi0
+[   34.743774] bc: off msm_ispif0
+[   34.776996] bc: off msm_csid0
+[   34.777064] bc: off msm_csiphy0
+[   34.777095] bc: off imx351 5-0010
+[   34.777113] bc: imx351 standby
+[   34.780740] bc: pm put
+[   34.780817] bc: csiphy_set_power 0
+[   34.780888] bc: csid_set_power 0
+[   34.780948] bc: vfe_put pc=2
+[   34.780967] bc: ispif_set_power 0
+[   34.781043] bc: vfe_put pc=1
+[   34.782891] bc: pm put done
+[   36.024145] bc: cci suspend
+[   36.025614] bc: imx351 power off
+[   38.311034] bc: pm get
+[   38.311132] bc: csiphy_set_power 1
+[   38.319944] bc: csid_set_power 1
+[   38.320008] bc: vfe_get pc=0
+[   38.320771] bc: ispif_set_power 1
+[   38.321335] bc: vfe_get pc=1
+[   38.321358] bc: pm get done 0
+[   38.321403] bc: on msm_vfe0_rdi0
+[   38.321448] bc: on msm_ispif0
+[   38.321466] bc: on msm_csid0
+[   38.321478] bc: on msm_csiphy0
+[   38.321499] bc: on imx351 5-0010
+[   38.321511] bc: imx351 enable
+[   38.321529] bc: imx351 power on
+[   38.334872] bc: imx351 writes
+[   38.335008] bc: cci resume
+[   38.381710] bc: imx351 stream on
+[   39.018485] bc: off msm_vfe0_rdi0
+[   39.066120] bc: off msm_ispif0
+[   39.099295] bc: off msm_csid0
+[   39.099479] bc: off msm_csiphy0
+[   39.099516] bc: off imx351 5-0010
+[   39.099550] bc: imx351 standby
+[   39.103378] bc: pm put
+[   39.103510] bc: csiphy_set_power 0
+[   39.103645] bc: csid_set_power 0
+[   39.103767] bc: vfe_put pc=2
+[   39.103832] bc: ispif_set_power 0
+[   39.104069] bc: vfe_put pc=1
+[   39.107071] bc: pm put done
+[   40.347977] bc: cci suspend
+[   40.348063] bc: imx351 power off
+[   41.843402] bc: pm get
+[   41.843510] bc: csiphy_set_power 1
+[   41.851945] bc: csid_set_power 1
+[   41.851972] bc: vfe_get pc=0
+[   41.853608] bc: ispif_set_power 1
+[   41.854284] bc: vfe_get pc=1
+[   41.854317] bc: pm get done 0
+[   41.854395] bc: on msm_vfe0_rdi0
+[   41.854451] bc: on msm_ispif0
+[   41.854474] bc: on msm_csid0
+[   41.854493] bc: on msm_csiphy0
+[   41.854521] bc: on imx351 5-0010
+[   41.854544] bc: imx351 enable
+[   41.854584] bc: imx351 power on
+[   41.868142] bc: imx351 writes
+[   41.868303] bc: cci resume
+[   41.911521] bc: imx351 stream on
+[   42.545141] bc: off msm_vfe0_rdi0
+[   42.599611] bc: off msm_ispif0
+[   42.633023] bc: off msm_csid0
+[   42.633138] bc: off msm_csiphy0
+[   42.633234] bc: off imx351 5-0010
+[   42.633276] bc: imx351 standby
+[   42.644956] bc: pm put
+[   42.645075] bc: csiphy_set_power 0
+[   42.645261] bc: csid_set_power 0
+[   42.645361] bc: vfe_put pc=2
+[   42.645406] bc: ispif_set_power 0
+[   42.645529] bc: vfe_put pc=1
+[   42.649426] bc: pm put done
+[   43.744230] bc: cci suspend
+[   43.826730] bc: imx351 power off
+[   45.524366] bc: pm get
+[   45.524495] bc: csiphy_set_power 1
+[   45.535921] bc: csid_set_power 1
+[   45.535941] bc: vfe_get pc=0
+[   45.538072] bc: ispif_set_power 1
+[   45.539306] bc: vfe_get pc=1
+[   45.539334] bc: pm get done 0
+[   45.539385] bc: on msm_vfe0_rdi0
+[   45.539427] bc: on msm_ispif0
+[   45.539446] bc: on msm_csid0
+[   45.539460] bc: on msm_csiphy0
+[   45.539480] bc: on imx351 5-0010
+[   45.539494] bc: imx351 enable
+[   45.539509] bc: imx351 power on
+[   45.553697] bc: imx351 writes
+[   45.553825] bc: cci resume
+[   45.613095] bc: imx351 stream on
+[   46.217871] bc: off msm_vfe0_rdi0
+[   46.273091] bc: off msm_ispif0
+[   46.306054] bc: off msm_csid0
+[   46.306141] bc: off msm_csiphy0
+[   46.306203] bc: off imx351 5-0010
+[   46.306246] bc: imx351 standby
+[   46.317163] bc: pm put
+[   46.317275] bc: csiphy_set_power 0
+[   46.317382] bc: csid_set_power 0
+[   46.317464] bc: vfe_put pc=2
+[   46.317502] bc: ispif_set_power 0
+[   46.317610] bc: vfe_put pc=1
+[   46.320199] bc: pm put done
+[   47.379332] bc: cci suspend
+[   47.536542] bc: imx351 power off
+[   48.958239] bc: pm get
+[   48.958435] bc: csiphy_set_power 1
+[   48.967904] bc: csid_set_power 1
+[   48.967923] bc: vfe_get pc=0
+[   48.968986] bc: ispif_set_power 1
+[   48.969528] bc: vfe_get pc=1
+[   48.969555] bc: pm get done 0
+[   48.969607] bc: on msm_vfe0_rdi0
+[   48.969646] bc: on msm_ispif0
+[   48.969669] bc: on msm_csid0
+[   48.969684] bc: on msm_csiphy0
+[   48.969701] bc: on imx351 5-0010
+[   48.969712] bc: imx351 enable
+[   48.969726] bc: imx351 power on
+[   48.983032] bc: imx351 writes
+[   48.983075] bc: cci resume
+[   49.028609] bc: imx351 stream on
+[   49.607500] bc: off msm_vfe0_rdi0
+[   49.661671] bc: off msm_ispif0
+[   49.695329] bc: off msm_csid0
+[   49.695416] bc: off msm_csiphy0
+[   49.695505] bc: off imx351 5-0010
+[   49.695571] bc: imx351 standby
+[   49.701540] bc: pm put
+[   49.701638] bc: csiphy_set_power 0
+[   49.701811] bc: csid_set_power 0
+[   49.701877] bc: vfe_put pc=2
+[   49.701896] bc: ispif_set_power 0
+[   49.701958] bc: vfe_put pc=1
+[   49.703535] bc: pm put done
+[   50.946405] bc: cci suspend
+[   50.946595] bc: imx351 power off
+[   52.376770] bc: pm get
+[   52.376949] bc: csiphy_set_power 1
+[   52.388437] bc: csid_set_power 1
+[   52.388587] bc: vfe_get pc=0
+[   52.389764] bc: ispif_set_power 1
+[   52.390429] bc: vfe_get pc=1
+[   52.390453] bc: pm get done 0
+[   52.390508] bc: on msm_vfe0_rdi0
+[   52.390544] bc: on msm_ispif0
+[   52.390559] bc: on msm_csid0
+[   52.390568] bc: on msm_csiphy0
+[   52.390583] bc: on imx351 5-0010
+[   52.390592] bc: imx351 enable
+[   52.390604] bc: imx351 power on
+[   52.403900] bc: imx351 writes
+[   52.403925] bc: cci resume
+[   52.446124] bc: imx351 stream on
+[   53.029694] bc: off msm_vfe0_rdi0
+[   53.082151] bc: off msm_ispif0
+[   53.115283] bc: off msm_csid0
+[   53.115359] bc: off msm_csiphy0
+[   53.115431] bc: off imx351 5-0010
+[   53.115465] bc: imx351 standby
+[   53.121829] bc: pm put
+[   53.121932] bc: csiphy_set_power 0
+[   53.122054] bc: csid_set_power 0
+[   53.122145] bc: vfe_put pc=2
+[   53.122180] bc: ispif_set_power 0
+[   53.122323] bc: vfe_put pc=1
+[   53.126420] bc: pm put done
+[   54.208435] bc: imx351 power off
+[   54.366067] bc: cci suspend
+[   56.008600] bc: pm get
+[   56.008737] bc: csiphy_set_power 1
+[   56.019210] bc: csid_set_power 1
+[   56.019227] bc: vfe_get pc=0
+[   56.020463] bc: ispif_set_power 1
+[   56.021054] bc: vfe_get pc=1
+[   56.021086] bc: pm get done 0
+[   56.021142] bc: on msm_vfe0_rdi0
+[   56.021193] bc: on msm_ispif0
+[   56.021214] bc: on msm_csid0
+[   56.021230] bc: on msm_csiphy0
+[   56.021252] bc: on imx351 5-0010
+[   56.021265] bc: imx351 enable
+[   56.021298] bc: imx351 power on
+[   56.035054] bc: imx351 writes
+[   56.035113] bc: cci resume
+[   56.171110] bc: imx351 stream on
+[   56.781845] bc: off msm_vfe0_rdi0
+[   56.839931] bc: off msm_ispif0
+[   56.873007] bc: off msm_csid0
+[   56.873098] bc: off msm_csiphy0
+[   56.873178] bc: off imx351 5-0010
+[   56.873243] bc: imx351 standby
+[   56.879195] bc: pm put
+[   56.879296] bc: csiphy_set_power 0
+[   56.879431] bc: csid_set_power 0
+[   56.879584] bc: vfe_put pc=2
+[   56.879627] bc: ispif_set_power 0
+[   56.879697] bc: vfe_put pc=1
+[   56.880986] bc: pm put done
+[   57.935532] bc: cci suspend
+[   58.008517] bc: imx351 power off
+[   59.598832] bc: pm get
+[   59.598997] bc: csiphy_set_power 1
+[   59.607884] bc: csid_set_power 1
+[   59.607902] bc: vfe_get pc=0
+[   59.608798] bc: ispif_set_power 1
+[   59.609337] bc: vfe_get pc=1
+[   59.609379] bc: pm get done 0
+[   59.609506] bc: on msm_vfe0_rdi0
+[   59.609567] bc: on msm_ispif0
+[   59.609591] bc: on msm_csid0
+[   59.609613] bc: on msm_csiphy0
+[   59.609637] bc: on imx351 5-0010
+[   59.609649] bc: imx351 enable
+[   59.609664] bc: imx351 power on
+[   59.622968] bc: imx351 writes
+[   59.623033] bc: cci resume
+[   59.673328] bc: imx351 stream on
+[   60.290485] bc: off msm_vfe0_rdi0
+[   60.342225] bc: off msm_ispif0
+[   60.375172] bc: off msm_csid0
+[   60.375259] bc: off msm_csiphy0
+[   60.375338] bc: off imx351 5-0010
+[   60.375401] bc: imx351 standby
+[   60.379270] bc: pm put
+[   60.379292] bc: csiphy_set_power 0
+[   60.379341] bc: csid_set_power 0
+[   60.379380] bc: vfe_put pc=2
+[   60.379395] bc: ispif_set_power 0
+[   60.379456] bc: vfe_put pc=1
+[   60.385362] bc: pm put done
+[   61.623969] bc: imx351 power off
+[   61.625915] bc: cci suspend
+[   63.094447] bc: pm get
+[   63.094595] bc: csiphy_set_power 1
+[   63.104197] bc: csid_set_power 1
+[   63.104302] bc: vfe_get pc=0
+[   63.105688] bc: ispif_set_power 1
+[   63.106332] bc: vfe_get pc=1
+[   63.106363] bc: pm get done 0
+[   63.106420] bc: on msm_vfe0_rdi0
+[   63.106464] bc: on msm_ispif0
+[   63.106481] bc: on msm_csid0
+[   63.106492] bc: on msm_csiphy0
+[   63.106510] bc: on imx351 5-0010
+[   63.106522] bc: imx351 enable
+[   63.106536] bc: imx351 power on
+[   63.119929] bc: imx351 writes
+[   63.119971] bc: cci resume
+[   63.171927] bc: imx351 stream on
+[   63.785357] bc: off msm_vfe0_rdi0
+[   63.841869] bc: off msm_ispif0
+[   63.874561] bc: off msm_csid0
+[   63.874641] bc: off msm_csiphy0
+[   63.874703] bc: off imx351 5-0010
+[   63.874747] bc: imx351 standby
+[   63.884935] bc: pm put
+[   63.885028] bc: csiphy_set_power 0
+[   63.885136] bc: csid_set_power 0
+[   63.885233] bc: vfe_put pc=2
+[   63.885270] bc: ispif_set_power 0
+[   63.885392] bc: vfe_put pc=1
+[   63.888408] bc: pm put done
+[   64.941063] bc: imx351 power off
+[   65.020331] bc: cci suspend
+[   66.686585] bc: pm get
+[   66.686738] bc: csiphy_set_power 1
+[   66.699468] bc: csid_set_power 1
+[   66.699523] bc: vfe_get pc=0
+[   66.700681] bc: ispif_set_power 1
+[   66.701140] bc: vfe_get pc=1
+[   66.701202] bc: pm get done 0
+[   66.701258] bc: on msm_vfe0_rdi0
+[   66.701303] bc: on msm_ispif0
+[   66.701326] bc: on msm_csid0
+[   66.701341] bc: on msm_csiphy0
+[   66.701361] bc: on imx351 5-0010
+[   66.701376] bc: imx351 enable
+[   66.701391] bc: imx351 power on
+[   66.715097] bc: imx351 writes
+[   66.715234] bc: cci resume
+[   66.758159] bc: imx351 stream on
+[   67.341771] bc: off msm_vfe0_rdi0
+[   67.393768] bc: off msm_ispif0
+[   67.427261] bc: off msm_csid0
+[   67.427348] bc: off msm_csiphy0
+[   67.427437] bc: off imx351 5-0010
+[   67.427501] bc: imx351 standby
+[   67.433590] bc: pm put
+[   67.433684] bc: csiphy_set_power 0
+[   67.433820] bc: csid_set_power 0
+[   67.433967] bc: vfe_put pc=2
+[   67.433987] bc: ispif_set_power 0
+[   67.434054] bc: vfe_put pc=1
+[   67.439692] bc: pm put done
+[   68.446680] bc: cci suspend
+[   68.446860] bc: imx351 power off
+[   70.157475] bc: pm get
+[   70.157608] bc: csiphy_set_power 1
+[   70.167950] bc: csid_set_power 1
+[   70.167968] bc: vfe_get pc=0
+[   70.169710] bc: ispif_set_power 1
+[   70.170580] bc: vfe_get pc=1
+[   70.170664] bc: pm get done 0
+[   70.170755] bc: on msm_vfe0_rdi0
+[   70.170803] bc: on msm_ispif0
+[   70.170827] bc: on msm_csid0
+[   70.170841] bc: on msm_csiphy0
+[   70.170863] bc: on imx351 5-0010
+[   70.170881] bc: imx351 enable
+[   70.170898] bc: imx351 power on
+[   70.183912] bc: imx351 writes
+[   70.183956] bc: cci resume
+[   70.229634] bc: imx351 stream on
+[   70.844144] bc: off msm_vfe0_rdi0
+[   70.898905] bc: off msm_ispif0
+[   70.931974] bc: off msm_csid0
+[   70.932061] bc: off msm_csiphy0
+[   70.932140] bc: off imx351 5-0010
+[   70.932205] bc: imx351 standby
+[   70.938167] bc: pm put
+[   70.938259] bc: csiphy_set_power 0
+[   70.938392] bc: csid_set_power 0
+[   70.938542] bc: vfe_put pc=2
+[   70.938595] bc: ispif_set_power 0
+[   70.938670] bc: vfe_put pc=1
+[   70.944130] bc: pm put done
+[   71.944961] bc: cci suspend
+[   72.183773] bc: imx351 power off
+[   73.597315] bc: pm get
+[   73.597453] bc: csiphy_set_power 1
+[   73.607879] bc: csid_set_power 1
+[   73.607899] bc: vfe_get pc=0
+[   73.608958] bc: ispif_set_power 1
+[   73.609421] bc: vfe_get pc=1
+[   73.609478] bc: pm get done 0
+[   73.609655] bc: on msm_vfe0_rdi0
+[   73.609718] bc: on msm_ispif0
+[   73.609743] bc: on msm_csid0
+[   73.609764] bc: on msm_csiphy0
+[   73.609787] bc: on imx351 5-0010
+[   73.609805] bc: imx351 enable
+[   73.609823] bc: imx351 power on
+[   73.623044] bc: imx351 writes
+[   73.623094] bc: cci resume
+[   73.668025] bc: imx351 stream on
+[   74.247585] bc: off msm_vfe0_rdi0
+[   74.303947] bc: off msm_ispif0
+[   74.337032] bc: off msm_csid0
+[   74.337120] bc: off msm_csiphy0
+[   74.337200] bc: off imx351 5-0010
+[   74.337266] bc: imx351 standby
+[   74.342161] bc: pm put
+[   74.342183] bc: csiphy_set_power 0
+[   74.342232] bc: csid_set_power 0
+[   74.342275] bc: vfe_put pc=2
+[   74.342290] bc: ispif_set_power 0
+[   74.342356] bc: vfe_put pc=1
+[   74.348445] bc: pm put done
+[   75.360600] bc: cci suspend
+[   75.587929] bc: imx351 power off
+[   77.155398] bc: pm get
+[   77.155586] bc: csiphy_set_power 1
+[   77.163880] bc: csid_set_power 1
+[   77.163901] bc: vfe_get pc=0
+[   77.164903] bc: ispif_set_power 1
+[   77.165373] bc: vfe_get pc=1
+[   77.165400] bc: pm get done 0
+[   77.165448] bc: on msm_vfe0_rdi0
+[   77.165499] bc: on msm_ispif0
+[   77.165530] bc: on msm_csid0
+[   77.165549] bc: on msm_csiphy0
+[   77.165582] bc: on imx351 5-0010
+[   77.165600] bc: imx351 enable
+[   77.165626] bc: imx351 power on
+[   77.179177] bc: imx351 writes
+[   77.179391] bc: cci resume
+[   77.221859] bc: imx351 stream on
+[   77.801855] bc: off msm_vfe0_rdi0
+[   77.857638] bc: off msm_ispif0
+[   77.891164] bc: off msm_csid0
+[   77.891263] bc: off msm_csiphy0
+[   77.891346] bc: off imx351 5-0010
+[   77.891409] bc: imx351 standby
+[   77.896456] bc: pm put
+[   77.896509] bc: csiphy_set_power 0
+[   77.896677] bc: csid_set_power 0
+[   77.896811] bc: vfe_put pc=2
+[   77.896863] bc: ispif_set_power 0
+[   77.897036] bc: vfe_put pc=1
+[   77.900340] bc: pm put done
+[   79.140029] bc: imx351 power off
+[   79.142604] bc: cci suspend
+[   80.633628] bc: pm get
+[   80.633895] bc: csiphy_set_power 1
+[   80.643900] bc: csid_set_power 1
+[   80.643918] bc: vfe_get pc=0
+[   80.645089] bc: ispif_set_power 1
+[   80.645788] bc: vfe_get pc=1
+[   80.645854] bc: pm get done 0
+[   80.646003] bc: on msm_vfe0_rdi0
+[   80.646059] bc: on msm_ispif0
+[   80.646085] bc: on msm_csid0
+[   80.646103] bc: on msm_csiphy0
+[   80.646121] bc: on imx351 5-0010
+[   80.646137] bc: imx351 enable
+[   80.646152] bc: imx351 power on
+[   80.659075] bc: imx351 writes
+[   80.659126] bc: cci resume
+[   80.704793] bc: imx351 stream on
+[   81.319098] bc: off msm_vfe0_rdi0
+[   81.373512] bc: off msm_ispif0
+[   81.407228] bc: off msm_csid0
+[   81.407390] bc: off msm_csiphy0
+[   81.407469] bc: off imx351 5-0010
+[   81.407517] bc: imx351 standby
+[   81.421121] bc: pm put
+[   81.421304] bc: csiphy_set_power 0
+[   81.421560] bc: csid_set_power 0
+[   81.421695] bc: vfe_put pc=2
+[   81.421748] bc: ispif_set_power 0
+[   81.421884] bc: vfe_put pc=1
+[   81.425431] bc: pm put done
+[   82.593687] bc: cci suspend
+[   82.593769] bc: imx351 power off
+[   84.201675] bc: pm get
+[   84.201815] bc: csiphy_set_power 1
+[   84.211906] bc: csid_set_power 1
+[   84.211950] bc: vfe_get pc=0
+[   84.213237] bc: ispif_set_power 1
+[   84.213627] bc: vfe_get pc=1
+[   84.213686] bc: pm get done 0
+[   84.213729] bc: on msm_vfe0_rdi0
+[   84.213769] bc: on msm_ispif0
+[   84.213784] bc: on msm_csid0
+[   84.213794] bc: on msm_csiphy0
+[   84.213809] bc: on imx351 5-0010
+[   84.213819] bc: imx351 enable
+[   84.213831] bc: imx351 power on
+[   84.227264] bc: imx351 writes
+[   84.227306] bc: cci resume
+[   84.272810] bc: imx351 stream on
+[   84.886734] bc: off msm_vfe0_rdi0
+[   84.941984] bc: off msm_ispif0
+[   84.975015] bc: off msm_csid0
+[   84.975111] bc: off msm_csiphy0
+[   84.975193] bc: off imx351 5-0010
+[   84.975259] bc: imx351 standby
+[   84.981191] bc: pm put
+[   84.981281] bc: csiphy_set_power 0
+[   84.981413] bc: csid_set_power 0
+[   84.981528] bc: vfe_put pc=2
+[   84.981579] bc: ispif_set_power 0
+[   84.981790] bc: vfe_put pc=1
+[   84.987009] bc: pm put done
+[   86.080465] bc: imx351 power off
+[   86.225868] bc: cci suspend
+[   87.685219] bc: pm get
+[   87.685449] bc: csiphy_set_power 1
+[   87.695957] bc: csid_set_power 1
+[   87.695975] bc: vfe_get pc=0
+[   87.696977] bc: ispif_set_power 1
+[   87.697393] bc: vfe_get pc=1
+[   87.697410] bc: pm get done 0
+[   87.697456] bc: on msm_vfe0_rdi0
+[   87.697501] bc: on msm_ispif0
+[   87.697525] bc: on msm_csid0
+[   87.697539] bc: on msm_csiphy0
+[   87.697566] bc: on imx351 5-0010
+[   87.697586] bc: imx351 enable
+[   87.697603] bc: imx351 power on
+[   87.711222] bc: imx351 writes
+[   87.711278] bc: cci resume
+[   87.836040] bc: imx351 stream on
+[   88.413341] bc: off msm_vfe0_rdi0
+[   88.472029] bc: off msm_ispif0
+[   88.505364] bc: off msm_csid0
+[   88.505428] bc: off msm_csiphy0
+[   88.505481] bc: off imx351 5-0010
+[   88.505522] bc: imx351 standby
+[   88.515644] bc: pm put
+[   88.515736] bc: csiphy_set_power 0
+[   88.515842] bc: csid_set_power 0
+[   88.515975] bc: vfe_put pc=2
+[   88.516011] bc: ispif_set_power 0
+[   88.516127] bc: vfe_put pc=1
+[   88.519690] bc: pm put done
+[   89.640454] bc: imx351 power off
+[   89.756392] bc: cci suspend
+[   89.756937] ------------[ cut here ]------------
+[   89.756969] camss_ahb_clk status stuck at 'on'
+[   89.757079] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x174/0x1a0, CPU#6: kworker/u34:2/72
+[   89.757165] Modules linked in: netconsole rfcomm cpufreq_conservative algif_hash bnep snd_soc_wcd934x snd_soc_wcd_mbhc snd_soc_wcd_common gpio_wcd934x snd_soc_wcd_classh wcd934x regmap_slimbus q6asm_dai q6routing q6afe_dai q6asm q6adm snd_q6dsp_common q6afe q6core q6voice apr qrtr_smd snd_soc_sdm845 snd_soc_rt5663 snd_soc_qcom_sdw snd_soc_qcom_common snd_soc_tfa989x snd_soc_hdmi_codec qcom_camss snd_soc_rl6231 snd_soc_es9218p snd_soc_core imx351 videobuf2_dma_sg v4l2_cci qcom_pd_mapper vl53l0x_i2c videobuf2_memops snd_compress ledtrig_pattern videobuf2_v4l2 sx9324 nxp_nci_i2c sx_common snd_pcm_dmaengine nxp_nci soundwire_bus industrialio_triggered_buffer videobuf2_common kfifo_buf snd_pcm v4l2_fwnode nci v4l2_async snd_timer dw7800_haptics snd hci_uart videodev btqca btbcm bluetooth ecdh_generic ecc ath10k_snoc nfc ff_memless soundcore thermal_weighted_adc leds_qcom_flash ath10k_core ath led_class_flash mac80211 mc qcom_spmi_adc5 i2c_qcom_cci qcom_vadc_common qcom_spmi_temp_alarm qrtr qcom_q6v5_pas qcom_q6v5_mss
+[   89.758057]  cfg80211 ipa qcom_stats qcom_pil_info qcom_q6v5 slim_qcom_ngd_ctrl rfkill qcom_sysmon libarc4 rpmsg_ctrl slimbus rpmsg_char qcom_common pdr_interface qcom_pdr_msg qcom_glink_smem qmi_helpers socinfo rmtfs_mem nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables uhid fuse
+[   89.758445] CPU: 6 UID: 0 PID: 72 Comm: kworker/u34:2 Not tainted 7.2.0-rc2-joan-bl+ #7 PREEMPT 
+[   89.758494] Hardware name: LG V30 (US998) (DT)
+[   89.758524] Workqueue: pm pm_runtime_work
+[   89.758588] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   89.758630] pc : clk_branch_toggle+0x174/0x1a0
+[   89.758667] lr : clk_branch_toggle+0x174/0x1a0
+[   89.758701] sp : ffff800080723b20
+[   89.758729] x29: ffff800080723b30 x28: 0000000000000000 x27: 0000000000000000
+[   89.758791] x26: ffff00008004b000 x25: ffffa6acfb583518 x24: 0000000000000000
+[   89.758850] x23: 0000000000000000 x22: ffffa6acfa1045a8 x21: 0000000000000000
+[   89.758907] x20: ffffa6acfc3da2d0 x19: 0000000000000000 x18: ffff800080701078
+[   89.758962] x17: ffff8000807236f0 x16: ffff0000f710d060 x15: 00000000ffffffff
+[   89.759019] x14: 0000000000000000 x13: 6f27207461206b63 x12: 7574732073757461
+[   89.759076] x11: ffffffffff800000 x10: 0000000000000027 x9 : ffffa6acf9817ddc
+[   89.759133] x8 : 3ffffffffffbffff x7 : ffff0000f8ce8000 x6 : 0000000000000001
+[   89.759189] x5 : ffff0000f9bbe1c8 x4 : 0000000000000000 x3 : 0000000000000027
+[   89.759245] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000080b6b240
+[   89.759303] Call trace:
+[   89.759333]  clk_branch_toggle+0x174/0x1a0 (P)
+[   89.759376]  clk_branch2_disable+0x28/0x40
+[   89.759416]  clk_core_disable+0x2b4/0x308
+[   89.759470]  clk_disable+0x44/0x70
+[   89.759518]  clk_bulk_disable+0x44/0x70
+[   89.759558]  cci_suspend_runtime+0x44/0x70 [i2c_qcom_cci]
+[   89.759615]  pm_generic_runtime_suspend+0x34/0x60
+[   89.759663]  genpd_runtime_suspend+0xc4/0x308
+[   89.759705]  __rpm_callback+0x54/0x230
+[   89.759753]  rpm_callback+0x84/0xa0
+[   89.759798]  rpm_suspend+0xe4/0x668
+[   89.759845]  pm_runtime_work+0xdc/0xf0
+[   89.759892]  process_one_work+0x16c/0x4c8
+[   89.759941]  worker_thread+0x19c/0x308
+[   89.759985]  kthread+0x138/0x158
+[   89.760026]  ret_from_fork+0x10/0x20
+[   89.760071] ---[ end trace 0000000000000000 ]---
+[   91.356323] bc: pm get
+[   91.356470] bc: csiphy_set_power 1
+[   91.367435] bc: csid_set_power 1
+[   91.367533] bc: vfe_get pc=0
+[   91.372063] bc: ispif_set_power 1
+[   91.373256] bc: vfe_get pc=1
+[   91.373339] bc: pm get done 0
+[   91.373492] bc: on msm_vfe0_rdi0
+[   91.373554] bc: on msm_ispif0
+[   91.373581] bc: on msm_csid0
+[   91.373598] bc: on msm_csiphy0
+[   91.373626] bc: on imx351 5-0010
+[   91.373643] bc: imx351 enable
+[   91.373664] bc: imx351 power on
+[   91.387240] bc: imx351 writes
+[   91.387442] bc: cci resume
+[   91.440141] bc: imx351 stream on
+[   92.021217] bc: off msm_vfe0_rdi0
+[   92.076093] bc: off msm_ispif0
+[   92.109111] bc: off msm_csid0
+[   92.109177] bc: off msm_csiphy0
+[   92.109232] bc: off imx351 5-0010
+[   92.109274] bc: imx351 standby
+[   92.119672] bc: pm put
+[   92.119766] bc: csiphy_set_power 0
+[   92.119918] bc: csid_set_power 0
+[   92.120014] bc: vfe_put pc=2
+[   92.120049] bc: ispif_set_power 0
+[   92.120169] bc: vfe_put pc=1
+[   92.122718] bc: pm put done
+[   93.232469] bc: cci suspend
+[   93.232770] bc: imx351 power off
+[   93.232994] ------------[ cut here ]------------
+[   93.233022] camss_ahb_clk status stuck at 'on'
+[   93.233100] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x174/0x1a0, CPU#7: kworker/u34:5/75
+[   93.233167] Modules linked in: netconsole rfcomm cpufreq_conservative algif_hash bnep snd_soc_wcd934x snd_soc_wcd_mbhc snd_soc_wcd_common gpio_wcd934x snd_soc_wcd_classh wcd934x regmap_slimbus q6asm_dai q6routing q6afe_dai q6asm q6adm snd_q6dsp_common q6afe q6core q6voice apr qrtr_smd snd_soc_sdm845 snd_soc_rt5663 snd_soc_qcom_sdw snd_soc_qcom_common snd_soc_tfa989x snd_soc_hdmi_codec qcom_camss snd_soc_rl6231 snd_soc_es9218p snd_soc_core imx351 videobuf2_dma_sg v4l2_cci qcom_pd_mapper vl53l0x_i2c videobuf2_memops snd_compress ledtrig_pattern videobuf2_v4l2 sx9324 nxp_nci_i2c sx_common snd_pcm_dmaengine nxp_nci soundwire_bus industrialio_triggered_buffer videobuf2_common kfifo_buf snd_pcm v4l2_fwnode nci v4l2_async snd_timer dw7800_haptics snd hci_uart videodev btqca btbcm bluetooth ecdh_generic ecc ath10k_snoc nfc ff_memless soundcore thermal_weighted_adc leds_qcom_flash ath10k_core ath led_class_flash mac80211 mc qcom_spmi_adc5 i2c_qcom_cci qcom_vadc_common qcom_spmi_temp_alarm qrtr qcom_q6v5_pas qcom_q6v5_mss
+[   93.233839]  cfg80211 ipa qcom_stats qcom_pil_info qcom_q6v5 slim_qcom_ngd_ctrl rfkill qcom_sysmon libarc4 rpmsg_ctrl slimbus rpmsg_char qcom_common pdr_interface qcom_pdr_msg qcom_glink_smem qmi_helpers socinfo rmtfs_mem nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables uhid fuse
+[   93.234130] CPU: 7 UID: 0 PID: 75 Comm: kworker/u34:5 Tainted: G        W           7.2.0-rc2-joan-bl+ #7 PREEMPT 
+[   93.234167] Tainted: [W]=WARN
+[   93.234188] Hardware name: LG V30 (US998) (DT)
+[   93.234211] Workqueue: pm pm_runtime_work
+[   93.234257] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   93.234287] pc : clk_branch_toggle+0x174/0x1a0
+[   93.234313] lr : clk_branch_toggle+0x174/0x1a0
+[   93.234337] sp : ffff80008078bb20
+[   93.234357] x29: ffff80008078bb30 x28: 0000000000000000 x27: 0000000000000000
+[   93.234403] x26: ffff00008004b000 x25: ffffa6acfb583518 x24: 0000000000000000
+[   93.234445] x23: 0000000000000000 x22: ffffa6acfa1045a8 x21: 0000000000000000
+[   93.234486] x20: ffffa6acfc3da2d0 x19: 0000000000000000 x18: ffff80008070d078
+[   93.234527] x17: ffff80008078b6f0 x16: ffff0000f710efe0 x15: 00000000ffffffff
+[   93.234569] x14: 0000000000000000 x13: 6f27207461206b63 x12: 7574732073757461
+[   93.234610] x11: ffffffffff800000 x10: 0000000000000027 x9 : ffffa6acf9817ddc
+[   93.234652] x8 : 3ffffffffffbffff x7 : ffff0000f8ce8000 x6 : 0000000000000001
+[   93.234692] x5 : ffff0000f9be11c8 x4 : 0000000000000000 x3 : 0000000000000027
+[   93.234733] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000080b68000
+[   93.234776] Call trace:
+[   93.234796]  clk_branch_toggle+0x174/0x1a0 (P)
+[   93.234829]  clk_branch2_disable+0x28/0x40
+[   93.234858]  clk_core_disable+0x2b4/0x308
+[   93.234898]  clk_disable+0x44/0x70
+[   93.234932]  clk_bulk_disable+0x44/0x70
+[   93.234962]  cci_suspend_runtime+0x44/0x70 [i2c_qcom_cci]
+[   93.235005]  pm_generic_runtime_suspend+0x34/0x60
+[   93.235038]  genpd_runtime_suspend+0xc4/0x308
+[   93.235070]  __rpm_callback+0x54/0x230
+[   93.235104]  rpm_callback+0x84/0xa0
+[   93.235137]  rpm_suspend+0xe4/0x668
+[   93.235170]  pm_runtime_work+0xdc/0xf0
+[   93.235204]  process_one_work+0x16c/0x4c8
+[   93.235241]  worker_thread+0x19c/0x308
+[   93.235273]  kthread+0x138/0x158
+[   93.235304]  ret_from_fork+0x10/0x20
+[   93.235338] ---[ end trace 0000000000000000 ]---
+[   95.133114] bc: pm get
+[   95.133275] bc: csiphy_set_power 1
+[   95.143971] bc: csid_set_power 1
+[   95.143994] bc: vfe_get pc=0
+[   95.144868] bc: ispif_set_power 1
+[   95.145472] bc: vfe_get pc=1
+[   95.145496] bc: pm get done 0
+[   95.145541] bc: on msm_vfe0_rdi0
+[   95.145594] bc: on msm_ispif0
+[   95.145629] bc: on msm_csid0
+[   95.145647] bc: on msm_csiphy0
+[   95.145672] bc: on imx351 5-0010
+[   95.145691] bc: imx351 enable
+[   95.145706] bc: imx351 power on
+[   95.159030] bc: imx351 writes
+[   95.159109] bc: cci resume
+[   95.201327] bc: imx351 stream on
+[   95.815937] bc: off msm_vfe0_rdi0
+[   95.870613] bc: off msm_ispif0
+[   95.903818] bc: off msm_csid0
+[   95.903924] bc: off msm_csiphy0
+[   95.903980] bc: off imx351 5-0010
+[   95.904022] bc: imx351 standby
+[   95.914126] bc: pm put
+[   95.914216] bc: csiphy_set_power 0
+[   95.914327] bc: csid_set_power 0
+[   95.914423] bc: vfe_put pc=2
+[   95.914473] bc: ispif_set_power 0
+[   95.914618] bc: vfe_put pc=1
+[   95.919064] bc: pm put done
+[   97.020396] bc: cci suspend
+[   97.020992] ------------[ cut here ]------------
+[   97.021023] camss_ahb_clk status stuck at 'on'
+[   97.021133] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x174/0x1a0, CPU#6: kworker/u34:0/56
+[   97.021223] Modules linked in: netconsole rfcomm cpufreq_conservative algif_hash bnep snd_soc_wcd934x snd_soc_wcd_mbhc snd_soc_wcd_common gpio_wcd934x snd_soc_wcd_classh wcd934x regmap_slimbus q6asm_dai q6routing q6afe_dai q6asm q6adm snd_q6dsp_common q6afe q6core q6voice apr qrtr_smd snd_soc_sdm845 snd_soc_rt5663 snd_soc_qcom_sdw snd_soc_qcom_common snd_soc_tfa989x snd_soc_hdmi_codec qcom_camss snd_soc_rl6231 snd_soc_es9218p snd_soc_core imx351 videobuf2_dma_sg v4l2_cci qcom_pd_mapper vl53l0x_i2c videobuf2_memops snd_compress ledtrig_pattern videobuf2_v4l2 sx9324 nxp_nci_i2c sx_common snd_pcm_dmaengine nxp_nci soundwire_bus industrialio_triggered_buffer videobuf2_common kfifo_buf snd_pcm v4l2_fwnode nci v4l2_async snd_timer dw7800_haptics snd hci_uart videodev btqca btbcm bluetooth ecdh_generic ecc ath10k_snoc nfc ff_memless soundcore thermal_weighted_adc leds_qcom_flash ath10k_core ath led_class_flash mac80211 mc qcom_spmi_adc5 i2c_qcom_cci qcom_vadc_common qcom_spmi_temp_alarm qrtr qcom_q6v5_pas qcom_q6v5_mss
+[   97.022144]  cfg80211 ipa qcom_stats qcom_pil_info qcom_q6v5 slim_qcom_ngd_ctrl rfkill qcom_sysmon libarc4 rpmsg_ctrl slimbus rpmsg_char qcom_common pdr_interface qcom_pdr_msg qcom_glink_smem qmi_helpers socinfo rmtfs_mem nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables uhid fuse
+[   97.022528] CPU: 6 UID: 0 PID: 56 Comm: kworker/u34:0 Tainted: G        W           7.2.0-rc2-joan-bl+ #7 PREEMPT 
+[   97.022578] Tainted: [W]=WARN
+[   97.022606] Hardware name: LG V30 (US998) (DT)
+[   97.022637] Workqueue: pm pm_runtime_work
+[   97.022699] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   97.022738] pc : clk_branch_toggle+0x174/0x1a0
+[   97.022773] lr : clk_branch_toggle+0x174/0x1a0
+[   97.022806] sp : ffff80008035bb20
+[   97.022833] x29: ffff80008035bb30 x28: 0000000000000000 x27: 0000000000000000
+[   97.022896] x26: ffff00008004b000 x25: ffffa6acfb583518 x24: 0000000000000000
+[   97.022955] x23: 0000000000000000 x22: ffffa6acfa1045a8 x21: 0000000000000000
+[   97.023011] x20: ffffa6acfc3da2d0 x19: 0000000000000000 x18: ffff80008030d078
+[   97.023067] x17: ffff80008035b6f0 x16: ffff0000f7110f60 x15: 00000000ffffffff
+[   97.023124] x14: 0000000000000000 x13: 6f27207461206b63 x12: 7574732073757461
+[   97.023181] x11: ffffffffff800000 x10: 0000000000000027 x9 : ffffa6acf9817ddc
+[   97.023238] x8 : 3ffffffffffbffff x7 : ffff0000f8ce8000 x6 : 0000000000000001
+[   97.023294] x5 : ffff0000f9bbe1c8 x4 : 0000000000000000 x3 : 0000000000000027
+[   97.023350] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000080b410c0
+[   97.023408] Call trace:
+[   97.023436]  clk_branch_toggle+0x174/0x1a0 (P)
+[   97.023477]  clk_branch2_disable+0x28/0x40
+[   97.023516]  clk_core_disable+0x2b4/0x308
+[   97.023568]  clk_disable+0x44/0x70
+[   97.023615]  clk_bulk_disable+0x44/0x70
+[   97.023657]  cci_suspend_runtime+0x44/0x70 [i2c_qcom_cci]
+[   97.023715]  pm_generic_runtime_suspend+0x34/0x60
+[   97.023762]  genpd_runtime_suspend+0xc4/0x308
+[   97.023804]  __rpm_callback+0x54/0x230
+[   97.023852]  rpm_callback+0x84/0xa0
+[   97.023896]  rpm_suspend+0xe4/0x668
+[   97.023941]  pm_runtime_work+0xdc/0xf0
+[   97.023987]  process_one_work+0x16c/0x4c8
+[   97.024036]  worker_thread+0x19c/0x308
+[   97.024079]  kthread+0x138/0x158
+[   97.024120]  ret_from_fork+0x10/0x20
+[   97.024166] ---[ end trace 0000000000000000 ]---
+[   97.056219] bc: imx351 power off
+[   98.599992] bc: pm get
+[   98.600143] bc: csiphy_set_power 1
+[   98.610980] bc: csid_set_power 1
+[   98.611028] bc: vfe_get pc=0
+[   98.612104] bc: ispif_set_power 1
+[   98.612931] bc: vfe_get pc=1
+[   98.613023] bc: pm get done 0
+[   98.613139] bc: on msm_vfe0_rdi0
+[   98.613200] bc: on msm_ispif0
+[   98.613232] bc: on msm_csid0
+[   98.613247] bc: on msm_csiphy0
+[   98.613311] bc: on imx351 5-0010
+[   98.613326] bc: imx351 enable
+[   98.613381] bc: imx351 power on
+[   98.627166] bc: imx351 writes
+[   98.627357] bc: cci resume
+[   98.699332] bc: imx351 stream on
+[   99.316314] bc: off msm_vfe0_rdi0
+[   99.368424] bc: off msm_ispif0
+[   99.401137] bc: off msm_csid0
+[   99.401153] bc: off msm_csiphy0
+[   99.401168] bc: off imx351 5-0010
+[   99.401179] bc: imx351 standby
+[   99.411330] bc: pm put
+[   99.411431] bc: csiphy_set_power 0
+[   99.411572] bc: csid_set_power 0
+[   99.411660] bc: vfe_put pc=2
+[   99.411714] bc: ispif_set_power 0
+[   99.411899] bc: vfe_put pc=1
+[   99.415458] bc: pm put done
+[  100.620398] bc: cci suspend
+[  100.620921] ------------[ cut here ]------------
+[  100.620944] camss_ahb_clk status stuck at 'on'
+[  100.621025] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x174/0x1a0, CPU#6: kworker/u34:2/72
+[  100.621092] Modules linked in: netconsole rfcomm cpufreq_conservative algif_hash bnep snd_soc_wcd934x snd_soc_wcd_mbhc snd_soc_wcd_common gpio_wcd934x snd_soc_wcd_classh wcd934x regmap_slimbus q6asm_dai q6routing q6afe_dai q6asm q6adm snd_q6dsp_common q6afe q6core q6voice apr qrtr_smd snd_soc_sdm845 snd_soc_rt5663 snd_soc_qcom_sdw snd_soc_qcom_common snd_soc_tfa989x snd_soc_hdmi_codec qcom_camss snd_soc_rl6231 snd_soc_es9218p snd_soc_core imx351 videobuf2_dma_sg v4l2_cci qcom_pd_mapper vl53l0x_i2c videobuf2_memops snd_compress ledtrig_pattern videobuf2_v4l2 sx9324 nxp_nci_i2c sx_common snd_pcm_dmaengine nxp_nci soundwire_bus industrialio_triggered_buffer videobuf2_common kfifo_buf snd_pcm v4l2_fwnode nci v4l2_async snd_timer dw7800_haptics snd hci_uart videodev btqca btbcm bluetooth ecdh_generic ecc ath10k_snoc nfc ff_memless soundcore thermal_weighted_adc leds_qcom_flash ath10k_core ath led_class_flash mac80211 mc qcom_spmi_adc5 i2c_qcom_cci qcom_vadc_common qcom_spmi_temp_alarm qrtr qcom_q6v5_pas qcom_q6v5_mss
+[  100.621757]  cfg80211 ipa qcom_stats qcom_pil_info qcom_q6v5 slim_qcom_ngd_ctrl rfkill qcom_sysmon libarc4 rpmsg_ctrl slimbus rpmsg_char qcom_common pdr_interface qcom_pdr_msg qcom_glink_smem qmi_helpers socinfo rmtfs_mem nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables uhid fuse
+[  100.622045] CPU: 6 UID: 0 PID: 72 Comm: kworker/u34:2 Tainted: G        W           7.2.0-rc2-joan-bl+ #7 PREEMPT 
+[  100.622083] Tainted: [W]=WARN
+[  100.622104] Hardware name: LG V30 (US998) (DT)
+[  100.622124] Workqueue: pm pm_runtime_work
+[  100.622170] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  100.622199] pc : clk_branch_toggle+0x174/0x1a0
+[  100.622226] lr : clk_branch_toggle+0x174/0x1a0
+[  100.622251] sp : ffff800080723b20
+[  100.622271] x29: ffff800080723b30 x28: 0000000000000000 x27: 0000000000000000
+[  100.622316] x26: ffff00008004b000 x25: ffffa6acfb583518 x24: 0000000000000000
+[  100.622358] x23: 0000000000000000 x22: ffffa6acfa1045a8 x21: 0000000000000000
+[  100.622399] x20: ffffa6acfc3da2d0 x19: 0000000000000000 x18: ffff800080701078
+[  100.622439] x17: ffff8000807236f0 x16: ffff0000f7112f50 x15: 00000000ffffffff
+[  100.622481] x14: 0000000000000000 x13: 6f27207461206b63 x12: 7574732073757461
+[  100.622521] x11: ffffffffff800000 x10: 0000000000000027 x9 : ffffa6acf9817ddc
+[  100.622562] x8 : 3ffffffffffbffff x7 : ffff0000f8ce8000 x6 : 0000000000000001
+[  100.622602] x5 : ffff0000f9bbe1c8 x4 : 0000000000000000 x3 : 0000000000000027
+[  100.622642] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000080b6b240
+[  100.622683] Call trace:
+[  100.622704]  clk_branch_toggle+0x174/0x1a0 (P)
+[  100.622735]  clk_branch2_disable+0x28/0x40
+[  100.622765]  clk_core_disable+0x2b4/0x308
+[  100.622804]  clk_disable+0x44/0x70
+[  100.622839]  clk_bulk_disable+0x44/0x70
+[  100.622868]  cci_suspend_runtime+0x44/0x70 [i2c_qcom_cci]
+[  100.622912]  pm_generic_runtime_suspend+0x34/0x60
+[  100.622947]  genpd_runtime_suspend+0xc4/0x308
+[  100.622978]  __rpm_callback+0x54/0x230
+[  100.623013]  rpm_callback+0x84/0xa0
+[  100.623046]  rpm_suspend+0xe4/0x668
+[  100.623079]  pm_runtime_work+0xdc/0xf0
+[  100.623112]  process_one_work+0x16c/0x4c8
+[  100.623147]  worker_thread+0x19c/0x308
+[  100.623178]  kthread+0x138/0x158
+[  100.623208]  ret_from_fork+0x10/0x20
+[  100.623242] ---[ end trace 0000000000000000 ]---
+[  100.652077] bc: imx351 power off
+[  102.107656] bc: pm get
+[  102.107776] bc: csiphy_set_power 1
+[  102.115870] bc: csid_set_power 1
+[  102.115887] bc: vfe_get pc=0
+[  102.117025] bc: ispif_set_power 1
+[  102.117376] bc: vfe_get pc=1
+[  102.117397] bc: pm get done 0
+[  102.117444] bc: on msm_vfe0_rdi0
+[  102.117484] bc: on msm_ispif0
+[  102.117501] bc: on msm_csid0
+[  102.117512] bc: on msm_csiphy0
+[  102.117529] bc: on imx351 5-0010
+[  102.117549] bc: imx351 enable
+[  102.117563] bc: imx351 power on
+[  102.131150] bc: imx351 writes
+[  102.131198] bc: cci resume
+[  102.189327] bc: imx351 stream on
+[  102.803918] bc: off msm_vfe0_rdi0
+[  102.858764] bc: off msm_ispif0
+[  102.892086] bc: off msm_csid0
+[  102.892152] bc: off msm_csiphy0
+[  102.892208] bc: off imx351 5-0010
+[  102.892249] bc: imx351 standby
+[  102.902322] bc: pm put
+[  102.902416] bc: csiphy_set_power 0
+[  102.902527] bc: csid_set_power 0
+[  102.902624] bc: vfe_put pc=2
+[  102.902659] bc: ispif_set_power 0
+[  102.902772] bc: vfe_put pc=1
+[  102.907299] bc: pm put done
+[  103.936378] bc: cci suspend
+[  103.936920] ------------[ cut here ]------------
+[  103.936951] camss_ahb_clk status stuck at 'on'
+[  103.937063] WARNING: drivers/clk/qcom/clk-branch.c:87 at clk_branch_toggle+0x174/0x1a0, CPU#6: kworker/u34:5/75
+[  103.937150] Modules linked in: netconsole rfcomm cpufreq_conservative algif_hash bnep snd_soc_wcd934x snd_soc_wcd_mbhc snd_soc_wcd_common gpio_wcd934x snd_soc_wcd_classh wcd934x regmap_slimbus q6asm_dai q6routing q6afe_dai q6asm q6adm snd_q6dsp_common q6afe q6core q6voice apr qrtr_smd snd_soc_sdm845 snd_soc_rt5663 snd_soc_qcom_sdw snd_soc_qcom_common snd_soc_tfa989x snd_soc_hdmi_codec qcom_camss snd_soc_rl6231 snd_soc_es9218p snd_soc_core imx351 videobuf2_dma_sg v4l2_cci qcom_pd_mapper vl53l0x_i2c videobuf2_memops snd_compress ledtrig_pattern videobuf2_v4l2 sx9324 nxp_nci_i2c sx_common snd_pcm_dmaengine nxp_nci soundwire_bus industrialio_triggered_buffer videobuf2_common kfifo_buf snd_pcm v4l2_fwnode nci v4l2_async snd_timer dw7800_haptics snd hci_uart videodev btqca btbcm bluetooth ecdh_generic ecc ath10k_snoc nfc ff_memless soundcore thermal_weighted_adc leds_qcom_flash ath10k_core ath led_class_flash mac80211 mc qcom_spmi_adc5 i2c_qcom_cci qcom_vadc_common qcom_spmi_temp_alarm qrtr qcom_q6v5_pas qcom_q6v5_mss
+[  103.938034]  cfg80211 ipa qcom_stats qcom_pil_info qcom_q6v5 slim_qcom_ngd_ctrl rfkill qcom_sysmon libarc4 rpmsg_ctrl slimbus rpmsg_char qcom_common pdr_interface qcom_pdr_msg qcom_glink_smem qmi_helpers socinfo rmtfs_mem nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables uhid fuse
+[  103.938419] CPU: 6 UID: 0 PID: 75 Comm: kworker/u34:5 Tainted: G        W           7.2.0-rc2-joan-bl+ #7 PREEMPT 
+[  103.938471] Tainted: [W]=WARN
+[  103.938499] Hardware name: LG V30 (US998) (DT)
+[  103.938528] Workqueue: pm pm_runtime_work
+[  103.938592] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  103.938632] pc : clk_branch_toggle+0x174/0x1a0
+[  103.938669] lr : clk_branch_toggle+0x174/0x1a0
+[  103.938703] sp : ffff80008078bb20
+[  103.938730] x29: ffff80008078bb30 x28: 0000000000000000 x27: 0000000000000000
+[  103.938791] x26: ffff00008004b000 x25: ffffa6acfb583518 x24: 0000000000000000
+[  103.938848] x23: 0000000000000000 x22: ffffa6acfa1045a8 x21: 0000000000000000
+[  103.938904] x20: ffffa6acfc3da2d0 x19: 0000000000000000 x18: ffff80008070d078
+[  103.938960] x17: ffff80008078b6f0 x16: ffff0000f7114f40 x15: 00000000ffffffff
+[  103.939017] x14: 0000000000000000 x13: 6f27207461206b63 x12: 7574732073757461
+[  103.939074] x11: ffffffffff800000 x10: 0000000000000027 x9 : ffffa6acf9817ddc
+[  103.939131] x8 : 3ffffffffffbffff x7 : ffff0000f8ce8000 x6 : 0000000000000001
+[  103.939187] x5 : ffff0000f9bbe1c8 x4 : 0000000000000000 x3 : 0000000000000027
+[  103.939242] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000080b68000
+[  103.939298] Call trace:
+[  103.939326]  clk_branch_toggle+0x174/0x1a0 (P)
+[  103.939368]  clk_branch2_disable+0x28/0x40
+[  103.939408]  clk_core_disable+0x2b4/0x308
+[  103.939460]  clk_disable+0x44/0x70
+[  103.939507]  clk_bulk_disable+0x44/0x70
+[  103.939548]  cci_suspend_runtime+0x44/0x70 [i2c_qcom_cci]
+[  103.939604]  pm_generic_runtime_suspend+0x34/0x60
+[  103.939650]  genpd_runtime_suspend+0xc4/0x308
+[  103.939690]  __rpm_callback+0x54/0x230
+[  103.939737]  rpm_callback+0x84/0xa0
+[  103.939783]  rpm_suspend+0xe4/0x668
+[  103.939829]  pm_runtime_work+0xdc/0xf0
+[  103.939875]  process_one_work+0x16c/0x4c8
+[  103.939929]  worker_thread+0x19c/0x308
+[  103.939971]  kthread+0x138/0x158
+[  103.940012]  ret_from_fork+0x10/0x20
+[  103.940057] ---[ end trace 0000000000000000 ]---
+[  104.142906] bc: imx351 power off
+[  106.169694] bc: pm get
+[  106.169827] bc: csiphy_set_power 1
+[  106.179926] bc: csid_set_power 1
+[  106.179950] bc: vfe_get pc=0
+[  106.180776] bc: ispif_set_power 1
+[  106.181396] bc: vfe_get pc=1
+[  106.181425] bc: pm get done 0
+[  106.181481] bc: on msm_vfe0_rdi0
+[  106.181526] bc: on msm_ispif0
+[  106.181546] bc: on msm_csid0
+[  106.181562] bc: on msm_csiphy0
+[  106.181582] bc: on imx351 5-0010
+[  106.181596] bc: imx351 enable
+[  106.181614] bc: imx351 power on
+[  106.195052] bc: imx351 writes
+[  106.195107] bc: cci resume
+[  106.242195] bc: imx351 stream on
+[  106.516127] bc: off msm_vfe0_rdi0
+[  106.578549] bc: off msm_ispif0
+[  106.611967] bc: off msm_csid0
+[  106.612055] bc: off msm_csiphy0
+[  106.612135] bc: off imx351 5-0010
+[  106.612200] bc: imx351 standby
+[  106.618248] bc: pm put
+[  106.618337] bc: csiphy_set_power 0
+[  106.618467] bc: csid_set_power 0
+[  106.618580] bc: vfe_put pc=2
+[  106.618631] bc: ispif_set_power 0
+[  106.618795] bc: vfe_put pc=1
+[  106.622466] bc: pm put done

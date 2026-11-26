@@ -1,0 +1,76 @@
+== input
+pm8941_pwrkey
+pm8941_resin
+stmfts
+Volume up
+LG-V30 Headset Jack
+== iio
+pmi8998-rradc in_current0_label in_current0_raw in_current0_scale in_current1_label
+800f000.spmi:pmic@0:adc@3100 in_temp_die_temp_input in_temp_die_temp_label
+== video
+video0 msm_vfe0_video0
+video1 msm_vfe0_video1
+video2 msm_vfe0_video2
+video3 msm_vfe1_video0
+video4 msm_vfe1_video1
+video5 msm_vfe1_video2
+== sound
+ 0 [LGV30          ]: sdm845 - LG-V30
+                      LG-V30
+== power_supply
+pmi8998-charger type=USB status=Charging cap=
+qcom-battery type=Battery status=Charging cap=96
+tcpm-source-psy-800f000.spmi:pmic@2:typec@1300 type=USB status= cap=
+== rfkill
+nfc0 nfc soft=0
+hci0 bluetooth soft=0
+phy0 wlan soft=0
+== net
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+usb0             UP             0e:7d:d5:1a:50:ea <BROADCAST,MULTICAST,UP,LOWER_UP> 
+rmnet_ipa0       UNKNOWN        <UP,LOWER_UP> 
+wlan0            UP             52:4c:cf:65:75:59 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+== leds
+mmc0::
+white:flash
+== remoteproc
+adsp running qcom/msm8998/joan/adsp.mdt
+4080000.remoteproc running qcom/msm8998/joan/mba.mbn
+== nfc
+nfc0
+== backlight
+c994000.dsi.0
+9
+255
+== drm
+card0
+card0-DP-1
+card0-DSI-1
+renderD128
+version
+== i2c
+0-0048 es9218p drv=es9218p
+0-0059 dw7800 drv=
+1-0049 fts3670 drv=stmfts
+2-0028 pn547 drv=nxp-nci_i2c
+3-0028 sx9320 drv=
+3-0034 tfa9872 drv=tfa989x
+5-0010 imx351 drv=
+5-0029 vl53l0x drv=
+i2c-0 QUP I2C adapter drv=
+i2c-1 QUP I2C adapter drv=
+i2c-2 QUP I2C adapter drv=
+i2c-3 QUP I2C adapter drv=
+i2c-4 dpu_dp_aux drv=
+i2c-5 Qualcomm-CCI drv=
+i2c-6 Qualcomm-CCI drv=
+== slpi-adsp-sensors
+== unbound-platform
+1f60000.syscon qcom,msm8998-tcsr syscon
+1fc0000.syscon qcom,msm8998-tcsr syscon
+778000.sram qcom,rpm-msg-ram
+800f000.spmi:pmic@3:labibb qcom,pmi8998-lab-ibb
+battery simple-battery
+opp-table-cprh operating-points-v2-qcom-level
+timer arm,armv8-timer
+wcd934x-soundwire.4.auto qcom,soundwire-v1.3.0

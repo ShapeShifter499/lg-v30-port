@@ -1,0 +1,88 @@
+# dvfs15 verification — gold CPR interpolation fix (Fulgor, ZCode:GLM-5.3, 2026-09-26)
+# thread1 = gold, thread0 = silver; compare against lineage-cpr-corners.txt (1-based) and dvfs14-verify.txt.
+# Gold TURBO_L1 corners now match vendor within one 4 mV step; silver unchanged; 2357 MHz @ 1136 mV under load.
+irq_status = 0x8000000f
+cpr_ctl = 0x1c1f
+thread 1 - hw tid: 0 - enabled: 0:
+30 corners, derived from 4 fuse corners
+corner 0 - uV=[624000 656000 656000] quot=0 freq=300000000
+corner 1 - uV=[624000 656000 656000] quot=0 freq=345600000
+corner 2 - uV=[624000 656000 656000] quot=0 freq=422400000
+corner 3 - uV=[624000 656000 656000] quot=0 freq=499200000
+corner 4 - uV=[624000 656000 656000] quot=0 freq=576000000
+corner 5 - uV=[624000 656000 656000] quot=0 freq=652800000
+corner 6 - uV=[624000 656000 656000] quot=0 freq=729600000
+corner 7 - uV=[624000 656000 656000] quot=0 freq=806400000
+corner 8 - uV=[624000 656000 656000] quot=0 freq=902400000
+corner 9 - uV=[624000 656000 656000] quot=0 freq=979200000
+corner 10 - uV=[624000 656000 656000] quot=0 freq=1056000000
+corner 11 - uV=[624000 656000 656000] quot=0 freq=1132800000
+corner 12 - uV=[632000 660000 660000] quot=433 freq=1190400000
+corner 13 - uV=[652000 684000 684000] quot=379 freq=1267200000
+corner 14 - uV=[672000 704000 704000] quot=325 freq=1344000000
+corner 15 - uV=[696000 728000 728000] quot=267 freq=1420800000
+corner 16 - uV=[720000 752000 752000] quot=212 freq=1497600000
+corner 17 - uV=[740000 772000 772000] quot=157 freq=1574400000
+corner 18 - uV=[764000 796000 796000] quot=100 freq=1651200000
+corner 19 - uV=[800000 816000 816000] quot=46 freq=1728000000
+corner 20 - uV=[852000 856000 856000] quot=613 freq=1804800000
+corner 21 - uV=[868000 908000 908000] quot=534 freq=1881600000
+corner 22 - uV=[908000 948000 948000] quot=456 freq=1958400000
+corner 23 - uV=[956000 996000 996000] quot=372 freq=2035200000
+corner 24 - uV=[1004000 1044000 1044000] quot=289 freq=2112000000
+corner 25 - uV=[1044000 1084000 1084000] quot=219 freq=2208000000
+corner 26 - uV=[1080000 1120000 1120000] quot=159 freq=2265600000
+corner 27 - uV=[1096000 1136000 1136000] quot=101 freq=2323200000
+corner 28 - uV=[1096000 1136000 1136000] quot=81 freq=2342400000
+corner 29 - uV=[1096000 1136000 1136000] quot=62 freq=2361600000
+fuse 0 - uV=[568000 656000 828000] quot=1072 freq=0
+fuse 1 - uV=[624000 656000 900000] quot=1072 freq=0
+fuse 2 - uV=[632000 832000 952000] quot=1562 freq=0
+fuse 3 - uV=[772000 1200000 1136000] quot=2230 freq=0
+cpr_result_0 = 0xfff01
+  [busy = 1, step_dn = 0, step_up = 0, error_steps = 0, error = 4095, negative = 0]
+cpr_result_1 = 0x0
+  [quot_min = 0, quot_max = 0, ro_min = 0, ro_max = 0]
+cpr_result_2 = 0x9a6
+  [qout_step_min = 38, qout_step_max = 38, sensor_min = 0, sensor_max = 0]
+==OSM==
+enable=0x1 perf_state_desired=29
+cc_zero=0x1 spm_cc_dcvs_dis=0x0 llm_intf_dcvs_dis=0x0 seq1=0x12 pdn_fsm=0x500003f
+cycle_ctrl=0x113
+lmh request (0xb04)=0x470009c: 1136 mV, 2995 MHz
+current point (0xb00)=0xc47b2470: 1136 mV, 2361 MHz
+pstate: deviation=0x0 corrected=0x0 met=0x0 wdog_pstate=0x0
+cycle_status 4154137271 -> 4178026577 (delta 23889306 in ~10 ms)
+lut[ 0] idx=0x0 freq=0x0004000f volt=0x000irq_status = 0x8000000f
+cpr_ctl = 0x1c1f
+thread 0 - hw tid: 0 - enabled: 0:
+22 corners, derived from 4 fuse corners
+corner 0 - uV=[608000 640000 640000] quot=0 freq=300000000
+corner 1 - uV=[608000 640000 640000] quot=0 freq=364800000
+corner 2 - uV=[608000 640000 640000] quot=0 freq=441600000
+corner 3 - uV=[608000 640000 640000] quot=0 freq=518400000
+corner 4 - uV=[608000 640000 640000] quot=0 freq=595200000
+corner 5 - uV=[608000 640000 640000] quot=0 freq=672000000
+corner 6 - uV=[608000 640000 640000] quot=0 freq=748800000
+corner 7 - uV=[608000 640000 640000] quot=0 freq=825600000
+corner 8 - uV=[632000 652000 652000] quot=110 freq=883200000
+corner 9 - uV=[636000 668000 668000] quot=54 freq=960000000
+corner 10 - uV=[648000 680000 680000] quot=0 freq=1036800000
+corner 11 - uV=[664000 692000 692000] quot=328 freq=1094400000
+corner 12 - uV=[680000 712000 712000] quot=281 freq=1171200000
+corner 13 - uV=[700000 732000 732000] quot=234 freq=1248000000
+corner 14 - uV=[724000 756000 756000] quot=187 freq=1324800000
+corner 15 - uV=[748000 780000 780000] quot=140 freq=1401600000
+corner 16 - uV=[764000 796000 796000] quot=90 freq=1478400000
+corner 17 - uV=[800000 816000 816000] quot=44 freq=1555200000
+corner 18 - uV=[852000 872000 872000] quot=241 freq=1670400000
+corner 19 - uV=[860000 900000 900000] quot=187 freq=1747200000
+corner 20 - uV=[888000 928000 928000] quot=131 freq=1824000000
+corner 21 - uV=[920000 960000 960000] quot=76 freq=1900800000
+fuse 0 - uV=[568000 640000 828000] quot=601 freq=0
+fuse 1 - uV=[632000 680000 900000] quot=753 freq=0
+fuse 2 - uV=[664000 832000 952000] quot=1123 freq=0
+fuse 3 - uV=[772000 988000 1056000] quot=1493 freq=0
+==LOAD==
+cpu4 ~2358 MHz
+current point (0xb00)=0xc47b2470: 1136 mV, 2361 MHz

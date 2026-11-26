@@ -1,0 +1,77 @@
+== before
+-rw-r--r--    1 root     root      32907264 2026-09-26 01:07:30 -0700 /boot/boot.img
+-rw-r--r--    1 root     root      12645681 2026-09-26 01:07:30 -0700 /boot/initramfs
+-rw-r--r--    1 root     root      20161894 2026-09-26 06:43:23 -0700 /boot/vmlinuz
+device-lge-joan-1-r18
+linux-lge-joan-7.2.0_rc2-r27
+== apk add
+WARNING: updating and opening http://mirror.postmarketos.org/postmarketos/extra-repos/systemd/main/aarch64/APKINDEX.tar.gz: DNS: transient error (try again later)
+WARNING: updating and opening http://mirror.postmarketos.org/postmarketos/main/aarch64/APKINDEX.tar.gz: DNS: transient error (try again later)
+WARNING: updating and opening http://dl-cdn.alpinelinux.org/alpine/edge/main/aarch64/APKINDEX.tar.gz: DNS: transient error (try again later)
+WARNING: updating and opening http://dl-cdn.alpinelinux.org/alpine/edge/community/aarch64/APKINDEX.tar.gz: DNS: transient error (try again later)
+WARNING: updating and opening http://dl-cdn.alpinelinux.org/alpine/edge/testing/aarch64/APKINDEX.tar.gz: DNS: transient error (try again later)
+Downloading 1 packages...
+Proceeding with upgrade...
+* 05:21:45.662170 Generating for kernel version: 7.2.0-rc2
+* 05:21:45.667348 Output directory: /boot
+* 05:21:45.667366 Unknown or no compression format set, using gzip
+* 05:21:45.667377 == Generating initramfs ==
+* 05:21:45.667388 - Using compression format gzip with level "default"
+* 05:21:45.667464 - Searching for directories specified in /usr/share/mkinitfs/dirs
+* 05:21:45.671557 -- Creating directories from: /usr/share/mkinitfs/dirs/00-initramfs-base.dirs
+* 05:21:45.675467 - Searching for directories specified in /etc/mkinitfs/dirs
+* 05:21:45.677572 - Searching for file lists from /usr/share/mkinitfs/files
+* 05:21:45.678790 -- Including files from: /usr/share/mkinitfs/files/00-initramfs-base.files
+* 05:21:45.684319 --- Unable to find optional path, skipping...
+* 05:21:45.684393 --- Unable to find optional path, skipping...
+* 05:21:45.698068 -- Including files from: /usr/share/mkinitfs/files/10-wireless-regdb.files
+* 05:21:45.698914 -- Including files from: /usr/share/mkinitfs/files/30-lge-joan-gpu.files
+* 05:21:45.704715 -- Including files from: /usr/share/mkinitfs/files/postmarketos-base.files
+* 05:21:45.705438 - Searching for file lists from /etc/mkinitfs/files
+* 05:21:45.706103 - Searching for hook scripts from /usr/share/mkinitfs/hooks
+* 05:21:45.706720 - Searching for hook scripts from /etc/mkinitfs/hooks
+* 05:21:45.707148 - Searching for hook scripts from /usr/share/mkinitfs/hooks-cleanup
+* 05:21:45.707174 -- Unable to find dir, skipping...
+* 05:21:45.707184 - Searching for hook scripts from /etc/mkinitfs/hooks-cleanup
+* 05:21:45.707209 -- Unable to find dir, skipping...
+* 05:21:45.707520 - Searching for kernel modules from /usr/share/mkinitfs/modules
+* 05:21:45.708778 -- Including modules from: /usr/share/mkinitfs/modules/00-default.modules
+* 05:21:45.829444 - Searching for kernel modules from /etc/mkinitfs/modules
+* 05:21:45.840215 - Searching for file lists from /usr/share/mkinitfs/files-extra
+* 05:21:45.841544 -- Including files from: /usr/share/mkinitfs/files-extra/00-initramfs-extra-base.files
+* 05:21:45.934972 -- Including files from: /usr/share/mkinitfs/files-extra/01-initramfs-base-systemd.files
+* 05:21:45.937059 -- Including files from: /usr/share/mkinitfs/files-extra/30-postmarketos-bootsplash.files
+* 05:21:46.008495 - Searching for file lists from /etc/mkinitfs/files-extra
+* 05:21:46.010445 - Searching for hook scripts from /usr/share/mkinitfs/hooks-extra
+* 05:21:46.010958 - Searching for hook scripts from /etc/mkinitfs/hooks-extra
+* 05:21:46.011754 - Searching for kernel modules from /usr/share/mkinitfs/modules-extra
+* 05:21:46.012408 -- Including modules from: /usr/share/mkinitfs/modules-extra/00-default-extra.modules
+* 05:21:46.013860 - Searching for kernel modules from /etc/mkinitfs/modules-extra
+* 05:21:49.918793 initramfs completed in: 4.25s
+* 05:21:49.919052 == Using boot-deploy to finalize/install files ==
+* ==> Running hooks
+* ==> kernel: device-tree blob operations
+* ==> kernel: appending device-tree qcom/msm8998-lge-joan
+* ==> initramfs: creating boot.img
+* systemd-boot: systemd-boot EFI app or powervm-boot not found, skipping
+* ==> Checking free space at /boot
+* ... OK!
+* ==> Installing: /boot/initramfs
+* ==> Installing: /boot/msm8998-lge-joan.dtb
+* ==> Installing: /boot/boot.img
+* 05:21:58.403931 boot-deploy completed in: 8.48s
+* 05:21:58.420750 mkinitfs completed in: 12.76s
+== after
+-rw-r--r--    1 root     root      32108544 2026-09-26 05:21:52 -0700 /boot/boot.img
+-rw-r--r--    1 root     root      14124381 2026-09-26 05:21:51 -0700 /boot/initramfs
+-rw-r--r--    1 root     root      17881130 2026-09-26 12:21:33 -0700 /boot/vmlinuz
+device-lge-joan-1-r18
+linux-lge-joan-7.2.0_rc2-r28
+7.2.0-rc2
+890dcfa293d51e17db0eb61b2db525de2b55b15e95d16fd130180a7bbc813d37  /home/kumo02/joan-images/boot-joan-r28.img
+Finished. Total time: 5.828s
+== booted
+7.2.0-rc2
+panic=5 pmos.force-partition-resize ipa.lowmem=1  pmos_boot_uuid=ca984cf4-a54d-429a-91b0-1fae66c9f085 pmos_root_uuid=ff480c16-a01c-4563-859b-9281241c4b36 pmos_rootfsopts=defaults androidboot.vendor.lge.model.name=LG-US998 lge.bootreason kswitch bootcable.type androidboot.vendor.lge.hydra=Plus androidboot.vendor.lge.petname=V30+ androidboot.dlcomplete=0 root=/dev/dm-0 dm="system none ro,0 1 android-verity /dev/sda22" androidboot.verifiedbootstate=orange androidboot.keymaster=1  androidboot.veritymode=enforcing androidboot.bootdevice=1da4000.ufshc androidboot.serialno=LGUS9986e606d55 androidboot.baseband=msm mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_sw43402_dsc_qhd_cmd_dv3_1:1:none:cfg:single_dsi
+running
+exit=0
